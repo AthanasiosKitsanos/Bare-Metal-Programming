@@ -1,0 +1,5 @@
+bin
+obj
+Makefile
+linker.ld
+.vscode
