@@ -1,6 +1,4 @@
 bin
 obj
-Makefiles
-Makefile
 linker.ld
 .vscode

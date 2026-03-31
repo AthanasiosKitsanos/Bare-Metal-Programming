@@ -12,28 +12,57 @@ _start:
     cld
     sti
 
-    movw $message, %si
+    movb %dl, boot_drive
 
-print_loop:
-    lodsb
-    cmpb $0, %al
-    je halt
+    movw $message_stage_1, %si
+    call print_string
 
-    movb $0x0E, %ah
-    movb $0x00, %bh
-    movb $0x07, %bl
-    int $0x10
-    jmp print_loop
+    xorw %ax, %ax
+    movw %ax, %es
+    movw $0x7E00, %bx
 
-halt:
+    movb $0x02, %ah
+    movb $0x04, %al
+    movb $0x00, %ch
+    movb $0x02, %cl
+    movb $0x00, %dh
+    movb boot_drive, %dl
+    int $0x13
+    jc disk_error
+
+    ljmp $0x0000, $0x7E00
+
+disk_error:
+    movw $disk_error_message, %si
+    call print_string
     cli
 
 hang:
     hlt
     jmp hang
 
-message:
-    .asciz "Stage 1 bootloader works!"
+print_string:
+    lodsb
+    cmpb $0, %al
+    je print_done
+
+    movb $0x0E, %ah
+    movb $0x00, %bh
+    movb $0x07, %bl
+    int $0x10
+    jmp print_string
+
+print_done:
+    ret
+
+boot_drive:
+    .byte 0
+
+message_stage_1:
+    .asciz "Stage 1 is loading 4 sectors...\r\n"
+
+disk_error_message:
+    .asciz "Disk read error.\r\n"
 
 .org 510
 .word 0xAA55
