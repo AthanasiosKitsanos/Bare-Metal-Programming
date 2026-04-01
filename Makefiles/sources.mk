@@ -1,10 +1,5 @@
-BOOT_STAGE_1 = boot/boot_stage_1.s
-BOOT_STAGE_1_OBJ = obj/boot_stage_1.o
-BOOT_STAGE_1_BIN = bin/boot_stage_1.bin
-
-BOOT_STAGE_2 = boot/boot_stage_2.s
-BOOT_STAGE_2_OBJ = obj/boot_stage_2.o
-BOOT_STAGE_2_TEMP_BIN = bin/boot_stage_2_temp.bin
-BOOT_STAGE_2_BIN = bin/boot_stage_2.bin
-
-OS_IMAGE = bin/os_image.bin
+include Makefiles/boot_1/boot_1_sources.mk
+include Makefiles/boot_2/boot_2_sources.mk
+include Makefiles/pm_entry/pm_entry_sources.mk
+include Makefiles/kernel/kernel_source.mk
+include Makefiles/os_image/os_image_sources.mk

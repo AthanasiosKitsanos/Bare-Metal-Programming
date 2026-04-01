@@ -1,0 +1,1 @@
+PM_ENTRY = boot/pm_entry.S
