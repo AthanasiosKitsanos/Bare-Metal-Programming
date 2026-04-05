@@ -11,13 +11,20 @@ class terminal
     // Private Methods
     void new_line() noexcept
     {
-
+        buffer.move_to_next_line();
+        if(buffer.at_buffer_end()) buffer.scroll();
     }
-    size_t strlen(const char* text) const noexcept;
+
+    size_t string_length(const char* text) const noexcept
+    {
+        size_t length{0};
+        for(; *text != '0'; ++text) ++length;
+        return length;
+    }
 
     public:
         // Constructor
-        terminal() noexcept;
+        terminal() noexcept = default;
 
         // Public methods
         void initialize() noexcept;

@@ -6,6 +6,10 @@
 class vga_text_buffer
 {
     // Private Members
+    static constexpr size_t vga_width{80};
+    static constexpr size_t vga_height{25};
+    static constexpr uintptr_t vga_address{0xB8000};
+    
     volatile uint16_t* const begin;
     volatile uint16_t* const end;
     volatile uint16_t* current;
@@ -26,9 +30,6 @@ class vga_text_buffer
 
     public:
         // Public Members
-        static constexpr size_t vga_width{80};
-        static constexpr size_t vga_height{25};
-        static constexpr uintptr_t vga_address{0xB8000};
 
         // Constructor
         vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), color(make_color(white, black)) {}
@@ -36,12 +37,9 @@ class vga_text_buffer
         // Public Methods
         void clear() noexcept
         {
-            if(current < end)
-            {
-                current = begin;
-                for(; current < end; ++current) *current = make_entry(' ', color);
-                current = begin;
-            }
+            current = begin;
+            for(; current < end; ++current) *current = make_entry(' ', color);
+            current = begin;
         }
 
         void put(char c) noexcept
@@ -51,9 +49,37 @@ class vga_text_buffer
             ++current;
         }
 
-        void move_to_line_start() noexcept;
-        void move_to_next_line() noexcept;
+        void move_to_line_start() noexcept
+        {
+            if(current == end) --current;
+            const size_t row{static_cast<size_t>(current - begin) / vga_width};
+            current = begin + row * vga_width;
+        }
 
-        bool at_line_end() const noexcept;
-        bool at_buffer_end() const noexcept;
+        void move_to_next_line() noexcept
+        {
+            const size_t row{(static_cast<size_t>(current - begin) / vga_width) + 1};
+            current = begin + row * vga_width;
+        }
+
+        bool at_line_end() const noexcept
+        {
+            if(current == begin || current == end) return false;
+            return (current - begin) % vga_width == 0;
+        }
+
+        void scroll() noexcept
+        {
+            current = begin;
+            volatile uint16_t* source{current + vga_width};
+            for(; source < end; ++source)
+            {
+                *current = *source;
+                ++current;
+            }
+            for(; current < end; ++current) *current = make_entry(' ', color);
+            current -= vga_width;
+        }
+
+        inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
 };
