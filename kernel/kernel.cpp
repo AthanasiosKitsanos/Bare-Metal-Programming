@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "../include/terminal.h"
+#include "terminal.h"
 
 extern "C" [[noreturn]] void kernel_main()
 {

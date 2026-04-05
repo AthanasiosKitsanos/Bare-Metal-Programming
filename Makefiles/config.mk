@@ -6,5 +6,5 @@ OBJC = i686-elf-objcopy
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -c
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
 LINKING_FLAGS = -ffreestanding -O3 -nostdlib
