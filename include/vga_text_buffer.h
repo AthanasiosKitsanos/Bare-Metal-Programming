@@ -29,8 +29,6 @@ class vga_text_buffer
     }
 
     public:
-        // Public Members
-
         // Constructor
         vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), color(make_color(white, black)) {}
 
@@ -60,12 +58,6 @@ class vga_text_buffer
         {
             const size_t row{(static_cast<size_t>(current - begin) / vga_width) + 1};
             current = begin + row * vga_width;
-        }
-
-        bool at_line_end() const noexcept
-        {
-            if(current == begin || current == end) return false;
-            return (current - begin) % vga_width == 0;
         }
 
         void scroll() noexcept
