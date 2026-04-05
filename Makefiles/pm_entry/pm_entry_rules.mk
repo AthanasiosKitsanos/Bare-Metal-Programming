@@ -1,0 +1,3 @@
+$(PM_ENTRY_OBJ): $(PM_ENTRY)
+	$(AS) $(PM_ENTRY) -o $(PM_ENTRY_OBJ)
+
