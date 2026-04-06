@@ -1,1 +1,0 @@
-OS_IMAGE = bin/os_image.bin

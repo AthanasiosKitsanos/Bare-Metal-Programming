@@ -18,7 +18,7 @@ class vga_text_buffer
     uint8_t color;
 
     // Private Methods
-    inline static uint8_t __attribute__((always_inline)) make_color(uint8_t foreground, uint8_t background) noexcept
+    inline static uint8_t __attribute__((always_inline)) make_color(uint8_t foreground, uint8_t background) noexcept 
     {
         return static_cast<uint8_t>(foreground | background << 4);
     }
@@ -30,48 +30,13 @@ class vga_text_buffer
 
     public:
         // Constructor
-        vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), color(make_color(white, black)) {}
+        vga_text_buffer() noexcept;
 
         // Public Methods
-        void clear() noexcept
-        {
-            current = begin;
-            for(; current < end; ++current) *current = make_entry(' ', color);
-            current = begin;
-        }
-
-        void put(char c) noexcept
-        {
-            if(current == end) return;
-            *current = make_entry(c, color);
-            ++current;
-        }
-
-        void move_to_line_start() noexcept
-        {
-            if(current == end) --current;
-            const size_t row{static_cast<size_t>(current - begin) / vga_width};
-            current = begin + row * vga_width;
-        }
-
-        void move_to_next_line() noexcept
-        {
-            const size_t row{(static_cast<size_t>(current - begin) / vga_width) + 1};
-            current = begin + row * vga_width;
-        }
-
-        void scroll() noexcept
-        {
-            current = begin;
-            volatile uint16_t* source{current + vga_width};
-            for(; source < end; ++source)
-            {
-                *current = *source;
-                ++current;
-            }
-            for(; current < end; ++current) *current = make_entry(' ', color);
-            current -= vga_width;
-        }
-
+        void clear() noexcept;
+        void put(char c) noexcept;
+        void move_to_line_start() noexcept;
+        void move_to_next_line() noexcept;
+        void scroll() noexcept;
         inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
 };
