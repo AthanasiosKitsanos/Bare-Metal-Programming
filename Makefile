@@ -5,6 +5,8 @@ AS = i686-elf-as
 LD = i686-elf-ld
 OBJC = i686-elf-objcopy
 
+MAKE_LIB = i686-elf-ar rcs
+
 QEMU = qemu-system-x86_64
 
 COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
@@ -35,17 +37,28 @@ KERNEL_BIN = bin/kernel.bin
 
 TERMINAL_H = include/terminal.h
 VGA_H = include/vga_text_buffer.h
+CURSOR_H = include/vga_hardware_cursor.h
+IO_H = include/io_registers.h
 
 TERMINAL_CPP = src/terminal.cpp
 TERMINAL_OBJ = obj/terminal.o
+
 VGA_CPP = src/vga_text_buffer.cpp
 VGA_OBJ = obj/vga_text_buffer.o
+
+CURSOR_CPP = src/vga_hardware_cursor.cpp
+CURSOR_OBJ = obj/vga_hardware_cursor.o
 
 INCLUDE = include
 
 # ------------------------Pm Entry---------------------------
 PM_ENTRY = boot/pm_entry.S
 PM_ENTRY_OBJ = obj/pm_entry.o
+
+# ------------------------Library----------------------------
+LIBRARY = lib/libkernel.a
+LINK_LIBS = -Llib -lkernel
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -65,14 +78,24 @@ $(BOOT_STAGE_1_BIN): $(BOOT_STAGE_1_ELF)
 	$(OBJC) -O binary $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_BIN)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H)
 	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
+# VGA cursor
+$(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
+	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
+
+# VGA Buffer
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(VGA_CPP) -o $(VGA_OBJ)
 
+# Terminal
 $(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP)
 	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+
+# Library
+$(LIBRARY): $(LIB_FILES)
+	$(MAKE_LIB) $(LIBRARY) $(LIB_FILES)
 
 # PM Entry
 $(PM_ENTRY_OBJ): $(PM_ENTRY)
@@ -82,9 +105,14 @@ $(PM_ENTRY_OBJ): $(PM_ENTRY)
 $(BOOT_STAGE_2_OBJ): $(BOOT_STAGE_2)
 	$(AS) $(BOOT_STAGE_2) -o $(BOOT_STAGE_2_OBJ)
 
-$(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ)
+#$(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ)
+#	$(LD) -T $(BOOT_2_LINKER) -o $(BOOT_STAGE_2_ELF) \
+#		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ)
+
+$(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LIBRARY)
 	$(LD) -T $(BOOT_2_LINKER) -o $(BOOT_STAGE_2_ELF) \
-		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ)
+		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
+
 
 $(BOOT_STAGE_2_BIN): $(BOOT_STAGE_2_ELF)
 	$(OBJC) -O binary $(BOOT_STAGE_2_ELF) $(BOOT_STAGE_2_BIN)
