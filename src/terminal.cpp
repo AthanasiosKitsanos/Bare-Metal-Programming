@@ -15,11 +15,17 @@ size_t terminal::string_length(const char* text) const noexcept
 
 void terminal::put_char(char c) noexcept
 {
-    if(c == '\n') new_line();
-    else
+    switch(c)
     {
-        buffer.put(c);
-        if(buffer.at_buffer_end()) buffer.scroll();
+        case '\r':
+            line_start();
+            break;
+        case '\n':
+            new_line();
+            break;
+        default:
+            buffer.put(c);
+            if(buffer.at_buffer_end()) buffer.scroll();
     }
 }
 
@@ -32,4 +38,14 @@ void terminal::write(const char* data, size_t size) noexcept
 void terminal::write_string(const char* text) noexcept
 {
     write(text, string_length(text));
+}
+
+terminal& terminal::operator<<(const char* text) noexcept
+{
+    for(char c{*text}; c != '\0'; c = *text)
+    {
+        put_char(c);
+        ++text;
+    }
+    return *this;
 }

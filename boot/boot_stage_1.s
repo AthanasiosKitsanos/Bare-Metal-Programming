@@ -14,9 +14,6 @@ _start:
 
     movb %dl, boot_drive
 
-    movw $message_stage_1, %si
-    call print_string
-
     xorw %ax, %ax
     movw %ax, %es
     movw $0x7E00, %bx
