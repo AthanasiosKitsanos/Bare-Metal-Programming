@@ -113,11 +113,11 @@ $(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LIBRARY)
 $(BOOT_STAGE_2_BIN): $(BOOT_STAGE_2_ELF)
 	$(OBJC) -O binary $(BOOT_STAGE_2_ELF) $(BOOT_STAGE_2_BIN)
 	size=$$(wc -c < $(BOOT_STAGE_2_BIN)); \
-	if [ $$size -gt 3072 ]; then \
-		echo "Stage 2 is too large: $$size bytes (max 2048)."; \
+	if [ $$size -gt 4096 ]; then \
+		echo "Stage 2 is too large: $$size bytes (max 4096 bytes)."; \
 		exit 1; \
 	fi
-	truncate -s 3072 $(BOOT_STAGE_2_BIN)
+	truncate -s 4096 $(BOOT_STAGE_2_BIN)
 
 # Os Image
 $(OS_IMAGE): $(BOOT_STAGE_1_BIN) $(BOOT_STAGE_2_BIN)

@@ -1,12 +1,5 @@
 #include "terminal.h"
 
-constexpr int32_t int_min{-2147483648};
-constexpr int32_t int_max{2147483647};
-constexpr uint32_t uint_max{4294967295};
-constexpr const char* int_min_char{"-2147483648"};
-constexpr const char* int_max_char{"2147483647"};
-constexpr const char* uint_max_char{"4294967294"};
-
 // Private Methods
 void terminal::new_line() noexcept
 {

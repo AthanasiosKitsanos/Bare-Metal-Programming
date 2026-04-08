@@ -3,6 +3,7 @@
 #include "vga_text_buffer.h"
 #include "vga_hardware_cursor.h"
 #include <stddef.h>
+#include <stdint.h>
 
 class terminal
 {
@@ -15,7 +16,7 @@ class terminal
     size_t string_length(const char* text) const noexcept;
 
     void put_char_no_sync(char c) noexcept;
-    
+
     inline void __attribute__((always_inline)) write_unsigned_no_sync(uint32_t value) noexcept
     {
         constexpr uint16_t count{10};
@@ -23,42 +24,24 @@ class terminal
         char* end{digits + count};
         char* current{end};
         do
-            {
-                --current;
-                *current = static_cast<char>('0' + (value % 10));
-                value /= 10;
-            }while(value != 0);
+        {
+            --current;
+            *current = static_cast<char>('0' + (value % 10));
+            value /= 10;
+        }while(value != 0);
         for(; current < end; ++current) put_char_no_sync(*current);
     }
     
     inline void __attribute__((always_inline)) write_signed_no_sync(int32_t value) noexcept
     {
-        constexpr uint16_t count{10};
-        char digits[count];
-        char* end{digits + count};
-        char* current{end};
         if(value < 0)
         {
             put_char_no_sync('-');
             uint32_t magnitude{static_cast<uint32_t>(0) - static_cast<uint32_t>(value)};
-            do
-            {
-                --current;
-                *current = static_cast<char>('0' + (magnitude % 10));
-                magnitude /= 10;
-            }while(magnitude != 0);
-            for(; current < end; ++current) put_char_no_sync(*current);
+            write_unsigned_no_sync(magnitude);
+            return;
         }
-        else
-        {
-            do
-            {
-                --current;
-                *current = static_cast<char>('0' + (value % 10));
-                value /= 10;
-            }while(value != 0);
-            for(; current < end; ++current) put_char_no_sync(*current);
-        }
+        write_unsigned_no_sync(static_cast<uint32_t>(value));
     }
 
     inline __attribute__((always_inline)) void line_start() noexcept { buffer.move_to_line_start(); }
@@ -77,4 +60,16 @@ class terminal
         terminal& operator<<(const char* text) noexcept;
         terminal& operator<<(const uint32_t value) noexcept;
         terminal& operator<<(const int32_t value) noexcept;
+
+        template<size_t N>
+        terminal& operator<<(const char (&text)[N]) noexcept
+        {
+            size_t length{0};
+            for(const char* curr{text}; length < N && *curr != '\0'; ++length)
+            {
+                ++curr;
+            }
+            write(text, length);
+            return *this;
+        }
 };
