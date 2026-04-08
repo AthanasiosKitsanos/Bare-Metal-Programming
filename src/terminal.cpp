@@ -78,24 +78,14 @@ terminal& terminal::operator<<(const char* text) noexcept
 
 terminal& terminal::operator<<(uint32_t value) noexcept
 {
-    constexpr uint16_t count{10};
-    char digits[count];
-    char* end{digits + count};
-    char* current{end};
-    do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-    for(; current < end; ++current) put_char_no_sync(*current);
+    write_unsigned_no_sync(value);
     sync_cursor();
     return *this;
 }
 
 terminal& terminal::operator<<(int32_t value) noexcept
 {
-    
+    write_signed_no_sync(value);
     sync_cursor();
     return *this;
 }
