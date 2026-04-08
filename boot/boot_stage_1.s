@@ -55,9 +55,6 @@ print_done:
 boot_drive:
     .byte 0
 
-message_stage_1:
-    .asciz "Stage 1 is loading 4 sectors...\r\n"
-
 disk_error_message:
     .asciz "Disk read error.\r\n"
 
