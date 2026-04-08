@@ -19,7 +19,7 @@ _start:
     movw $0x7E00, %bx
 
     movb $0x02, %ah
-    movb $0x04, %al
+    movb $0x06, %al
     movb $0x00, %ch
     movb $0x02, %cl
     movb $0x00, %dh

@@ -39,4 +39,5 @@ class vga_text_buffer
         void move_to_next_line() noexcept;
         void scroll() noexcept;
         inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
+        inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
 };
