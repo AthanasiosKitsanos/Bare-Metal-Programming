@@ -37,16 +37,6 @@ void terminal::put_char_no_sync(char c) noexcept
     }
 }
 
-// void terminal::write_unsigned_no_sync(uint32_t value) noexcept
-// {
-
-// }
-
-// void terminal::write_signed_no_sync(int32_t value) noexcept
-// {
-
-// }
-
 // Public Methods
 void terminal::initialize() noexcept
 {
@@ -98,39 +88,14 @@ terminal& terminal::operator<<(uint32_t value) noexcept
             *current = static_cast<char>('0' + (value % 10));
             value /= 10;
         }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
+    for(; current < end; ++current) put_char_no_sync(*current);
     sync_cursor();
     return *this;
 }
 
 terminal& terminal::operator<<(int32_t value) noexcept
 {
-    constexpr uint16_t count{10};
-    char digits[count];
-    char* end{digits + count};
-    char* current{end};
-    if(value < 0)
-    {
-        put_char_no_sync('-');
-        uint32_t magnitude{static_cast<uint32_t>(0) - static_cast<uint32_t>(value)};
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (magnitude % 10));
-            magnitude /= 10;
-        }while(magnitude != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
-    }
-    else
-    {
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
-    }
+    
     sync_cursor();
     return *this;
 }
