@@ -82,3 +82,10 @@ terminal& terminal::operator<<(int32_t value) noexcept
     sync_cursor();
     return *this;
 }
+
+terminal& terminal::operator<<(const bool value) noexcept
+{
+    put_char_no_sync(static_cast<char>('0' + value));
+    sync_cursor();
+    return *this;
+}

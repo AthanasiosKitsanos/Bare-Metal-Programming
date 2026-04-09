@@ -12,6 +12,8 @@ QEMU = qemu-system-x86_64
 COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
 LINKING_FLAGS = -ffreestanding -O3 -nostdlib
 
+SECTOR_SIZE = 512
+
 # File Sources
 
 # ---------------------Boot stage 1---------------------------
@@ -27,6 +29,7 @@ BOOT_STAGE_2_OBJ = obj/boot_stage_2.o
 BOOT_STAGE_2_ELF = elf/boot_stage_2.elf
 BOOT_STAGE_2_BIN = bin/boot_stage_2.bin
 BOOT_2_LINKER = links/boot_2_linker.ld
+BOOT_STAGE_2_INC = inc/boot_stage_2_load.inc
 
 # -----------------------Kenrel-------------------------------
 KERNEL_CPP = kernel/kernel.cpp
@@ -67,16 +70,6 @@ OS_IMAGE = bin/os_image.bin
 
 all: $(OS_IMAGE)
 
-# Boot 1
-$(BOOT_STAGE_1_OBJ): $(BOOT_STAGE_1)
-	$(AS) $(BOOT_STAGE_1) -o $(BOOT_STAGE_1_OBJ)
-
-$(BOOT_STAGE_1_ELF): $(BOOT_STAGE_1_OBJ)
-	$(LD) -T $(BOOT_1_LIKNER) -o $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_OBJ)
-
-$(BOOT_STAGE_1_BIN): $(BOOT_STAGE_1_ELF)
-	$(OBJC) -O binary $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_BIN)
-
 # Kernel
 $(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H)
 	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
@@ -109,18 +102,39 @@ $(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LIBRARY)
 	$(LD) -T $(BOOT_2_LINKER) -o $(BOOT_STAGE_2_ELF) \
 		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
 
-
 $(BOOT_STAGE_2_BIN): $(BOOT_STAGE_2_ELF)
 	$(OBJC) -O binary $(BOOT_STAGE_2_ELF) $(BOOT_STAGE_2_BIN)
-	size=$$(wc -c < $(BOOT_STAGE_2_BIN)); \
-	if [ $$size -gt 4096 ]; then \
-		echo "Stage 2 is too large: $$size bytes (max 4096 bytes)."; \
+	size=$$(wc -c < $(BOOT_STAGE_2_BIN) ); \
+	sectors=$$(( ($$size + $(SECTOR_SIZE) - 1) / $(SECTOR_SIZE) )); \
+	padded_size=$$(( $$sectors * $(SECTOR_SIZE) )); \
+	if [ $$sectors -gt 127 ]; then \
+		echo "Stage 2 is too large: $$sectors sectors (BIOS read limit exceeded)."; \
 		exit 1; \
-	fi
-	truncate -s 4096 $(BOOT_STAGE_2_BIN)
+	fi; \
+	truncate -s $$padded_size $(BOOT_STAGE_2_BIN)
 
+# Loading Configuration
+$(BOOT_STAGE_2_INC): $(BOOT_STAGE_2_BIN)
+	size=$$(wc -c < $(BOOT_STAGE_2_BIN)); \
+	sectors=$$(( $$size / $(SECTOR_SIZE) )); \
+	if [ -z "$$sectors" ]; then \
+		echo "Failed to compute stage 2 sector count."; \
+		exit 1; \
+	fi; \
+	printf '.set BOOT_STAGE_2_SECTORS, %s\n' "$$sectors" > $(BOOT_STAGE_2_INC)
+
+# Boot 1
+$(BOOT_STAGE_1_OBJ): $(BOOT_STAGE_1) $(BOOT_STAGE_2_INC)
+	$(AS) -I inc $(BOOT_STAGE_1) -o $(BOOT_STAGE_1_OBJ)
+
+$(BOOT_STAGE_1_ELF): $(BOOT_STAGE_1_OBJ) 
+	$(LD) -T $(BOOT_1_LIKNER) -o $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_OBJ)
+
+$(BOOT_STAGE_1_BIN): $(BOOT_STAGE_1_ELF)
+	$(OBJC) -O binary $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_BIN)
+	
 # Os Image
-$(OS_IMAGE): $(BOOT_STAGE_1_BIN) $(BOOT_STAGE_2_BIN)
+$(OS_IMAGE): $(BOOT_STAGE_1_BIN) $(BOOT_STAGE_2_PADDED_BIN)
 	cat $(BOOT_STAGE_1_BIN) $(BOOT_STAGE_2_BIN) > $(OS_IMAGE)
 
 # Rest

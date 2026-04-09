@@ -56,10 +56,11 @@ class terminal
         void write(const char* data, size_t size) noexcept;
         void write_string(const char* text) noexcept;
 
-        terminal& operator<<(const char c) noexcept;
-        terminal& operator<<(const char* text) noexcept;
-        terminal& operator<<(const uint32_t value) noexcept;
-        terminal& operator<<(const int32_t value) noexcept;
+        terminal& operator<<(const char) noexcept;
+        terminal& operator<<(const char*) noexcept;
+        terminal& operator<<(const uint32_t) noexcept;
+        terminal& operator<<(const int32_t) noexcept;
+        terminal& operator<<(const bool) noexcept;
 
         template<size_t N>
         terminal& operator<<(const char (&text)[N]) noexcept

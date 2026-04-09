@@ -15,7 +15,8 @@ extern "C" [[noreturn]] void kernel_main()
     << "Positive signed test: " << static_cast<int32_t>(5) << '\n';
 
     char array[] = {'H', 'e', 'l', 'l', 'o'};
-    screen << array << '\n';
+    screen << array << '\n'
+    << true << '\n';
 
     while(true) asm volatile("hlt");
 }
