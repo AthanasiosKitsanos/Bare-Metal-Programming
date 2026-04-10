@@ -30,6 +30,69 @@ void terminal::put_char_no_sync(char c) noexcept
     }
 }
 
+void terminal::write_hex_no_sync(uint32_t value) noexcept
+{
+    put_hex_prefix();
+    if(value == 0)
+    {
+        put_char_no_sync('0');
+        return;
+    }
+    bool started{false};
+    uint8_t nibble{0};
+    for(int shift{28}; shift >= 0; shift -= 4)
+    {
+        nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
+        if(!started)
+        {
+            if(nibble == 0) continue;
+            started = true;
+        }
+        put_char_no_sync(hex_digit(nibble));
+    }
+}
+
+void terminal::write_pointer_no_sync(uintptr_t value) noexcept
+{
+    put_hex_prefix();
+    constexpr size_t total_nibbles{sizeof(uintptr_t) * 2};
+    size_t shift{0};
+    uint8_t nibble{0};
+    for(size_t i{0}; i < total_nibbles; ++i)
+    {
+        shift = (total_nibbles - 1 - i) * 4;
+        nibble = static_cast<uint8_t>((value >> shift) & static_cast<uintptr_t>(0x0F));
+        put_char_no_sync(hex_digit(nibble));
+    }
+}
+
+void terminal::write_signed_no_sync(int32_t value) noexcept
+{
+    if(value < 0)
+    {
+        put_char_no_sync('-');
+        uint32_t magnitude{static_cast<uint32_t>(0) - static_cast<uint32_t>(value)};
+        write_unsigned_no_sync(magnitude);
+        return;
+    }
+    write_unsigned_no_sync(static_cast<uint32_t>(value));
+}
+
+void terminal::write_unsigned_no_sync(uint32_t value) noexcept
+{
+    constexpr uint16_t count{10};
+    char digits[count];
+    char* end{digits + count};
+    char* current{end};
+    do
+    {
+        --current;
+        *current = static_cast<char>('0' + (value % 10));
+        value /= 10;
+    }while(value != 0);
+    for(; current < end; ++current) put_char_no_sync(*current);
+}
+
 // Public Methods
 void terminal::initialize() noexcept
 {
@@ -86,6 +149,20 @@ terminal& terminal::operator<<(int32_t value) noexcept
 terminal& terminal::operator<<(const bool value) noexcept
 {
     put_char_no_sync(static_cast<char>('0' + value));
+    sync_cursor();
+    return *this;
+}
+
+terminal& terminal::operator<<(hex32 value) noexcept
+{
+    write_hex_no_sync(value.value);
+    sync_cursor();
+    return *this;
+}
+
+terminal& terminal::operator<<(const void* ptr) noexcept
+{
+    write_pointer_no_sync(reinterpret_cast<uintptr_t>(ptr));
     sync_cursor();
     return *this;
 }

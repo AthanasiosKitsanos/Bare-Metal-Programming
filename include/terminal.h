@@ -4,6 +4,7 @@
 #include "vga_hardware_cursor.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "hex32.h"
 
 class terminal
 {
@@ -14,37 +15,26 @@ class terminal
     // Private Methods
     void new_line() noexcept;
     size_t string_length(const char* text) const noexcept;
-
+    void write_unsigned_no_sync(uint32_t value) noexcept;
+    void write_signed_no_sync(int32_t value) noexcept;
+    void write_pointer_no_sync(uintptr_t value) noexcept;
+    void write_hex_no_sync(uint32_t value) noexcept;
     void put_char_no_sync(char c) noexcept;
 
-    inline void __attribute__((always_inline)) write_unsigned_no_sync(uint32_t value) noexcept
+    // Inline Methods
+    inline char __attribute__((always_inline)) hex_digit(uint8_t nibble) const noexcept
     {
-        constexpr uint16_t count{10};
-        char digits[count];
-        char* end{digits + count};
-        char* current{end};
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
-    }
-    
-    inline void __attribute__((always_inline)) write_signed_no_sync(int32_t value) noexcept
-    {
-        if(value < 0)
-        {
-            put_char_no_sync('-');
-            uint32_t magnitude{static_cast<uint32_t>(0) - static_cast<uint32_t>(value)};
-            write_unsigned_no_sync(magnitude);
-            return;
-        }
-        write_unsigned_no_sync(static_cast<uint32_t>(value));
+        if(nibble < 10) return static_cast<char>('0' + nibble);
+        return static_cast<char>('A' + (nibble - 10));
     }
 
-    inline __attribute__((always_inline)) void line_start() noexcept { buffer.move_to_line_start(); }
+    inline void __attribute__((always_inline)) put_hex_prefix() noexcept
+    {
+        put_char_no_sync('0');
+        put_char_no_sync('x');
+    }
+
+    inline void __attribute__((always_inline)) line_start() noexcept { buffer.move_to_line_start(); }
     inline void __attribute__((always_inline)) sync_cursor() noexcept { cursor.set_position(buffer.cursor_position()); }
 
     public:
@@ -56,11 +46,14 @@ class terminal
         void write(const char* data, size_t size) noexcept;
         void write_string(const char* text) noexcept;
 
+        // Operators
         terminal& operator<<(const char) noexcept;
         terminal& operator<<(const char*) noexcept;
         terminal& operator<<(const uint32_t) noexcept;
         terminal& operator<<(const int32_t) noexcept;
         terminal& operator<<(const bool) noexcept;
+        terminal& operator<<(hex32 value) noexcept;
+        terminal& operator<<(const void* ptr) noexcept;
 
         template<size_t N>
         terminal& operator<<(const char (&text)[N]) noexcept

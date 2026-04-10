@@ -6,17 +6,11 @@ extern "C" [[noreturn]] void kernel_main()
     terminal screen{};
     screen.initialize();
 
-    screen << "Char test: " << 'A' << '\n'
-    << "Unsigned test: " << static_cast<uint32_t>(1234567890u) << '\n'
-    << "Signed test: " << static_cast<int32_t>(-12345) << '\n'
-    << "Zero test: " << static_cast<uint32_t>(0) << '\n'
-    << "Min int32 test: " << static_cast<int32_t>(-2147483647 - 1) << '\n'
-    << "CR test: ABC" << '\r' << 'Z' << '\n'
-    << "Positive signed test: " << static_cast<int32_t>(5) << '\n';
-
-    char array[] = {'H', 'e', 'l', 'l', 'o'};
-    screen << array << '\n'
-    << true << '\n';
+    screen << "Hex zero: " << hex(0) << '\n'
+    << "Hex Small: " << hex(0x2A) << '\n'
+    << "Hex full: " << hex(0xDEADBEEF) << '\n'
+    << "Null pointer: " << static_cast<const void*>(nullptr) << '\n'
+    << "VGA pointer: " << reinterpret_cast<const void*>(0xB8000);
 
     while(true) asm volatile("hlt");
 }
