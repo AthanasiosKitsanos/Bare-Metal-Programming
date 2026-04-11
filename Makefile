@@ -42,7 +42,6 @@ TERMINAL_H = include/terminal.h
 VGA_H = include/vga_text_buffer.h
 CURSOR_H = include/vga_hardware_cursor.h
 IO_H = include/io_registers.h
-HEX32 = struct_types/hex32.h
 
 TERMINAL_CPP = src/terminal.cpp
 TERMINAL_OBJ = obj/terminal.o
@@ -53,9 +52,8 @@ VGA_OBJ = obj/vga_text_buffer.o
 CURSOR_CPP = src/vga_hardware_cursor.cpp
 CURSOR_OBJ = obj/vga_hardware_cursor.o
 
-INCLUDE = include
-STRUCT_TYPES = struct_types
-INCLUDE_TERMINAL_INLCUDE_FOLDERS = -I$(INCLUDE) -I$(STRUCT_TYPES)
+INCLUDE_FOLDER = -Iinclude
+
 # ------------------------Pm Entry---------------------------
 PM_ENTRY = boot/pm_entry.S
 PM_ENTRY_OBJ = obj/pm_entry.o
@@ -73,20 +71,20 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(HEX32)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_INLCUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
 $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
-	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
 
 # VGA Buffer
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
-	$(CC) $(COMPILE_FLAGS) -I$(INCLUDE) -c $(VGA_CPP) -o $(VGA_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
 
 # Terminal
-$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(HEX32)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_INLCUDE_FOLDERS) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
 
 # Library
 $(LIBRARY): $(LIB_FILES)

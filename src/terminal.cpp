@@ -14,6 +14,15 @@ size_t terminal::string_length(const char* text) const noexcept
     return length;
 }
 
+void terminal::write_string_no_sync(const char* text) noexcept
+{
+    for(char c{*text}; c != '\0'; c = *text)
+    {
+        put_char_no_sync(c);
+        ++text;
+    }
+}
+
 void terminal::put_char_no_sync(char c) noexcept
 {
     switch(c)
@@ -71,8 +80,7 @@ void terminal::write_signed_no_sync(int32_t value) noexcept
     if(value < 0)
     {
         put_char_no_sync('-');
-        uint32_t magnitude{static_cast<uint32_t>(0) - static_cast<uint32_t>(value)};
-        write_unsigned_no_sync(magnitude);
+        write_unsigned_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
         return;
     }
     write_unsigned_no_sync(static_cast<uint32_t>(value));
@@ -123,39 +131,51 @@ terminal& terminal::operator<<(const char c) noexcept
 
 terminal& terminal::operator<<(const char* text) noexcept
 {
-    for(char c{*text}; c != '\0'; c = *text)
-    {
-        put_char_no_sync(c);
-        ++text;
-    }
+    write_string_no_sync(text);
     sync_cursor();
     return *this;
 }
 
 terminal& terminal::operator<<(uint32_t value) noexcept
 {
-    write_unsigned_no_sync(value);
+    switch(state)
+    {
+        case integer_base::dec:
+            write_unsigned_no_sync(value);
+            break;
+        case integer_base::hex:
+            write_hex_no_sync(value);
+            break;   
+    }
     sync_cursor();
     return *this;
 }
 
 terminal& terminal::operator<<(int32_t value) noexcept
 {
-    write_signed_no_sync(value);
+    switch(state)
+    {
+        case integer_base::dec:
+            write_signed_no_sync(value);
+            break;
+        case integer_base::hex:
+            if(value < 0)
+            {
+                put_char_no_sync('-');
+                write_hex_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
+                break;
+            }
+            write_hex_no_sync(value);
+            break;
+    }
     sync_cursor();
     return *this;
 }
 
 terminal& terminal::operator<<(const bool value) noexcept
 {
-    put_char_no_sync(static_cast<char>('0' + value));
-    sync_cursor();
-    return *this;
-}
-
-terminal& terminal::operator<<(hex32 value) noexcept
-{
-    write_hex_no_sync(value.value);
+    if(bool_alpha_enabled) write_string_no_sync(static_cast<const char*>(value ? "true" : "false"));
+    else put_char_no_sync(static_cast<char>('0' + value));
     sync_cursor();
     return *this;
 }
@@ -165,4 +185,34 @@ terminal& terminal::operator<<(const void* ptr) noexcept
     write_pointer_no_sync(reinterpret_cast<uintptr_t>(ptr));
     sync_cursor();
     return *this;
+}
+
+terminal& terminal::operator<<(terminal_manipulator manipulator) noexcept
+{
+    return manipulator(*this);
+}
+
+
+terminal& dec(terminal& out) noexcept
+{
+    out.state = integer_base::dec;
+    return out;
+}
+
+terminal& hex(terminal& out) noexcept
+{
+    out.state = integer_base::hex;
+    return out;
+}
+
+terminal& bool_alpha(terminal& out) noexcept
+{
+    out.bool_alpha_enabled = true;
+    return out;
+}
+
+terminal& bool_no_alpha(terminal& out) noexcept
+{
+    out.bool_alpha_enabled = false;
+    return out;
 }
