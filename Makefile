@@ -57,9 +57,9 @@ LOGGER_H = include/kernel_logger/kernel_logger.h
 LOGGER_CPP = src/kernel_logger/kernel_logger.cpp
 LOGGER_OBJ = obj/kernel_logger/kenrel_logger.o
 
-INCLUDE_TERNINAL_FOLDER = -Iinclude/terminal
+INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INLCUDE_LOGGER_FOLDER = -Iinclude/kernel_logger
-INCLUDE_FOLDERS = $(INCLUDE_TERNINAL_FOLDER) $(INLCUDE_LOGGER_FOLDER)
+INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INLCUDE_LOGGER_FOLDER)
 
 # ------------------------Pm Entry---------------------------
 PM_ENTRY = boot/pm_entry.S
@@ -83,7 +83,7 @@ $(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER
 
 # VGA cursor
 $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERNINAL_FOLDER) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
 
 # VGA Buffer
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)

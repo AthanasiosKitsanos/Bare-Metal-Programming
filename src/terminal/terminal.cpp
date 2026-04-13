@@ -193,10 +193,3 @@ terminal& bool_no_alpha(terminal& out) noexcept
     out.bool_alpha_enabled = false;
     return out;
 }
-
-terminal& nl(terminal& out) noexcept
-{
-    out.new_line();
-    out.sync_cursor();
-    return out;
-}

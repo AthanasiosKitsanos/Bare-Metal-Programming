@@ -7,7 +7,10 @@ extern "C" [[noreturn]] void kernel_main()
     terminal screen{};
     kernel_logger logger{&screen};
     screen.initialize();
-    logger.print_error("Error");
+    logger.error() << "Something went wrong\n";
+    logger.warning() << "Warning Testing\n";
+    logger.info() << "Info Testing\n";
+    logger.debug() << "Debug Testing";
     
     while(true) asm volatile("hlt");
 }

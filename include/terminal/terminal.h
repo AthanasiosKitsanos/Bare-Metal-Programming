@@ -57,7 +57,6 @@ class terminal
     friend terminal& hex(terminal&) noexcept;
     friend terminal& bool_alpha(terminal&) noexcept;
     friend terminal& bool_no_alpha(terminal&) noexcept;
-    friend terminal& nl(terminal&) noexcept;
 
     // Inline Methods
     inline char __attribute__((always_inline)) hex_digit(uint8_t nibble) const noexcept
@@ -110,4 +109,3 @@ terminal& dec(terminal&) noexcept;
 terminal& hex(terminal&) noexcept;
 terminal& bool_alpha(terminal&) noexcept;
 terminal& bool_no_alpha(terminal&) noexcept;
-terminal& nl(terminal&) noexcept;
