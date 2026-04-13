@@ -39,28 +39,6 @@ void terminal::put_char_no_sync(char c) noexcept
     }
 }
 
-void terminal::write_hex_no_sync(uint32_t value) noexcept
-{
-    put_hex_prefix();
-    if(value == 0)
-    {
-        put_char_no_sync('0');
-        return;
-    }
-    bool started{false};
-    uint8_t nibble{0};
-    for(int shift{28}; shift >= 0; shift -= 4)
-    {
-        nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
-        if(!started)
-        {
-            if(nibble == 0) continue;
-            started = true;
-        }
-        put_char_no_sync(hex_digit(nibble));
-    }
-}
-
 void terminal::write_pointer_no_sync(uintptr_t value) noexcept
 {
     put_hex_prefix();
@@ -113,7 +91,6 @@ void terminal::write(const char* data, size_t size) noexcept
 {
     const char* const end_of_data{data + size};
     for(; data < end_of_data; ++data) put_char_no_sync(*data);
-    sync_cursor();
 }
 
 void terminal::write_string(const char* text) noexcept
@@ -192,7 +169,7 @@ terminal& terminal::operator<<(terminal_manipulator manipulator) noexcept
     return manipulator(*this);
 }
 
-
+// Free Methods
 terminal& dec(terminal& out) noexcept
 {
     out.state = integer_base::dec;
@@ -214,5 +191,12 @@ terminal& bool_alpha(terminal& out) noexcept
 terminal& bool_no_alpha(terminal& out) noexcept
 {
     out.bool_alpha_enabled = false;
+    return out;
+}
+
+terminal& nl(terminal& out) noexcept
+{
+    out.new_line();
+    out.sync_cursor();
     return out;
 }

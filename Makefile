@@ -38,21 +38,28 @@ KERNEL_ELF = elf/kernel.elf
 KERNEL_LINKER = links/kernel_linker.ld
 KERNEL_BIN = bin/kernel.bin
 
-TERMINAL_H = include/terminal.h
-VGA_H = include/vga_text_buffer.h
-CURSOR_H = include/vga_hardware_cursor.h
-IO_H = include/io_registers.h
+TERMINAL_H = include/terminal/terminal.h
+VGA_H = include/terminal/vga_text_buffer.h
+CURSOR_H = include/terminal/vga_hardware_cursor.h
+IO_H = include/terminal/io_registers.h
 
-TERMINAL_CPP = src/terminal.cpp
-TERMINAL_OBJ = obj/terminal.o
+TERMINAL_CPP = src/terminal/terminal.cpp
+TERMINAL_OBJ = obj/terminal/terminal.o
 
-VGA_CPP = src/vga_text_buffer.cpp
-VGA_OBJ = obj/vga_text_buffer.o
+VGA_CPP = src/terminal/vga_text_buffer.cpp
+VGA_OBJ = obj/terminal/vga_text_buffer.o
 
-CURSOR_CPP = src/vga_hardware_cursor.cpp
-CURSOR_OBJ = obj/vga_hardware_cursor.o
+CURSOR_CPP = src/terminal/vga_hardware_cursor.cpp
+CURSOR_OBJ = obj/terminal/vga_hardware_cursor.o
 
-INCLUDE_FOLDER = -Iinclude
+LOGGER_H = include/kernel_logger/kernel_logger.h
+
+LOGGER_CPP = src/kernel_logger/kernel_logger.cpp
+LOGGER_OBJ = obj/kernel_logger/kenrel_logger.o
+
+INCLUDE_TERNINAL_FOLDER = -Iinclude/terminal
+INLCUDE_LOGGER_FOLDER = -Iinclude/kernel_logger
+INCLUDE_FOLDERS = $(INCLUDE_TERNINAL_FOLDER) $(INLCUDE_LOGGER_FOLDER)
 
 # ------------------------Pm Entry---------------------------
 PM_ENTRY = boot/pm_entry.S
@@ -61,7 +68,7 @@ PM_ENTRY_OBJ = obj/pm_entry.o
 # ------------------------Library----------------------------
 LIBRARY = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -71,20 +78,24 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
 $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERNINAL_FOLDER) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
 
 # VGA Buffer
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
 
 # Terminal
-$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDER) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+
+# Kernel Logger
+$(LOGGER_OBJ): $(LOGGER_H) $(LOGGER_CPP) $(TERMINAL_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(LOGGER_CPP) -o $(LOGGER_OBJ)
 
 # Library
 $(LIBRARY): $(LIB_FILES)
