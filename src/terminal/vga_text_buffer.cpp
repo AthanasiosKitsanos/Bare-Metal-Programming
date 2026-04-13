@@ -1,19 +1,19 @@
 #include "vga_text_buffer.h"
 
-vga_text_buffer::vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), color(make_color(white, black)) {}
+vga_text_buffer::vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), active_color(make_color(vga_color::white, vga_color::black)) {}
 
 
 void vga_text_buffer::clear() noexcept
 {
     current = begin;
-    for(; current < end; ++current) *current = make_entry(' ', color);
+    for(; current < end; ++current) *current = make_entry(' ', active_color);
     current = begin;
 }
 
 void vga_text_buffer::put(char c) noexcept
 {
     if(current == end) return;
-    *current = make_entry(c, color);
+    *current = make_entry(c, active_color);
     ++current;
 }
 
@@ -39,6 +39,6 @@ void vga_text_buffer::scroll() noexcept
         *current = *source;
         ++current;
     }
-    for(; current < end; ++current) *current = make_entry(' ', color);
+    for(; current < end; ++current) *current = make_entry(' ', active_color);
     current -= vga_width;
 }

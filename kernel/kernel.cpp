@@ -10,6 +10,7 @@ extern "C" [[noreturn]] void kernel_main()
     logger.error() << "Something went wrong\n";
     logger.warning() << "Warning Testing\n";
     logger.info() << "Info Testing\n";
+    screen << "Check if color is reset back to white\n";
     logger.debug() << "Debug Testing";
     
     while(true) asm volatile("hlt");

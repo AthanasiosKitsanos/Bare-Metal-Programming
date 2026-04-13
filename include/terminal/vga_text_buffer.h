@@ -3,6 +3,28 @@
 #include <stdint.h>
 #include <stddef.h>
 
+using color_code = uint8_t;
+
+enum class vga_color: color_code
+{
+    black = 0x0,
+    blue = 0x1,
+    green = 0x2,
+    cyan = 0x3,
+    red = 0x4,
+    magenta = 0x5,
+    brown = 0x6,
+    light_gray = 0x7,
+    dark_gray = 0x8,
+    light_blue = 0x9,
+    light_green = 0xA,
+    light_cyan = 0xB,
+    light_red = 0xC,
+    light_magenta = 0xD,
+    yellow = 0xE,
+    white = 0xF
+};
+
 class vga_text_buffer
 {
     // Private Members
@@ -13,17 +35,16 @@ class vga_text_buffer
     volatile uint16_t* const begin;
     volatile uint16_t* const end;
     volatile uint16_t* current;
-    static constexpr uint8_t black{0x0};
-    static constexpr uint8_t white{0xF};
-    uint8_t color;
+    color_code active_color;
 
     // Private Methods
-    inline static uint8_t __attribute__((always_inline)) make_color(uint8_t foreground, uint8_t background) noexcept 
+    // Inline Private Methods
+    static inline color_code __attribute__((always_inline)) make_color(vga_color foreground, vga_color background) noexcept 
     {
-        return static_cast<uint8_t>(foreground | background << 4);
+        return static_cast<color_code>(foreground) | (static_cast<color_code>(background) << 4);
     }
 
-    inline static uint16_t __attribute__((always_inline)) make_entry(unsigned char c, uint8_t color) noexcept
+    static inline uint16_t __attribute__((always_inline)) make_entry(unsigned char c, color_code color) noexcept
     {
         return static_cast<uint16_t>(c) | static_cast<uint16_t>(color << 8);
     }
@@ -38,6 +59,11 @@ class vga_text_buffer
         void move_to_line_start() noexcept;
         void move_to_next_line() noexcept;
         void scroll() noexcept;
+
+        // Inline Public Methods
+        inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { active_color = color; }
+        inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { active_color = make_color(foreground, background); }
+        inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return active_color; }
         inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
         inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
 };

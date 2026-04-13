@@ -82,6 +82,11 @@ class terminal
         void write(const char*, size_t) noexcept;
         void write_string(const char*) noexcept;
 
+        // Inline Public Methods
+        inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
+        inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
+        inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return buffer.current_color_code(); }
+
         // Operators
         terminal& operator<<(const char) noexcept;
         terminal& operator<<(const char*) noexcept;
