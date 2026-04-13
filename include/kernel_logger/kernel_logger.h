@@ -8,7 +8,7 @@ class kernel_logger
     terminal* const m_terminal;
     
     public:
-        kernel_logger(terminal* const) noexcept;
+        explicit kernel_logger(terminal* const) noexcept;
         ~kernel_logger() noexcept = default;
 
         inline terminal& __attribute__((always_inline)) error() noexcept { return *m_terminal << "[ERROR]: ";}
