@@ -34,32 +34,32 @@ BOOT_STAGE_2_INC = inc/boot_stage_2_load.inc
 # -----------------------Kenrel-------------------------------
 KERNEL_CPP = kernel/kernel.cpp
 KERNEL_OBJ = obj/kernel.o
-KERNEL_ELF = elf/kernel.elf
-KERNEL_LINKER = links/kernel_linker.ld
-KERNEL_BIN = bin/kernel.bin
 
-TERMINAL_H = include/terminal/terminal.h
-VGA_H = include/terminal/vga_text_buffer.h
-CURSOR_H = include/terminal/vga_hardware_cursor.h
 IO_H = include/terminal/io_registers.h
 
+TERMINAL_H = include/terminal/terminal.h
 TERMINAL_CPP = src/terminal/terminal.cpp
 TERMINAL_OBJ = obj/terminal/terminal.o
 
+VGA_H = include/terminal/vga_text_buffer.h
 VGA_CPP = src/terminal/vga_text_buffer.cpp
 VGA_OBJ = obj/terminal/vga_text_buffer.o
 
+CURSOR_H = include/terminal/vga_hardware_cursor.h
 CURSOR_CPP = src/terminal/vga_hardware_cursor.cpp
 CURSOR_OBJ = obj/terminal/vga_hardware_cursor.o
 
-LOGGER_H = include/kernel_logger/kernel_logger.h
+LOGGER_H = include/kernel/logger.h
+LOGGER_CPP = src/kernel/logger.cpp
+LOGGER_OBJ = obj/kernel/logger.o
 
-LOGGER_CPP = src/kernel_logger/kernel_logger.cpp
-LOGGER_OBJ = obj/kernel_logger/kenrel_logger.o
+ASSERT_H = include/kernel/assert.h
+ASSERT_CPP = src/kernel/assert.cpp
+ASSERT_OBJ = obj/kernel/assert.o
 
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
-INLCUDE_LOGGER_FOLDER = -Iinclude/kernel_logger
-INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INLCUDE_LOGGER_FOLDER)
+INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
+INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
 
 # ------------------------Pm Entry---------------------------
 PM_ENTRY = boot/pm_entry.S
@@ -68,7 +68,7 @@ PM_ENTRY_OBJ = obj/pm_entry.o
 # ------------------------Library----------------------------
 LIBRARY = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -78,7 +78,7 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
@@ -96,6 +96,10 @@ $(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H)
 # Kernel Logger
 $(LOGGER_OBJ): $(LOGGER_H) $(LOGGER_CPP) $(TERMINAL_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(LOGGER_CPP) -o $(LOGGER_OBJ)
+
+# Kernel Assert
+$(ASSERT_OBJ): $(ASSERT_CPP) $(ASSERT_H) $(LOGGER_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(ASSERT_CPP) -o $(ASSERT_OBJ)
 
 # Library
 $(LIBRARY): $(LIB_FILES)
@@ -155,7 +159,9 @@ run:
 	$(QEMU) -drive format=raw,file=$(OS_IMAGE) 
 
 clean:
-	rm -f obj/*
+	rm -f obj/kernel/*
+	rm -f obj/terminal/*
+	rm -f -r obj/*
 	rm -f bin/*
 	rm -f elf/*
 	rm -f lib/*

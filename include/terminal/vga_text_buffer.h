@@ -25,45 +25,48 @@ enum class vga_color: color_code
     white = 0xF
 };
 
-class vga_text_buffer
+namespace kernel
 {
-    // Private Members
-    static constexpr size_t vga_width{80};
-    static constexpr size_t vga_height{25};
-    static constexpr uintptr_t vga_address{0xB8000};
-    
-    volatile uint16_t* const begin;
-    volatile uint16_t* const end;
-    volatile uint16_t* current;
-    color_code active_color;
-
-    // Private Methods
-    // Inline Private Methods
-    static inline color_code __attribute__((always_inline)) make_color(vga_color foreground, vga_color background) noexcept 
+    class vga_text_buffer
     {
-        return static_cast<color_code>(foreground) | (static_cast<color_code>(background) << 4);
-    }
+        // Private Members
+        static constexpr size_t vga_width{80};
+        static constexpr size_t vga_height{25};
+        static constexpr uintptr_t vga_address{0xB8000};
+        
+        volatile uint16_t* const begin;
+        volatile uint16_t* const end;
+        volatile uint16_t* current;
+        color_code active_color;
 
-    static inline uint16_t __attribute__((always_inline)) make_entry(unsigned char c, color_code color) noexcept
-    {
-        return static_cast<uint16_t>(c) | static_cast<uint16_t>(color << 8);
-    }
+        // Private Methods
+        // Inline Private Methods
+        static inline color_code __attribute__((always_inline)) make_color(vga_color foreground, vga_color background) noexcept 
+        {
+            return static_cast<color_code>(foreground) | (static_cast<color_code>(background) << 4);
+        }
 
-    public:
-        // Constructor
-        vga_text_buffer() noexcept;
+        static inline uint16_t __attribute__((always_inline)) make_entry(unsigned char c, color_code color) noexcept
+        {
+            return static_cast<uint16_t>(c) | static_cast<uint16_t>(color << 8);
+        }
 
-        // Public Methods
-        void clear() noexcept;
-        void put(char c) noexcept;
-        void move_to_line_start() noexcept;
-        void move_to_next_line() noexcept;
-        void scroll() noexcept;
+        public:
+            // Constructor
+            vga_text_buffer() noexcept;
 
-        // Inline Public Methods
-        inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { active_color = color; }
-        inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { active_color = make_color(foreground, background); }
-        inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return active_color; }
-        inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
-        inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
-};
+            // Public Methods
+            void clear() noexcept;
+            void put(char c) noexcept;
+            void move_to_line_start() noexcept;
+            void move_to_next_line() noexcept;
+            void scroll() noexcept;
+
+            // Inline Public Methods
+            inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { active_color = color; }
+            inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { active_color = make_color(foreground, background); }
+            inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return active_color; }
+            inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
+            inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
+    };
+}
