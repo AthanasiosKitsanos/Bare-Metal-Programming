@@ -15,7 +15,7 @@ namespace kernel
 {
     void set_assert_logger(logger* log) noexcept { g_assert_logger = log; }
 
-    [[noreturn]] void assert_failed(const char* expression, const char* file, uint32_t line)
+    [[noreturn]] void assert_failed(const char* expression, const char* file, uint32_t line) noexcept
     {
         if(!g_assert_logger) halt_forever();
         g_assert_logger->error() << "Assertion failed: " << expression << '\n';
