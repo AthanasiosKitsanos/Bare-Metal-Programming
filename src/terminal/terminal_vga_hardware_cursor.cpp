@@ -1,5 +1,5 @@
-#include "vga_hardware_cursor.h"
-#include "io_registers.h"
+#include "terminal_vga_hardware_cursor.h"
+#include "terminal_io_registers.h"
 
 namespace kernel
 {

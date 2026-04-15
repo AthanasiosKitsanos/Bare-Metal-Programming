@@ -35,27 +35,27 @@ BOOT_STAGE_2_INC = inc/boot_stage_2_load.inc
 KERNEL_CPP = kernel/kernel.cpp
 KERNEL_OBJ = obj/kernel.o
 
-IO_H = include/terminal/io_registers.h
+IO_H = include/terminal/terminal_io_registers.h
 
 TERMINAL_H = include/terminal/terminal.h
 TERMINAL_CPP = src/terminal/terminal.cpp
 TERMINAL_OBJ = obj/terminal/terminal.o
 
-VGA_H = include/terminal/vga_text_buffer.h
-VGA_CPP = src/terminal/vga_text_buffer.cpp
-VGA_OBJ = obj/terminal/vga_text_buffer.o
+VGA_H = include/terminal/terminal_vga_text_buffer.h
+VGA_CPP = src/terminal/terminal_vga_text_buffer.cpp
+VGA_OBJ = obj/terminal/terminal_vga_text_buffer.o
 
-CURSOR_H = include/terminal/vga_hardware_cursor.h
-CURSOR_CPP = src/terminal/vga_hardware_cursor.cpp
-CURSOR_OBJ = obj/terminal/vga_hardware_cursor.o
+CURSOR_H = include/terminal/terminal_vga_hardware_cursor.h
+CURSOR_CPP = src/terminal/terminal_vga_hardware_cursor.cpp
+CURSOR_OBJ = obj/terminal/terminal_vga_hardware_cursor.o
 
-LOGGER_H = include/kernel/logger.h
-LOGGER_CPP = src/kernel/logger.cpp
-LOGGER_OBJ = obj/kernel/logger.o
+LOGGER_H = include/kernel/kernel_logger.h
+LOGGER_CPP = src/kernel/kernel_logger.cpp
+LOGGER_OBJ = obj/kernel/kernel_logger.o
 
-ASSERT_H = include/kernel/assert.h
-ASSERT_CPP = src/kernel/assert.cpp
-ASSERT_OBJ = obj/kernel/assert.o
+ASSERT_H = include/kernel/kernel_assert.h
+ASSERT_CPP = src/kernel/kernel_assert.cpp
+ASSERT_OBJ = obj/kernel/kernel_assert.o
 
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
@@ -66,7 +66,7 @@ PM_ENTRY = boot/pm_entry.S
 PM_ENTRY_OBJ = obj/pm_entry.o
 
 # ------------------------Library----------------------------
-LIBRARY = lib/libkernel.a
+KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
 LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ)
 
@@ -101,9 +101,9 @@ $(LOGGER_OBJ): $(LOGGER_H) $(LOGGER_CPP) $(TERMINAL_H)
 $(ASSERT_OBJ): $(ASSERT_CPP) $(ASSERT_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(ASSERT_CPP) -o $(ASSERT_OBJ)
 
-# Library
-$(LIBRARY): $(LIB_FILES)
-	$(MAKE_LIB) $(LIBRARY) $(LIB_FILES)
+# KERNEL_A
+$(KERNEL_A): $(LIB_FILES)
+	$(MAKE_LIB) $(KERNEL_A) $(LIB_FILES)
 
 # PM Entry
 $(PM_ENTRY_OBJ): $(PM_ENTRY)
@@ -113,7 +113,7 @@ $(PM_ENTRY_OBJ): $(PM_ENTRY)
 $(BOOT_STAGE_2_OBJ): $(BOOT_STAGE_2)
 	$(AS) $(BOOT_STAGE_2) -o $(BOOT_STAGE_2_OBJ)
 
-$(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LIBRARY)
+$(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
 	$(LD) -T $(BOOT_2_LINKER) -o $(BOOT_STAGE_2_ELF) \
 		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
 
@@ -161,7 +161,7 @@ run:
 clean:
 	rm -f obj/kernel/*
 	rm -f obj/terminal/*
-	rm -f -r obj/*
+	rm -f -r obj/*.o
 	rm -f bin/*
 	rm -f elf/*
 	rm -f lib/*

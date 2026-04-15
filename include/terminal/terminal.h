@@ -1,7 +1,7 @@
 #pragma once
 
-#include "vga_text_buffer.h"
-#include "vga_hardware_cursor.h"
+#include "terminal_vga_text_buffer.h"
+#include "terminal_vga_hardware_cursor.h"
 #include <stddef.h>
 #include <stdint.h>
 

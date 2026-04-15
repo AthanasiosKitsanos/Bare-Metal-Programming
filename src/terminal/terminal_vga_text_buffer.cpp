@@ -1,4 +1,4 @@
-#include "vga_text_buffer.h"
+#include "terminal_vga_text_buffer.h"
 
 namespace kernel
 {

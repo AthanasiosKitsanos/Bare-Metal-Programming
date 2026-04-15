@@ -1,4 +1,4 @@
-#include "logger.h"
+#include "kernel_logger.h"
 
 namespace kernel
 {
