@@ -9,28 +9,28 @@ namespace
     {
         while(true) asm volatile("cli; hlt");
     }
+
+    kernel::terminal& build_assert_message(const char* expression, const char* file, uint32_t line) noexcept
+    {
+        if(!g_assert_logger) halt_forever();
+        return g_assert_logger->error() << "Assertion failed: " << expression << '\n' << "File: " << file << '\n' << "Line: " << line << '\n';
+    }
 }
 
 namespace kernel
 {
+    constexpr const char* panic_message{"Kernel assertion failed"};
     void set_assert_logger(logger* log) noexcept { g_assert_logger = log; }
 
     [[noreturn]] void assert_failed(const char* expression, const char* file, uint32_t line) noexcept
     {
-        if(!g_assert_logger) halt_forever();
-        g_assert_logger->error() << "Assertion failed: " << expression << '\n'
-        << "File: " << file << '\n'
-        << "Line: " << line << '\n';
-        g_assert_logger->panic("Kernel assertion failed");
+        build_assert_message(expression, file, line);
+        g_assert_logger->panic(panic_message);
     }
 
     [[noreturn]] void assert_failed_msg(const char* expression, const char* message, const char* file, uint32_t line) noexcept
     {
-        if(!g_assert_logger) halt_forever();
-        g_assert_logger->error() << "Assertion failed: " << expression << '\n'
-        << "File: " << file << '\n'
-        << "Line: " << line << '\n'
-        << "Message: " << message << '\n';
-        g_assert_logger->panic("Closing Program");
+        build_assert_message(expression, file, line) << "Message: " << message << '\n';
+        g_assert_logger->panic(panic_message);
     }
 }
