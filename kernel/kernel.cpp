@@ -11,6 +11,7 @@ extern "C" [[noreturn]] void kernel_main()
     
     kernel::set_assert_logger(&logger);
     int value{0};
-    KERNEL_ASSERT(value < 0);
+    KERNEL_ASSERT(value == 0);
+    KERNEL_DEBUG_ASSERT_MSG(value != 0, "Devision by zero");
     logger.panic("End of Program!");
 }

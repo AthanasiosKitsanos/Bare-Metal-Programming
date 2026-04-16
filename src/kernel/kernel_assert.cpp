@@ -18,9 +18,19 @@ namespace kernel
     [[noreturn]] void assert_failed(const char* expression, const char* file, uint32_t line) noexcept
     {
         if(!g_assert_logger) halt_forever();
-        g_assert_logger->error() << "Assertion failed: " << expression << '\n';
-        g_assert_logger->error() << "File: " << file << '\n';
-        g_assert_logger->error() << "Line: " << line << '\n';
+        g_assert_logger->error() << "Assertion failed: " << expression << '\n'
+        << "File: " << file << '\n'
+        << "Line: " << line << '\n';
         g_assert_logger->panic("Kernel assertion failed");
+    }
+
+    [[noreturn]] void assert_failed_msg(const char* expression, const char* message, const char* file, uint32_t line) noexcept
+    {
+        if(!g_assert_logger) halt_forever();
+        g_assert_logger->error() << "Assertion failed: " << expression << '\n'
+        << "File: " << file << '\n'
+        << "Line: " << line << '\n'
+        << "Message: " << message << '\n';
+        g_assert_logger->panic("Closing Program");
     }
 }
