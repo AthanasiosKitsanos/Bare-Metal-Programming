@@ -57,6 +57,8 @@ ASSERT_H = include/kernel/kernel_assert.h
 ASSERT_CPP = src/kernel/kernel_assert.cpp
 ASSERT_OBJ = obj/kernel/kernel_assert.o
 
+CONSOLE_H = include/console/console.h
+
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
 INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
@@ -90,8 +92,8 @@ $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
 
 # Terminal
-$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H) $(LOGGER_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
 
 # Kernel Logger
 $(LOGGER_OBJ): $(LOGGER_H) $(LOGGER_CPP) $(TERMINAL_H)
