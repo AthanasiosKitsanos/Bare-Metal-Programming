@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#define KERNEL_ENABLE_DEBUG_ASSERTS
+
 namespace kernel
 {
     class logger;

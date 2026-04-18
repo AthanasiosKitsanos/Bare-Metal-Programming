@@ -85,9 +85,14 @@ namespace kernel
             void write_string(const char*) noexcept;
 
             // Inline Public Methods
+            inline void __attribute__((always_inline)) reset_color() noexcept { set_color_code(buffer.get_default_color_code()); }
             inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
             inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
             inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return buffer.current_color_code(); }
+            inline bool __attribute__((always_inline)) in_default_color() const noexcept
+            {
+                return current_color_code() == buffer.get_default_color_code();
+            }
 
             // Operators
             terminal& operator<<(const char) noexcept;

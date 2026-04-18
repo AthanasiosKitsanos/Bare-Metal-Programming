@@ -33,6 +33,7 @@ namespace kernel
         static constexpr size_t vga_width{80};
         static constexpr size_t vga_height{25};
         static constexpr uintptr_t vga_address{0xB8000};
+        static constexpr color_code default_color{static_cast<color_code>(vga_color::white) | (static_cast<color_code>(vga_color::black) << 4)};
         
         volatile uint16_t* const begin;
         volatile uint16_t* const end;
@@ -68,5 +69,6 @@ namespace kernel
             inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return active_color; }
             inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
             inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
+            inline color_code __attribute__((always_inline)) get_default_color_code() const noexcept { return default_color; }
     };
 }
