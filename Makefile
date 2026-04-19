@@ -57,12 +57,9 @@ ASSERT_H = include/kernel/kernel_assert.h
 ASSERT_CPP = src/kernel/kernel_assert.cpp
 ASSERT_OBJ = obj/kernel/kernel_assert.o
 
-TYPE_TRAITS_H = include/utilities/type_traits.h
-
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
-INCLUDE_UTILITIES_FOLDER = -Iinclude/utilities
-INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER)
+INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
 
 # ------------------------Pm Entry---------------------------
 PM_ENTRY = boot/pm_entry.S
@@ -81,7 +78,7 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(TYPE_TRAITS_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
@@ -93,7 +90,7 @@ $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
 
 # Terminal
-$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H) $(LOGGER_H) $(TYPE_TRAITS_H)
+$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
 
 # Kernel Logger

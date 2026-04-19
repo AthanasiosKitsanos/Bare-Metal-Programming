@@ -107,6 +107,54 @@ namespace kernel
         for(; current < end; ++current) put_char_no_sync(*current);
     }
 
+    void terminal::write_hex_32_no_sync(uint32_t value) noexcept
+        {
+            put_hex_prefix();
+            if(value == 0)
+            {
+                put_char_no_sync('0');
+                return;
+            }
+            bool started{false};
+            uint8_t nibble{0};
+            constexpr int initial_shift{sizeof(uint32_t) * 8 - 4};
+            int shift{initial_shift};
+            for(; shift >= 0; shift -= 4)
+            {
+                nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
+                if(!started)
+                {
+                    if(nibble == 0) continue;
+                    started = true;
+                }
+                put_char_no_sync(hex_digit(nibble));
+            }
+        }
+
+        void terminal::write_hex_64_no_sync(uint64_t value) noexcept
+        {
+            put_hex_prefix();
+            if(value == 0)
+            {
+                put_char_no_sync('0');
+                return;
+            }
+            bool started{false};
+            uint8_t nibble{0};
+            constexpr int initial_shift{sizeof(uint64_t) * 8 - 4};
+            int shift{initial_shift};
+            for(; shift >= 0; shift -= 4)
+            {
+                nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
+                if(!started)
+                {
+                    if(nibble == 0) continue;
+                    started = true;
+                }
+                put_char_no_sync(hex_digit(nibble));
+            }
+        }
+
     // Public Methods
     void terminal::initialize() noexcept
     {
@@ -149,7 +197,7 @@ namespace kernel
                 write_unsigned_no_sync(value);
                 break;
             case integer_base::hex:
-                write_hex_no_sync(value);
+                write_hex_32_no_sync(value);
                 break;   
         }
         sync_cursor();
@@ -167,10 +215,10 @@ namespace kernel
                 if(value < 0)
                 {
                     put_char_no_sync('-');
-                    write_hex_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
+                    write_hex_32_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
                     break;
                 }
-                write_hex_no_sync(value);
+                write_hex_32_no_sync(static_cast<uint32_t>(value));
                 break;
         }
         sync_cursor();
@@ -185,7 +233,7 @@ namespace kernel
                 write_unsigned_64_no_sync(value);
                 break;
             case integer_base::hex:
-                write_hex_no_sync(value);
+                write_hex_64_no_sync(value);
                 break;   
         }
         sync_cursor();
@@ -203,10 +251,10 @@ namespace kernel
                 if(value < 0)
                 {
                     put_char_no_sync('-');
-                    write_hex_no_sync(static_cast<uint64_t>(0) - static_cast<uint64_t>(value));
+                    write_hex_64_no_sync(static_cast<uint64_t>(0) - static_cast<uint64_t>(value));
                     break;
                 }
-                write_hex_no_sync(value);
+                write_hex_64_no_sync(static_cast<uint64_t>(value));
                 break;
         }
         sync_cursor();
