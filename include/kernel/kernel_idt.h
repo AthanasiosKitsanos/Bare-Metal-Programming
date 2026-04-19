@@ -20,5 +20,5 @@ namespace kernel
     };
 
     static_assert(sizeof(idt_entry) == 8, "idt_entry must be exactly 8 bytes");
-    static_assert(sizeof(idtr_descriptor) == 6, "idtr_discriptor must be exactly 6 bytes");
+    static_assert(sizeof(idtr_descriptor) == 6, "idtr_descriptor must be exactly 6 bytes");
 }
