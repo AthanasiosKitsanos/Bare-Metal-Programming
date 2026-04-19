@@ -81,6 +81,32 @@ namespace kernel
         for(; current < end; ++current) put_char_no_sync(*current);
     }
 
+    void terminal::write_signed_64_no_sync(int64_t value) noexcept
+    {
+        if(value < 0)
+        {
+            put_char_no_sync('-');
+            write_unsigned_64_no_sync(static_cast<uint64_t>(0) - static_cast<uint64_t>(value));
+            return;
+        }
+        write_unsigned_64_no_sync(static_cast<uint64_t>(value));
+    }
+
+    void terminal::write_unsigned_64_no_sync(uint64_t value) noexcept
+    {
+        constexpr uint16_t count{20};
+        char digits[count];
+        char* end{digits + count};
+        char* current{end};
+        do
+        {
+            --current;
+            *current = static_cast<char>('0' + (value % 10));
+            value /= 10;
+        }while(value != 0);
+        for(; current < end; ++current) put_char_no_sync(*current);
+    }
+
     // Public Methods
     void terminal::initialize() noexcept
     {
@@ -142,6 +168,42 @@ namespace kernel
                 {
                     put_char_no_sync('-');
                     write_hex_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
+                    break;
+                }
+                write_hex_no_sync(value);
+                break;
+        }
+        sync_cursor();
+        return *this;
+    }
+
+    terminal& terminal::operator<<(uint64_t value) noexcept
+    {
+        switch(state)
+        {
+            case integer_base::dec:
+                write_unsigned_64_no_sync(value);
+                break;
+            case integer_base::hex:
+                write_hex_no_sync(value);
+                break;   
+        }
+        sync_cursor();
+        return *this;
+    }
+
+    terminal& terminal::operator<<(int64_t value) noexcept
+    {
+        switch(state)
+        {
+            case integer_base::dec:
+                write_signed_64_no_sync(value);
+                break;
+            case integer_base::hex:
+                if(value < 0)
+                {
+                    put_char_no_sync('-');
+                    write_hex_no_sync(static_cast<uint64_t>(0) - static_cast<uint64_t>(value));
                     break;
                 }
                 write_hex_no_sync(value);

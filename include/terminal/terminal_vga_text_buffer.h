@@ -5,6 +5,9 @@
 
 using color_code = uint8_t;
 
+static_assert(sizeof(color_code) == 1, "color_code must be exactly 1 byte\n");
+static_assert(sizeof(uint16_t) == 2, "VGA Text entry must be exactly 2 bytes\n");
+
 enum class vga_color: color_code
 {
     black = 0x0,

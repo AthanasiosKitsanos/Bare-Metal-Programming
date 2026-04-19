@@ -13,7 +13,7 @@ namespace
     kernel::terminal& build_assert_message(const char* expression, const char* file, uint32_t line) noexcept
     {
         if(!g_assert_logger) halt_forever();
-        return g_assert_logger->error() << "Assertion failed: " << expression << '\n' << "File: " << file << '\n' << "Line: " << line << '\n';
+        return g_assert_logger->error() << "Assertion failed: " << expression << "\nFile: " << file << "\nLine: " << line << '\n';
     }
 }
 
