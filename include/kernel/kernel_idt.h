@@ -9,7 +9,7 @@ namespace kernel
         uint16_t offset_low;
         uint16_t selector;
         uint8_t zero{0};
-        uint8_t type_attribute;
+        uint8_t type_attributes;
         uint16_t offset_high;
     };
 
