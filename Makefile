@@ -57,6 +57,10 @@ ASSERT_H = include/kernel/kernel_assert.h
 ASSERT_CPP = src/kernel/kernel_assert.cpp
 ASSERT_OBJ = obj/kernel/kernel_assert.o
 
+IDT_ENTRY_H = include/kernel/kernel_idt.IO_H
+IDT_ENTRY_CPP = src/kernel/kernel_idt.cpp
+IDT_ENTRY_OBJ = obj/kernel/kernel_idt.o
+
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
 INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
