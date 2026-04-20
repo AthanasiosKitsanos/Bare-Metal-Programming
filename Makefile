@@ -24,12 +24,15 @@ BOOT_STAGE_1_BIN = bin/boot_stage_1.bin
 BOOT_1_LIKNER = links/boot_1_linker.ld
 
 # ---------------------Boot stage 2---------------------------
+BOOT_STAGE_2_INC = inc/boot_stage_2_load.inc
 BOOT_STAGE_2 = boot/boot_stage_2.S
 BOOT_STAGE_2_OBJ = obj/boot_stage_2.o
-BOOT_STAGE_2_ELF = elf/boot_stage_2.elf
-BOOT_STAGE_2_BIN = bin/boot_stage_2.bin
-BOOT_2_LINKER = links/boot_2_linker.ld
-BOOT_STAGE_2_INC = inc/boot_stage_2_load.inc
+
+# --------------------Code 32--------------------------------
+CODE_32_ELF = elf/code_32.elf
+CODE_32_BIN = bin/code_32.bin
+CODE_32_LINKER = links/code_32.ld
+
 
 # -----------------------Kenrel-------------------------------
 KERNEL_CPP = kernel/kernel.cpp
@@ -57,9 +60,13 @@ ASSERT_H = include/kernel/kernel_assert.h
 ASSERT_CPP = src/kernel/kernel_assert.cpp
 ASSERT_OBJ = obj/kernel/kernel_assert.o
 
-IDT_ENTRY_H = include/kernel/kernel_idt.IO_H
+IDT_ENTRY_H = include/kernel/kernel_idt.h
 IDT_ENTRY_CPP = src/kernel/kernel_idt.cpp
 IDT_ENTRY_OBJ = obj/kernel/kernel_idt.o
+
+EXCEPTIONS_H = include/kernel/kernel_exceptions.h
+EXCEPTIONS_CPP = src/kernel/kernel_exceptions.cpp
+EXCEPTIONS_OBJ = obj/kernel/kernel_exceptions.o
 
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
@@ -69,10 +76,13 @@ INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
 PM_ENTRY = boot/pm_entry.S
 PM_ENTRY_OBJ = obj/pm_entry.o
 
+EXC_STUBS = boot/exception_stubs.S
+EXC_STUBS_OBJ = obj/exception_stubs.o
+
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -82,7 +92,7 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
@@ -105,6 +115,14 @@ $(LOGGER_OBJ): $(LOGGER_H) $(LOGGER_CPP) $(TERMINAL_H)
 $(ASSERT_OBJ): $(ASSERT_CPP) $(ASSERT_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(ASSERT_CPP) -o $(ASSERT_OBJ)
 
+# Kenrel IDT
+$(IDT_ENTRY_OBJ): $(IDT_ENTRY_CPP) $(IDT_ENTRY_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(IDT_ENTRY_CPP) -o $(IDT_ENTRY_OBJ)
+
+# Kernel Exceptions
+$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
+
 # KERNEL_A
 $(KERNEL_A): $(LIB_FILES)
 	$(MAKE_LIB) $(KERNEL_A) $(LIB_FILES)
@@ -113,28 +131,33 @@ $(KERNEL_A): $(LIB_FILES)
 $(PM_ENTRY_OBJ): $(PM_ENTRY)
 	$(AS) $(PM_ENTRY) -o $(PM_ENTRY_OBJ)
 
+# Exception Stubs
+$(EXC_STUBS_OBJ): $(EXC_STUBS)
+	$(AS) $(EXC_STUBS) -o $(EXC_STUBS_OBJ)
+
 # Boot 2
 $(BOOT_STAGE_2_OBJ): $(BOOT_STAGE_2)
 	$(AS) $(BOOT_STAGE_2) -o $(BOOT_STAGE_2_OBJ)
 
-$(BOOT_STAGE_2_ELF): $(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
-	$(LD) -T $(BOOT_2_LINKER) -o $(BOOT_STAGE_2_ELF) \
-		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
+# Code 32
+$(CODE_32_ELF): $(BOOT_STAGE_2_OBJ) $(EXC_STUBS_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
+	$(LD) -T $(CODE_32_LINKER) -o $(CODE_32_ELF) \
+		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(EXC_STUBS_OBJ) $(LINK_LIBS)
 
-$(BOOT_STAGE_2_BIN): $(BOOT_STAGE_2_ELF)
-	$(OBJC) -O binary $(BOOT_STAGE_2_ELF) $(BOOT_STAGE_2_BIN)
-	size=$$(wc -c < $(BOOT_STAGE_2_BIN) ); \
+$(CODE_32_BIN): $(CODE_32_ELF)
+	$(OBJC) -O binary $(CODE_32_ELF) $(CODE_32_BIN)
+	size=$$(wc -c < $(CODE_32_BIN) ); \
 	sectors=$$(( ($$size + $(SECTOR_SIZE) - 1) / $(SECTOR_SIZE) )); \
 	padded_size=$$(( $$sectors * $(SECTOR_SIZE) )); \
 	if [ $$sectors -gt 127 ]; then \
 		echo "Stage 2 is too large: $$sectors sectors (BIOS read limit exceeded)."; \
 		exit 1; \
 	fi; \
-	truncate -s $$padded_size $(BOOT_STAGE_2_BIN)
+	truncate -s $$padded_size $(CODE_32_BIN)
 
 # Loading Configuration
-$(BOOT_STAGE_2_INC): $(BOOT_STAGE_2_BIN)
-	size=$$(wc -c < $(BOOT_STAGE_2_BIN)); \
+$(BOOT_STAGE_2_INC): $(CODE_32_BIN)
+	size=$$(wc -c < $(CODE_32_BIN)); \
 	sectors=$$(( $$size / $(SECTOR_SIZE) )); \
 	if [ -z "$$sectors" ]; then \
 		echo "Failed to compute stage 2 sector count."; \
@@ -153,8 +176,8 @@ $(BOOT_STAGE_1_BIN): $(BOOT_STAGE_1_ELF)
 	$(OBJC) -O binary $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_BIN)
 	
 # Os Image
-$(OS_IMAGE): $(BOOT_STAGE_1_BIN) $(BOOT_STAGE_2_PADDED_BIN)
-	cat $(BOOT_STAGE_1_BIN) $(BOOT_STAGE_2_BIN) > $(OS_IMAGE)
+$(OS_IMAGE): $(BOOT_STAGE_1_BIN) $(CODE_32_BIN)
+	cat $(BOOT_STAGE_1_BIN) $(CODE_32_BIN) > $(OS_IMAGE)
 
 # Rest
 .PHONY: run clean
