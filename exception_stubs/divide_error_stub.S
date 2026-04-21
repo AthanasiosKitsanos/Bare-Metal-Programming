@@ -5,8 +5,3 @@
 
 invalid_opcode_stub:
     call invalid_opcode_exception_handler
-
-halt_forever:
-    cli
-    hlt
-    jmp halt_forever

@@ -76,8 +76,12 @@ INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
 PM_ENTRY = boot/pm_entry.S
 PM_ENTRY_OBJ = obj/pm_entry.o
 
-EXC_STUBS = boot/exception_stubs.S
-EXC_STUBS_OBJ = obj/exception_stubs.o
+#-------------------------Stubs-------------------------------
+OPCODE_ERROR_S = exception_stubs/opcode_stub.S
+OPCODE_ERROR_OBJ = obj/exception_stubs/opcode_stub.obj
+
+DIVIDE_ERROR_S = exception_stubs/divide_error_stub.S
+DIVIDE_ERROR_OBJ = obj/exception_stubs/divide_error.o
 
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
@@ -132,17 +136,20 @@ $(PM_ENTRY_OBJ): $(PM_ENTRY)
 	$(AS) $(PM_ENTRY) -o $(PM_ENTRY_OBJ)
 
 # Exception Stubs
-$(EXC_STUBS_OBJ): $(EXC_STUBS)
-	$(AS) $(EXC_STUBS) -o $(EXC_STUBS_OBJ)
+$(OPCODE_ERROR_OBJ): $(OPCODE_ERROR_S)
+	$(AS) $(OPCODE_ERROR_S) -o $(OPCODE_ERROR_OBJ)
+
+$(DIVIDE_ERROR_OBJ): $(DIVIDE_ERROR_S)
+	$(AS) $(DIVIDE_ERROR_S) -o $(DIVIDE_ERROR_OBJ)
 
 # Boot 2
 $(BOOT_STAGE_2_OBJ): $(BOOT_STAGE_2)
 	$(AS) $(BOOT_STAGE_2) -o $(BOOT_STAGE_2_OBJ)
 
 # Code 32
-$(CODE_32_ELF): $(BOOT_STAGE_2_OBJ) $(EXC_STUBS_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
+$(CODE_32_ELF): $(BOOT_STAGE_2_OBJ) $(OPCODE_ERROR_OBJ) $(DIVIDE_ERROR_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
 	$(LD) -T $(CODE_32_LINKER) -o $(CODE_32_ELF) \
-		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ) $(EXC_STUBS_OBJ) $(LINK_LIBS)
+		$(BOOT_STAGE_2_OBJ) $(OPCODE_ERROR_OBJ) $(DIVIDE_ERROR_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
 
 $(CODE_32_BIN): $(CODE_32_ELF)
 	$(OBJC) -O binary $(CODE_32_ELF) $(CODE_32_BIN)
@@ -188,6 +195,7 @@ run:
 clean:
 	rm -f obj/kernel/*
 	rm -f obj/terminal/*
+	rm -f obj/exception_stubs/*
 	rm -f -r obj/*.o
 	rm -f bin/*
 	rm -f elf/*
