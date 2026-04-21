@@ -1,7 +1,12 @@
 .code32
 .section .text
-.global invalid_division_stub
+.global divide_error_stub
 .extern zero_division_exception_handler
 
-invalid_division_stub:
-    call zero_division_exception_handler
+divide_error_stub:
+    call divide_error_exception_handler
+
+halt_forever:
+    cli
+    hlt
+    jmp halt_forever

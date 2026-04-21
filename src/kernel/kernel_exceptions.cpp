@@ -28,11 +28,11 @@ extern "C" [[noreturn]]  void invalid_opcode_exception_handler() noexcept
     g_exception_logger->panic("Unhandled CPU exception");
 }
 
-extern "C" void invalid_division_stub() noexcept;
-extern "C" [[noreturn]] void zero_division_exception_handler() noexcept
+extern "C" void divide_error_stub() noexcept;
+extern "C" [[noreturn]] void divide_error_exception_handler() noexcept
 {
     if(!g_exception_logger) halt_forever();
-    g_exception_logger->error() << "CPU exception: Division by zero (#DE, vector 0)\n";
+    g_exception_logger->error() << "CPU exception: Divide Exception (#DE, vector 0)\n";
     g_exception_logger->panic("Unhandled CPU exception");
 }
 
@@ -43,7 +43,7 @@ namespace kernel
     void initialize_exceptions() noexcept
     {
         initialize_idt();
-        set_interrupt_gate(division_by_zero, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(invalid_division_stub)), kernel_code_selector, interrupt_gate_attributes);
+        set_interrupt_gate(division_by_zero, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(divide_error_stub)), kernel_code_selector, interrupt_gate_attributes);
         set_interrupt_gate(invalid_opcode_vector, static_cast<uint32_t>(reinterpret_cast<uintptr_t>(invalid_opcode_stub)), kernel_code_selector, interrupt_gate_attributes);
         load_idt();
     }

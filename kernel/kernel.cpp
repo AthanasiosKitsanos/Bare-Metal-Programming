@@ -4,8 +4,6 @@
 #include "kernel_assert.h"
 #include "kernel_exceptions.h"
 
-constexpr color_code yellow_color{static_cast<color_code>(vga_color::yellow) | (static_cast<color_code>(vga_color::black) << 4)};
-
 extern "C" [[noreturn]] void kernel_main()
 {
     kernel::terminal console{};
