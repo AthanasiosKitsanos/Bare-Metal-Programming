@@ -13,11 +13,6 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::set_exception_logger(&logger);
     kernel::initialize_exceptions();
     
-    volatile uint32_t divisor{0};
-    volatile uint32_t value{10};
-
-    volatile uint32_t result{value/divisor};
-    console << result;
-    logger.info() << "Program Terminated Successfully!\n";
+    asm volatile("ud2");
     while(true) asm volatile("cli; hlt");
 }

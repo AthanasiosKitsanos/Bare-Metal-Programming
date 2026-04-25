@@ -24,14 +24,20 @@ namespace kernel
 
         // Private Methods
         void new_line() noexcept;
+        void put_char_no_sync(char) noexcept;
+        void write_string_no_sync(const char*) noexcept;
+
         size_t string_length(const char*) const noexcept;
-        void write_unsigned_no_sync(uint32_t) noexcept;
-        void write_signed_no_sync(int32_t) noexcept;
+
+        void write_unsigned_8_no_sync(uint8_t) noexcept;
+        void write_signed_8_no_sync(int8_t) noexcept;
+        void write_unsigned_32_no_sync(uint32_t) noexcept;
+        void write_signed_32_no_sync(int32_t) noexcept;
         void write_unsigned_64_no_sync(uint64_t) noexcept;
         void write_signed_64_no_sync(int64_t) noexcept;
         void write_pointer_no_sync(uintptr_t) noexcept;
-        void put_char_no_sync(char) noexcept;
-        void write_string_no_sync(const char*) noexcept;
+
+        void write_hex_8_no_sync(uint8_t) noexcept;
         void write_hex_32_no_sync(uint32_t) noexcept;
         void write_hex_64_no_sync(uint64_t) noexcept;
 
@@ -78,6 +84,8 @@ namespace kernel
             // Operators
             terminal& operator<<(const char) noexcept;
             terminal& operator<<(const char*) noexcept;
+            terminal& operator<<(const uint8_t) noexcept;
+            terminal& operator<<(const int8_t) noexcept;
             terminal& operator<<(const uint32_t) noexcept;
             terminal& operator<<(const int32_t) noexcept;
             terminal& operator<<(const uint64_t) noexcept;
@@ -101,13 +109,60 @@ namespace kernel
             }
 
             template<size_t N>
+            terminal& operator<<(const uint8_t (&value)[N]) noexcept
+            {
+                const uint8_t* const end{value + N};
+                switch(state)
+                {
+                    case integer_base::dec:
+                        for(const uint8_t* curr{value}; curr < end; ++curr) write_unsigned_8_no_sync(*curr);
+                        break;
+                    case integer_base::hex:
+                        for(const uint8_t* curr{value}; curr < end; ++curr) write_hex_8_no_sync(*curr);
+                        break;
+                }
+                sync_cursor();
+                return *this;
+            }
+
+            template<size_t N>
+            terminal& operator<<(const int8_t (&value)[N]) noexcept
+            {
+                const int8_t* const end{value + N};
+                switch(state)
+                {
+                    case integer_base::dec:
+                        for(const int8_t* curr{value}; curr < end; ++curr) write_signed_8_no_sync(*curr);
+                        break;
+                    case integer_base::hex:
+                    {
+                        int32_t temp{0};
+                        for(const int8_t* curr{value}; curr < end; ++curr)
+                        {
+                            temp = *curr;
+                            if(temp < 0)
+                            {
+                                put_char_no_sync('-');
+                                write_hex_8_no_sync(static_cast<uint8_t>(0) - static_cast<uint8_t>(temp));
+                                continue;
+                            }
+                            write_hex_8_no_sync(static_cast<uint8_t>(temp));
+                        }
+                        break;
+                    }
+                }
+                sync_cursor();
+                return *this;
+            }
+
+            template<size_t N>
             terminal& operator<<(const uint32_t (&value)[N]) noexcept
             {
                 const uint32_t* const end{value + N};
                 switch(state)
                 {
                     case integer_base::dec:
-                        for(const uint32_t* curr{value}; curr < end; ++curr) write_unsigned_no_sync(*curr);
+                        for(const uint32_t* curr{value}; curr < end; ++curr) write_unsigned_32_no_sync(*curr);
                         break;
                     case integer_base::hex:
                         for(const uint32_t* curr{value}; curr < end; ++curr) write_hex_32_no_sync(*curr);
@@ -124,7 +179,7 @@ namespace kernel
                 switch(state)
                 {
                     case integer_base::dec:
-                        for(const int32_t* curr{value}; curr < end; ++curr) write_signed_no_sync(*curr);
+                        for(const int32_t* curr{value}; curr < end; ++curr) write_signed_32_no_sync(*curr);
                         break;
                     case integer_base::hex:
                     {
