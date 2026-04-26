@@ -30,7 +30,6 @@ namespace
         for(;;) asm volatile("cli; hlt");
     }
 
-    #define VECTOR_TO_STRING(expression)
     [[noreturn]] void handle_exception(const char* name, const char* mnemonic, uint8_t vector) noexcept
     {
         if(!g_exception_logger) halt_forever();
