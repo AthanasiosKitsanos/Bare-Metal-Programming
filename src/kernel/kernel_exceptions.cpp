@@ -5,6 +5,13 @@
 
 #include <stdint.h>
 
+#define INTERRUPT_LIST  \
+    X(0, divide_error, "Divide Error", "#DE")   \
+    X(6, invalid_opcode, "Invalid Opcode", "#UD")   \
+    X(13, general_protection_fault, "General Protection Fault", "#GP")   \
+    X(14, page_fault, "Page Fault", "#PF")  \
+    X(50, random, "Random Fault", "#RF")
+
 namespace
 {
     // Vectors
@@ -43,27 +50,19 @@ namespace
         g_exception_logger->panic("Unhandled CPU exception");
     }
 
+    #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
+    INTERRUPT_LIST
+    #undef X
+
+    #define X(vector, name, title, mnemonic)    \
+        constexpr exception_descriptor name##_desc{vector, isr_##vector, title, mnemonic};
+
+    INTERRUPT_LIST
+    #undef X
+
     inline void __attribute__((always_inline)) install_exception(const exception_descriptor& ex) noexcept
     {
         kernel::set_interrupt_gate(ex.vector, reinterpret_cast<uint32_t>(ex.stub), kernel_code_selector, interrupt_gate_attributes);
-    }
-
-    extern "C" void invalid_opcode_stub() noexcept;
-    extern "C" void divide_error_stub() noexcept;
-
-    constexpr exception_descriptor opcode_error{invalid_opcode_vector, invalid_opcode_stub, "Invalid Opcode", "#UD"};
-    constexpr exception_descriptor divide_error{divide_error_vector, divide_error_stub, "Divide Error", "#DE"};
-
-    // Opcode Exception Handler
-    [[noreturn]] void invalid_opcode_exception_handler(kernel::interrupt_frame* frame) noexcept
-    {
-        handle_exception(opcode_error.name, opcode_error.mnemonic, frame);
-    }
-
-    // Divide Error Handler
-    [[noreturn]] void divide_error_exception_handler(kernel::interrupt_frame* frame) noexcept
-    {
-        handle_exception(divide_error.name, divide_error.mnemonic, frame);
     }
 }
 
@@ -71,12 +70,16 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 {
     switch(frame->vector)
     {
-        case 0:
-            divide_error_exception_handler(frame);
-        case 6:
-            invalid_opcode_exception_handler(frame);
+        #define X(vector, name, title, mnemonic)    \
+            case vector:    \
+                handle_exception(title, mnemonic, frame); \
+                break;
+            
+        INTERRUPT_LIST
+        #undef X
         default:
             halt_forever();
+            break;
     }
 }
 
@@ -87,8 +90,11 @@ namespace kernel
     void initialize_exceptions() noexcept
     {
         initialize_idt();
-        install_exception(opcode_error);
-        install_exception(divide_error);
+        #define X(vector, name, title, mnemonic)    \
+            install_exception(name##_desc);
+
+        INTERRUPT_LIST
+        #undef X
         load_idt();
     }
 }

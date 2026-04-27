@@ -2,8 +2,6 @@
 
 #include <stdint.h>
 
-namespace{ struct exception_descriptor; }
-
 namespace kernel
 {
     struct [[gnu::packed]] idt_entry

@@ -3,21 +3,36 @@
 
 .set DATA_SEG, 0x10
 
-.global divide_error_stub
-.global invalid_opcode_stub
 .global common_interrupt_entry
 
 .extern interrupt_dispatcher
 
-divide_error_stub:
+.macro ISR_NO_ERROR vector
+.global isr_\vector
+isr_\vector:
     pushl $0
-    pushl $0
+    pushl $\vector
     jmp common_interrupt_entry
+.endm
 
-invalid_opcode_stub:
-    pushl $0
-    pushl $6
+.macro ISR_WITH_ERROR vector
+.global isr_\vector
+isr_\vector:
+    pushl $\vector
     jmp common_interrupt_entry
+.endm
+
+.irp v, 0, 1, 2, 3, 4, 5, 6, 7
+ISR_NO_ERROR \v
+.endr
+
+.irp v, 8, 10, 11, 12, 13, 14, 17
+    ISR_WITH_ERROR \v
+.endr
+
+.irp v, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 50
+    ISR_NO_ERROR \v
+.endr
 
 common_interrupt_entry:
     pusha
