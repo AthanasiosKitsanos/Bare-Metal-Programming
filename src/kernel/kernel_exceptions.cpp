@@ -1,6 +1,8 @@
-#include "kernel_exceptions.h"
-#include "kernel_logger.h"
 #include "kernel_idt.h"
+#include "kernel_logger.h"
+#include "kernel_exceptions.h"
+#include "kernel_interrupt_frame.h"
+
 #include <stdint.h>
 
 namespace
@@ -17,10 +19,10 @@ namespace
 
     struct exception_descriptor
     {
+        uint8_t vector;
         exception_handler_ptr stub;
         const char* name;
         const char* mnemonic;
-        uint8_t vector;
     };
 
     kernel::logger* g_exception_logger{nullptr};
@@ -33,30 +35,46 @@ namespace
     [[noreturn]] void handle_exception(const char* name, const char* mnemonic, uint8_t vector) noexcept
     {
         if(!g_exception_logger) halt_forever();
-        g_exception_logger->error() << "CPU exception: " << name << " (" << mnemonic << " vector " << vector << ")\n" ;
+        g_exception_logger->error() << "CPU exception: " << name << " (" << mnemonic << ", vector " << vector << ")\n" ;
         
         g_exception_logger->panic("Unhandled CPU exception");
     }
+
+    inline void __attribute__((always_inline)) install_exception(const exception_descriptor& ex) noexcept
+    {
+        kernel::set_interrupt_gate(ex.vector, reinterpret_cast<uint32_t>(ex.stub), kernel_code_selector, interrupt_gate_attributes);
+    }
+
+    extern "C" void invalid_opcode_stub() noexcept;
+    extern "C" void divide_error_stub() noexcept;
+
+    constexpr exception_descriptor opcode_error{invalid_opcode_vector, invalid_opcode_stub, "Invalid Opcode", "#UD"};
+    constexpr exception_descriptor divide_error{divide_error_vector, divide_error_stub, "Divide Error", "#DE"};
+
+    // Opcode Exception Handler
+    [[noreturn]] void invalid_opcode_exception_handler(kernel::interrupt_frame* frame) noexcept
+    {
+        handle_exception(opcode_error.name, opcode_error.mnemonic, opcode_error.vector);
+    }
+
+    // Divide Error Handler
+    [[noreturn]] void divide_error_exception_handler(kernel::interrupt_frame* frame) noexcept
+    {
+        handle_exception(divide_error.name, divide_error.mnemonic, divide_error.vector);
+    }
 }
 
-
-
-// Stub Declarations
-extern "C" void invalid_opcode_stub() noexcept;
-extern "C" void divide_error_stub() noexcept;
-
-// Opcode Exception Handler
-constexpr exception_descriptor opcode_error{invalid_opcode_stub, "Invalid Opcode", "#UD", invalid_opcode_vector};
-extern "C" [[noreturn]] void invalid_opcode_exception_handler() noexcept
+extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 {
-    handle_exception(opcode_error.name, opcode_error.mnemonic, opcode_error.vector);
-}
-
-// Divide Error Handler
-constexpr exception_descriptor divide_error{divide_error_stub, "Divide Exception", "#DE", divide_error_vector};
-extern "C" [[noreturn]] void divide_error_exception_handler() noexcept
-{
-    handle_exception(divide_error.name, divide_error.mnemonic, divide_error.vector);
+    switch(frame->vector)
+    {
+        case 0:
+            divide_error_exception_handler(frame);
+        case 6:
+            invalid_opcode_exception_handler(frame);
+        default:
+            halt_forever();
+    }
 }
 
 namespace kernel
@@ -66,8 +84,8 @@ namespace kernel
     void initialize_exceptions() noexcept
     {
         initialize_idt();
-        set_interrupt_gate(opcode_error.vector, reinterpret_cast<uint32_t>(opcode_error.stub), kernel_code_selector, interrupt_gate_attributes);
-        set_interrupt_gate(divide_error.vector, reinterpret_cast<uint32_t>(divide_error.stub), kernel_code_selector, interrupt_gate_attributes);
+        install_exception(opcode_error);
+        install_exception(divide_error);
         load_idt();
     }
 }

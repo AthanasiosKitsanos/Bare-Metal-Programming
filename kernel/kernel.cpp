@@ -13,6 +13,8 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::set_exception_logger(&logger);
     kernel::initialize_exceptions();
     
-    asm volatile("ud2");
+    volatile uint32_t div{0};
+    volatile uint32_t ten{10};
+    volatile uint32_t result{ten/div};
     while(true) asm volatile("cli; hlt");
 }

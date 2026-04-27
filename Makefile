@@ -68,6 +68,8 @@ EXCEPTIONS_H = include/kernel/kernel_exceptions.h
 EXCEPTIONS_CPP = src/kernel/kernel_exceptions.cpp
 EXCEPTIONS_OBJ = obj/kernel/kernel_exceptions.o
 
+INTERRUPT_FRAME_H = include/kernel/kernel_interrupt_frame.h
+
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
 INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
@@ -76,9 +78,9 @@ INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
 PM_ENTRY = boot/pm_entry.S
 PM_ENTRY_OBJ = obj/pm_entry.o
 
-#-------------------------Stubs-------------------------------
-EXCEPTIONS_STUBS_S = exception_stubs/exception_stubs.S
-EXCEPTIONS_STUBS_OBJ = obj/exception_stubs/exception_stubs.o
+#-------------------------Common Interrupt Entry-------------------------------
+INTERRUPT_ENTRY_S = exception_stubs/common_interrupt_entry.S
+INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
 
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
@@ -121,7 +123,7 @@ $(IDT_ENTRY_OBJ): $(IDT_ENTRY_CPP) $(IDT_ENTRY_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(IDT_ENTRY_CPP) -o $(IDT_ENTRY_OBJ)
 
 # Kernel Exceptions
-$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H)
+$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
 
 # KERNEL_A
@@ -132,18 +134,18 @@ $(KERNEL_A): $(LIB_FILES)
 $(PM_ENTRY_OBJ): $(PM_ENTRY)
 	$(AS) $(PM_ENTRY) -o $(PM_ENTRY_OBJ)
 
-# Exception Stubs
-$(EXCEPTIONS_STUBS_OBJ): $(EXCEPTIONS_STUBS_S)
-	$(AS) $(EXCEPTIONS_STUBS_S) -o $(EXCEPTIONS_STUBS_OBJ)
+# Common Interrupt Entry
+$(INTERRUPT_ENTRY_OBJ): $(INTERRUPT_ENTRY_S)
+	$(AS) $(INTERRUPT_ENTRY_S) -o $(INTERRUPT_ENTRY_OBJ)
 
 # Boot 2
 $(BOOT_STAGE_2_OBJ): $(BOOT_STAGE_2)
 	$(AS) $(BOOT_STAGE_2) -o $(BOOT_STAGE_2_OBJ)
 
 # Code 32
-$(CODE_32_ELF): $(BOOT_STAGE_2_OBJ) $(EXCEPTIONS_STUBS_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
+$(CODE_32_ELF): $(BOOT_STAGE_2_OBJ) $(INTERRUPT_ENTRY_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)
 	$(LD) -T $(CODE_32_LINKER) -o $(CODE_32_ELF) \
-		$(BOOT_STAGE_2_OBJ) $(EXCEPTIONS_STUBS_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
+		$(BOOT_STAGE_2_OBJ) $(INTERRUPT_ENTRY_OBJ) $(PM_ENTRY_OBJ) $(LINK_LIBS)
 
 $(CODE_32_BIN): $(CODE_32_ELF)
 	$(OBJC) -O binary $(CODE_32_ELF) $(CODE_32_BIN)
