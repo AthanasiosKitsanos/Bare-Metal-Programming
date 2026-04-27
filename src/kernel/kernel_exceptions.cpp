@@ -32,11 +32,14 @@ namespace
         for(;;) asm volatile("cli; hlt");
     }
 
-    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, uint8_t vector) noexcept
+    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, const kernel::interrupt_frame* frame) noexcept
     {
         if(!g_exception_logger) halt_forever();
-        g_exception_logger->error() << "CPU exception: " << name << " (" << mnemonic << ", vector " << vector << ")\n" ;
-        
+        g_exception_logger->error() << "CPU exception: " << name << ' ' << mnemonic
+        << kernel::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
+        << "\nEAX:" << frame->eax << "     ECX:" << frame->ecx << "\nEDX:" << frame->edx << " EBX:" << frame->ebx
+        << "\nESP:" << frame->esp << " EBP:" << frame->ebp << "\nESI:" << frame->esi << "  EDI:" << frame->edi
+        << "\nVector:" << frame->vector << '\n';
         g_exception_logger->panic("Unhandled CPU exception");
     }
 
@@ -54,13 +57,13 @@ namespace
     // Opcode Exception Handler
     [[noreturn]] void invalid_opcode_exception_handler(kernel::interrupt_frame* frame) noexcept
     {
-        handle_exception(opcode_error.name, opcode_error.mnemonic, opcode_error.vector);
+        handle_exception(opcode_error.name, opcode_error.mnemonic, frame);
     }
 
     // Divide Error Handler
     [[noreturn]] void divide_error_exception_handler(kernel::interrupt_frame* frame) noexcept
     {
-        handle_exception(divide_error.name, divide_error.mnemonic, divide_error.vector);
+        handle_exception(divide_error.name, divide_error.mnemonic, frame);
     }
 }
 

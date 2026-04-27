@@ -30,10 +30,6 @@ common_interrupt_entry:
     call interrupt_dispatcher
     addl $4, %esp
 
-    movw $DATA_SEG, %ax
-    movw %ax, %ds
-    movw %ax, %es
-
     popa
     addl $8, %esp
     iret
