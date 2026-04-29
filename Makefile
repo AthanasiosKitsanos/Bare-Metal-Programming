@@ -14,6 +14,8 @@ LINKING_FLAGS = -ffreestanding -O3 -nostdlib
 
 SECTOR_SIZE = 512
 
+INCLUDE_MAP_FILE = -Map=output.map
+
 # File Sources
 
 # ---------------------Boot stage 1---------------------------
@@ -68,8 +70,11 @@ EXCEPTIONS_H = include/kernel/kernel_exceptions.h
 EXCEPTIONS_CPP = src/kernel/kernel_exceptions.cpp
 EXCEPTIONS_OBJ = obj/kernel/kernel_exceptions.o
 
-INTERRUPT_FRAME_H = include/kernel/kernel_interrupt_frame.h
+PIC_H = include/kernel/kernel_pic.h
+PIC_CPP = src/kernel/kernel_pic.cpp
+PIC_OBJ = obj/kernel/kernel_pic.o
 
+# --------------------Include Folders--------------------------
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
 INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
@@ -85,7 +90,7 @@ INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -123,8 +128,12 @@ $(IDT_ENTRY_OBJ): $(IDT_ENTRY_CPP) $(IDT_ENTRY_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(IDT_ENTRY_CPP) -o $(IDT_ENTRY_OBJ)
 
 # Kernel Exceptions
-$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H)
+$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
+
+# Kernel PIC
+$(PIC_OBJ): $(PIC_CPP) $(PIC_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIC_CPP) -o $(PIC_OBJ)
 
 # KERNEL_A
 $(KERNEL_A): $(LIB_FILES)
@@ -135,7 +144,7 @@ $(PM_ENTRY_OBJ): $(PM_ENTRY)
 	$(AS) $(PM_ENTRY) -o $(PM_ENTRY_OBJ)
 
 # Common Interrupt Entry
-$(INTERRUPT_ENTRY_OBJ): $(INTERRUPT_ENTRY_S)
+$(INTERRUPT_ENTRY_OBJ): $(INTERRUPT_ENTRY_S) 
 	$(AS) $(INTERRUPT_ENTRY_S) -o $(INTERRUPT_ENTRY_OBJ)
 
 # Boot 2

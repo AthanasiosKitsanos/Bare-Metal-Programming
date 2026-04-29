@@ -2,22 +2,20 @@
 #include "kernel_logger.h"
 #include "kernel_exceptions.h"
 #include "kernel_interrupt_frame.h"
-
+#include "kernel_pic.h"
 #include <stdint.h>
 
-#define INTERRUPT_LIST  \
+#define CPU_INTERRUPT_LIST  \
     X(0, divide_error, "Divide Error", "#DE")   \
     X(6, invalid_opcode, "Invalid Opcode", "#UD")   \
     X(13, general_protection_fault, "General Protection Fault", "#GP")   \
     X(14, page_fault, "Page Fault", "#PF")  \
-    X(50, random, "Random Fault", "#RF")
+
+#define HARDWARE_INTERRUPT_LIST \
+    X(32, timer_interrupt, "Timer Interrupt", "IRQ0")
 
 namespace
 {
-    // Vectors
-    constexpr uint8_t invalid_opcode_vector{6};
-    constexpr uint8_t divide_error_vector{0};
-
     // Selectors and Attributes
     constexpr uint16_t kernel_code_selector{0x08};
     constexpr uint8_t interrupt_gate_attributes{0x8E};
@@ -51,14 +49,25 @@ namespace
     }
 
     #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
-    INTERRUPT_LIST
+        
+    CPU_INTERRUPT_LIST
+    #undef X
+
+    #define X(vector, name, title, mnemonic) extern "C" void irq_##vector() noexcept;
+        
+    HARDWARE_INTERRUPT_LIST
     #undef X
 
     #define X(vector, name, title, mnemonic)    \
         constexpr exception_descriptor name##_desc{vector, isr_##vector, title, mnemonic};
-
-    INTERRUPT_LIST
+    CPU_INTERRUPT_LIST
     #undef X
+
+    #define X(vector, name, title, mnemonic)    \
+        constexpr exception_descriptor name##_desc{vector, irq_##vector, title, mnemonic};
+    HARDWARE_INTERRUPT_LIST
+    #undef X
+    
 
     inline void __attribute__((always_inline)) install_exception(const exception_descriptor& ex) noexcept
     {
@@ -75,8 +84,13 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
                 handle_exception(title, mnemonic, frame); \
                 break;
             
-        INTERRUPT_LIST
+        CPU_INTERRUPT_LIST
         #undef X
+
+        case 32:
+            g_exception_logger->info() << "A hardware interrupt arrived\n";
+            kernel::send_eoi(32);
+            break;
         default:
             halt_forever();
             break;
@@ -90,11 +104,18 @@ namespace kernel
     void initialize_exceptions() noexcept
     {
         initialize_idt();
+
+        constexpr uint8_t master_offset{32};
+        constexpr uint8_t slave_offset{40};
+        pic_remap(master_offset, slave_offset);
+
         #define X(vector, name, title, mnemonic)    \
             install_exception(name##_desc);
 
-        INTERRUPT_LIST
+        CPU_INTERRUPT_LIST
+        HARDWARE_INTERRUPT_LIST
         #undef X
+
         load_idt();
     }
 }
