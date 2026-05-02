@@ -74,6 +74,14 @@ PIC_H = include/kernel/kernel_pic.h
 PIC_CPP = src/kernel/kernel_pic.cpp
 PIC_OBJ = obj/kernel/kernel_pic.o
 
+TIMER_H = include/kernel/kernel_timer.h
+TIMER_CPP = src/kernel/kernel_timer.cpp
+TIMER_OBJ = obj/kernel/kernel_timer.o
+
+PIT_H = include/kernel/kernel_pit.h
+PIT_CPP = src/kernel/kernel_pit.cpp
+PIT_OBJ = obj/kernel_pit.o
+
 # --------------------Include Folders--------------------------
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
@@ -90,7 +98,7 @@ INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -100,7 +108,7 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
@@ -127,13 +135,21 @@ $(ASSERT_OBJ): $(ASSERT_CPP) $(ASSERT_H) $(LOGGER_H)
 $(IDT_ENTRY_OBJ): $(IDT_ENTRY_CPP) $(IDT_ENTRY_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(IDT_ENTRY_CPP) -o $(IDT_ENTRY_OBJ)
 
+# Kernel Timer
+$(TIMER_OBJ): $(TIMER_CPP) $(TIMER_H) $(LOGGER_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TIMER_CPP) -o $(TIMER_OBJ)
+
 # Kernel Exceptions
-$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H)
+$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H) $(TIMER_H) $(PIT_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
 
 # Kernel PIC
 $(PIC_OBJ): $(PIC_CPP) $(PIC_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIC_CPP) -o $(PIC_OBJ)
+
+# Kernel PIT
+$(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
 
 # KERNEL_A
 $(KERNEL_A): $(LIB_FILES)

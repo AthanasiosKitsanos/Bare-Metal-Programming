@@ -3,17 +3,30 @@
 #include "kernel_logger.h"
 #include "kernel_assert.h"
 #include "kernel_exceptions.h"
+#include "kernel_timer.h"
+#include "kernel_pit.h"
+
+constexpr uint32_t timer_frequency_hz{100};
 
 extern "C" [[noreturn]] void kernel_main()
 {
     kernel::terminal console{};
     kernel::logger logger{&console};
     console.initialize();
+
     kernel::set_assert_logger(&logger);
     kernel::set_exception_logger(&logger);
     kernel::initialize_exceptions();
-    
-    asm volatile("int $32");
-    console << "End of Program\n";
-    while(true) asm volatile("cli; hlt");
+    kernel::set_timer_logger(&logger);
+
+    if(!kernel::initialize_pit(timer_frequency_hz))
+    {
+        logger.panic("Failed to initialize PIT");
+    }
+    kernel::set_timer_frequency(timer_frequency_hz);
+
+    logger.info() << "Timer frequency: " << kernel::timer_frequency() << " Hz\n";
+    console << "Activating Interrupts\n";
+    asm volatile("sti");
+    for(;;) asm volatile("hlt");
 }

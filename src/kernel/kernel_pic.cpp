@@ -53,4 +53,12 @@ namespace kernel
         if(vector > 39) outb(slave_command, eoi_command);
         outb(master_command, eoi_command);
     }
+
+    void mask_all_except_timer() noexcept
+    {
+        outb(master_data, 0xFE);
+        io_wait();
+        outb(slave_data, 0xFF);
+        io_wait();
+    }
 }

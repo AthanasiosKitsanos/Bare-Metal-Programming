@@ -3,6 +3,7 @@
 #include "kernel_exceptions.h"
 #include "kernel_interrupt_frame.h"
 #include "kernel_pic.h"
+#include "kernel_timer.h"
 #include <stdint.h>
 
 #define CPU_INTERRUPT_LIST  \
@@ -32,22 +33,6 @@ namespace
 
     kernel::logger* g_exception_logger{nullptr};
 
-    [[noreturn]] void halt_forever() noexcept
-    {
-        for(;;) asm volatile("cli; hlt");
-    }
-
-    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, const kernel::interrupt_frame* frame) noexcept
-    {
-        if(!g_exception_logger) halt_forever();
-        g_exception_logger->error() << "CPU exception: " << name << ' ' << mnemonic
-        << kernel::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
-        << "\nEAX:" << frame->eax << "     ECX:" << frame->ecx << "\nEDX:" << frame->edx << " EBX:" << frame->ebx
-        << "\nESP:" << frame->esp << " EBP:" << frame->ebp << "\nESI:" << frame->esi << "  EDI:" << frame->edi
-        << "\nVector:" << frame->vector << '\n';
-        g_exception_logger->panic("Unhandled CPU exception");
-    }
-
     #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
         
     CPU_INTERRUPT_LIST
@@ -73,6 +58,29 @@ namespace
     {
         kernel::set_interrupt_gate(ex.vector, reinterpret_cast<uint32_t>(ex.stub), kernel_code_selector, interrupt_gate_attributes);
     }
+
+    [[noreturn]] void halt_forever() noexcept
+    {
+        for(;;) asm volatile("cli; hlt");
+    }
+
+    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, const kernel::interrupt_frame* frame) noexcept
+    {
+        if(!g_exception_logger) halt_forever();
+        g_exception_logger->error() << "CPU exception: " << name << ' ' << mnemonic
+        << kernel::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
+        << "\nEAX:" << frame->eax << "     ECX:" << frame->ecx << "\nEDX:" << frame->edx << " EBX:" << frame->ebx
+        << "\nESP:" << frame->esp << " EBP:" << frame->ebp << "\nESI:" << frame->esi << "  EDI:" << frame->edi
+        << "\nVector:" << frame->vector << '\n';
+        g_exception_logger->panic("Unhandled CPU exception");
+    }
+
+    void handle_hardware_interrupt(const kernel::interrupt_frame* frame) noexcept
+    {
+        kernel::handle_timer_tick();
+        kernel::send_eoi(frame->vector);
+        return;
+    }
 }
 
 extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
@@ -87,10 +95,14 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
         CPU_INTERRUPT_LIST
         #undef X
 
-        case 32:
-            g_exception_logger->info() << "A hardware interrupt arrived\n";
-            kernel::send_eoi(32);
-            break;
+        #define X(vector, name, title, mnemonic)    \
+            case vector:    \
+                handle_hardware_interrupt(frame);   \
+                break;
+        
+        HARDWARE_INTERRUPT_LIST
+        #undef X
+
         default:
             halt_forever();
             break;
@@ -115,6 +127,8 @@ namespace kernel
         CPU_INTERRUPT_LIST
         HARDWARE_INTERRUPT_LIST
         #undef X
+
+        kernel::mask_all_except_timer();
 
         load_idt();
     }
