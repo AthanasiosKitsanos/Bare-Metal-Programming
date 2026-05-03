@@ -14,4 +14,6 @@ namespace kernel
     void handle_timer_tick() noexcept;
     uint32_t timer_ticks() noexcept;
     uint32_t uptime_seconds() noexcept;
+    void sleep_ticks(uint32_t ticks) noexcept;
+    void sleep_ms(uint32_t ms) noexcept;
 }

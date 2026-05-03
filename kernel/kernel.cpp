@@ -25,8 +25,15 @@ extern "C" [[noreturn]] void kernel_main()
     }
     kernel::set_timer_frequency(timer_frequency_hz);
 
-    logger.info() << "Timer frequency: " << kernel::timer_frequency() << " Hz\n";
-    console << "Activating Interrupts\n";
+    logger.info() << "Timer frequency: " << kernel::timer_frequency() << " Hz\n"
+    << "Activating Interrupts\n";
+
     asm volatile("sti");
+
+    logger.info() << "Before sleep ticks: " <<  kernel::timer_ticks() << '\n';
+    // kernel::sleep_ticks(300);
+    kernel::sleep_ms(3000);
+    logger.info() << "After sleep ticks: " << kernel::timer_ticks() << '\n';
+
     for(;;) asm volatile("hlt");
 }
