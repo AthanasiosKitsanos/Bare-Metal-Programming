@@ -4,6 +4,7 @@
 #include "kernel_interrupt_frame.h"
 #include "kernel_pic.h"
 #include "kernel_timer.h"
+#include "keyboard.h"
 #include <stdint.h>
 
 #define CPU_INTERRUPT_LIST  \
@@ -13,7 +14,8 @@
     X(14, page_fault, "Page Fault", "#PF")  \
 
 #define HARDWARE_INTERRUPT_LIST \
-    X(32, timer_interrupt, "Timer Interrupt", "IRQ0")
+    X(32, timer_interrupt, "Timer Interrupt", "IRQ0")   \
+    X(33, keyboard_interrupt, "Keyboard Interrupt", "IRQ1")
 
 namespace
 {
@@ -74,13 +76,6 @@ namespace
         << "\nVector:" << frame->vector << '\n';
         g_exception_logger->panic("Unhandled CPU exception");
     }
-
-    void handle_hardware_interrupt(const kernel::interrupt_frame* frame) noexcept
-    {
-        kernel::handle_timer_tick();
-        kernel::send_eoi(frame->vector);
-        return;
-    }
 }
 
 extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
@@ -97,7 +92,8 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 
         #define X(vector, name, title, mnemonic)    \
             case vector:    \
-                handle_hardware_interrupt(frame);   \
+                kernel::handle_##name();   \
+                kernel::send_eoi(vector); \
                 break;
         
         HARDWARE_INTERRUPT_LIST
@@ -128,7 +124,7 @@ namespace kernel
         HARDWARE_INTERRUPT_LIST
         #undef X
 
-        kernel::mask_all_except_timer();
+        kernel::mask_all_except_timer_and_keyboard();
 
         load_idt();
     }

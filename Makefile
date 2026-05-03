@@ -82,6 +82,10 @@ PIT_H = include/kernel/kernel_pit.h
 PIT_CPP = src/kernel/kernel_pit.cpp
 PIT_OBJ = obj/kernel_pit.o
 
+KEYBOARD_H = include/kernel/keyboard.h
+KEYBOARD_CPP = src/kernel/keyboard.cpp
+KEYBOARD_OBJ = obj/kernel/keyboard.o
+
 # --------------------Include Folders--------------------------
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
@@ -98,7 +102,7 @@ INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ) $(KEYBOARD_OBJ)
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
@@ -108,7 +112,7 @@ OS_IMAGE = bin/os_image.bin
 all: $(OS_IMAGE)
 
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # VGA cursor
@@ -140,7 +144,7 @@ $(TIMER_OBJ): $(TIMER_CPP) $(TIMER_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TIMER_CPP) -o $(TIMER_OBJ)
 
 # Kernel Exceptions
-$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H) $(TIMER_H) $(PIT_H)
+$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
 
 # Kernel PIC
@@ -148,8 +152,12 @@ $(PIC_OBJ): $(PIC_CPP) $(PIC_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIC_CPP) -o $(PIC_OBJ)
 
 # Kernel PIT
-$(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H)
+$(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
+
+# Keyboard
+$(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)
 
 # KERNEL_A
 $(KERNEL_A): $(LIB_FILES)

@@ -54,9 +54,9 @@ namespace kernel
         outb(master_command, eoi_command);
     }
 
-    void mask_all_except_timer() noexcept
+    void mask_all_except_timer_and_keyboard() noexcept
     {
-        outb(master_data, 0xFE);
+        outb(master_data, 0xFC);
         io_wait();
         outb(slave_data, 0xFF);
         io_wait();

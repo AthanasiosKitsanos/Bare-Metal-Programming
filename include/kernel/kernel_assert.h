@@ -37,4 +37,5 @@ do                                                                              
 #else
     #define KERNEL_DEBUG_ASSERT(expression) do {}while(false)
     #define KERNEL_DEBUG_ASSERT_MSG(expression, message) do {}while(false)
+    #define KERNEL_DEBUG(expression, message) dp {}while(false)
 #endif

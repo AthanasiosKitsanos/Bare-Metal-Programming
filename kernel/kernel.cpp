@@ -5,6 +5,7 @@
 #include "kernel_exceptions.h"
 #include "kernel_timer.h"
 #include "kernel_pit.h"
+#include "keyboard.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -19,21 +20,19 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     kernel::set_timer_logger(&logger);
 
+    logger.info() << "Setting frequency to: " << timer_frequency_hz << '\n';
     if(!kernel::initialize_pit(timer_frequency_hz))
     {
         logger.panic("Failed to initialize PIT");
     }
     kernel::set_timer_frequency(timer_frequency_hz);
+    console << "Frequency set\n";
 
-    logger.info() << "Timer frequency: " << kernel::timer_frequency() << " Hz\n"
-    << "Activating Interrupts\n";
+    logger.info() << "Setting Keyboard logger\n";
+    kernel::set_keyboard_logger(&logger);
+    console << "Keyboard Logger set\n";
 
     asm volatile("sti");
-
-    logger.info() << "Before sleep ticks: " <<  kernel::timer_ticks() << '\n';
-    // kernel::sleep_ticks(300);
-    kernel::sleep_ms(3000);
-    logger.info() << "After sleep ticks: " << kernel::timer_ticks() << '\n';
 
     for(;;) asm volatile("hlt");
 }

@@ -1,6 +1,9 @@
 #include <stdint.h>
 #include "kernel_timer.h"
 #include "kernel_logger.h"
+#include "kernel_assert.h"
+
+// #define KERNEL_DEBUG
 
 namespace
 {
@@ -16,14 +19,16 @@ namespace kernel
 {
     void set_timer_logger(logger* log) noexcept { g_timer_logger = log; }
 
-    void handle_timer_tick() noexcept
+    void handle_timer_interrupt() noexcept
     {
         ++g_timer_ticks;
-        // if(g_timer_logger && g_timer_frequency != 0 && g_timer_ticks % g_timer_frequency == 0)
-        // {
-        //     g_timer_logger->info() << "Timer ticks: " << g_timer_ticks
-        //     << "\nUptime: " << uptime_seconds() << "s\n";
-        // }
+        #ifdef KERNEL_DEBUG
+            if(g_timer_logger && g_timer_frequency != 0 && g_timer_ticks % g_timer_frequency == 0)
+            {
+                g_timer_logger->info() << "Timer ticks: " << g_timer_ticks
+                << "\nUptime: " << uptime_seconds() << "s\n";
+            }
+        #endif
     }
 
     void set_timer_frequency(uint32_t frequency) noexcept { g_timer_frequency = frequency; }
@@ -57,7 +62,6 @@ namespace kernel
             return;
         }
 
-        // Calculating Ticks using the variables above
         const uint32_t whole_second_ticks{whole_seconds * frequency};
         const uint32_t remaining_ticks{(remaining_milliseconds * frequency + milliseconds_per_second - 1) / milliseconds_per_second};
 
