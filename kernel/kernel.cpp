@@ -31,8 +31,9 @@ extern "C" [[noreturn]] void kernel_main()
     logger.info() << "Setting Keyboard logger\n";
     kernel::set_keyboard_logger(&logger);
     console << "Keyboard Logger set\n";
-
+    
     asm volatile("sti");
 
+    console << static_cast<uint16_t>(0x5);
     for(;;) asm volatile("hlt");
 }

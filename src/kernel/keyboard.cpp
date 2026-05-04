@@ -22,6 +22,32 @@ namespace
     volatile bool g_extended_pending{false};
 
     kernel::keyboard_event g_last_event{};
+
+    kernel::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
+    {
+        if(extended) return kernel::keyboard_key::unknown;
+        switch(key_code)
+        {
+            case 0x01: return kernel::keyboard_key::escape;
+            case 0x02: return kernel::keyboard_key::digit_1;
+            case 0x03: return kernel::keyboard_key::digit_2;
+            case 0x04: return kernel::keyboard_key::digit_3;
+            case 0x05: return kernel::keyboard_key::digit_4;
+            case 0x06: return kernel::keyboard_key::digit_5;
+            case 0x07: return kernel::keyboard_key::digit_6;
+            case 0x08: return kernel::keyboard_key::digit_7;
+            case 0x09: return kernel::keyboard_key::digit_8;
+            case 0x0A: return kernel::keyboard_key::digit_9;
+            case 0x0B: return kernel::keyboard_key::digit_0;
+            case 0x1C: return kernel::keyboard_key::enter;
+            case 0x1E: return kernel::keyboard_key::a;
+            case 0x2E: return kernel::keyboard_key::c;
+            case 0x30: return kernel::keyboard_key::b;
+            case 0x39: return kernel::keyboard_key::space;
+            default:
+                return kernel::keyboard_key::unknown;
+        }
+    }
 }
 
 namespace kernel
@@ -42,12 +68,16 @@ namespace kernel
             return;
         }
 
+        const bool extended{g_extended_pending};
+        const uint8_t key_code{static_cast<uint8_t>(scancode & key_code_mask)};
+        const keyboard_key key{map_scancode_set_1_key(key_code, extended)};
         const keyboard_event event
         {
             scancode,
-            static_cast<uint8_t>(scancode & key_code_mask),
+            key_code,
+            key,
             ((scancode & release_mask) != 0 ? key_state::released : key_state::pressed),
-            g_extended_pending,
+            extended,
             true
         };
 
@@ -59,8 +89,8 @@ namespace kernel
         #ifdef KERNEL_DEBUG
             if(g_keyboard_logger)
             {
-                g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << kernel::dec
-                << " extended=" << event.extended << (event.state == key_state::pressed ? " pressed\n" : " released\n");
+                g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
+                << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed\n" : " released\n") << kernel::dec;
             }
         #endif
     }

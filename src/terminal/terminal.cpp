@@ -81,6 +81,32 @@ namespace kernel
         for(; current < end; ++current) put_char_no_sync(*current);
     }
 
+    void terminal::write_signed_16_no_sync(int16_t value) noexcept
+    {
+        if(value < 0)
+        {
+            put_char_no_sync('-');
+            write_unsigned_16_no_sync(static_cast<uint16_t>(0) - static_cast<uint16_t>(value));
+            return;
+        }
+        write_unsigned_16_no_sync(static_cast<uint16_t>(value));
+    }
+
+    void terminal::write_unsigned_16_no_sync(uint16_t value) noexcept
+    {
+        constexpr uint16_t count{5};
+        char digits[count];
+        char* end{digits + count};
+        char* current{end};
+        do
+        {
+            --current;
+            *current = static_cast<char>('0' + (value % 10));
+            value /= 10;
+        }while(value != 0);
+        for(; current < end; ++current) put_char_no_sync(*current);
+    }
+
     void terminal::write_signed_32_no_sync(int32_t value) noexcept
     {
         if(value < 0)
@@ -148,6 +174,30 @@ namespace kernel
         for(; shift >= 0; shift -= 4)
         {
             nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
+            if(!started)
+            {
+                if(nibble == 0) continue;
+                started = true;
+            }
+            put_char_no_sync(hex_digit(nibble));
+        }
+    }
+
+    void terminal::write_hex_16_no_sync(uint16_t value) noexcept
+    {
+        put_hex_prefix();
+        if(value == 0)
+        {
+            put_char_no_sync('0');
+            return;
+        }
+        bool started{false};
+        uint8_t nibble{0};
+        constexpr int initial_shift{sizeof(uint16_t) * 8 - 4};
+        int shift{initial_shift};
+        for(; shift >= 0; shift -= 4)
+        {
+            nibble = static_cast<uint16_t>((value >> shift) & 0x0F);
             if(!started)
             {
                 if(nibble == 0) continue;
@@ -268,7 +318,43 @@ namespace kernel
                     write_hex_8_no_sync(static_cast<uint8_t>(0) - static_cast<uint8_t>(value));
                     break;
                 }
-                write_hex_8_no_sync(static_cast<uint32_t>(value));
+                write_hex_8_no_sync(static_cast<uint8_t>(value));
+                break;
+        }
+        sync_cursor();
+        return *this;
+    }
+
+    terminal& terminal::operator<<(uint16_t value) noexcept
+    {
+        switch(state)
+        {
+            case integer_base::dec:
+                write_unsigned_16_no_sync(value);
+                break;
+            case integer_base::hex:
+                write_hex_16_no_sync(value);
+                break;   
+        }
+        sync_cursor();
+        return *this;
+    }
+
+    terminal& terminal::operator<<(int16_t value) noexcept
+    {
+        switch(state)
+        {
+            case integer_base::dec:
+                write_signed_16_no_sync(value);
+                break;
+            case integer_base::hex:
+                if(value < 0)
+                {
+                    put_char_no_sync('-');
+                    write_hex_16_no_sync(static_cast<uint16_t>(0) - static_cast<uint16_t>(value));
+                    break;
+                }
+                write_hex_16_no_sync(static_cast<uint16_t>(value));
                 break;
         }
         sync_cursor();
