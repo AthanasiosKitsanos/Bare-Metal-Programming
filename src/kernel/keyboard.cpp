@@ -13,6 +13,7 @@ namespace
     constexpr uint8_t release_mask{0x80};
     constexpr uint8_t key_code_mask{0x7F};
     constexpr uint8_t extended_prefix{0xE0};
+    constexpr uint8_t normal_key_map_size{128};
 
     kernel::logger* g_keyboard_logger{nullptr};
 
@@ -23,30 +24,39 @@ namespace
 
     kernel::keyboard_event g_last_event{};
 
+    static_assert(static_cast<uint16_t>(kernel::keyboard_key::unknown) == 0x0000);
+
+    struct normal_key_map_table
+    {
+        kernel::keyboard_key entries[normal_key_map_size];
+
+        constexpr normal_key_map_table(): entries{}
+        {
+            entries[0x01] = kernel::keyboard_key::escape;
+            entries[0x02] = kernel::keyboard_key::digit_1;
+            entries[0x03] = kernel::keyboard_key::digit_2;
+            entries[0x04] = kernel::keyboard_key::digit_3;
+            entries[0x05] = kernel::keyboard_key::digit_4;
+            entries[0x06] = kernel::keyboard_key::digit_5;
+            entries[0x07] = kernel::keyboard_key::digit_6;
+            entries[0x08] = kernel::keyboard_key::digit_7;
+            entries[0x09] = kernel::keyboard_key::digit_8;
+            entries[0x0A] = kernel::keyboard_key::digit_9;
+            entries[0x0B] = kernel::keyboard_key::digit_0;
+            entries[0x1C] = kernel::keyboard_key::enter;
+            entries[0x1E] = kernel::keyboard_key::a;
+            entries[0x2E] = kernel::keyboard_key::c;
+            entries[0x30] = kernel::keyboard_key::b;
+            entries[0x39] = kernel::keyboard_key::space;
+        }
+    };
+
+    constexpr normal_key_map_table normal_key_map{};
+
     kernel::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
     {
         if(extended) return kernel::keyboard_key::unknown;
-        switch(key_code)
-        {
-            case 0x01: return kernel::keyboard_key::escape;
-            case 0x02: return kernel::keyboard_key::digit_1;
-            case 0x03: return kernel::keyboard_key::digit_2;
-            case 0x04: return kernel::keyboard_key::digit_3;
-            case 0x05: return kernel::keyboard_key::digit_4;
-            case 0x06: return kernel::keyboard_key::digit_5;
-            case 0x07: return kernel::keyboard_key::digit_6;
-            case 0x08: return kernel::keyboard_key::digit_7;
-            case 0x09: return kernel::keyboard_key::digit_8;
-            case 0x0A: return kernel::keyboard_key::digit_9;
-            case 0x0B: return kernel::keyboard_key::digit_0;
-            case 0x1C: return kernel::keyboard_key::enter;
-            case 0x1E: return kernel::keyboard_key::a;
-            case 0x2E: return kernel::keyboard_key::c;
-            case 0x30: return kernel::keyboard_key::b;
-            case 0x39: return kernel::keyboard_key::space;
-            default:
-                return kernel::keyboard_key::unknown;
-        }
+        return *(normal_key_map.entries + key_code);
     }
 }
 
