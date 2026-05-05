@@ -6,6 +6,8 @@
 #include "kernel_timer.h"
 #include "keyboard.h"
 #include <stdint.h>
+#include "kernel_cpu_interrupts.h"
+#include "kernel_hardware_interrupts.h"
 
 #define CPU_INTERRUPT_LIST  \
     X(0, divide_error, "Divide Error", "#DE")   \

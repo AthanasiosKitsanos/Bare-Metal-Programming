@@ -83,6 +83,8 @@ PIT_CPP = src/kernel/kernel_pit.cpp
 PIT_OBJ = obj/kernel_pit.o
 
 KEYBOARD_KEY_LIST_H = include/kernel/internal/kernel_keyboard_key_list.h
+KERNEL_CPU_INTERRUPTS_H = include/kernel/internal/kernel_cpu_interrupts.h
+KERNEL_HARDWARE_INTERRUPRS_H = include/kernel/internal/kernel_hardware_interrupts.h
 
 KEYBOARD_H = include/kernel/keyboard.h
 KEYBOARD_CPP = src/kernel/keyboard.cpp
@@ -147,8 +149,8 @@ $(TIMER_OBJ): $(TIMER_CPP) $(TIMER_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TIMER_CPP) -o $(TIMER_OBJ)
 
 # Kernel Exceptions
-$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
+$(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H) $(KERNEL_CPU_INTERRUPTS_H) $(KERNEL_HARDWARE_INTERRUPRS_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) $(INCLUDE_KERNEL_INTERNALS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
 
 # Kernel PIC
 $(PIC_OBJ): $(PIC_CPP) $(PIC_H)
