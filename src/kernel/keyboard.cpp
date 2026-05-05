@@ -1,6 +1,7 @@
 #include "keyboard.h"
 #include "kernel_logger.h"
 #include "terminal_io_registers.h"
+#include "kernel_keyboard_key_list.h"
 
 #define KERNEL_DEBUG
 
@@ -46,7 +47,8 @@ namespace
         static_assert(normal_key_map.entries[key_code] == kernel::keyboard_key::key);
     KERNEL_KEYBOARD_KEY_LIST
     #undef X
-    
+    static_assert(normal_key_map.entries[127] == kernel::keyboard_key::unknown);
+
     kernel::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
     {
         if(extended) return kernel::keyboard_key::unknown;
