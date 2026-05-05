@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#define KEY_LIST    \
+#define KERNEL_KEYBOARD_KEY_LIST    \
     X(escape , 0x0001)  \
     X(digit_1, 0x0002)  \
     X(digit_2, 0x0003)  \
@@ -66,7 +66,7 @@ namespace kernel
         unknown = 0x0000,
         #define X(key, key_code)    \
             key = key_code,
-        KEY_LIST
+        KERNEL_KEYBOARD_KEY_LIST
         #undef X
     };
 

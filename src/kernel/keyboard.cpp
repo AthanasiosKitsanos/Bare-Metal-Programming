@@ -15,6 +15,9 @@ namespace
     constexpr uint8_t extended_prefix{0xE0};
     constexpr uint8_t normal_key_map_size{128};
 
+    static_assert(static_cast<uint16_t>(kernel::keyboard_key::unknown) == 0x0000);
+    static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
+
     kernel::logger* g_keyboard_logger{nullptr};
 
     volatile uint8_t g_last_scancode{0};
@@ -32,13 +35,18 @@ namespace
         {
             #define X(key, key_code)    \
                 entries[key_code] = kernel::keyboard_key::key;
-            KEY_LIST
+            KERNEL_KEYBOARD_KEY_LIST
             #undef X
         }
     };
 
     constexpr normal_key_map_table normal_key_map{};
 
+    #define X(key, key_code)    \
+        static_assert(normal_key_map.entries[key_code] == kernel::keyboard_key::key);
+    KERNEL_KEYBOARD_KEY_LIST
+    #undef X
+    
     kernel::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
     {
         if(extended) return kernel::keyboard_key::unknown;
@@ -52,7 +60,7 @@ namespace
             case kernel::keyboard_key::unknown: return "Unknown";
             #define X(key, key_code)    \
                 case kernel::keyboard_key::key: return #key;
-            KEY_LIST
+            KERNEL_KEYBOARD_KEY_LIST
             #undef X
 
             default:
