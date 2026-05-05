@@ -54,7 +54,6 @@ namespace kernel
 {
     class logger;
 
-
     enum class key_state: uint8_t
     {
         not_pressed,
@@ -66,7 +65,7 @@ namespace kernel
     {
         unknown = 0x0000,
         #define X(key, key_code)    \
-            key = key_code,    \
+            key = key_code,
         KEY_LIST
         #undef X
     };

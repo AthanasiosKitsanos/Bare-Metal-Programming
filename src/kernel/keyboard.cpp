@@ -31,7 +31,7 @@ namespace
         constexpr normal_key_map_table(): entries{}
         {
             #define X(key, key_code)    \
-                entries[key_code] = kernel::keyboard_key::key;  \
+                entries[key_code] = kernel::keyboard_key::key;
             KEY_LIST
             #undef X
         }
@@ -49,9 +49,12 @@ namespace
     {
         switch(key)
         {
+            case kernel::keyboard_key::unknown: return "Unknown";
             #define X(key, key_code)    \
-                case kernel::keyboard_key::key: return ##key;   \
+                case kernel::keyboard_key::key: return #key;
             KEY_LIST
+            #undef X
+
             default:
                 return "Unknown";
         }
@@ -98,8 +101,8 @@ namespace kernel
             if(g_keyboard_logger)
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
-                << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed\n" : " released\n")
-                << keyboard_key_name(event.key) << kernel::dec;
+                << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed" : " released")
+                << "\nkey_name=" << keyboard_key_name(event.key) << '\n' << kernel::dec;
             }
         #endif
     }
