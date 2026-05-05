@@ -30,13 +30,47 @@ namespace kernel
         digit_9 = 0x000A,
         digit_0 = 0x000B,
 
+        backspace = 0x000E,
+        tab = 0x000F,
+
+        q = 0x0010,
+        w = 0x0011,
+        e = 0x0012,
+        r = 0x0013,
+        t = 0x0014,
+        y = 0x0015,
+        u = 0x0016,
+        i = 0x0017,
+        o = 0x0018,
+        p = 0x0019,
+
         enter = 0x001C,
+        left_ctrl = 0x001D,
 
         a = 0x001E,
-        c = 0x002E,
-        b = 0x0030,
+        s = 0x001F,
+        d = 0x0020,
+        f = 0x0021,
+        g = 0x0022,
+        h = 0x0023,
+        j = 0x0024,
+        k = 0x0025,
+        l = 0x0026,
 
+        left_shift = 0x002A,
+
+        z = 0x002C,
+        x = 0x002D,
+        c = 0x002E,
+        v = 0x002F,
+        b = 0x0030,
+        n = 0x0031,
+        m = 0x0032,
+
+        right_shift = 0x0036,
+        left_alt = 0x0038,
         space = 0x0039,
+        caps_lock = 0x003A
     };
 
     struct keyboard_event

@@ -34,6 +34,5 @@ extern "C" [[noreturn]] void kernel_main()
     
     asm volatile("sti");
 
-    console << static_cast<uint16_t>(0x5);
     for(;;) asm volatile("hlt");
 }
