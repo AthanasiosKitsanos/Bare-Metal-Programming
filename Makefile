@@ -82,6 +82,8 @@ PIT_H = include/kernel/kernel_pit.h
 PIT_CPP = src/kernel/kernel_pit.cpp
 PIT_OBJ = obj/kernel_pit.o
 
+KEYBOARD_KEY_LIST_H = include/kernel/internal/kernel_keyboard_key_list.h
+
 KEYBOARD_H = include/kernel/keyboard.h
 KEYBOARD_CPP = src/kernel/keyboard.cpp
 KEYBOARD_OBJ = obj/kernel/keyboard.o
@@ -89,6 +91,7 @@ KEYBOARD_OBJ = obj/kernel/keyboard.o
 # --------------------Include Folders--------------------------
 INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
+INCLUDE_KERNEL_INTERNALS = -Iinclude/kernel/internal
 INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
 
 # ------------------------Pm Entry---------------------------
@@ -156,8 +159,8 @@ $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
 
 # Keyboard
-$(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)
+$(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H) $(KEYBOARD_KEY_LIST_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) $(INCLUDE_KERNEL_INTERNALS) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)
 
 # KERNEL_A
 $(KERNEL_A): $(LIB_FILES)
