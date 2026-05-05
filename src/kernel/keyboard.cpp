@@ -24,60 +24,16 @@ namespace
 
     kernel::keyboard_event g_last_event{};
 
-    static_assert(static_cast<uint16_t>(kernel::keyboard_key::unknown) == 0x0000);
-
     struct normal_key_map_table
     {
         kernel::keyboard_key entries[normal_key_map_size];
 
         constexpr normal_key_map_table(): entries{}
         {
-            entries[0x01] = kernel::keyboard_key::escape;
-            entries[0x02] = kernel::keyboard_key::digit_1;
-            entries[0x03] = kernel::keyboard_key::digit_2;
-            entries[0x04] = kernel::keyboard_key::digit_3;
-            entries[0x05] = kernel::keyboard_key::digit_4;
-            entries[0x06] = kernel::keyboard_key::digit_5;
-            entries[0x07] = kernel::keyboard_key::digit_6;
-            entries[0x08] = kernel::keyboard_key::digit_7;
-            entries[0x09] = kernel::keyboard_key::digit_8;
-            entries[0x0A] = kernel::keyboard_key::digit_9;
-            entries[0x0B] = kernel::keyboard_key::digit_0;
-            entries[0x0E] = kernel::keyboard_key::backspace;
-            entries[0x0F] = kernel::keyboard_key::tab;
-            entries[0x10] = kernel::keyboard_key::q;
-            entries[0x11] = kernel::keyboard_key::w;
-            entries[0x12] = kernel::keyboard_key::e;
-            entries[0x13] = kernel::keyboard_key::r;
-            entries[0x14] = kernel::keyboard_key::t;
-            entries[0x15] = kernel::keyboard_key::y;
-            entries[0x16] = kernel::keyboard_key::u;
-            entries[0x17] = kernel::keyboard_key::i;
-            entries[0x18] = kernel::keyboard_key::o;
-            entries[0x19] = kernel::keyboard_key::p;
-            entries[0x1C] = kernel::keyboard_key::enter;
-            entries[0x1D] = kernel::keyboard_key::left_ctrl;
-            entries[0x1E] = kernel::keyboard_key::a;
-            entries[0x1F] = kernel::keyboard_key::s;
-            entries[0x20] = kernel::keyboard_key::d;
-            entries[0x21] = kernel::keyboard_key::f;
-            entries[0x22] = kernel::keyboard_key::g;
-            entries[0x23] = kernel::keyboard_key::h;
-            entries[0x24] = kernel::keyboard_key::j;
-            entries[0x25] = kernel::keyboard_key::k;
-            entries[0x26] = kernel::keyboard_key::l;
-            entries[0x2A] = kernel::keyboard_key::left_shift;
-            entries[0x2C] = kernel::keyboard_key::z;
-            entries[0x2D] = kernel::keyboard_key::x;
-            entries[0x2E] = kernel::keyboard_key::c;
-            entries[0x2F] = kernel::keyboard_key::v;
-            entries[0x30] = kernel::keyboard_key::b;
-            entries[0x31] = kernel::keyboard_key::n;
-            entries[0x32] = kernel::keyboard_key::m;
-            entries[0x36] = kernel::keyboard_key::right_shift;
-            entries[0x38] = kernel::keyboard_key::left_alt;
-            entries[0x39] = kernel::keyboard_key::space;
-            entries[0x3A] = kernel::keyboard_key::caps_lock;
+            #define X(key, key_code)    \
+                entries[key_code] = kernel::keyboard_key::key;  \
+            KEY_LIST
+            #undef X
         }
     };
 
@@ -87,6 +43,18 @@ namespace
     {
         if(extended) return kernel::keyboard_key::unknown;
         return *(normal_key_map.entries + key_code);
+    }
+
+    const char* keyboard_key_name(const kernel::keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            #define X(key, key_code)    \
+                case kernel::keyboard_key::key: return ##key;   \
+            KEY_LIST
+            default:
+                return "Unknown";
+        }
     }
 }
 
@@ -130,7 +98,8 @@ namespace kernel
             if(g_keyboard_logger)
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
-                << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed\n" : " released\n") << kernel::dec;
+                << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed\n" : " released\n")
+                << keyboard_key_name(event.key) << kernel::dec;
             }
         #endif
     }
