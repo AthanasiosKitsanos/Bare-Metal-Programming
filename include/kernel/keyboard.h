@@ -102,8 +102,8 @@ namespace kernel
 
     keyboard_modifier_state current_keyboard_modifier_state() noexcept;
 
-    inline bool __attribute__((always_inline)) is_shift_active(const kernel::keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
-    inline bool __attribute__((always_inline)) is_ctrl_active(const kernel::keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
-    inline bool __attribute__((always_inline)) is_alt_active(const kernel::keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
-    inline bool __attribute__((always_inline)) is_caps_lock_active(const kernel::keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
+    inline bool __attribute__((always_inline)) is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
+    inline bool __attribute__((always_inline)) is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
+    inline bool __attribute__((always_inline)) is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
+    inline bool __attribute__((always_inline)) is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
 }
