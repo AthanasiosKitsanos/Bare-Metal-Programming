@@ -92,6 +92,7 @@ namespace kernel
     };
 
     void set_keyboard_logger(logger* log) noexcept;
+    bool initialize_keyboard() noexcept;
     void handle_keyboard_interrupt() noexcept;
 
     uint8_t last_keyboard_scancode() noexcept;

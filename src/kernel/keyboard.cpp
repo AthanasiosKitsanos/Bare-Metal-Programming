@@ -1,3 +1,4 @@
+#include "kernel_pic.h"
 #include "keyboard.h"
 #include "kernel_logger.h"
 #include "terminal_io_registers.h"
@@ -11,6 +12,15 @@ namespace
     constexpr uint16_t status_port{0x64};
 
     constexpr uint8_t output_buffer_full{0x01};
+    constexpr uint8_t input_buffer_full{0x02};
+
+    constexpr uint32_t keyboard_timeout{100000};
+    constexpr uint8_t keyboard_ack{0xFA};
+    constexpr uint8_t keyboard_resend{0xFE};
+    constexpr uint8_t set_leds_command{0xED};
+    constexpr uint8_t led_caps_lock{0x04};
+    constexpr uint8_t all_leds_off{0x00};
+
     constexpr uint8_t release_mask{0x80};
     constexpr uint8_t key_code_mask{0x7F};
     constexpr uint8_t extended_prefix{0xE0};
@@ -101,11 +111,65 @@ namespace
                 break;
         }
     }
+
+    bool wait_input_buffer_clear() noexcept
+    {
+        for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
+        {
+            if((kernel::inb(status_port) & input_buffer_full) == 0) return true;
+            kernel::io_wait();
+        }
+        return false;
+    }
+
+    bool wait_output_buffer_full() noexcept
+    {
+        for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
+        {
+            if((kernel::inb(status_port) & output_buffer_full) != 0) return true;
+            kernel::io_wait();
+        }
+        return false;
+    }
+
+    bool read_keyboard_ack() noexcept
+    {
+        if(!wait_output_buffer_full()) return false;
+        const uint8_t response{kernel::inb(data_port)};
+        g_keyboard_logger->debug() << "Response: " << response << " Keyboard Ack: " << keyboard_ack << '\n';
+        return response == keyboard_ack;
+    }
+
+    bool send_keyboard_byte_and_wait_ack(const uint8_t byte) noexcept
+    {
+        if(!wait_input_buffer_clear()) return false;
+        kernel::outb(data_port, byte);
+        return read_keyboard_ack();
+    }
+
+    void flush_keyboard_output_buffer() noexcept
+    {
+        for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
+        {
+            if((kernel::inb(status_port) & output_buffer_full) == 0) return;
+            static_cast<void>(kernel::inb(data_port));
+            kernel::io_wait();
+        }
+    }
 }
 
 namespace kernel
 {
     void set_keyboard_logger(logger* log) noexcept { g_keyboard_logger = log; }
+
+    bool initialize_keyboard() noexcept
+    {
+        g_modifier_state = kernel::keyboard_modifier_state{};
+        flush_keyboard_output_buffer();
+        if(!send_keyboard_byte_and_wait_ack(set_leds_command)) return false;
+        if(!send_keyboard_byte_and_wait_ack(all_leds_off)) return false;
+        return true;
+    }
 
     void handle_keyboard_interrupt() noexcept
     {
@@ -149,7 +213,7 @@ namespace kernel
                 << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
                 << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
                 << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
-                << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS ON:" << event.modifiers.caps_lock_on << '\n'; 
+                << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
             }
         #endif
     }

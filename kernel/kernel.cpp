@@ -18,6 +18,7 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::set_assert_logger(&logger);
     kernel::set_exception_logger(&logger);
     kernel::initialize_exceptions();
+
     kernel::set_timer_logger(&logger);
 
     logger.info() << "Setting frequency to: " << timer_frequency_hz << '\n';
@@ -31,6 +32,12 @@ extern "C" [[noreturn]] void kernel_main()
     logger.info() << "Setting Keyboard logger\n";
     kernel::set_keyboard_logger(&logger);
     console << "Keyboard Logger set\n";
+    logger.info() << "Synchronizing keyboard\n";
+    if(!kernel::initialize_keyboard())
+    {
+        logger.warning() << "Failed to synchronize keyboard\n";
+    }
+    else console << "Keyboard Synchronized\n";
     
     asm volatile("sti");
 
