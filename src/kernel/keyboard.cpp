@@ -70,24 +70,24 @@ namespace
         }
     }
 
-    void update_modifier_state(const kernel::keyboard_event& event) noexcept
+    void update_modifier_state(const kernel::keyboard_event* event) noexcept
     {
-        switch(event.key)
+        switch(event->key)
         {
             case kernel::keyboard_key::left_shift:
-                g_modifier_state.left_shift_down = (event.state == kernel::key_state::pressed);
+                g_modifier_state.left_shift_down = (event->state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::right_shift:
-                g_modifier_state.right_shift_down = (event.state == kernel::key_state::pressed);
+                g_modifier_state.right_shift_down = (event->state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::left_ctrl:
-                g_modifier_state.left_ctrl_down = (event.state == kernel::key_state::pressed);
+                g_modifier_state.left_ctrl_down = (event->state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::left_alt:
-                g_modifier_state.left_alt_down = (event.state == kernel::key_state::pressed);
+                g_modifier_state.left_alt_down = (event->state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::caps_lock:
-                if(event.state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
+                if(event->state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
                 break;
             default:
                 break;
@@ -128,7 +128,7 @@ namespace kernel
         };
 
         g_extended_pending = false;
-        update_modifier_state(event);
+        update_modifier_state(&event);
         event.modifiers = g_modifier_state;
         g_last_event = event;
         ++g_keyboard_events;
