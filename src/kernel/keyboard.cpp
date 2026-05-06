@@ -2,7 +2,6 @@
 #include "kernel_logger.h"
 #include "terminal_io_registers.h"
 #include "kernel_keyboard_key_list.h"
-#include "kernel_assert.h"
 
 #define KERNEL_KEYBOARD_DEBUG
 
