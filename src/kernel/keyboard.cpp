@@ -87,7 +87,15 @@ namespace
                 g_modifier_state.left_alt_down = (event->state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::caps_lock:
-                if(event->state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
+                if(event->state == kernel::key_state::pressed)
+                {
+                    if(!g_modifier_state.caps_lock_down)
+                    {
+                        g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
+                        g_modifier_state.caps_lock_down = true;
+                    }
+                }
+                else g_modifier_state.caps_lock_down = false;
                 break;
             default:
                 break;

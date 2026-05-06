@@ -78,6 +78,7 @@ namespace kernel
         bool left_ctrl_down;
         bool left_alt_down;
         bool caps_lock_on;
+        bool caps_lock_down;
     };
 
     struct keyboard_event
