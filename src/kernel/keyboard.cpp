@@ -2,8 +2,9 @@
 #include "kernel_logger.h"
 #include "terminal_io_registers.h"
 #include "kernel_keyboard_key_list.h"
+#include "kernel_assert.h"
 
-#define KERNEL_DEBUG
+#define KERNEL_KEYBOARD_DEBUG
 
 namespace
 {
@@ -70,24 +71,24 @@ namespace
         }
     }
 
-    void update_modifier_state(const kernel::keyboard_event* event) noexcept
+    void update_modifier_state(const kernel::keyboard_event& event) noexcept
     {
-        switch(event->key)
+        switch(event.key)
         {
             case kernel::keyboard_key::left_shift:
-                event->state == kernel::key_state::pressed ? g_modifier_state.left_shift_down = true : g_modifier_state.left_shift_down = false;
+                event.state == kernel::key_state::pressed ? g_modifier_state.left_shift_down = true : g_modifier_state.left_shift_down = false;
                 break;
             case kernel::keyboard_key::right_shift:
-                event->state == kernel::key_state::pressed ? g_modifier_state.right_shift_down = true : g_modifier_state.right_shift_down = false;
+                event.state == kernel::key_state::pressed ? g_modifier_state.right_shift_down = true : g_modifier_state.right_shift_down = false;
                 break;
             case  kernel::keyboard_key::left_ctrl:
-            event->state == kernel::key_state::pressed ? g_modifier_state.left_ctrl_down = true : g_modifier_state.left_ctrl_down = false;
+            event.state == kernel::key_state::pressed ? g_modifier_state.left_ctrl_down = true : g_modifier_state.left_ctrl_down = false;
                 break;
             case kernel::keyboard_key::left_alt:
-                event->state == kernel::key_state::pressed ? g_modifier_state.left_alt_down = true : g_modifier_state.left_alt_down = false;
+                event.state == kernel::key_state::pressed ? g_modifier_state.left_alt_down = true : g_modifier_state.left_alt_down = false;
                 break;
             case kernel::keyboard_key::caps_lock:
-                if(event->state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
+                if(event.state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
                 break;
             default:
                 break;
@@ -127,11 +128,11 @@ namespace kernel
         };
 
         g_extended_pending = false;
-        update_modifier_state(&event);
+        update_modifier_state(event);
         g_last_event = event;
         ++g_keyboard_events;
 
-        #ifdef KERNEL_DEBUG
+        #ifdef KERNEL_KEYBOARD_DEBUG
             if(g_keyboard_logger && event.state == kernel::key_state::pressed)
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
