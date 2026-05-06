@@ -112,7 +112,7 @@ namespace kernel
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
                 << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed" : " released")
-                << "\nkey_name=" << keyboard_key_name(event.key) << '\n' << kernel::dec;
+                << " key_name=" << keyboard_key_name(event.key) << '\n' << kernel::dec;
             }
         #endif
     }
