@@ -76,16 +76,16 @@ namespace
         switch(event.key)
         {
             case kernel::keyboard_key::left_shift:
-                event.state == kernel::key_state::pressed ? g_modifier_state.left_shift_down = true : g_modifier_state.left_shift_down = false;
+                g_modifier_state.left_shift_down = (event.state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::right_shift:
-                event.state == kernel::key_state::pressed ? g_modifier_state.right_shift_down = true : g_modifier_state.right_shift_down = false;
+                g_modifier_state.right_shift_down = (event.state == kernel::key_state::pressed);
                 break;
             case  kernel::keyboard_key::left_ctrl:
-            event.state == kernel::key_state::pressed ? g_modifier_state.left_ctrl_down = true : g_modifier_state.left_ctrl_down = false;
+                g_modifier_state.left_ctrl_down = (event.state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::left_alt:
-                event.state == kernel::key_state::pressed ? g_modifier_state.left_alt_down = true : g_modifier_state.left_alt_down = false;
+                g_modifier_state.left_alt_down = (event.state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::caps_lock:
                 if(event.state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
