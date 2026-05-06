@@ -71,6 +71,15 @@ namespace kernel
         caps_lock = 0x003A
     };
 
+    struct keyboard_modifier_state
+    {
+        bool left_shift_down;
+        bool right_shift_down;
+        bool left_ctrl_down;
+        bool left_alt_down;
+        bool caps_lock_on;
+    };
+
     struct keyboard_event
     {
         uint8_t raw_scancode;
@@ -79,15 +88,7 @@ namespace kernel
         key_state state;
         bool extended;
         bool valid;
-    };
-
-    struct keyboard_modifier_state
-    {
-        bool left_shift_down;
-        bool right_shift_down;
-        bool left_ctrl_down;
-        bool left_alt_down;
-        bool caps_lock_on;
+        keyboard_modifier_state modifiers;
     };
 
     void set_keyboard_logger(logger* log) noexcept;

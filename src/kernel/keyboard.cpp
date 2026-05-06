@@ -117,18 +117,20 @@ namespace kernel
         const bool extended{g_extended_pending};
         const uint8_t key_code{static_cast<uint8_t>(scancode & key_code_mask)};
         const keyboard_key key{map_scancode_set_1_key(key_code, extended)};
-        const keyboard_event event
+        keyboard_event event
         {
             scancode,
             key_code,
             key,
             ((scancode & release_mask) != 0 ? key_state::released : key_state::pressed),
             extended,
-            true
+            true,
+            keyboard_modifier_state{}
         };
 
         g_extended_pending = false;
         update_modifier_state(event);
+        event.modifiers = g_modifier_state;
         g_last_event = event;
         ++g_keyboard_events;
 
@@ -138,8 +140,8 @@ namespace kernel
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
                 << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
                 << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
-                << "mod= LSHIFT:" << g_modifier_state.left_shift_down << " RSHIFT:" << g_modifier_state.right_shift_down
-                << " LCtrl:" << g_modifier_state.left_ctrl_down << " LALT:" << g_modifier_state.left_alt_down << " CAPS:" << g_modifier_state.caps_lock_on << '\n'; 
+                << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
+                << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down << " CAPS:" << event.modifiers.caps_lock_on << '\n'; 
             }
         #endif
     }
