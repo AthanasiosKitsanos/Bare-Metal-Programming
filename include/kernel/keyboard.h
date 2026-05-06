@@ -8,9 +8,8 @@ namespace kernel
 
     enum class key_state: uint8_t
     {
-        not_pressed,
+        released,
         pressed,
-        released
     };
 
     enum class keyboard_key: uint16_t
@@ -77,8 +76,8 @@ namespace kernel
         bool right_shift_down;
         bool left_ctrl_down;
         bool left_alt_down;
-        bool caps_lock_on;
         bool caps_lock_down;
+        bool caps_lock_on;
     };
 
     struct keyboard_event

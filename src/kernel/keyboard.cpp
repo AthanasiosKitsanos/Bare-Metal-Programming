@@ -91,8 +91,8 @@ namespace
                 {
                     if(!g_modifier_state.caps_lock_down)
                     {
-                        g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
                         g_modifier_state.caps_lock_down = true;
+                        g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
                     }
                 }
                 else g_modifier_state.caps_lock_down = false;
@@ -148,7 +148,8 @@ namespace kernel
                 << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
                 << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
                 << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
-                << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down << " CAPS:" << event.modifiers.caps_lock_on << '\n'; 
+                << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
+                << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS ON:" << event.modifiers.caps_lock_on << '\n'; 
             }
         #endif
     }
