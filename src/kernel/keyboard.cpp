@@ -136,7 +136,11 @@ namespace
     {
         if(!wait_output_buffer_full()) return false;
         const uint8_t response{kernel::inb(data_port)};
-        g_keyboard_logger->debug() << "Response: " << response << " Keyboard Ack: " << keyboard_ack << '\n';
+
+        #ifdef KERNEL_KEYBOARD_DEBUG
+            g_keyboard_logger->debug() << "Response: " << response << " Keyboard Ack: " << keyboard_ack << '\n';
+        #endif
+
         return response == keyboard_ack;
     }
 
@@ -206,7 +210,7 @@ namespace kernel
         ++g_keyboard_events;
 
         #ifdef KERNEL_KEYBOARD_DEBUG
-            if(g_keyboard_logger && event.state == kernel::key_state::pressed)
+            if(g_keyboard_logger)
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
                 << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)

@@ -35,7 +35,6 @@ do                                                                              
     #define KERNEL_DEBUG_ASSERT(expression) KERNEL_ASSERT(expression)
     #define KERNEL_DEBUG_ASSERT_MSG(expression, message) KERNEL_ASSERT_MSG(expression, message)
 #else
-    #define KERNEL_DEBUG_ASSERT(expression) do {}while(false)
-    #define KERNEL_DEBUG_ASSERT_MSG(expression, message) do {}while(false)
-    #define KERNEL_DEBUG(expression, message) dp {}while(false)
+    #define KERNEL_DEBUG_ASSERT(expression)
+    #define KERNEL_DEBUG_ASSERT_MSG(expression, message)
 #endif
