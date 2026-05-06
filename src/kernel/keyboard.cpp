@@ -81,7 +81,7 @@ namespace
             case kernel::keyboard_key::right_shift:
                 g_modifier_state.right_shift_down = (event.state == kernel::key_state::pressed);
                 break;
-            case  kernel::keyboard_key::left_ctrl:
+            case kernel::keyboard_key::left_ctrl:
                 g_modifier_state.left_ctrl_down = (event.state == kernel::key_state::pressed);
                 break;
             case kernel::keyboard_key::left_alt:
