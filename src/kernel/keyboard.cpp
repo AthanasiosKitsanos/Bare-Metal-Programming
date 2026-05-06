@@ -19,14 +19,14 @@ namespace
     static_assert(static_cast<uint16_t>(kernel::keyboard_key::unknown) == 0x0000);
     static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
 
-    kernel::logger* g_keyboard_logger{nullptr};
-
     volatile uint8_t g_last_scancode{0};
     volatile uint32_t g_keyboard_events{0};
 
     volatile bool g_extended_pending{false};
 
+    kernel::logger* g_keyboard_logger{nullptr};
     kernel::keyboard_event g_last_event{};
+    kernel::keyboard_modifier_state g_modifier_state{};
 
     struct normal_key_map_table
     {
@@ -69,6 +69,30 @@ namespace
                 return "Unknown";
         }
     }
+
+    void update_modifier_state(const kernel::keyboard_event* event) noexcept
+    {
+        switch(event->key)
+        {
+            case kernel::keyboard_key::left_shift:
+                event->state == kernel::key_state::pressed ? g_modifier_state.left_shift_down = true : g_modifier_state.left_shift_down = false;
+                break;
+            case kernel::keyboard_key::right_shift:
+                event->state == kernel::key_state::pressed ? g_modifier_state.right_shift_down = true : g_modifier_state.right_shift_down = false;
+                break;
+            case  kernel::keyboard_key::left_ctrl:
+            event->state == kernel::key_state::pressed ? g_modifier_state.left_ctrl_down = true : g_modifier_state.left_ctrl_down = false;
+                break;
+            case kernel::keyboard_key::left_alt:
+                event->state == kernel::key_state::pressed ? g_modifier_state.left_alt_down = true : g_modifier_state.left_alt_down = false;
+                break;
+            case kernel::keyboard_key::caps_lock:
+                if(event->state == kernel::key_state::pressed) g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 namespace kernel
@@ -103,16 +127,18 @@ namespace kernel
         };
 
         g_extended_pending = false;
-
+        update_modifier_state(&event);
         g_last_event = event;
         ++g_keyboard_events;
 
         #ifdef KERNEL_DEBUG
-            if(g_keyboard_logger)
+            if(g_keyboard_logger && event.state == kernel::key_state::pressed)
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
-                << " mapped=" << static_cast<uint32_t>(event.key) << (event.state == key_state::pressed ? " pressed" : " released")
-                << " key_name=" << keyboard_key_name(event.key) << '\n' << kernel::dec;
+                << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
+                << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
+                << "mod= LSHIFT:" << g_modifier_state.left_shift_down << " RSHIFT:" << g_modifier_state.right_shift_down
+                << " LCtrl:" << g_modifier_state.left_ctrl_down << " LALT:" << g_modifier_state.left_alt_down << " CAPS:" << g_modifier_state.caps_lock_on << '\n'; 
             }
         #endif
     }
@@ -122,4 +148,5 @@ namespace kernel
 
     keyboard_event last_keyboard_event() noexcept { return g_last_event; }
     bool has_keyboard_event() noexcept { return g_last_event.valid; }
+    keyboard_modifier_state current_keyboard_modifier_state() noexcept { return g_modifier_state; }
 }

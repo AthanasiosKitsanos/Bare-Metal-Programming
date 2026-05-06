@@ -81,6 +81,15 @@ namespace kernel
         bool valid;
     };
 
+    struct keyboard_modifier_state
+    {
+        bool left_shift_down;
+        bool right_shift_down;
+        bool left_ctrl_down;
+        bool left_alt_down;
+        bool caps_lock_on;
+    };
+
     void set_keyboard_logger(logger* log) noexcept;
     void handle_keyboard_interrupt() noexcept;
 
@@ -89,4 +98,6 @@ namespace kernel
 
     keyboard_event last_keyboard_event() noexcept;
     bool has_keyboard_event() noexcept;
+
+    keyboard_modifier_state current_keyboard_modifier_state() noexcept;
 }
