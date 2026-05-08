@@ -15,6 +15,7 @@ namespace
     constexpr uint16_t interrupt_vector_count{256};
     constexpr uint16_t kernel_code_selector{0x08};
     constexpr uint8_t interrupt_gate_attributes{0x8E};
+    constexpr uint8_t cpu_exception_count{32};
     constexpr uint8_t irq_base{32};
     constexpr uint8_t irq_max{47};
 
@@ -26,21 +27,6 @@ namespace
         exception_handler_ptr stub;
         const char* name;
         const char* mnemonic;
-    };
-
-    struct cpu_exception_info
-    {
-        const char* title;
-        const char* mnemonic;
-    };
-
-    constexpr cpu_exception_info g_cpu_exception_info[] =
-    {
-        #define X(vector, name, title, mnemonic)    \
-            {title, mnemonic},
-
-        CPU_INTERRUPT_LIST
-        #undef X
     };
 
     using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept;
@@ -69,7 +55,6 @@ namespace
     HARDWARE_INTERRUPT_LIST
     #undef X
     
-
     inline void __attribute__((always_inline)) install_exception(const exception_descriptor& ex) noexcept
     {
         kernel::set_interrupt_gate(ex.vector, reinterpret_cast<uint32_t>(ex.stub), kernel_code_selector, interrupt_gate_attributes);
@@ -93,8 +78,19 @@ namespace
 
     [[noreturn]] void handle_cpu_exception(kernel::interrupt_frame* frame) noexcept
     {
-        const cpu_exception_info* info{(g_cpu_exception_info + frame->vector)};
-        handle_exception(info->title, info->mnemonic, frame);
+        switch(frame->vector)
+        {
+            #define X(vector, name, title, mnemonic)    \
+                case vector:    \
+                    handle_exception(title, mnemonic, frame);   \
+                    break;
+            CPU_INTERRUPT_LIST
+            #undef X
+
+            default:
+                if(g_exception_logger) g_exception_logger->warning() << "No handler registered in vector " << frame->vector;
+                halt_forever();
+        }
     }
 
     void default_interrupt_handler(kernel::interrupt_frame* frame) noexcept
