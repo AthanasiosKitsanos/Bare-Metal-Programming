@@ -3,6 +3,7 @@
 #include "kernel_logger.h"
 #include "terminal_io_registers.h"
 #include "kernel_keyboard_key_list.h"
+#include "kernel_interrupt_frame.h"
 
 #define KERNEL_KEYBOARD_DEBUG
 
@@ -175,8 +176,9 @@ namespace kernel
         return true;
     }
 
-    void handle_keyboard_interrupt() noexcept
+    void handle_keyboard_interrupt(interrupt_frame* frame) noexcept
     {
+        static_cast<void>(frame);
         const uint8_t status{inb(status_port)};
         if((status & output_buffer_full) == 0) return;
 

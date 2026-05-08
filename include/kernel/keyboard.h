@@ -1,10 +1,11 @@
 #pragma once
 
-#include <stdint.h>  
+#include <stdint.h>
 
 namespace kernel
 {
     class logger;
+    class interrupt_frame;
 
     enum class key_state: uint8_t
     {
@@ -93,7 +94,7 @@ namespace kernel
 
     void set_keyboard_logger(logger* log) noexcept;
     bool initialize_keyboard() noexcept;
-    void handle_keyboard_interrupt() noexcept;
+    void handle_keyboard_interrupt(interrupt_frame* frame) noexcept;
 
     uint8_t last_keyboard_scancode() noexcept;
     uint32_t keyboard_event_count() noexcept;

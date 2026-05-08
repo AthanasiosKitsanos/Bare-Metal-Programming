@@ -39,7 +39,7 @@ extern "C" [[noreturn]] void kernel_main()
     }
     else console << "Keyboard Synchronized\n";
     
-    asm volatile("sti");
+    asm volatile("ud2; sti");
 
     for(;;) asm volatile("hlt");
 }

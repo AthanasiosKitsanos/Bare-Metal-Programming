@@ -9,21 +9,14 @@
 #include "kernel_cpu_interrupts.h"
 #include "kernel_hardware_interrupts.h"
 
-#define CPU_INTERRUPT_LIST  \
-    X(0, divide_error, "Divide Error", "#DE")   \
-    X(6, invalid_opcode, "Invalid Opcode", "#UD")   \
-    X(13, general_protection_fault, "General Protection Fault", "#GP")   \
-    X(14, page_fault, "Page Fault", "#PF")  \
-
-#define HARDWARE_INTERRUPT_LIST \
-    X(32, timer_interrupt, "Timer Interrupt", "IRQ0")   \
-    X(33, keyboard_interrupt, "Keyboard Interrupt", "IRQ1")
-
 namespace
 {
     // Selectors and Attributes
+    constexpr uint16_t interrupt_vector_count{256};
     constexpr uint16_t kernel_code_selector{0x08};
     constexpr uint8_t interrupt_gate_attributes{0x8E};
+    constexpr uint8_t irq_base{32};
+    constexpr uint8_t irq_max{47};
 
     using exception_handler_ptr = void (*)() noexcept;
 
@@ -34,6 +27,25 @@ namespace
         const char* name;
         const char* mnemonic;
     };
+
+    struct cpu_exception_info
+    {
+        const char* title;
+        const char* mnemonic;
+    };
+
+    constexpr cpu_exception_info g_cpu_exception_info[] =
+    {
+        #define X(vector, name, title, mnemonic)    \
+            {title, mnemonic},
+
+        CPU_INTERRUPT_LIST
+        #undef X
+    };
+
+    using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept;
+
+    interrupt_handler g_interrupt_handlers[interrupt_vector_count]{};
 
     kernel::logger* g_exception_logger{nullptr};
 
@@ -68,7 +80,7 @@ namespace
         for(;;) asm volatile("cli; hlt");
     }
 
-    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, const kernel::interrupt_frame* frame) noexcept
+    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, kernel::interrupt_frame* frame) noexcept
     {
         if(!g_exception_logger) halt_forever();
         g_exception_logger->error() << "CPU exception: " << name << ' ' << mnemonic
@@ -78,33 +90,51 @@ namespace
         << "\nVector:" << frame->vector << '\n';
         g_exception_logger->panic("Unhandled CPU exception");
     }
+
+    [[noreturn]] void handle_cpu_exception(kernel::interrupt_frame* frame) noexcept
+    {
+        const cpu_exception_info* info{(g_cpu_exception_info + frame->vector)};
+        handle_exception(info->title, info->mnemonic, frame);
+    }
+
+    void default_interrupt_handler(kernel::interrupt_frame* frame) noexcept
+    {
+        if(!frame) halt_forever();
+        const uint32_t vector{frame->vector};
+        if(g_exception_logger)
+        {
+            g_exception_logger->error() << "Unhandled interrupt vector: " << vector << "\nError Code: " << frame->error_code
+            << "\nEIP: " << kernel::hex << frame->eip << '\n' << kernel::dec;
+        }
+        if(vector >= irq_base && vector <= irq_max) return;
+        halt_forever();
+    }
+
+    void initialize_interrupt_handlers_table() noexcept
+    {
+        for(uint32_t vector{0}; vector < interrupt_vector_count; ++vector)
+        {
+            *(g_interrupt_handlers + vector) = default_interrupt_handler;
+        }
+
+        #define X(vector, name, title, mnemonic)    \
+            *(g_interrupt_handlers + vector) = handle_cpu_exception;
+        CPU_INTERRUPT_LIST
+        #undef X
+        
+        #define X(vector, name, title, mnemonic)    \
+            *(g_interrupt_handlers + vector) = kernel::handle_##name;
+        HARDWARE_INTERRUPT_LIST
+        #undef X
+
+    }
 }
 
 extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 {
-    switch(frame->vector)
-    {
-        #define X(vector, name, title, mnemonic)    \
-            case vector:    \
-                handle_exception(title, mnemonic, frame); \
-                break;
-            
-        CPU_INTERRUPT_LIST
-        #undef X
-
-        #define X(vector, name, title, mnemonic)    \
-            case vector:    \
-                kernel::handle_##name();   \
-                kernel::send_eoi(vector); \
-                break;
-        
-        HARDWARE_INTERRUPT_LIST
-        #undef X
-
-        default:
-            halt_forever();
-            break;
-    }
+    uint32_t vector{frame->vector};
+    g_interrupt_handlers[vector](frame);
+    if(vector >=irq_base && vector <= irq_max) kernel::send_eoi(static_cast<uint8_t>(vector - irq_base));
 }
 
 namespace kernel
@@ -125,6 +155,8 @@ namespace kernel
         CPU_INTERRUPT_LIST
         HARDWARE_INTERRUPT_LIST
         #undef X
+        
+        initialize_interrupt_handlers_table();
 
         kernel::mask_all_except_timer_and_keyboard();
 

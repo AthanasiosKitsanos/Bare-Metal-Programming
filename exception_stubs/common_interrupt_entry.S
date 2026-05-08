@@ -30,7 +30,7 @@ irq_\vector:
     jmp common_interrupt_entry
 .endm
 
-.irp v, 0, 1, 2, 3, 4, 5, 6, 7
+.irp v, 0, 1, 2, 3, 4, 5, 6, 7, 9, 15, 16
 ISR_NO_ERROR \v
 .endr
 

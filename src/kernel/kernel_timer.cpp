@@ -2,6 +2,7 @@
 #include "kernel_timer.h"
 #include "kernel_logger.h"
 #include "kernel_assert.h"
+#include "kernel_interrupt_frame.h"
 
 // #define KERNEL_DEBUG
 
@@ -19,8 +20,9 @@ namespace kernel
 {
     void set_timer_logger(logger* log) noexcept { g_timer_logger = log; }
 
-    void handle_timer_interrupt() noexcept
+    void handle_timer_interrupt(interrupt_frame* frame) noexcept
     {
+        static_cast<void>(frame);
         ++g_timer_ticks;
         #ifdef KERNEL_DEBUG
             if(g_timer_logger && g_timer_frequency != 0 && g_timer_ticks % g_timer_frequency == 0)
