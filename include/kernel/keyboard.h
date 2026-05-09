@@ -104,11 +104,13 @@ namespace kernel
 
     keyboard_modifier_state current_keyboard_modifier_state() noexcept;
 
+    // Modiffier State Helpers
     inline bool __attribute__((always_inline)) is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
     inline bool __attribute__((always_inline)) is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
     inline bool __attribute__((always_inline)) is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
     inline bool __attribute__((always_inline)) is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
 
+    // Key Classification Helper
     inline bool __attribute__((always_inline)) is_modifier_key(const keyboard_key key) noexcept
     {
         switch(key)
@@ -123,4 +125,11 @@ namespace kernel
                 return false;
         }
     }
+
+    // Event Classification Helpers
+    inline bool __attribute__((always_inline)) is_pressed_event(const keyboard_event* event) noexcept { return event->state == key_state::pressed; }
+    inline bool __attribute__((always_inline)) is_released_event(const keyboard_event* event) noexcept { return event->state == key_state::released; }
+    inline bool __attribute__((always_inline)) is_modifier_event(const keyboard_event* event) noexcept { return is_modifier_key(event->key); }
+    inline bool __attribute__((always_inline)) is_non_modifier_event(const keyboard_event* event) noexcept { return !is_modifier_key(event->key); }
+    inline bool __attribute__((always_inline)) is_non_modifier_press_event(const keyboard_event* event) noexcept {return is_pressed_event(event) && is_non_modifier_event(event); }
 }
