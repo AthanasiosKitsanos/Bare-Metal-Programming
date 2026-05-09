@@ -132,12 +132,12 @@ namespace kernel
     inline bool __attribute__((always_inline)) is_modifier_event(const keyboard_event* event) noexcept { return is_modifier_key(event->key); }
     inline bool __attribute__((always_inline)) is_non_modifier_event(const keyboard_event* event) noexcept { return !is_modifier_event(event); }
     inline bool __attribute__((always_inline)) is_non_modifier_press_event(const keyboard_event* event) noexcept { return is_pressed_event(event) && is_non_modifier_event(event); }
-    
+
     inline bool __attribute__((always_inline)) is_known_key(const keyboard_key key) noexcept { return key != keyboard_key::unknown; }
     inline bool __attribute__((always_inline)) is_unknown_key(const keyboard_key key) noexcept { return !is_known_key(key); }
     inline bool __attribute__((always_inline)) is_known_key_event(const keyboard_event* event) noexcept { return is_known_key(event->key); }
     inline bool __attribute__((always_inline)) is_unknown_key_event(const keyboard_event* event) noexcept { return is_unknown_key(event->key); }
-    inline bool __attribute__((always_inline)) is_input_character_candidate_event(const keyboard_event* event) noexcept
+    inline bool __attribute__((always_inline)) is_input_candidate_event(const keyboard_event* event) noexcept
     {
         return event->valid && is_pressed_event(event) && is_known_key_event(event) && is_non_modifier_event(event);
     }
