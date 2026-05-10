@@ -30,10 +30,10 @@ extern "C" [[noreturn]] void kernel_main()
     console << "Frequency set\n";
 
     logger.info() << "Setting Keyboard logger\n";
-    kernel::set_keyboard_logger(&logger);
+    driver::set_keyboard_logger(&logger);
     console << "Keyboard Logger set\n";
     logger.info() << "Synchronizing keyboard\n";
-    if(!kernel::initialize_keyboard())
+    if(!driver::initialize_keyboard())
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }

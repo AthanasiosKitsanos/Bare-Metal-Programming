@@ -6,7 +6,10 @@ namespace kernel
 {
     class logger;
     class interrupt_frame;
+}
 
+namespace driver
+{
     enum class key_state: uint8_t
     {
         released,
@@ -92,9 +95,9 @@ namespace kernel
         keyboard_modifier_state modifiers;
     };
 
-    void set_keyboard_logger(logger* log) noexcept;
+    void set_keyboard_logger(kernel::logger* log) noexcept;
     bool initialize_keyboard() noexcept;
-    void handle_keyboard_interrupt(interrupt_frame* frame) noexcept;
+    void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
 
     uint8_t last_keyboard_scancode() noexcept;
     uint32_t keyboard_event_count() noexcept;

@@ -40,7 +40,7 @@ namespace
     CPU_INTERRUPT_LIST
     #undef X
 
-    #define X(vector, name, title, mnemonic) extern "C" void irq_##vector() noexcept;
+    #define X(vector, name_space, name, title, mnemonic) extern "C" void irq_##vector() noexcept;
         
     HARDWARE_INTERRUPT_LIST
     #undef X
@@ -50,7 +50,7 @@ namespace
     CPU_INTERRUPT_LIST
     #undef X
 
-    #define X(vector, name, title, mnemonic)    \
+    #define X(vector, name_space, name, title, mnemonic)    \
         constexpr exception_descriptor name##_desc{vector, irq_##vector, title, mnemonic};
     HARDWARE_INTERRUPT_LIST
     #undef X
@@ -118,8 +118,8 @@ namespace
         CPU_INTERRUPT_LIST
         #undef X
         
-        #define X(vector, name, title, mnemonic)    \
-            *(g_interrupt_handlers + vector) = kernel::handle_##name;
+        #define X(vector, name_space, name, title, mnemonic)    \
+            *(g_interrupt_handlers + vector) = name_space::handle_##name;
         HARDWARE_INTERRUPT_LIST
         #undef X
 
@@ -149,6 +149,11 @@ namespace kernel
             install_exception(name##_desc);
 
         CPU_INTERRUPT_LIST
+        #undef X
+
+        #define X(vector, name_scace, name, title, mnemonic)    \
+            install_exception(name##_desc);
+
         HARDWARE_INTERRUPT_LIST
         #undef X
         
