@@ -16,109 +16,40 @@ SECTOR_SIZE = 512
 
 INCLUDE_MAP_FILE = -Map=output.map
 
-# File Sources
+#-----------------------Include Mk Files---------------------------------------
+include boot/boot_files.mk
+include exception_stubs/exceptions_files.mk
+include include/header_files.mk
+include src/src_files.mk
 
-# ---------------------Boot stage 1---------------------------
-BOOT_STAGE_1 = boot/boot_stage_1.S
-BOOT_STAGE_1_OBJ = obj/boot_stage_1.o
-BOOT_STAGE_1_ELF = elf/boot_stage_1.elf
-BOOT_STAGE_1_BIN = bin/boot_stage_1.bin
-BOOT_1_LIKNER = links/boot_1_linker.ld
-
-# ---------------------Boot stage 2---------------------------
-BOOT_STAGE_2_INC = inc/boot_stage_2_load.inc
-BOOT_STAGE_2 = boot/boot_stage_2.S
-BOOT_STAGE_2_OBJ = obj/boot_stage_2.o
-
-# --------------------Code 32--------------------------------
-CODE_32_ELF = elf/code_32.elf
-CODE_32_BIN = bin/code_32.bin
-CODE_32_LINKER = links/code_32.ld
-
-
-# -----------------------Kenrel-------------------------------
+# -----------------------Kenrel Main-------------------------------
 KERNEL_CPP = kernel/kernel.cpp
 KERNEL_OBJ = obj/kernel.o
-
-IO_H = include/terminal/terminal_io_registers.h
-
-TERMINAL_H = include/terminal/terminal.h
-TERMINAL_CPP = src/terminal/terminal.cpp
-TERMINAL_OBJ = obj/terminal/terminal.o
-
-VGA_H = include/terminal/terminal_vga_text_buffer.h
-VGA_CPP = src/terminal/terminal_vga_text_buffer.cpp
-VGA_OBJ = obj/terminal/terminal_vga_text_buffer.o
-
-CURSOR_H = include/terminal/terminal_vga_hardware_cursor.h
-CURSOR_CPP = src/terminal/terminal_vga_hardware_cursor.cpp
-CURSOR_OBJ = obj/terminal/terminal_vga_hardware_cursor.o
-
-LOGGER_H = include/kernel/kernel_logger.h
-LOGGER_CPP = src/kernel/kernel_logger.cpp
-LOGGER_OBJ = obj/kernel/kernel_logger.o
-
-ASSERT_H = include/kernel/kernel_assert.h
-ASSERT_CPP = src/kernel/kernel_assert.cpp
-ASSERT_OBJ = obj/kernel/kernel_assert.o
-
-IDT_ENTRY_H = include/kernel/kernel_idt.h
-IDT_ENTRY_CPP = src/kernel/kernel_idt.cpp
-IDT_ENTRY_OBJ = obj/kernel/kernel_idt.o
-
-EXCEPTIONS_H = include/kernel/kernel_exceptions.h
-EXCEPTIONS_CPP = src/kernel/kernel_exceptions.cpp
-EXCEPTIONS_OBJ = obj/kernel/kernel_exceptions.o
-
-PIC_H = include/kernel/kernel_pic.h
-PIC_CPP = src/kernel/kernel_pic.cpp
-PIC_OBJ = obj/kernel/kernel_pic.o
-
-TIMER_H = include/kernel/kernel_timer.h
-TIMER_CPP = src/kernel/kernel_timer.cpp
-TIMER_OBJ = obj/kernel/kernel_timer.o
-
-PIT_H = include/kernel/kernel_pit.h
-PIT_CPP = src/kernel/kernel_pit.cpp
-PIT_OBJ = obj/kernel_pit.o
-
-KEYBOARD_KEY_LIST_H = include/kernel/internal/kernel_keyboard_key_list.h
-KERNEL_CPU_INTERRUPTS_H = include/kernel/internal/kernel_cpu_interrupts.h
-KERNEL_HARDWARE_INTERRUPRS_H = include/kernel/internal/kernel_hardware_interrupts.h
-
-KEYBOARD_H = include/kernel/keyboard.h
-KEYBOARD_CPP = src/kernel/keyboard.cpp
-KEYBOARD_OBJ = obj/kernel/keyboard.o
-
-# --------------------Include Folders--------------------------
-INCLUDE_TERMINAL_FOLDER = -Iinclude/terminal
-INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
-INCLUDE_KERNEL_INTERNALS = -Iinclude/kernel/internal
-INCLUDE_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_FOLDER)
-
-# ------------------------Pm Entry---------------------------
-PM_ENTRY = boot/pm_entry.S
-PM_ENTRY_OBJ = obj/pm_entry.o
-
-#-------------------------Common Interrupt Entry-------------------------------
-INTERRUPT_ENTRY_S = exception_stubs/common_interrupt_entry.S
-INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
 
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
 LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ) $(KEYBOARD_OBJ)
 
+# --------------------Code 32--------------------------------
+CODE_32_ELF = elf/code_32.elf
+CODE_32_BIN = bin/code_32.bin
+CODE_32_LINKER = links/code_32.ld
+
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin
+
+#-----------------------Include All Folders----------------------------------------
+INCLUDE_ALL_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_ALL_FOLDERS) $(INCLUDE_DRIVERS_ALL_FOLDERS)
 
 # ----------------------Rules--------------------------------
 
 all: $(OS_IMAGE)
 
-# Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
+#--------------------------------------Terminal Rules----------------------------------------------------------
+# Terminal
+$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H) $(LOGGER_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
 
 # VGA cursor
 $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
@@ -128,17 +59,18 @@ $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
 
-# Terminal
-$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H) $(LOGGER_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+#--------------------------------------Kernel Main Rules------------------------------------------------------------
+# Kernel
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # Kernel Logger
 $(LOGGER_OBJ): $(LOGGER_H) $(LOGGER_CPP) $(TERMINAL_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(LOGGER_CPP) -o $(LOGGER_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(LOGGER_CPP) -o $(LOGGER_OBJ)
 
 # Kernel Assert
 $(ASSERT_OBJ): $(ASSERT_CPP) $(ASSERT_H) $(LOGGER_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(ASSERT_CPP) -o $(ASSERT_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(ASSERT_CPP) -o $(ASSERT_OBJ)
 
 # Kenrel IDT
 $(IDT_ENTRY_OBJ): $(IDT_ENTRY_CPP) $(IDT_ENTRY_H)
@@ -146,28 +78,30 @@ $(IDT_ENTRY_OBJ): $(IDT_ENTRY_CPP) $(IDT_ENTRY_H)
 
 # Kernel Timer
 $(TIMER_OBJ): $(TIMER_CPP) $(TIMER_H) $(LOGGER_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(TIMER_CPP) -o $(TIMER_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(TIMER_CPP) -o $(TIMER_OBJ)
 
 # Kernel Exceptions
 $(EXCEPTIONS_OBJ): $(EXCEPTIONS_CPP) $(EXCEPTIONS_H) $(LOGGER_H) $(IDT_ENTRY_H) $(INTERRUPT_FRAME_H) $(PIC_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H) $(KERNEL_CPU_INTERRUPTS_H) $(KERNEL_HARDWARE_INTERRUPRS_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) $(INCLUDE_KERNEL_INTERNALS) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) $(INCLUDE_KERNEL_INTERNAL_FOLDER) -c $(EXCEPTIONS_CPP) -o $(EXCEPTIONS_OBJ)
 
 # Kernel PIC
 $(PIC_OBJ): $(PIC_CPP) $(PIC_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIC_CPP) -o $(PIC_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(PIC_CPP) -o $(PIC_OBJ)
 
 # Kernel PIT
 $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
 
 # Keyboard
 $(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H) $(KEYBOARD_KEY_LIST_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_FOLDERS) $(INCLUDE_KERNEL_INTERNALS) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) $(INCLUDE_DRIVERS_INTERNAL_FOLDER) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)
 
+#---------------------------------Kernel Library Rules-------------------------------------------------------------------------
 # KERNEL_A
 $(KERNEL_A): $(LIB_FILES)
 	$(MAKE_LIB) $(KERNEL_A) $(LIB_FILES)
 
+#----------------------------------Assembly Rules----------------------------------------------------------------------------
 # PM Entry
 $(PM_ENTRY_OBJ): $(PM_ENTRY)
 	$(AS) $(PM_ENTRY) -o $(PM_ENTRY_OBJ)

@@ -199,7 +199,7 @@ namespace kernel
     }
 
     [[gnu::always_inline]]
-    inline bool is_input_text_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_text_key(event->key); }
+    inline bool is_text_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_text_key(event->key); }
 
     [[gnu::always_inline]]
     inline bool is_control_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_control_key(event->key); }
