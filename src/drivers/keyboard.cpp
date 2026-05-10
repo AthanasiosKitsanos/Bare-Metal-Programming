@@ -5,7 +5,7 @@
 #include "kernel_keyboard_key_list.h"
 #include "kernel_interrupt_frame.h"
 
-#define KERNEL_KEYBOARD_DEBUG
+#define DRIVER_KEYBOARD_DEBUG
 
 namespace
 {
@@ -211,12 +211,12 @@ namespace driver
         g_last_event = event;
         ++g_keyboard_events;
 
-        #ifdef driver_KEYBOARD_DEBUG
+        #ifdef DRIVER_KEYBOARD_DEBUG
             if(g_keyboard_logger)
             {
-                g_keyboard_logger->info() << driver::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
+                g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
                 << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
-                << driver::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
+                << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
                 << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
                 << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
                 << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
