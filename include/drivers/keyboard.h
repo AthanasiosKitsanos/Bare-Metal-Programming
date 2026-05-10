@@ -30,10 +30,10 @@ namespace driver
         digit_8 = 0x0009,
         digit_9 = 0x000A,
         digit_0 = 0x000B,
-        
+        plus = 0x000D,
+        dash = 0x000C,
         backspace = 0x000E,
         tab = 0x000F,
-
         q = 0x0010,
         w = 0x0011,
         e = 0x0012,
@@ -44,10 +44,8 @@ namespace driver
         i = 0x0017,
         o = 0x0018,
         p = 0x0019,
-
         enter = 0x001C,
         left_ctrl = 0x001D,
-
         a = 0x001E,
         s = 0x001F,
         d = 0x0020,
@@ -57,9 +55,9 @@ namespace driver
         j = 0x0024,
         k = 0x0025,
         l = 0x0026,
-
+        ud_dot = 0x0027,
+        double_quotes = 0x0028,
         left_shift = 0x002A,
-
         z = 0x002C,
         x = 0x002D,
         c = 0x002E,
@@ -67,11 +65,22 @@ namespace driver
         b = 0x0030,
         n = 0x0031,
         m = 0x0032,
-        
         right_shift = 0x0036,
         left_alt = 0x0038,
         space = 0x0039,
-        caps_lock = 0x003A
+        caps_lock = 0x003A,
+        f1 = 0x003B,
+        f2 = 0x003C,
+        f3 = 0x003D,
+        f4 = 0x003E,
+        f5 = 0x003F,
+        f6 = 0x0040,
+        f7 = 0x0041,
+        f8 = 0x0042,
+        f9 = 0x0043,
+        f10 = 0x0044,
+        f11 = 0x0057,
+        f12 = 0x0058,
     };
 
     struct keyboard_modifier_state

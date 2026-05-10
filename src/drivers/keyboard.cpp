@@ -2,7 +2,7 @@
 #include "keyboard.h"
 #include "kernel_logger.h"
 #include "terminal_io_registers.h"
-#include "kernel_keyboard_key_list.h"
+#include "keyboard_key_list_n_map.h"
 #include "kernel_interrupt_frame.h"
 
 #define DRIVER_KEYBOARD_DEBUG
@@ -39,24 +39,39 @@ namespace
     driver::keyboard_event g_last_event{};
     driver::keyboard_modifier_state g_modifier_state{};
 
-    struct normal_key_map_table
+    struct normal_key_list
     {
         driver::keyboard_key entries[normal_key_map_size];
 
-        constexpr normal_key_map_table(): entries{}
+        constexpr normal_key_list(): entries{}
         {
             #define X(key, key_code)    \
                 entries[key_code] = driver::keyboard_key::key;
-            KERNEL_KEYBOARD_KEY_LIST
+            DRIVER_KEYBOARD_KEY_LIST
             #undef X
         }
     };
 
-    constexpr normal_key_map_table normal_key_map{};
+    constexpr normal_key_list normal_key_map{};
+
+    struct normal_key_mapping_list
+    {
+        char characters[normal_key_map_size];
+
+        constexpr normal_key_mapping_list(): characters{}
+        {
+            #define X(character, key_code)  \
+                characters[key_code] = character;
+            DRIVER_KEYBOARD_NORMAL_KEY_MAPPING
+            #undef X
+        }
+    };
+
+    constexpr normal_key_mapping_list characters_map{};
 
     #define X(key, key_code)    \
         static_assert(normal_key_map.entries[key_code] == driver::keyboard_key::key);
-    KERNEL_KEYBOARD_KEY_LIST
+    DRIVER_KEYBOARD_KEY_LIST
     #undef X
     static_assert(normal_key_map.entries[127] == driver::keyboard_key::unknown);
 
@@ -66,19 +81,20 @@ namespace
         return *(normal_key_map.entries + key_code);
     }
 
-    const char* keyboard_key_name(const driver::keyboard_key key) noexcept
+    char keyboard_key_name(const driver::keyboard_key key) noexcept
     {
-        switch(key)
-        {
-            case driver::keyboard_key::unknown: return "Unknown";
-            #define X(key, key_code)    \
-                case driver::keyboard_key::key: return #key;
-            KERNEL_KEYBOARD_KEY_LIST
-            #undef X
+        // switch(key)
+        // {
+        //     case driver::keyboard_key::unknown: return "Unknown";
+        //     #define X(key, key_code)    
+        //         case driver::keyboard_key::key: return #key;
+        //     DRIVER_KEYBOARD_KEY_LIST
+        //     #undef X
 
-            default:
-                return "Unknown";
-        }
+        //     default:
+        //         return "Unknown";
+        // }
+        return *(characters_map.characters + static_cast<uint8_t>(key));
     }
 
     void update_modifier_state(const driver::keyboard_event* event) noexcept
@@ -137,11 +153,6 @@ namespace
     {
         if(!wait_output_buffer_full()) return false;
         const uint8_t response{kernel::inb(data_port)};
-
-        #ifdef driver_KEYBOARD_DEBUG
-            g_keyboard_logger->debug() << "Response: " << response << " Keyboard Ack: " << keyboard_ack << '\n';
-        #endif
-
         return response == keyboard_ack;
     }
 
@@ -220,6 +231,12 @@ namespace driver
                 << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
                 << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
                 << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
+            }
+        #else
+            if(g_keyboard_logger && event.state == key_state::pressed)
+            {
+                g_keyboard_logger->info() << kernel::hex << "Key=" << event.key_code
+                << " mapped=" << static_cast<uint32_t>(event.key) << kernel::dec << " key_name=" << keyboard_key_name(event.key) << '\n';
             }
         #endif
     }

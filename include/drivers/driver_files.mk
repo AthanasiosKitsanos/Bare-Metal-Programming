@@ -1,5 +1,5 @@
 #-----------------Drivers Internal-----------------------
-KEYBOARD_KEY_LIST_H = include/drivers/internal/kernel_keyboard_key_list.h
+KEYBOARD_KEY_LIST_H = include/drivers/internal/keyboard_key_list_n_map.h
 
 #-------------------Keyboard Headers----------------------------------
 KEYBOARD_H = include/drivers/keyboard.h
