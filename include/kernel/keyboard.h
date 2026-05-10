@@ -105,13 +105,21 @@ namespace kernel
     keyboard_modifier_state current_keyboard_modifier_state() noexcept;
 
     // Modifier State Helpers
-    inline bool __attribute__((always_inline)) is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
-    inline bool __attribute__((always_inline)) is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
-    inline bool __attribute__((always_inline)) is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
-    inline bool __attribute__((always_inline)) is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
+    [[gnu::always_inline]]
+    inline bool is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
+
+    [[gnu::always_inline]]
+    inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
+
+    [[gnu::always_inline]]
+    inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
+
+    [[gnu::always_inline]]
+    inline bool is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
 
     // Key Classification Helper
-    inline bool __attribute__((always_inline)) is_modifier_key(const keyboard_key key) noexcept
+    [[gnu::always_inline]]
+    inline bool is_modifier_key(const keyboard_key key) noexcept
     {
         switch(key)
         {
@@ -126,19 +134,73 @@ namespace kernel
         }
     }
 
-    // Event Classification Helpers
-    inline bool __attribute__((always_inline)) is_pressed_event(const keyboard_event* event) noexcept { return event->state == key_state::pressed; }
-    inline bool __attribute__((always_inline)) is_released_event(const keyboard_event* event) noexcept { return event->state == key_state::released; }
-    inline bool __attribute__((always_inline)) is_modifier_event(const keyboard_event* event) noexcept { return is_modifier_key(event->key); }
-    inline bool __attribute__((always_inline)) is_non_modifier_event(const keyboard_event* event) noexcept { return !is_modifier_event(event); }
-    inline bool __attribute__((always_inline)) is_non_modifier_press_event(const keyboard_event* event) noexcept { return is_pressed_event(event) && is_non_modifier_event(event); }
+    [[gnu::always_inline]]
+    inline bool is_letter_key(const keyboard_key key) noexcept
+    {
+        return (key >= keyboard_key::q && key <= keyboard_key::p) || (key >= keyboard_key::a && key <= keyboard_key::l) || (key >= keyboard_key::z && key <= keyboard_key::m);
+    }
 
-    inline bool __attribute__((always_inline)) is_known_key(const keyboard_key key) noexcept { return key != keyboard_key::unknown; }
-    inline bool __attribute__((always_inline)) is_unknown_key(const keyboard_key key) noexcept { return !is_known_key(key); }
-    inline bool __attribute__((always_inline)) is_known_key_event(const keyboard_event* event) noexcept { return is_known_key(event->key); }
-    inline bool __attribute__((always_inline)) is_unknown_key_event(const keyboard_event* event) noexcept { return is_unknown_key(event->key); }
-    inline bool __attribute__((always_inline)) is_input_candidate_event(const keyboard_event* event) noexcept
+    [[gnu::always_inline]]
+    inline bool is_digit_key(const keyboard_key key) noexcept { return (key >= keyboard_key::digit_1 && key <= keyboard_key::digit_0); }
+
+    [[gnu::always_inline]]
+    inline bool is_space_key(const keyboard_key key) noexcept { return key == keyboard_key::space; }
+
+    [[gnu::always_inline]]
+    inline bool is_text_key(const keyboard_key key) noexcept { return is_letter_key(key) || is_digit_key(key) || is_space_key(key); }
+
+    [[gnu::always_inline]]
+    inline bool is_control_key(const keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case keyboard_key::escape:
+            case keyboard_key::backspace:
+            case keyboard_key::tab:
+            case keyboard_key::enter:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    // Event Classification Helpers
+    [[gnu::always_inline]]
+    inline bool is_pressed_event(const keyboard_event* event) noexcept { return event->state == key_state::pressed; }
+
+    [[gnu::always_inline]]
+    inline bool is_released_event(const keyboard_event* event) noexcept { return event->state == key_state::released; }
+
+    [[gnu::always_inline]]
+    inline bool is_modifier_event(const keyboard_event* event) noexcept { return is_modifier_key(event->key); }
+
+    [[gnu::always_inline]]
+    inline bool is_non_modifier_event(const keyboard_event* event) noexcept { return !is_modifier_event(event); }
+
+    [[gnu::always_inline]]
+    inline bool is_non_modifier_press_event(const keyboard_event* event) noexcept { return is_pressed_event(event) && is_non_modifier_event(event); }
+
+    [[gnu::always_inline]]
+    inline bool is_known_key(const keyboard_key key) noexcept { return key != keyboard_key::unknown; }
+
+    [[gnu::always_inline]]
+    inline bool is_unknown_key(const keyboard_key key) noexcept { return !is_known_key(key); }
+
+    [[gnu::always_inline]]
+    inline bool is_known_key_event(const keyboard_event* event) noexcept { return is_known_key(event->key); }
+
+    [[gnu::always_inline]]
+    inline bool is_unknown_key_event(const keyboard_event* event) noexcept { return is_unknown_key(event->key); }
+
+    [[gnu::always_inline]]
+    inline bool is_input_candidate_event(const keyboard_event* event) noexcept
     {
         return event->valid && is_pressed_event(event) && is_known_key_event(event) && is_non_modifier_event(event);
     }
+
+    [[gnu::always_inline]]
+    inline bool is_input_text_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_text_key(event->key); }
+
+    [[gnu::always_inline]]
+    inline bool is_control_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_control_key(event->key); }
 }
