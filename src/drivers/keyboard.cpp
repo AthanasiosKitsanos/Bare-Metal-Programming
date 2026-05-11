@@ -5,8 +5,6 @@
 #include "keyboard_key_list_n_map.h"
 #include "kernel_interrupt_frame.h"
 
-#define DRIVER_KEYBOARD_DEBUG
-
 namespace
 {
     constexpr uint16_t data_port{0x60};
@@ -90,21 +88,6 @@ namespace
     char get_normal_character(const driver::keyboard_key key) noexcept { return *(normal_characters_table.entries + static_cast<uint16_t>(key)); }
 
     char get_shifted_character(const driver::keyboard_key key) noexcept { return *(shifted_characters_table.entries + static_cast<uint16_t>(key)); }
-
-    const char* keyboard_key_name(const driver::keyboard_key key) noexcept
-    {
-        switch(key)
-        {
-            case driver::keyboard_key::unknown: return "Unknown";
-            #define X(key, key_code)    \
-                case driver::keyboard_key::key: return #key;
-            DRIVER_KEYBOARD_KEY_LIST
-            #undef X
-
-            default:
-                return "Unknown";
-        }
-    }
 
     void update_modifier_state(const driver::keyboard_event* event) noexcept
     {
@@ -253,6 +236,7 @@ namespace driver
         g_last_event = event;
         ++g_keyboard_events;
 
+        // #define DRIVER_KEYBOARD_DEBUG
         #ifdef DRIVER_KEYBOARD_DEBUG
             if(g_keyboard_logger && event.state == key_state::pressed)
             {
@@ -262,9 +246,10 @@ namespace driver
                 << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
                 << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
                 << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
-                return;
             }
         #endif
+        char character{'\0'};
+        if(try_translate_text_event(&event, &character)) g_keyboard_logger->info() << character << '\n';
     }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
