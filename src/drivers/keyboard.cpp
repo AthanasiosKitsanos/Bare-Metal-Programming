@@ -251,8 +251,6 @@ namespace driver
                 << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
             }
         #endif
-        char character{'\0'};
-        if(try_translate_text_event(&event, &character)) g_keyboard_logger->info() << character << '\n';
        }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
