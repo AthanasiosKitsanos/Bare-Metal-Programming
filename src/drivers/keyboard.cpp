@@ -196,6 +196,26 @@ namespace driver
         return true;
     }
 
+    bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept
+    {
+        if(!is_text_input_candidate_event(event)) return false;
+        const bool shift_pressed{is_shift_active(&event->modifiers)};
+        const bool caps_on{is_caps_lock_active(&event->modifiers)};
+
+        if(is_letter_key(event->key))
+        {
+            *out_character = shift_pressed != caps_on ? get_shifted_character(event->key) : get_normal_character(event->key);
+        }
+        else
+        {
+            *out_character = shift_pressed ? get_shifted_character(event->key) : get_normal_character(event->key);
+        }
+
+        if(*out_character == '\0') return false;
+
+        return true;
+    }
+
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept
     {
         static_cast<void>(frame);
