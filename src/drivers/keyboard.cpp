@@ -202,17 +202,19 @@ namespace driver
         const bool shift_pressed{is_shift_active(&event->modifiers)};
         const bool caps_on{is_caps_lock_active(&event->modifiers)};
 
+        char character{'\0'};
         if(is_letter_key(event->key))
         {
-            *out_character = shift_pressed != caps_on ? get_shifted_character(event->key) : get_normal_character(event->key);
+            character = shift_pressed != caps_on ? get_shifted_character(event->key) : get_normal_character(event->key);
         }
         else
         {
-            *out_character = shift_pressed ? get_shifted_character(event->key) : get_normal_character(event->key);
+            character = shift_pressed ? get_shifted_character(event->key) : get_normal_character(event->key);
         }
 
-        if(*out_character == '\0') return false;
-
+        if(character == '\0') return false;
+        
+        *out_character = character;
         return true;
     }
 
