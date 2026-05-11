@@ -37,6 +37,9 @@ namespace
     driver::keyboard_event g_last_event{};
     driver::keyboard_modifier_state g_modifier_state{};
 
+    constexpr uint32_t keyboard_event_queue_size{64};
+    driver::keyboard_event g_keyboard_event_queue[keyboard_event_queue_size]{};
+
     struct key_list
     {
         driver::keyboard_key entries[normal_key_map_size];
@@ -250,7 +253,7 @@ namespace driver
         #endif
         char character{'\0'};
         if(try_translate_text_event(&event, &character)) g_keyboard_logger->info() << character << '\n';
-    }
+       }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
     uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
