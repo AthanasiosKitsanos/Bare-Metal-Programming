@@ -159,7 +159,22 @@ namespace driver
     inline bool is_space_key(const keyboard_key key) noexcept { return key == keyboard_key::space; }
 
     [[gnu::always_inline]]
-    inline bool is_text_key(const keyboard_key key) noexcept { return is_letter_key(key) || is_digit_key(key) || is_space_key(key); }
+    inline bool is_symbol_key(const keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case keyboard_key::dash:
+            case keyboard_key::plus:
+            case keyboard_key::ud_dot:
+            case keyboard_key::double_quotes:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    [[gnu::always_inline]]
+    inline bool is_text_key(const keyboard_key key) noexcept { return is_letter_key(key) || is_digit_key(key) || is_space_key(key) || is_symbol_key(key); }
 
     [[gnu::always_inline]]
     inline bool is_control_key(const keyboard_key key) noexcept
@@ -215,4 +230,25 @@ namespace driver
 
     [[gnu::always_inline]]
     inline bool is_control_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_control_key(event->key); }
+
+    [[gnu::always_inline]]
+    inline bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept
+    {
+        if(!is_text_input_candidate_event(event)) return false;
+        const bool shift_pressed{is_shift_active(&event->modifiers)};
+        const bool caps_on{is_caps_lock_active(&event->modifiers)};
+
+        if(is_letter_key(event->key))
+        {
+            *out_character = shift_pressed != caps_on ? get_shifted_character(event->key) : get_normal_character(event->key);
+        }
+        else
+        {
+            *out_character = shift_pressed ? get_shifted_character(event->key) : get_normal_character(event->key);
+        }
+
+        if(*out_character == '\0') return false;
+
+        return true;
+    }
 }
