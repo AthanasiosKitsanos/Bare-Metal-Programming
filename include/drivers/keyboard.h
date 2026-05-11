@@ -113,6 +113,7 @@ namespace driver
 
     keyboard_event last_keyboard_event() noexcept;
     bool has_keyboard_event() noexcept;
+    bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept;
 
     keyboard_modifier_state current_keyboard_modifier_state() noexcept;
 
@@ -159,7 +160,22 @@ namespace driver
     inline bool is_space_key(const keyboard_key key) noexcept { return key == keyboard_key::space; }
 
     [[gnu::always_inline]]
-    inline bool is_text_key(const keyboard_key key) noexcept { return is_letter_key(key) || is_digit_key(key) || is_space_key(key); }
+    inline bool is_symbol_key(const keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case keyboard_key::dash:
+            case keyboard_key::plus:
+            case keyboard_key::ud_dot:
+            case keyboard_key::double_quotes:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    [[gnu::always_inline]]
+    inline bool is_text_key(const keyboard_key key) noexcept { return is_letter_key(key) || is_digit_key(key) || is_space_key(key) || is_symbol_key(key); }
 
     [[gnu::always_inline]]
     inline bool is_control_key(const keyboard_key key) noexcept
