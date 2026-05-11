@@ -213,7 +213,7 @@ namespace driver
         }
 
         if(character == '\0') return false;
-        
+
         *out_character = character;
         return true;
     }
@@ -254,7 +254,7 @@ namespace driver
         ++g_keyboard_events;
 
         #ifdef DRIVER_KEYBOARD_DEBUG
-            if(event.state == key_state::pressed)
+            if(g_keyboard_logger && event.state == key_state::pressed)
             {
                 g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
                 << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
