@@ -40,6 +40,10 @@ namespace
     constexpr uint32_t keyboard_event_queue_size{64};
     driver::keyboard_event g_keyboard_event_queue[keyboard_event_queue_size]{};
 
+    volatile uint32_t g_keyboard_event_queue_head{0};
+    volatile uint32_t g_keyboard_event_queue_tail{0};
+    volatile uint32_t g_keyboard_event_queue_count{0};
+
     struct key_list
     {
         driver::keyboard_key entries[normal_key_map_size];
