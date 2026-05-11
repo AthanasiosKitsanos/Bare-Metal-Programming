@@ -113,6 +113,7 @@ namespace driver
 
     keyboard_event last_keyboard_event() noexcept;
     bool has_keyboard_event() noexcept;
+    bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept;
 
     keyboard_modifier_state current_keyboard_modifier_state() noexcept;
 
@@ -230,25 +231,4 @@ namespace driver
 
     [[gnu::always_inline]]
     inline bool is_control_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_control_key(event->key); }
-
-    [[gnu::always_inline]]
-    inline bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept
-    {
-        if(!is_text_input_candidate_event(event)) return false;
-        const bool shift_pressed{is_shift_active(&event->modifiers)};
-        const bool caps_on{is_caps_lock_active(&event->modifiers)};
-
-        if(is_letter_key(event->key))
-        {
-            *out_character = shift_pressed != caps_on ? get_shifted_character(event->key) : get_normal_character(event->key);
-        }
-        else
-        {
-            *out_character = shift_pressed ? get_shifted_character(event->key) : get_normal_character(event->key);
-        }
-
-        if(*out_character == '\0') return false;
-
-        return true;
-    }
 }
