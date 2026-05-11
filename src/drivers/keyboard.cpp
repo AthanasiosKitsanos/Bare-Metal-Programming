@@ -43,6 +43,7 @@ namespace
     volatile uint32_t g_keyboard_event_queue_head{0};
     volatile uint32_t g_keyboard_event_queue_tail{0};
     volatile uint32_t g_keyboard_event_queue_count{0};
+    volatile uint32_t g_keyboard_event_queue_dropped{0};
 
     struct key_list
     {
