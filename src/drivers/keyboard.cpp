@@ -34,16 +34,7 @@ namespace
     volatile bool g_extended_pending{false};
 
     kernel::logger* g_keyboard_logger{nullptr};
-    driver::keyboard_event g_last_event{};
     driver::keyboard_modifier_state g_modifier_state{};
-
-    constexpr uint32_t keyboard_event_queue_size{64};
-    driver::keyboard_event g_keyboard_event_queue[keyboard_event_queue_size]{};
-
-    volatile uint32_t g_keyboard_event_queue_head{0};
-    volatile uint32_t g_keyboard_event_queue_tail{0};
-    volatile uint32_t g_keyboard_event_queue_count{0};
-    volatile uint32_t g_keyboard_event_queue_dropped{0};
 
     struct key_list
     {
@@ -172,6 +163,17 @@ namespace
             kernel::io_wait();
         }
     }
+
+    constexpr uint8_t event_queue_size{64};
+    struct keyboard_event_queue
+    {
+        driver::keyboard_event entries[event_queue_size];
+        volatile uint8_t head;
+        volatile uint8_t tail;
+        volatile uint8_t count;
+        volatile uint8_t dropped; 
+    };
+    keyboard_event_queue g_event_queue{};
 }
 
 namespace driver
@@ -241,27 +243,10 @@ namespace driver
         g_extended_pending = false;
         update_modifier_state(&event);
         event.modifiers = g_modifier_state;
-        g_last_event = event;
         ++g_keyboard_events;
-
-        // #define DRIVER_KEYBOARD_DEBUG
-        #ifdef DRIVER_KEYBOARD_DEBUG
-            if(g_keyboard_logger && event.state == key_state::pressed)
-            {
-                g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
-                << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
-                << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
-                << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
-                << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
-                << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
-            }
-        #endif
        }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
     uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
-
-    keyboard_event last_keyboard_event() noexcept { return g_last_event; }
-    bool has_keyboard_event() noexcept { return g_last_event.valid; }
     keyboard_modifier_state current_keyboard_modifier_state() noexcept { return g_modifier_state; }
 }
