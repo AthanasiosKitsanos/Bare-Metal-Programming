@@ -81,20 +81,19 @@ namespace
         return *(normal_key_map.entries + key_code);
     }
 
-    char keyboard_key_name(const driver::keyboard_key key) noexcept
+    const char* keyboard_key_name(const driver::keyboard_key key) noexcept
     {
-        // switch(key)
-        // {
-        //     case driver::keyboard_key::unknown: return "Unknown";
-        //     #define X(key, key_code)    
-        //         case driver::keyboard_key::key: return #key;
-        //     DRIVER_KEYBOARD_KEY_LIST
-        //     #undef X
+        switch(key)
+        {
+            case driver::keyboard_key::unknown: return "Unknown";
+            #define X(key, key_code)    \
+                case driver::keyboard_key::key: return #key;
+            DRIVER_KEYBOARD_KEY_LIST
+            #undef X
 
-        //     default:
-        //         return "Unknown";
-        // }
-        return *(characters_map.characters + static_cast<uint8_t>(key));
+            default:
+                return "Unknown";
+        }
     }
 
     void update_modifier_state(const driver::keyboard_event* event) noexcept
