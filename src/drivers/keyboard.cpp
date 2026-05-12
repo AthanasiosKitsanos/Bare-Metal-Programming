@@ -165,13 +165,14 @@ namespace
     }
 
     constexpr uint8_t event_queue_size{64};
+    constexpr uint8_t event_queue_mask{event_queue_size - 1};
     struct keyboard_event_queue
     {
         driver::keyboard_event entries[event_queue_size];
+        volatile uint32_t dropped; 
         volatile uint8_t head;
         volatile uint8_t tail;
         volatile uint8_t count;
-        volatile uint8_t dropped; 
     };
     keyboard_event_queue g_event_queue{};
 }
