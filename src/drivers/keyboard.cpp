@@ -283,7 +283,7 @@ namespace driver
         return true;
     }
 
-    bool has_pending_event() noexcept { return g_keyboard_event_queue.count != 0; }
+    bool has_pending_keyboard_event() noexcept { return g_keyboard_event_queue.count != 0; }
     uint8_t pending_keyboard_event_count() noexcept { return g_keyboard_event_queue.count; }
     uint32_t dropped_keyboard_event_count() noexcept { return g_keyboard_event_queue.dropped; }
 }
