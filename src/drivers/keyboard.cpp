@@ -273,7 +273,11 @@ namespace driver
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
     uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
-    keyboard_modifier_state current_keyboard_modifier_state() noexcept { return g_modifier_state; }
+    keyboard_modifier_state current_keyboard_modifier_state() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_modifier_state;
+    }
 
     bool poll_keyboard_event(keyboard_event* out_event) noexcept
     {
