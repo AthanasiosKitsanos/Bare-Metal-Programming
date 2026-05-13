@@ -18,4 +18,4 @@ PIC_CPP = src/kernel/kernel_pic.cpp
 PIC_OBJ = obj/kernel/kernel_pic.o
 
 PIT_CPP = src/kernel/kernel_pit.cpp
-PIT_OBJ = obj/kernel_pit.o
+PIT_OBJ = obj/kernel/kernel_pit.o

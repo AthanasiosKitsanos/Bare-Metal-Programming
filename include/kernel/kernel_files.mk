@@ -17,6 +17,8 @@ TIMER_H = include/kernel/kernel_timer.h
 
 PIT_H = include/kernel/kernel_pit.h
 
+INTERRUPT_GUARD_H = include/kernel/kernel_interrupt_guard.h
+
 #----------------------Include Folders--------------------------------------
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
 INCLUDE_KERNEL_INTERNAL_FOLDER = -Iinclude/kernel/internal

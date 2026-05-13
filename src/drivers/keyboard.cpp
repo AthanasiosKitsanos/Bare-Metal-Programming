@@ -4,6 +4,7 @@
 #include "terminal_io_registers.h"
 #include "keyboard_key_list_n_map.h"
 #include "kernel_interrupt_frame.h"
+#include "kernel_interrupt_guard.h"
 
 namespace
 {
@@ -34,7 +35,6 @@ namespace
     volatile bool g_extended_pending{false};
 
     kernel::logger* g_keyboard_logger{nullptr};
-    driver::keyboard_event g_last_event{};
     driver::keyboard_modifier_state g_modifier_state{};
 
     struct key_list
@@ -164,6 +164,40 @@ namespace
             kernel::io_wait();
         }
     }
+
+    constexpr uint8_t keyboard_event_queue_size{64};
+    constexpr uint8_t keyboard_event_queue_mask{keyboard_event_queue_size - 1};
+    static_assert((keyboard_event_queue_size & keyboard_event_queue_mask) == 0);
+    struct keyboard_event_queue
+    {
+        driver::keyboard_event entries[keyboard_event_queue_size];
+        uint32_t dropped; 
+        driver::keyboard_event* volatile head;
+        driver::keyboard_event* volatile tail;
+        uint8_t count;
+
+        constexpr keyboard_event_queue() noexcept: entries{}, dropped{}, head{entries}, tail{entries}, count{} {}
+    };
+    keyboard_event_queue g_keyboard_event_queue{};
+
+    [[gnu::always_inline]]
+    inline driver::keyboard_event* next_keyboard_event_queue_pointer(driver::keyboard_event* current) noexcept
+    {
+        return g_keyboard_event_queue.entries + static_cast<uint8_t>((current - g_keyboard_event_queue.entries + 1) & keyboard_event_queue_mask);
+    }
+
+    bool push_keyboard_event(const driver::keyboard_event* event) noexcept
+    {
+        if(g_keyboard_event_queue.count == keyboard_event_queue_size)
+        {
+            ++g_keyboard_event_queue.dropped;
+            return false;
+        }
+        *g_keyboard_event_queue.tail = *event;
+        g_keyboard_event_queue.tail = next_keyboard_event_queue_pointer(g_keyboard_event_queue.tail);
+        ++g_keyboard_event_queue.count;
+        return true;
+    }
 }
 
 namespace driver
@@ -233,29 +267,43 @@ namespace driver
         g_extended_pending = false;
         update_modifier_state(&event);
         event.modifiers = g_modifier_state;
-        g_last_event = event;
         ++g_keyboard_events;
-
-        // #define DRIVER_KEYBOARD_DEBUG
-        #ifdef DRIVER_KEYBOARD_DEBUG
-            if(g_keyboard_logger && event.state == key_state::pressed)
-            {
-                g_keyboard_logger->info() << kernel::hex << "Keyboard event: raw=" << event.raw_scancode << " key=" << event.key_code << " extended=" << event.extended
-                << " mapped=" << static_cast<uint32_t>(event.key) << " key_name=" << keyboard_key_name(event.key)
-                << kernel::dec << (event.state == key_state::pressed ? " pressed\n" : " released\n")
-                << "mod= LSHIFT:" << event.modifiers.left_shift_down << " RSHIFT:" << event.modifiers.right_shift_down
-                << " LCtrl:" << event.modifiers.left_ctrl_down << " LALT:" << event.modifiers.left_alt_down
-                << " CAPS_DOWN:" << event.modifiers.caps_lock_down << " CAPS_ON:" << event.modifiers.caps_lock_on << '\n'; 
-            }
-        #endif
-        char character{'\0'};
-        if(try_translate_text_event(&event, &character)) g_keyboard_logger->info() << character << '\n';
+        static_cast<void>(push_keyboard_event(&event));
     }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
     uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
+    keyboard_modifier_state current_keyboard_modifier_state() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_modifier_state;
+    }
 
-    keyboard_event last_keyboard_event() noexcept { return g_last_event; }
-    bool has_keyboard_event() noexcept { return g_last_event.valid; }
-    keyboard_modifier_state current_keyboard_modifier_state() noexcept { return g_modifier_state; }
+    bool poll_keyboard_event(keyboard_event* out_event) noexcept
+    {
+        kernel::interrupt_guard guard{};
+        if(g_keyboard_event_queue.count == 0) return false;
+        *out_event = *g_keyboard_event_queue.head;
+        g_keyboard_event_queue.head = next_keyboard_event_queue_pointer(g_keyboard_event_queue.head);
+        --g_keyboard_event_queue.count;
+        return true;
+    }
+
+    bool has_pending_keyboard_event() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_keyboard_event_queue.count != 0;
+    }
+    
+    uint8_t pending_keyboard_event_count() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_keyboard_event_queue.count;
+    }
+
+    uint32_t dropped_keyboard_event_count() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_keyboard_event_queue.dropped;
+    }
 }
