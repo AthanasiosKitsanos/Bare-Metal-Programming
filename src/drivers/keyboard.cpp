@@ -166,6 +166,7 @@ namespace
 
     constexpr uint8_t keyboard_event_queue_size{64};
     constexpr uint8_t keyboard_event_queue_mask{keyboard_event_queue_size - 1};
+    static_assert((keyboard_event_queue_size & keyboard_event_queue_mask) == 0);
     struct keyboard_event_queue
     {
         driver::keyboard_event entries[keyboard_event_queue_size];
@@ -179,7 +180,7 @@ namespace
     keyboard_event_queue g_keyboard_event_queue{};
 
     [[gnu::always_inline]]
-    inline driver::keyboard_event* next_keyboard_event_queue_pointer(const driver::keyboard_event* current) noexcept
+    inline driver::keyboard_event* next_keyboard_event_queue_pointer(driver::keyboard_event* current) noexcept
     {
         return g_keyboard_event_queue.entries + static_cast<uint8_t>((current - g_keyboard_event_queue.entries + 1) & keyboard_event_queue_mask);
     }
@@ -266,10 +267,7 @@ namespace driver
         update_modifier_state(&event);
         event.modifiers = g_modifier_state;
         ++g_keyboard_events;
-        if(!push_keyboard_event(&event))
-        {
-            g_keyboard_logger->warning() << "Event not pushed\n";
-        }
+        static_cast<void>(push_keyboard_event(&event));
     }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
