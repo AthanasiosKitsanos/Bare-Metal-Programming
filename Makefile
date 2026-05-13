@@ -93,7 +93,7 @@ $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
 
 # Keyboard
-$(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H) $(KEYBOARD_KEY_LIST_H)
+$(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H) $(KEYBOARD_KEY_LIST_H) $(INTERRUPT_GUARD_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) $(INCLUDE_DRIVERS_INTERNAL_FOLDER) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)
 
 #---------------------------------Kernel Library Rules-------------------------------------------------------------------------

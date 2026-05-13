@@ -4,6 +4,7 @@
 #include "terminal_io_registers.h"
 #include "keyboard_key_list_n_map.h"
 #include "kernel_interrupt_frame.h"
+#include "kernel_interrupt_guard.h"
 
 namespace
 {
@@ -276,6 +277,7 @@ namespace driver
 
     bool poll_keyboard_event(keyboard_event* out_event) noexcept
     {
+        kernel::interrupt_guard guard{};
         if(g_keyboard_event_queue.count == 0) return false;
         *out_event = *g_keyboard_event_queue.head;
         g_keyboard_event_queue.head = next_keyboard_event_queue_pointer(g_keyboard_event_queue.head);
@@ -283,7 +285,21 @@ namespace driver
         return true;
     }
 
-    bool has_pending_keyboard_event() noexcept { return g_keyboard_event_queue.count != 0; }
-    uint8_t pending_keyboard_event_count() noexcept { return g_keyboard_event_queue.count; }
-    uint32_t dropped_keyboard_event_count() noexcept { return g_keyboard_event_queue.dropped; }
+    bool has_pending_keyboard_event() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_keyboard_event_queue.count != 0;
+    }
+    
+    uint8_t pending_keyboard_event_count() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_keyboard_event_queue.count;
+    }
+
+    uint32_t dropped_keyboard_event_count() noexcept
+    {
+        kernel::interrupt_guard guard{};
+        return g_keyboard_event_queue.dropped;
+    }
 }
