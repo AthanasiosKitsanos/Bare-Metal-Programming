@@ -273,4 +273,13 @@ namespace driver
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
     uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
     keyboard_modifier_state current_keyboard_modifier_state() noexcept { return g_modifier_state; }
+
+    bool poll_keyboard_event(keyboard_event* out_event) noexcept
+    {
+        if(g_keyboard_event_queue.count == 0) return false;
+        *out_event = *g_keyboard_event_queue.head;
+        g_keyboard_event_queue.head = next_keyboard_event_queue_pointer(g_keyboard_event_queue.head);
+        --g_keyboard_event_queue.count;
+        return true;
+    }
 }

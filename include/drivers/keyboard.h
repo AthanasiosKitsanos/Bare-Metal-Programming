@@ -110,6 +110,7 @@ namespace driver
 
     uint8_t last_keyboard_scancode() noexcept;
     uint32_t keyboard_event_count() noexcept;
+    bool poll_keyboard_event(keyboard_event* out_event) noexcept;
 
     bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept;
 
