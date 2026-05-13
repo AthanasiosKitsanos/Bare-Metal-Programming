@@ -164,17 +164,19 @@ namespace
         }
     }
 
-    constexpr uint8_t event_queue_size{64};
-    constexpr uint8_t event_queue_mask{event_queue_size - 1};
+    constexpr uint8_t keyboard_event_queue_size{64};
+    constexpr uint8_t keyboard_event_queue_mask{keyboard_event_queue_size - 1};
     struct keyboard_event_queue
     {
-        driver::keyboard_event entries[event_queue_size];
-        volatile uint32_t dropped; 
-        volatile uint8_t head;
-        volatile uint8_t tail;
-        volatile uint8_t count;
+        driver::keyboard_event entries[keyboard_event_queue_size];
+        uint32_t dropped; 
+        driver::keyboard_event* volatile head;
+        driver::keyboard_event* volatile tail;
+        uint8_t count;
+
+        constexpr keyboard_event_queue(): entries{}, dropped{}, head{entries}, tail{entries}, count{} {}
     };
-    keyboard_event_queue g_event_queue{};
+    keyboard_event_queue g_keyboard_event_queue{};
 }
 
 namespace driver
