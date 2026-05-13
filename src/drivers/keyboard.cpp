@@ -174,9 +174,28 @@ namespace
         driver::keyboard_event* volatile tail;
         uint8_t count;
 
-        constexpr keyboard_event_queue(): entries{}, dropped{}, head{entries}, tail{entries}, count{} {}
+        constexpr keyboard_event_queue() noexcept: entries{}, dropped{}, head{entries}, tail{entries}, count{} {}
     };
     keyboard_event_queue g_keyboard_event_queue{};
+
+    [[gnu::always_inline]]
+    inline driver::keyboard_event* next_keyboard_event_queue_pointer(const driver::keyboard_event* current) noexcept
+    {
+        return g_keyboard_event_queue.entries + static_cast<uint8_t>((current - g_keyboard_event_queue.entries + 1) & keyboard_event_queue_mask);
+    }
+
+    bool push_keyboard_event(const driver::keyboard_event* event) noexcept
+    {
+        if(g_keyboard_event_queue.count == keyboard_event_queue_size)
+        {
+            ++g_keyboard_event_queue.dropped;
+            return false;
+        }
+        *g_keyboard_event_queue.tail = *event;
+        g_keyboard_event_queue.tail = next_keyboard_event_queue_pointer(g_keyboard_event_queue.tail);
+        ++g_keyboard_event_queue.count;
+        return true;
+    }
 }
 
 namespace driver
@@ -247,7 +266,11 @@ namespace driver
         update_modifier_state(&event);
         event.modifiers = g_modifier_state;
         ++g_keyboard_events;
-       }
+        if(!push_keyboard_event(&event))
+        {
+            g_keyboard_logger->warning() << "Event not pushed\n";
+        }
+    }
 
     uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
     uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
