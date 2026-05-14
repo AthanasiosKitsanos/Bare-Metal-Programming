@@ -87,6 +87,18 @@ namespace driver
         f10 = 0x0044,
         f11 = 0x0057,
         f12 = 0x0058,
+        right_ctrl = 0xE01D,
+        right_alt = 0xE038, 
+        home = 0xE047,
+        arrow_up = 0xE048,
+        page_up = 0xE049,
+        arrow_left = 0xE04B,
+        arrow_right = 0xE04D,
+        end = 0xE04F,
+        arrow_down = 0xE050,
+        page_down = 0xE051,
+        insert = 0xE052,
+        delete_key = 0xE053,
     };
 
     struct keyboard_modifier_state

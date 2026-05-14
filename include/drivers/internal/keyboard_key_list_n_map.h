@@ -69,7 +69,21 @@
     X(f9, 0x0043)   \
     X(f10, 0x0044)  \
     X(f11, 0x0057)  \
-    X(f12, 0x0058)  \
+    X(f12, 0x0058)
+
+#define DRIVER_KEYBOARD_EXTENDED_KEY_MAPPING    \
+    X(right_ctrl, 0x001D)   \
+    X(right_alt, 0x0038)    \
+    X(home, 0x0047) \
+    X(arrow_up, 0x0048) \
+    X(page_up, 0x0049)  \
+    X(arrow_left, 0x004B)   \
+    X(arrow_right, 0x004D)  \
+    X(end, 0x004F)  \
+    X(arrow_down, 0x050)   \
+    X(page_down, 0x0051)    \
+    X(insert, 0x0052)   \
+    X(delete_key, 0x0053)
 
 #define DRIVER_KEYBOARD_NORMAL_KEY_MAPPING \
     X('\0', 0x0001)  \

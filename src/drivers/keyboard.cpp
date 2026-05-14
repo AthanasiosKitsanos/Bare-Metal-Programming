@@ -42,7 +42,7 @@ namespace
             #undef X
         }
     };
-    constexpr key_list key_list_map{};
+    constexpr key_list normal_key_map{};
 
     struct normal_character_map_table
     {
@@ -72,10 +72,24 @@ namespace
     };
     constexpr shifted_character_map_table shifted_characters_table{};
 
+    struct extended_key_map_table
+    {
+        driver::keyboard_key entries[normal_key_map_size];
+
+        constexpr extended_key_map_table(): entries{}
+        {
+            #define X(key, key_code)    \
+                entries[key_code] = driver::keyboard_key::key;
+            DRIVER_KEYBOARD_EXTENDED_KEY_MAPPING
+            #undef X
+        }
+    };
+    constexpr extended_key_map_table extended_key_table{};
+
     driver::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
     {
-        if(extended) return driver::keyboard_key::unknown;
-        return *(key_list_map.entries + key_code);
+        if(extended) return *(extended_key_table.entries + key_code);
+        return *(normal_key_map.entries + key_code);
     }
 
     char get_normal_character(const driver::keyboard_key key) noexcept { return *(normal_characters_table.entries + static_cast<uint16_t>(key)); }
