@@ -24,16 +24,16 @@ namespace
     constexpr uint8_t release_mask{0x80};
     constexpr uint8_t key_code_mask{0x7F};
     constexpr uint8_t extended_prefix{0xE0};
-    constexpr uint8_t normal_key_map_size{128};
 
     static_assert(static_cast<uint16_t>(driver::keyboard_key::unknown) == 0x0000);
-    static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
 
     volatile bool g_extended_pending{false};
 
     kernel::logger* g_keyboard_logger{nullptr};
     driver::keyboard_modifier_state g_modifier_state{};
 
+    constexpr uint8_t normal_key_map_size{128};
+    static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
     struct key_list
     {
         driver::keyboard_key entries[normal_key_map_size];
