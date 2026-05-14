@@ -4,7 +4,6 @@
 
 namespace kernel
 {
-    class logger;
     class interrupt_frame;
 }
 
@@ -110,7 +109,6 @@ namespace driver
         keyboard_modifier_state modifiers;
     };
 
-    void set_keyboard_logger(kernel::logger* log) noexcept;
     bool initialize_keyboard() noexcept;
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
 

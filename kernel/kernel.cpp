@@ -22,23 +22,16 @@ extern "C" [[noreturn]] void kernel_main()
 
     kernel::set_timer_logger(&logger);
 
-    logger.info() << "Setting frequency to: " << timer_frequency_hz << '\n';
     if(!kernel::initialize_pit(timer_frequency_hz))
     {
         logger.panic("Failed to initialize PIT");
     }
     kernel::set_timer_frequency(timer_frequency_hz);
-    console << "Frequency set\n";
 
-    logger.info() << "Setting Keyboard logger\n";
-    driver::set_keyboard_logger(&logger);
-    console << "Keyboard Logger set\n";
-    logger.info() << "Synchronizing keyboard\n";
     if(!driver::initialize_keyboard())
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
-    else console << "Keyboard Synchronized\n";
     
     asm volatile("sti");
 
@@ -64,6 +57,5 @@ extern "C" [[noreturn]] void kernel_main()
         {
             kernel::enable_interrupts();
         }
-        asm volatile("hlt");
     }
 }

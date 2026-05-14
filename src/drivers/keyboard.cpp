@@ -1,6 +1,5 @@
 #include "kernel_pic.h"
 #include "keyboard.h"
-#include "kernel_logger.h"
 #include "terminal_io_registers.h"
 #include "keyboard_key_list_n_map.h"
 #include "kernel_interrupt_frame.h"
@@ -16,9 +15,7 @@ namespace
 
     constexpr uint32_t keyboard_timeout{100000};
     constexpr uint8_t keyboard_ack{0xFA};
-    constexpr uint8_t keyboard_resend{0xFE};
     constexpr uint8_t set_leds_command{0xED};
-    constexpr uint8_t led_caps_lock{0x04};
     constexpr uint8_t all_leds_off{0x00};
 
     constexpr uint8_t release_mask{0x80};
@@ -29,7 +26,6 @@ namespace
 
     volatile bool g_extended_pending{false};
 
-    kernel::logger* g_keyboard_logger{nullptr};
     driver::keyboard_modifier_state g_modifier_state{};
 
     constexpr uint8_t normal_key_map_size{128};
@@ -192,8 +188,6 @@ namespace
 
 namespace driver
 {
-    void set_keyboard_logger(kernel::logger* log) noexcept { g_keyboard_logger = log; }
-
     bool initialize_keyboard() noexcept
     {
         g_modifier_state = driver::keyboard_modifier_state{};
