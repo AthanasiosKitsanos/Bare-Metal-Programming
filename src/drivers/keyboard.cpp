@@ -29,9 +29,6 @@ namespace
     static_assert(static_cast<uint16_t>(driver::keyboard_key::unknown) == 0x0000);
     static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
 
-    volatile uint8_t g_last_scancode{0};
-    volatile uint32_t g_keyboard_events{0};
-
     volatile bool g_extended_pending{false};
 
     kernel::logger* g_keyboard_logger{nullptr};
@@ -89,24 +86,24 @@ namespace
 
     char get_shifted_character(const driver::keyboard_key key) noexcept { return *(shifted_characters_table.entries + static_cast<uint16_t>(key)); }
 
-    void update_modifier_state(const driver::keyboard_event* event) noexcept
+    void update_modifier_state(const driver::keyboard_key key, const driver::key_state state) noexcept
     {
-        switch(event->key)
+        switch(key)
         {
             case driver::keyboard_key::left_shift:
-                g_modifier_state.left_shift_down = (event->state == driver::key_state::pressed);
+                g_modifier_state.left_shift_down = (state == driver::key_state::pressed);
                 break;
             case driver::keyboard_key::right_shift:
-                g_modifier_state.right_shift_down = (event->state == driver::key_state::pressed);
+                g_modifier_state.right_shift_down = (state == driver::key_state::pressed);
                 break;
             case driver::keyboard_key::left_ctrl:
-                g_modifier_state.left_ctrl_down = (event->state == driver::key_state::pressed);
+                g_modifier_state.left_ctrl_down = (state == driver::key_state::pressed);
                 break;
             case driver::keyboard_key::left_alt:
-                g_modifier_state.left_alt_down = (event->state == driver::key_state::pressed);
+                g_modifier_state.left_alt_down = (state == driver::key_state::pressed);
                 break;
             case driver::keyboard_key::caps_lock:
-                if(event->state == driver::key_state::pressed)
+                if(state == driver::key_state::pressed)
                 {
                     if(!g_modifier_state.caps_lock_down)
                     {
@@ -186,17 +183,10 @@ namespace
         return g_keyboard_event_queue.entries + static_cast<uint8_t>((current - g_keyboard_event_queue.entries + 1) & keyboard_event_queue_mask);
     }
 
-    bool push_keyboard_event(const driver::keyboard_event* event) noexcept
+    void commit_keyboard_event() noexcept
     {
-        if(g_keyboard_event_queue.count == keyboard_event_queue_size)
-        {
-            ++g_keyboard_event_queue.dropped;
-            return false;
-        }
-        *g_keyboard_event_queue.tail = *event;
         g_keyboard_event_queue.tail = next_keyboard_event_queue_pointer(g_keyboard_event_queue.tail);
         ++g_keyboard_event_queue.count;
-        return true;
     }
 }
 
@@ -237,8 +227,6 @@ namespace driver
         if((status & output_buffer_full) == 0) return;
 
         const uint8_t scancode{kernel::inb(data_port)};
-        g_last_scancode = scancode;
-
         if(scancode == extended_prefix)
         {
             g_extended_pending = true;
@@ -248,26 +236,26 @@ namespace driver
         const bool extended{g_extended_pending};
         const uint8_t key_code{static_cast<uint8_t>(scancode & key_code_mask)};
         const keyboard_key key{map_scancode_set_1_key(key_code, extended)};
-        keyboard_event event
-        {
-            scancode,
-            key_code,
-            key,
-            ((scancode & release_mask) != 0 ? key_state::released : key_state::pressed),
-            extended,
-            true,
-            keyboard_modifier_state{}
-        };
-
+        const key_state state{(scancode & release_mask) != 0 ? key_state::released : key_state::pressed};
         g_extended_pending = false;
-        update_modifier_state(&event);
-        event.modifiers = g_modifier_state;
-        ++g_keyboard_events;
-        static_cast<void>(push_keyboard_event(&event));
+        update_modifier_state(key, state);
+
+        if(g_keyboard_event_queue.count == keyboard_event_queue_size)
+        {
+            ++g_keyboard_event_queue.dropped;
+            return;
+        }
+
+        g_keyboard_event_queue.tail->raw_scancode = scancode;
+        g_keyboard_event_queue.tail->key_code = key_code;
+        g_keyboard_event_queue.tail->key = key;
+        g_keyboard_event_queue.tail->state = state;
+        g_keyboard_event_queue.tail->extended = extended;
+
+        g_keyboard_event_queue.tail->modifiers = g_modifier_state;
+        commit_keyboard_event();
     }
 
-    uint8_t last_keyboard_scancode() noexcept { return g_last_scancode; }
-    uint32_t keyboard_event_count() noexcept { return g_keyboard_events; }
     keyboard_modifier_state current_keyboard_modifier_state() noexcept
     {
         kernel::interrupt_guard guard{};

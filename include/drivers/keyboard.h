@@ -44,6 +44,8 @@ namespace driver
         i = 0x0017,
         o = 0x0018,
         p = 0x0019,
+        left_bracket = 0x001A,
+        right_bracket = 0x001B,
         enter = 0x001C,
         left_ctrl = 0x001D,
         a = 0x001E,
@@ -55,9 +57,11 @@ namespace driver
         j = 0x0024,
         k = 0x0025,
         l = 0x0026,
-        ud_dot = 0x0027,
-        double_quotes = 0x0028,
+        semicolon = 0x0027,
+        apostrophe = 0x0028,
+        backtick = 0x0029,
         left_shift = 0x002A,
+        back_slash = 0x002B,
         z = 0x002C,
         x = 0x002D,
         c = 0x002E,
@@ -65,6 +69,9 @@ namespace driver
         b = 0x0030,
         n = 0x0031,
         m = 0x0032,
+        comma = 0x0033,
+        period = 0x0034,
+        slash = 0x0035,
         right_shift = 0x0036,
         left_alt = 0x0038,
         space = 0x0039,
@@ -100,7 +107,6 @@ namespace driver
         keyboard_key key;
         key_state state;
         bool extended;
-        bool valid;
         keyboard_modifier_state modifiers;
     };
 
@@ -108,8 +114,6 @@ namespace driver
     bool initialize_keyboard() noexcept;
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
 
-    uint8_t last_keyboard_scancode() noexcept;
-    uint32_t keyboard_event_count() noexcept;
     bool poll_keyboard_event(keyboard_event* out_event) noexcept;
     bool has_pending_keyboard_event() noexcept;
     uint8_t pending_keyboard_event_count() noexcept;
@@ -168,8 +172,11 @@ namespace driver
         {
             case keyboard_key::dash:
             case keyboard_key::plus:
-            case keyboard_key::ud_dot:
-            case keyboard_key::double_quotes:
+            case keyboard_key::semicolon:
+            case keyboard_key::apostrophe:
+            case keyboard_key::left_bracket:
+            case keyboard_key::right_bracket:
+            case keyboard_key::backtick:
                 return true;
             default:
                 return false;
@@ -225,7 +232,7 @@ namespace driver
     [[gnu::always_inline]]
     inline bool is_input_candidate_event(const keyboard_event* event) noexcept
     {
-        return event->valid && is_pressed_event(event) && is_known_key_event(event) && is_non_modifier_event(event);
+        return is_pressed_event(event) && is_known_key_event(event) && is_non_modifier_event(event);
     }
 
     [[gnu::always_inline]]
