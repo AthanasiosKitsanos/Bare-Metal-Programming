@@ -175,6 +175,10 @@ namespace driver
             case keyboard_key::left_bracket:
             case keyboard_key::right_bracket:
             case keyboard_key::backtick:
+            case keyboard_key::back_slash:
+            case keyboard_key::comma:
+            case keyboard_key::period:
+            case keyboard_key::slash:
                 return true;
             default:
                 return false;
