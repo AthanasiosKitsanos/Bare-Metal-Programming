@@ -6,6 +6,7 @@
 #include "kernel_timer.h"
 #include "kernel_pit.h"
 #include "keyboard.h"
+#include "kernel_interrupt_guard.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -41,5 +42,28 @@ extern "C" [[noreturn]] void kernel_main()
     
     asm volatile("sti");
 
-    for(;;) asm volatile("hlt");
+    for(;;)
+    {
+        driver::keyboard_event event{};
+        char character{'\0'};
+        while(driver::poll_keyboard_event(&event))
+        {
+            if(driver::try_translate_text_event(&event, &character))
+            {
+                console << character;
+            }
+        }
+
+        kernel::disable_interrupts();
+
+        if(!driver::has_pending_keyboard_event())
+        {
+            kernel::enable_interrupt_and_halt();
+        }
+        else
+        {
+            kernel::enable_interrupts();
+        }
+        asm volatile("hlt");
+    }
 }

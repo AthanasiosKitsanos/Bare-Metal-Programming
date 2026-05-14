@@ -18,6 +18,12 @@ namespace kernel
     [[gnu::always_inline]]
     inline void enable_interrupts() noexcept { asm volatile("sti" : : : "memory", "cc"); }
 
+    [[gnu::always_inline]]
+    inline void enable_interrupt_and_halt() noexcept
+    {
+        asm volatile("sti; hlt");
+    }
+
     class interrupt_guard
     {
         static constexpr uint32_t interrupt_flag{1u << 9};

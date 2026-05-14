@@ -61,7 +61,7 @@ $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H) $(INTERRUPT_GUARD_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # Kernel Logger
