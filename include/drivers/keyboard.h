@@ -29,8 +29,8 @@ namespace driver
         digit_8 = 0x0009,
         digit_9 = 0x000A,
         digit_0 = 0x000B,
-        plus = 0x000D,
-        dash = 0x000C,
+        minus = 0x000C,
+        equals = 0x000D,
         backspace = 0x000E,
         tab = 0x000F,
         q = 0x0010,
@@ -166,19 +166,15 @@ namespace driver
     [[gnu::always_inline]]
     inline bool is_symbol_key(const keyboard_key key) noexcept
     {
+        if(key >= keyboard_key::semicolon && key <= keyboard_key::backtick) return true;
+        if(key >= keyboard_key::comma && key <= keyboard_key::slash) return true;
         switch(key)
         {
-            case keyboard_key::dash:
-            case keyboard_key::plus:
-            case keyboard_key::semicolon:
-            case keyboard_key::apostrophe:
+            case keyboard_key::minus:
+            case keyboard_key::equals:
             case keyboard_key::left_bracket:
             case keyboard_key::right_bracket:
-            case keyboard_key::backtick:
             case keyboard_key::back_slash:
-            case keyboard_key::comma:
-            case keyboard_key::period:
-            case keyboard_key::slash:
                 return true;
             default:
                 return false;

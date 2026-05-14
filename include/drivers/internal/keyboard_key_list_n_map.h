@@ -12,8 +12,8 @@
     X(digit_8,0x0009)   \
     X(digit_9, 0x000A)  \
     X(digit_0, 0x000B)  \
-    X(dash, 0x000C) \
-    X(plus, 0x000D)  \
+    X(minus, 0x000C) \
+    X(equals, 0x000D)  \
     X(backspace, 0x000E)    \
     X(tab, 0x000F)  \
     X(q, 0x0010)    \
