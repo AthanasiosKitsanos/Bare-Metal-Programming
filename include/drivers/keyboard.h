@@ -106,6 +106,8 @@ namespace driver
         bool left_shift_down;
         bool right_shift_down;
         bool left_ctrl_down;
+        bool right_ctrl_down;
+        bool left_alt_down;
         bool left_alt_down;
         bool caps_lock_down;
         bool caps_lock_on;
@@ -138,7 +140,7 @@ namespace driver
     inline bool is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
 
     [[gnu::always_inline]]
-    inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
+    inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down || state->right_ctrl_down; }
 
     [[gnu::always_inline]]
     inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
