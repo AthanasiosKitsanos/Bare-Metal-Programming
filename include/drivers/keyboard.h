@@ -29,8 +29,8 @@ namespace driver
         digit_8 = 0x0009,
         digit_9 = 0x000A,
         digit_0 = 0x000B,
-        plus = 0x000D,
-        dash = 0x000C,
+        minus = 0x000C,
+        equals = 0x000D,
         backspace = 0x000E,
         tab = 0x000F,
         q = 0x0010,
@@ -87,6 +87,18 @@ namespace driver
         f10 = 0x0044,
         f11 = 0x0057,
         f12 = 0x0058,
+        right_ctrl = 0xE01D,
+        right_alt = 0xE038,
+        home = 0xE047,
+        arrow_up = 0xE048,
+        page_up = 0xE049,
+        arrow_left = 0xE04B,
+        arrow_right = 0xE04D,
+        end = 0xE04F,
+        arrow_down = 0xE050,
+        page_down = 0xE051,
+        insert = 0xE052,
+        delete_key = 0xE053,
     };
 
     struct keyboard_modifier_state
@@ -94,7 +106,9 @@ namespace driver
         bool left_shift_down;
         bool right_shift_down;
         bool left_ctrl_down;
+        bool right_ctrl_down;
         bool left_alt_down;
+        bool right_alt_down;
         bool caps_lock_down;
         bool caps_lock_on;
     };
@@ -126,10 +140,10 @@ namespace driver
     inline bool is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
 
     [[gnu::always_inline]]
-    inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down; }
+    inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down || state->right_ctrl_down; }
 
     [[gnu::always_inline]]
-    inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
+    inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down || state->right_alt_down; }
 
     [[gnu::always_inline]]
     inline bool is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
@@ -143,6 +157,8 @@ namespace driver
             case keyboard_key::left_shift:
             case keyboard_key::right_shift:
             case keyboard_key::left_ctrl:
+            case keyboard_key::right_ctrl:
+            case keyboard_key::right_alt:
             case keyboard_key::left_alt:
             case keyboard_key::caps_lock:
                 return true;
@@ -166,19 +182,15 @@ namespace driver
     [[gnu::always_inline]]
     inline bool is_symbol_key(const keyboard_key key) noexcept
     {
+        if(key >= keyboard_key::semicolon && key <= keyboard_key::backtick) return true;
+        if(key >= keyboard_key::comma && key <= keyboard_key::slash) return true;
         switch(key)
         {
-            case keyboard_key::dash:
-            case keyboard_key::plus:
-            case keyboard_key::semicolon:
-            case keyboard_key::apostrophe:
+            case keyboard_key::minus:
+            case keyboard_key::equals:
             case keyboard_key::left_bracket:
             case keyboard_key::right_bracket:
-            case keyboard_key::backtick:
             case keyboard_key::back_slash:
-            case keyboard_key::comma:
-            case keyboard_key::period:
-            case keyboard_key::slash:
                 return true;
             default:
                 return false;
