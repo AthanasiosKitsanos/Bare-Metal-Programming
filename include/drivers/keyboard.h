@@ -198,6 +198,50 @@ namespace driver
     }
 
     [[gnu::always_inline]]
+    inline bool is_arrow_key(const keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case keyboard_key::arrow_up:
+            case keyboard_key::arrow_down:
+            case keyboard_key::arrow_left:
+            case keyboard_key::arrow_right:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    [[gnu::always_inline]]
+    inline bool is_navigation_key(const keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case keyboard_key::home:
+            case keyboard_key::page_up:
+            case keyboard_key::end:
+            case keyboard_key::page_down:
+                return true;
+            default:
+                return is_arrow_key(key);
+        }
+    }
+
+    [[gnu::always_inline]]
+    inline bool is_editing_key(const keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case keyboard_key::insert:
+            case keyboard_key::delete_key:
+            case keyboard_key::backspace:
+                return true;
+            default:
+                return false;
+        }
+    }
+
+    [[gnu::always_inline]]
     inline bool is_text_key(const keyboard_key key) noexcept { return is_letter_key(key) || is_digit_key(key) || is_space_key(key) || is_symbol_key(key); }
 
     [[gnu::always_inline]]
