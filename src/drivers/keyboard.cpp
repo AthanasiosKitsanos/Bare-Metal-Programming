@@ -109,8 +109,14 @@ namespace
             case driver::keyboard_key::left_ctrl:
                 g_modifier_state.left_ctrl_down = (state == driver::key_state::pressed);
                 break;
+            case driver::keyboard_key::right_ctrl:
+                g_modifier_state.right_ctrl_down = (state == driver::key_state::pressed);
+                break;
             case driver::keyboard_key::left_alt:
                 g_modifier_state.left_alt_down = (state == driver::key_state::pressed);
+                break;
+            case driver::keyboard_key::right_alt:
+                g_modifier_state.right_alt_down = (state == driver::key_state::pressed);
                 break;
             case driver::keyboard_key::caps_lock:
                 if(state == driver::key_state::pressed)

@@ -108,7 +108,7 @@ namespace driver
         bool left_ctrl_down;
         bool right_ctrl_down;
         bool left_alt_down;
-        bool left_alt_down;
+        bool right_alt_down;
         bool caps_lock_down;
         bool caps_lock_on;
     };
@@ -157,6 +157,8 @@ namespace driver
             case keyboard_key::left_shift:
             case keyboard_key::right_shift:
             case keyboard_key::left_ctrl:
+            case keyboard_key::right_ctrl:
+            case keyboard_key::right_alt:
             case keyboard_key::left_alt:
             case keyboard_key::caps_lock:
                 return true;

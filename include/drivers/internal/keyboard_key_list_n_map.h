@@ -80,7 +80,7 @@
     X(arrow_left, 0x004B)   \
     X(arrow_right, 0x004D)  \
     X(end, 0x004F)  \
-    X(arrow_down, 0x050)   \
+    X(arrow_down, 0x0050)   \
     X(page_down, 0x0051)    \
     X(insert, 0x0052)   \
     X(delete_key, 0x0053)
