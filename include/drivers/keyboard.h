@@ -88,7 +88,7 @@ namespace driver
         f11 = 0x0057,
         f12 = 0x0058,
         right_ctrl = 0xE01D,
-        right_alt = 0xE038, 
+        right_alt = 0xE038,
         home = 0xE047,
         arrow_up = 0xE048,
         page_up = 0xE049,
@@ -143,7 +143,7 @@ namespace driver
     inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down || state->right_ctrl_down; }
 
     [[gnu::always_inline]]
-    inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down; }
+    inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down || state->right_alt_down; }
 
     [[gnu::always_inline]]
     inline bool is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
