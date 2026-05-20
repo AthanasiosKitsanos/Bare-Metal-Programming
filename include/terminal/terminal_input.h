@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace kernel
+namespace terminal
 {
     class input_line
     {

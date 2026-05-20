@@ -3,7 +3,7 @@
 namespace kernel
 {
     // Constructor
-    logger::logger(terminal* const t) noexcept: m_terminal(t) {}
+    logger::logger(terminal::output* const t) noexcept: m_terminal(t) {}
 
     // Private Methods
     void logger::set_prefix_text_and_color(const char* error_type, vga_color foreground, vga_color background) noexcept

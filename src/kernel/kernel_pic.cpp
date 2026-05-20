@@ -19,46 +19,46 @@ namespace kernel
 {
     void pic_remap(uint8_t offset_1, uint8_t offset_2) noexcept
     {
-        uint8_t master_mask{inb(master_data)};
-        uint8_t slave_mask{inb(slave_data)};
+        uint8_t master_mask{terminal::inb(master_data)};
+        uint8_t slave_mask{terminal::inb(slave_data)};
 
-        outb(master_command, enable);
+        terminal::outb(master_command, enable);
         io_wait();
-        outb(slave_command, enable);
-        io_wait();
-
-        outb(master_data, offset_1);
-        io_wait();
-        outb(slave_data, offset_2);
+        terminal::outb(slave_command, enable);
         io_wait();
 
-        outb(master_data, master_bit);
+        terminal::outb(master_data, offset_1);
         io_wait();
-        outb(slave_data, slave_bit);
-        io_wait();
-
-        outb(master_data, x86_mode);
-        io_wait();
-        outb(slave_data, x86_mode);
+        terminal::outb(slave_data, offset_2);
         io_wait();
 
-        outb(master_data, master_mask);
+        terminal::outb(master_data, master_bit);
         io_wait();
-        outb(slave_data, slave_mask);
+        terminal::outb(slave_data, slave_bit);
+        io_wait();
+
+        terminal::outb(master_data, x86_mode);
+        io_wait();
+        terminal::outb(slave_data, x86_mode);
+        io_wait();
+
+        terminal::outb(master_data, master_mask);
+        io_wait();
+        terminal::outb(slave_data, slave_mask);
         io_wait();
     }
 
     void send_eoi(uint8_t vector) noexcept
     {
-        if(vector > 39) outb(slave_command, eoi_command);
-        outb(master_command, eoi_command);
+        if(vector > 39) terminal::outb(slave_command, eoi_command);
+        terminal::outb(master_command, eoi_command);
     }
 
     void mask_all_except_timer_and_keyboard() noexcept
     {
-        outb(master_data, 0xFC);
+        terminal::outb(master_data, 0xFC);
         io_wait();
-        outb(slave_data, 0xFF);
+        terminal::outb(slave_data, 0xFF);
         io_wait();
     }
 }

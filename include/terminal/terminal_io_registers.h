@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace kernel
+namespace terminal
 {
     inline __attribute__((always_inline)) void outb(uint16_t port, uint8_t value) noexcept
     {

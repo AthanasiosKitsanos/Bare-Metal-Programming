@@ -69,7 +69,7 @@ namespace
     {
         if(!g_exception_logger) halt_forever();
         g_exception_logger->error() << "CPU exception: " << name << ' ' << mnemonic
-        << kernel::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
+        << terminal::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
         << "\nEAX:" << frame->eax << "     ECX:" << frame->ecx << "\nEDX:" << frame->edx << " EBX:" << frame->ebx
         << "\nESP:" << frame->esp << " EBP:" << frame->ebp << "\nESI:" << frame->esi << "  EDI:" << frame->edi
         << "\nVector:" << frame->vector << '\n';
@@ -100,7 +100,7 @@ namespace
         if(g_exception_logger)
         {
             g_exception_logger->error() << "Unhandled interrupt vector: " << vector << "\nError Code: " << frame->error_code
-            << "\nEIP: " << kernel::hex << frame->eip << '\n' << kernel::dec;
+            << "\nEIP: " << terminal::hex << frame->eip << '\n' << terminal::dec;
         }
         if(vector >= irq_base && vector <= irq_max) return;
         halt_forever();
