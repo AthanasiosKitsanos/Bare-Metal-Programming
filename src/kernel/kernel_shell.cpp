@@ -23,5 +23,6 @@ namespace kernel
         if(command_ready || command_size() == 0) return false;
         --current_data;
         *current_data = '\0';
+        return true; 
     }
 }

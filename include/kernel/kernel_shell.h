@@ -18,7 +18,11 @@ namespace kernel
             bool backspace() noexcept;
             
             [[gnu::always_inline]]
-            void submit() noexcept { command_ready = true; }
+            void submit() noexcept
+            {
+                *current_data = '\0';
+                command_ready = true;
+            }
             
             [[gnu::always_inline]]
             bool has_command() const noexcept { return command_ready; }
