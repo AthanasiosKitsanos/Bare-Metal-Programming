@@ -27,6 +27,7 @@ namespace kernel
             [[gnu::always_inline]]
             bool has_command() const noexcept { return command_ready; }
             
+            // This needs to be a submitted command or else it is invalid
             [[gnu::always_inline]]
             inline const char* command() const noexcept { return command_buffer; }
             
