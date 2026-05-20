@@ -18,6 +18,13 @@ namespace terminal
         ++current;
     }
 
+    void vga_text_buffer::remove_last_char() noexcept
+    {
+        if(current == begin) return;
+        *current = make_entry(' ', active_color);
+        --current;
+    }
+
     void vga_text_buffer::move_to_line_start() noexcept
     {
         if(current == end) --current;

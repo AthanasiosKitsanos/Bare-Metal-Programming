@@ -1,0 +1,35 @@
+#pragma once
+
+#include <stdint.h>
+
+namespace kernel
+{
+    class shell
+    {
+        static constexpr uint8_t command_capacity{128};
+        char command_buffer[command_capacity + 1];
+        char* current_data;
+        bool command_ready;
+
+        public:
+            constexpr shell() noexcept: command_buffer{'\0'}, current_data(command_buffer), command_ready{false} {}
+            void reset() noexcept;
+            bool push_character(char) noexcept;
+            bool backspace() noexcept;
+            
+            [[gnu::always_inline]]
+            void submit() noexcept { command_ready = true; }
+            
+            [[gnu::always_inline]]
+            bool has_command() const noexcept { return command_ready; }
+            
+            [[gnu::always_inline]]
+            inline const char* command() const noexcept { return command_buffer; }
+            
+            [[gnu::always_inline]]
+            inline uint8_t max_command_size() const noexcept { return command_capacity; }
+            
+            [[gnu::always_inline]]
+            inline uint8_t command_size() const noexcept { return static_cast<uint8_t>(current_data - command_buffer); }
+        };
+}

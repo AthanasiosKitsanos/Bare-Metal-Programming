@@ -62,6 +62,7 @@ namespace terminal
             // Public Methods
             void clear() noexcept;
             void put(char c) noexcept;
+            void remove_last_char() noexcept;
             void move_to_line_start() noexcept;
             void move_to_next_line() noexcept;
             void scroll() noexcept;

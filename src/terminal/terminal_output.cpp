@@ -274,6 +274,11 @@ namespace terminal
         write(text, string_length(text));
     }
 
+    vga_text_buffer* output::get_vga_buffer() noexcept
+    {
+        return &buffer;
+    }
+
     // Operators
     output& output::operator<<(const char c) noexcept
     {
