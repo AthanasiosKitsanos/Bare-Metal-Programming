@@ -19,6 +19,8 @@ PIT_H = include/kernel/kernel_pit.h
 
 INTERRUPT_GUARD_H = include/kernel/kernel_interrupt_guard.h
 
+KERNEL_INPUT_H = include/kernel/kernel_input.h
+
 #----------------------Include Folders--------------------------------------
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel
 INCLUDE_KERNEL_INTERNAL_FOLDER = -Iinclude/kernel/internal
