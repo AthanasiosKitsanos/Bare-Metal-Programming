@@ -3,7 +3,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-namespace kernel
+namespace terminal
 {
     class vga_hardware_cursor
     {

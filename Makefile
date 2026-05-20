@@ -29,7 +29,7 @@ KERNEL_OBJ = obj/kernel.o
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ) $(KEYBOARD_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OUTPUT_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ) $(KEYBOARD_OBJ)
 
 # --------------------Code 32--------------------------------
 CODE_32_ELF = elf/code_32.elf
@@ -48,8 +48,8 @@ all: $(OS_IMAGE)
 
 #--------------------------------------Terminal Rules----------------------------------------------------------
 # Terminal
-$(TERMINAL_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_CPP) $(IO_H) $(LOGGER_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(TERMINAL_CPP) -o $(TERMINAL_OBJ)
+$(TERMINAL_OUTPUT_OBJ): $(VGA_H) $(TERMINAL_H) $(TERMINAL_OUTPUT_CPP) $(IO_H) $(LOGGER_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(TERMINAL_OUTPUT_CPP) -o $(TERMINAL_OUTPUT_OBJ)
 
 # VGA cursor
 $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
@@ -58,6 +58,10 @@ $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
 # VGA Buffer
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
+
+# Terminal Input
+$(TERMINAL_INPUT_OBJ): $(TERMINAL_INPUT_CPP) $(TERMINAL_INPUT_H)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(TERMINAL_INPUT_CPP) -o $(TERMINAL_INPUT_OBJ)
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 # Kernel

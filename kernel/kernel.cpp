@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "terminal.h"
+#include "terminal_output.h"
 #include "kernel_logger.h"
 #include "kernel_assert.h"
 #include "kernel_exceptions.h"
@@ -12,7 +12,7 @@ constexpr uint32_t timer_frequency_hz{100};
 
 extern "C" [[noreturn]] void kernel_main()
 {
-    kernel::terminal console{};
+    terminal::output console{};
     kernel::logger logger{&console};
     console.initialize();
 

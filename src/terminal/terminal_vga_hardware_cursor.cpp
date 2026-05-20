@@ -1,7 +1,7 @@
 #include "terminal_vga_hardware_cursor.h"
 #include "terminal_io_registers.h"
 
-namespace kernel
+namespace terminal
 {
     void vga_hardware_cursor::write_register(uint8_t index, uint8_t value) noexcept
     {

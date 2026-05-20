@@ -138,7 +138,7 @@ namespace
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
         {
-            if((kernel::inb(status_port) & input_buffer_full) == 0) return true;
+            if((terminal::inb(status_port) & input_buffer_full) == 0) return true;
             kernel::io_wait();
         }
         return false;
@@ -148,7 +148,7 @@ namespace
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
         {
-            if((kernel::inb(status_port) & output_buffer_full) != 0) return true;
+            if((terminal::inb(status_port) & output_buffer_full) != 0) return true;
             kernel::io_wait();
         }
         return false;
@@ -157,14 +157,14 @@ namespace
     bool read_keyboard_ack() noexcept
     {
         if(!wait_output_buffer_full()) return false;
-        const uint8_t response{kernel::inb(data_port)};
+        const uint8_t response{terminal::inb(data_port)};
         return response == keyboard_ack;
     }
 
     bool send_keyboard_byte_and_wait_ack(const uint8_t byte) noexcept
     {
         if(!wait_input_buffer_clear()) return false;
-        kernel::outb(data_port, byte);
+        terminal::outb(data_port, byte);
         return read_keyboard_ack();
     }
 
@@ -172,8 +172,8 @@ namespace
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
         {
-            if((kernel::inb(status_port) & output_buffer_full) == 0) return;
-            static_cast<void>(kernel::inb(data_port));
+            if((terminal::inb(status_port) & output_buffer_full) == 0) return;
+            static_cast<void>(terminal::inb(data_port));
             kernel::io_wait();
         }
     }
@@ -237,10 +237,10 @@ namespace driver
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept
     {
         static_cast<void>(frame);
-        const uint8_t status{kernel::inb(status_port)};
+        const uint8_t status{terminal::inb(status_port)};
         if((status & output_buffer_full) == 0) return;
 
-        const uint8_t scancode{kernel::inb(data_port)};
+        const uint8_t scancode{terminal::inb(data_port)};
         if(scancode == extended_prefix)
         {
             g_extended_pending = true;

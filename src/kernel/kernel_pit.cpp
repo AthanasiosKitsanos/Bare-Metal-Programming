@@ -25,9 +25,9 @@ namespace kernel
         if(divisor_32 < min_divisor || divisor_32 > max_divisor) return false;
         const uint16_t divisor{static_cast<uint16_t>(divisor_32)};
 
-        outb(command_port, channel_0_lobyte_hibyte_mode_3_binary);
-        outb(channel_0_data_port, static_cast<uint8_t>(divisor & 0x00FF));
-        outb(channel_0_data_port, static_cast<uint8_t>((divisor >> 8) & 0x00FF));
+        terminal::outb(command_port, channel_0_lobyte_hibyte_mode_3_binary);
+        terminal::outb(channel_0_data_port, static_cast<uint8_t>(divisor & 0x00FF));
+        terminal::outb(channel_0_data_port, static_cast<uint8_t>((divisor >> 8) & 0x00FF));
         
         return true;
     }

@@ -11,14 +11,14 @@ enum class integer_base: uint8_t
     hex,
 };
 
-namespace kernel
+namespace terminal
 {
-    class terminal
+    class output
     {
         // Private Members
         vga_text_buffer buffer;
         vga_hardware_cursor cursor;
-        using terminal_manipulator = terminal& (*)(terminal&) noexcept;
+        using output_manipulator = output& (*)(output&) noexcept;
         integer_base state{integer_base::dec};
         bool bool_alpha_enabled{false};
 
@@ -45,10 +45,10 @@ namespace kernel
         void write_hex_64_no_sync(uint64_t) noexcept;
 
         // Private Friend Methods
-        friend terminal& dec(terminal&) noexcept;
-        friend terminal& hex(terminal&) noexcept;
-        friend terminal& bool_alpha(terminal&) noexcept;
-        friend terminal& bool_no_alpha(terminal&) noexcept;
+        friend output& dec(output&) noexcept;
+        friend output& hex(output&) noexcept;
+        friend output& bool_alpha(output&) noexcept;
+        friend output& bool_no_alpha(output&) noexcept;
 
         // Inline Methods
         inline char __attribute__((always_inline)) hex_digit(uint8_t nibble) const noexcept
@@ -67,7 +67,7 @@ namespace kernel
         
         public:
             // Constructor
-            terminal() noexcept = default;
+            output() noexcept = default;
 
             // Public methods
             void initialize() noexcept;
@@ -85,23 +85,23 @@ namespace kernel
             }
 
             // Operators
-            terminal& operator<<(const char) noexcept;
-            terminal& operator<<(const char*) noexcept;
-            terminal& operator<<(const uint8_t) noexcept;
-            terminal& operator<<(const int8_t) noexcept;
-            terminal& operator<<(const uint16_t) noexcept;
-            terminal& operator<<(const int16_t) noexcept;
-            terminal& operator<<(const uint32_t) noexcept;
-            terminal& operator<<(const int32_t) noexcept;
-            terminal& operator<<(const uint64_t) noexcept;
-            terminal& operator<<(const int64_t) noexcept;
-            terminal& operator<<(const bool) noexcept;
-            terminal& operator<<(const void*) noexcept;
-            terminal& operator<<(terminal_manipulator) noexcept;
+            output& operator<<(const char) noexcept;
+            output& operator<<(const char*) noexcept;
+            output& operator<<(const uint8_t) noexcept;
+            output& operator<<(const int8_t) noexcept;
+            output& operator<<(const uint16_t) noexcept;
+            output& operator<<(const int16_t) noexcept;
+            output& operator<<(const uint32_t) noexcept;
+            output& operator<<(const int32_t) noexcept;
+            output& operator<<(const uint64_t) noexcept;
+            output& operator<<(const int64_t) noexcept;
+            output& operator<<(const bool) noexcept;
+            output& operator<<(const void*) noexcept;
+            output& operator<<(output_manipulator) noexcept;
 
             // Templates
             template<size_t N>
-            terminal& operator<<(const char (&text)[N]) noexcept
+            output& operator<<(const char (&text)[N]) noexcept
             {
                 size_t length{0};
                 for(const char* curr{text}; length < N && *curr != '\0'; ++length)
@@ -114,7 +114,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const uint8_t (&value)[N]) noexcept
+            output& operator<<(const uint8_t (&value)[N]) noexcept
             {
                 const uint8_t* const end{value + N};
                 switch(state)
@@ -131,7 +131,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const int8_t (&value)[N]) noexcept
+            output& operator<<(const int8_t (&value)[N]) noexcept
             {
                 const int8_t* const end{value + N};
                 switch(state)
@@ -161,7 +161,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const uint16_t (&value)[N]) noexcept
+            output& operator<<(const uint16_t (&value)[N]) noexcept
             {
                 const uint16_t* const end{value + N};
                 switch(state)
@@ -178,7 +178,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const int16_t (&value)[N]) noexcept
+            output& operator<<(const int16_t (&value)[N]) noexcept
             {
                 const int16_t* const end{value + N};
                 switch(state)
@@ -208,7 +208,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const uint32_t (&value)[N]) noexcept
+            output& operator<<(const uint32_t (&value)[N]) noexcept
             {
                 const uint32_t* const end{value + N};
                 switch(state)
@@ -225,7 +225,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const int32_t (&value)[N]) noexcept
+            output& operator<<(const int32_t (&value)[N]) noexcept
             {
                 const int32_t* const end{value + N};
                 switch(state)
@@ -255,7 +255,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const uint64_t (&value)[N]) noexcept
+            output& operator<<(const uint64_t (&value)[N]) noexcept
             {
                 const uint64_t* const end{value + N};
                 switch(state)
@@ -272,7 +272,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const int64_t (&value)[N]) noexcept
+            output& operator<<(const int64_t (&value)[N]) noexcept
             {
                 const int64_t* const end{value + N};
                 switch(state)
@@ -302,7 +302,7 @@ namespace kernel
             }
 
             template<size_t N>
-            terminal& operator<<(const bool (&array)[N]) noexcept
+            output& operator<<(const bool (&array)[N]) noexcept
             {
                 const bool* const end{array + N};
                 for(const bool* curr{array}; curr < end; ++curr)
@@ -316,8 +316,8 @@ namespace kernel
     };
 
     // Free Functions
-    terminal& dec(terminal&) noexcept;
-    terminal& hex(terminal&) noexcept;
-    terminal& bool_alpha(terminal&) noexcept;
-    terminal& bool_no_alpha(terminal&) noexcept;
+    output& dec(output&) noexcept;
+    output& hex(output&) noexcept;
+    output& bool_alpha(output&) noexcept;
+    output& bool_no_alpha(output&) noexcept;
 }

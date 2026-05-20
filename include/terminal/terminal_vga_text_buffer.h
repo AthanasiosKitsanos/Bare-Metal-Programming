@@ -28,7 +28,7 @@ enum class vga_color: color_code
     white = 0xF
 };
 
-namespace kernel
+namespace terminal
 {
     class vga_text_buffer
     {
