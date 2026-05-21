@@ -45,8 +45,7 @@ extern "C" [[noreturn]] void kernel_main()
         {
             if(driver::try_translate_text_event(&event, &character))
             {
-                shell.push_character(character);
-                console << character;
+                if(shell.push_character(character)) console << character;
                 continue;
             }
             if(driver::is_control_input_candidate_event(&event))
