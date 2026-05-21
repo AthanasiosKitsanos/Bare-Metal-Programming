@@ -55,12 +55,11 @@ extern "C" [[noreturn]] void kernel_main()
                 {
                     case driver::keyboard_key::enter:
                         shell.submit();
-                        console << '\n' << shell.command();
+                        console << '\n' << shell.command() << '\n';
                         shell.reset();
                         break;
                     case driver::keyboard_key::backspace:
-                        shell.backspace();
-                        console.delete_last_char();
+                        if(shell.backspace()) console.delete_last_char();
                         break;
                     default:
                         break;
