@@ -31,8 +31,6 @@ namespace
 
     using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept;
 
-    interrupt_handler g_interrupt_handlers[interrupt_vector_count]{};
-
     kernel::logger* g_exception_logger{nullptr};
 
     #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
@@ -106,30 +104,36 @@ namespace
         halt_forever();
     }
 
-    void initialize_interrupt_handlers_table() noexcept
+    struct g_interrupt_handlers_table
     {
-        for(uint32_t vector{0}; vector < interrupt_vector_count; ++vector)
+        interrupt_handler entries[interrupt_vector_count];
+
+        constexpr g_interrupt_handlers_table(): entries{}
         {
-            *(g_interrupt_handlers + vector) = default_interrupt_handler;
+            for(uint32_t vector{0}; vector < interrupt_vector_count; ++vector)
+            {
+                *(entries + vector) = default_interrupt_handler;
+            }
+
+            #define X(vector, name, title, mnemonic)    \
+                *(entries + vector) = handle_cpu_exception;
+            CPU_INTERRUPT_LIST
+            #undef X
+            
+            #define X(vector, name_space, name, title, mnemonic)    \
+                *(entries + vector) = name_space::handle_##name;
+            HARDWARE_INTERRUPT_LIST
+            #undef X
         }
+    };
 
-        #define X(vector, name, title, mnemonic)    \
-            *(g_interrupt_handlers + vector) = handle_cpu_exception;
-        CPU_INTERRUPT_LIST
-        #undef X
-        
-        #define X(vector, name_space, name, title, mnemonic)    \
-            *(g_interrupt_handlers + vector) = name_space::handle_##name;
-        HARDWARE_INTERRUPT_LIST
-        #undef X
-
-    }
+    constexpr g_interrupt_handlers_table g_interrupt_handlers{};
 }
 
 extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 {
     uint32_t vector{frame->vector};
-    g_interrupt_handlers[vector](frame);
+    g_interrupt_handlers.entries[vector](frame);
     if(vector >=irq_base && vector <= irq_max) kernel::send_eoi(static_cast<uint8_t>(vector - irq_base));
 }
 
@@ -156,8 +160,6 @@ namespace kernel
 
         HARDWARE_INTERRUPT_LIST
         #undef X
-        
-        initialize_interrupt_handlers_table();
 
         kernel::mask_all_except_timer_and_keyboard();
 

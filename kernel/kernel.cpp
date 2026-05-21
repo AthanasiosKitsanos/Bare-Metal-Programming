@@ -36,7 +36,6 @@ extern "C" [[noreturn]] void kernel_main()
     
     asm volatile("sti");
 
-
     driver::keyboard_event event{};
     char character{'\0'};
     kernel::shell shell{};
@@ -58,7 +57,6 @@ extern "C" [[noreturn]] void kernel_main()
             else if(event.key == driver::keyboard_key::backspace)
             {
                 shell.backspace();
-                continue;
             }
         }
 
