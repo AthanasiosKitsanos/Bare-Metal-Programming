@@ -43,20 +43,28 @@ extern "C" [[noreturn]] void kernel_main()
     {
         while(driver::poll_keyboard_event(&event))
         {
-            if(driver::is_text_key(event.key) && driver::try_translate_text_event(&event, &character))
+            if(driver::try_translate_text_event(&event, &character))
             {
                 shell.push_character(character);
                 console << character;
+                continue;
             }
-            else if(event.key == driver::keyboard_key::enter)
+            if(driver::is_control_input_candidate_event(&event))
             {
-                shell.submit();
-                console << '\n' << shell.command();
-                shell.reset();
-            }
-            else if(event.key == driver::keyboard_key::backspace)
-            {
-                shell.backspace();
+                switch(event.key)
+                {
+                    case driver::keyboard_key::enter:
+                        shell.submit();
+                        console << '\n' << shell.command();
+                        shell.reset();
+                        break;
+                    case driver::keyboard_key::backspace:
+                        shell.backspace();
+                        console.delete_last_char();
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
