@@ -25,7 +25,10 @@ namespace kernel
             }
             
             [[gnu::always_inline]]
-            bool has_command() const noexcept { return command_ready; }
+            inline bool has_command() const noexcept { return command_ready; }
+
+            [[gnu::always_inline]]
+            inline bool is_empty() const noexcept { return command_size() == 0; }
             
             // This needs to be a submitted command or else it is invalid
             [[gnu::always_inline]]
