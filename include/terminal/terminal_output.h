@@ -77,7 +77,6 @@ namespace terminal
             vga_text_buffer* get_vga_buffer() noexcept;
 
             // Inline Public Methods
-            inline void __attribute__((always_inline)) put_char(char c) { put_char_no_sync(c); }
             inline void __attribute__((always_inline)) reset_color() noexcept { set_color_code(buffer.get_default_color_code()); }
             inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
             inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
