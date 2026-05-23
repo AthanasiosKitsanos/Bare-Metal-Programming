@@ -67,7 +67,7 @@ namespace terminal
         
         public:
             // Constructor
-            output() noexcept = default;
+            constexpr output() noexcept {}
 
             // Public methods
             void initialize() noexcept;

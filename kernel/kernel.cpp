@@ -69,16 +69,5 @@ extern "C" [[noreturn]] void kernel_main()
                 }
             }
         }
-
-        kernel::disable_interrupts();
-
-        if(!driver::has_pending_keyboard_event())
-        {
-            kernel::enable_interrupt_and_halt();
-        }
-        else
-        {
-            kernel::enable_interrupts();
-        }
     }
 }
