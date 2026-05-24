@@ -50,9 +50,6 @@ namespace kernel
             
             // This needs to be a submitted command or else it is invalid
             [[gnu::always_inline]]
-            inline const char* command() const noexcept { return command_buffer; }
-            
-            [[gnu::always_inline]]
             inline uint8_t max_command_size() const noexcept { return command_capacity; }
             
             [[gnu::always_inline]]
