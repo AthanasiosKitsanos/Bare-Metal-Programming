@@ -95,7 +95,7 @@ $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 
 #Kernel Shell
 $(KERNEL_SHELL_OBJ): $(KERNEL_SHELL_CPP) $(KERNEL_SHELL_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(KERNEL_SHELL_CPP) -o $(KERNEL_SHELL_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_SHELL_CPP) -o $(KERNEL_SHELL_OBJ)
 
 #-------------------------Drivers----------------------------------------------------------------------------------
 # Keyboard

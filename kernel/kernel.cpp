@@ -33,41 +33,13 @@ extern "C" [[noreturn]] void kernel_main()
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
+
+    kernel::shell shell{&console};
     
     asm volatile("sti");
 
-    driver::keyboard_event event{};
-    char character{'\0'};
-    kernel::shell shell{};
     for(;;)
     {
-        while(driver::poll_keyboard_event(&event))
-        {
-            if(driver::try_translate_text_event(&event, &character))
-            {
-                if(shell.push_character(character)) console << character;
-                continue;
-            }
-            if(driver::is_control_input_candidate_event(&event))
-            {
-                switch(event.key)
-                {
-                    case driver::keyboard_key::enter:
-                        if(!shell.is_empty())
-                        {
-                            shell.submit();
-                            console << '\n' << shell.command();
-                            shell.reset();
-                        }
-                        console << '\n';
-                        break;
-                    case driver::keyboard_key::backspace:
-                        if(shell.backspace()) console.delete_last_char();
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
+        shell.read_command();
     }
 }

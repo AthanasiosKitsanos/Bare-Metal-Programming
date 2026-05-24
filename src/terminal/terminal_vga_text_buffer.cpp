@@ -2,7 +2,7 @@
 
 namespace terminal
 {
-    // vga_text_buffer::vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), active_color(make_color(vga_color::white, vga_color::black)) {}
+    vga_text_buffer::vga_text_buffer() noexcept: begin(reinterpret_cast<volatile uint16_t*>(vga_address)), end(begin + vga_width * vga_height), current(begin), active_color(make_color(vga_color::white, vga_color::black)) {}
 
     void vga_text_buffer::clear() noexcept
     {

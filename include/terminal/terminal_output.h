@@ -67,7 +67,7 @@ namespace terminal
         
         public:
             // Constructor
-            constexpr output() noexcept {}
+            output() noexcept = default;
 
             // Public methods
             void initialize() noexcept;
@@ -79,6 +79,11 @@ namespace terminal
             inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
             inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
             inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return buffer.current_color_code(); }
+            inline void __attribute__((always_inline)) clear() noexcept
+            {
+                buffer.clear();
+                sync_cursor();
+            }
 
             inline void __attribute__((always_inline)) delete_last_char() noexcept
             {
