@@ -37,6 +37,13 @@ namespace
         return static_cast<int16_t>(*from) - static_cast<int16_t>(*to);
     }
 
+    [[gnu::always_inline]]
+    inline uint8_t control_key_index(const uint8_t key_code) noexcept
+    {
+        constexpr uint8_t index_mask{0x03};
+        return ((key_code - 1) & index_mask);
+    }
+
     void wait_for_keyboard_event() noexcept
     {
         kernel::disable_interrupts();
@@ -114,10 +121,10 @@ namespace kernel
         constexpr uint8_t tab_spaces{4};
         for(uint8_t i{0}; i < tab_spaces; ++i)
         {
-            s->push_character(' ');
-            *(s->console) << ' ';
+            if(s->push_character(' ')) *s->console << ' ';
         }
     }
+
     void enter_handler(kernel::shell* s) noexcept
     {
         if(!s->is_empty())

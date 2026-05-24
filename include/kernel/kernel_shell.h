@@ -16,13 +16,6 @@ namespace kernel
         char* current_data;
         bool command_ready;
 
-        [[gnu::always_inline]]
-        inline uint8_t control_key_index(const uint8_t key_code) noexcept
-        {
-            constexpr uint8_t index_mask{0x03};
-            return ((key_code - 1) & index_mask);
-        }
-
         friend void escape_handler(kernel::shell* s) noexcept;
         friend void backspace_handler(kernel::shell* s) noexcept;
         friend void tab_handler(kernel::shell* s) noexcept;
