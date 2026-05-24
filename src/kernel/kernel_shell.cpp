@@ -100,7 +100,6 @@ namespace kernel
         reset();
     }
 
-
     // Friend Fucntions
     void escape_handler(shell* s) noexcept
     {
@@ -129,9 +128,9 @@ namespace kernel
     {
         if(!s->is_empty())
         {
-            s->submit();
             *(s->console) << '\n' << s->command_buffer;
         }
+        s->submit();
         *(s->console) << '\n';
     }
 }
