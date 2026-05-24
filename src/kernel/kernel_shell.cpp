@@ -97,6 +97,11 @@ namespace kernel
     // Friend Fucntions
     void escape_handler(shell* s) noexcept
     {
+        while(s->current_data > s->command_buffer)
+        {
+            --s->current_data;
+            s->console->delete_last_char();
+        }
         s->reset();
         s->command_ready = true;
     }

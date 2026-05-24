@@ -38,6 +38,7 @@ extern "C" [[noreturn]] void kernel_main()
     
     asm volatile("sti");
 
+    console << "Hello, World!\n";
     for(;;)
     {
         shell.read_command();
