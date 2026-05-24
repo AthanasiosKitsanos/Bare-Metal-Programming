@@ -85,9 +85,19 @@ namespace terminal
                 sync_cursor();
             }
 
-            inline void __attribute__((always_inline)) delete_last_char() noexcept
+            inline void __attribute__((always_inline)) delete_last_char_no_sync() noexcept
             {
                 buffer.remove_last_char();
+            }
+
+            inline void __attribute__((always_inline)) delete_last_char_sync() noexcept
+            {
+                buffer.remove_last_char();
+                sync_cursor();
+            }
+
+            inline void __attribute__((always_inline)) call_cursor_sync() noexcept
+            {
                 sync_cursor();
             }
 

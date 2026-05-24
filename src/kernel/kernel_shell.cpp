@@ -100,13 +100,14 @@ namespace kernel
         while(s->current_data > s->command_buffer)
         {
             --s->current_data;
-            s->console->delete_last_char();
+            s->console->delete_last_char_no_sync();
         }
-        s->reset();
+        s->console->call_cursor_sync();
+        s->current_data = '\0';
         s->command_ready = true;
     }
 
-    void backspace_handler(shell* s) noexcept { if(s->backspace()) s->console->delete_last_char(); }
+    void backspace_handler(shell* s) noexcept { if(s->backspace()) s->console->delete_last_char_sync(); }
     
     void tab_handler(shell* s) noexcept
     {
