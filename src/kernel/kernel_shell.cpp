@@ -91,6 +91,12 @@ namespace kernel
                 if(driver::is_control_input_candidate_event(&g_k_event))
                 {
                     g_control_table.entries[control_key_index(g_k_event.key_code)](this);
+                    continue;
+                }
+                if(driver::is_navigation_input_candidate_event(&g_k_event))
+                {
+                    // g_navigation_table.entries
+                    // continue;
                 }
             }
 
@@ -100,7 +106,7 @@ namespace kernel
         reset();
     }
 
-    // Friend Fucntions
+    // Control Friend Fucntions
     void escape_handler(shell* s) noexcept
     {
         while(s->current_data > s->command_buffer)
@@ -133,4 +139,7 @@ namespace kernel
         s->submit();
         *(s->console) << '\n';
     }
+
+    // Navigation Friend Functions
+
 }
