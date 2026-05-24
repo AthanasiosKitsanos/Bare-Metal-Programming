@@ -102,7 +102,7 @@ namespace kernel
             --s->current_data;
             s->console->delete_last_char_no_sync();
         }
-        s->current_data = '\0';
+        *s->current_data = '\0';
         s->console->call_cursor_sync();
         s->command_ready = true;
     }
@@ -122,10 +122,9 @@ namespace kernel
     {
         if(!s->is_empty())
         {
+            s->submit();
             *(s->console) << '\n' << s->command_buffer;
-
         }
-        s->submit();
         *(s->console) << '\n';
     }
 }
