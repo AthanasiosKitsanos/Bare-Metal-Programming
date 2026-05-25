@@ -11,6 +11,7 @@ namespace
 
     using control_func_ptr = void(*)(kernel::shell*) noexcept;
 
+    // Control Table Struct
     constexpr uint8_t table_size{4};
     struct control_func_table
     {
@@ -27,6 +28,39 @@ namespace
 
     constexpr control_func_table g_control_table{};
 
+    [[gnu::always_inline]]
+    inline uint8_t control_key_index(const uint8_t key_code) noexcept
+    {
+        constexpr uint8_t index_mask{0x03};
+        return ((key_code - 1) & index_mask);
+    }
+
+    using nav_func_ptr = void (*)(kernel::shell*) noexcept;
+
+    // Navigation Table Struct
+    constexpr uint8_t nav_table_size{16};
+    struct nav_func_table
+    {
+        nav_func_ptr entries[nav_table_size];
+        
+        constexpr nav_func_table(): entries{}
+        {
+            #define X(func_name, index) \
+                entries[index] = kernel::func_name##_handler;
+            NAVIGATION_KEY_TABLE
+            #undef X
+        }
+    };
+
+    constexpr nav_func_table g_navigation_func_table{};
+
+    [[gnu::always_inline]]
+    inline uint8_t navigation_key_index(const uint8_t key_code) noexcept
+    {
+        constexpr uint8_t mask{0x0F};
+        return (key_code & mask);
+    }
+
     int16_t string_compare(const char* from, const char* to) noexcept
     {
         while(*from != '\0' && *from == *to)
@@ -35,13 +69,6 @@ namespace
             ++to;
         }
         return static_cast<int16_t>(*from) - static_cast<int16_t>(*to);
-    }
-
-    [[gnu::always_inline]]
-    inline uint8_t control_key_index(const uint8_t key_code) noexcept
-    {
-        constexpr uint8_t index_mask{0x03};
-        return ((key_code - 1) & index_mask);
     }
 
     void wait_for_keyboard_event() noexcept
@@ -63,9 +90,10 @@ namespace kernel
 
     bool shell::push_character(char c) noexcept
     {
-        if(command_ready || current_data >= (command_buffer + command_capacity)) return false;
+        if(command_ready || current_data >= end) return false;
         *current_data = c;
         ++current_data;
+        *current_data = ' ';
         return true;
     }
 
@@ -73,6 +101,7 @@ namespace kernel
     {
         if(command_ready || command_size() == 0) return false;
         --current_data;
+        *current_data = '\0';
         return true;
     }
 
@@ -95,8 +124,7 @@ namespace kernel
                 }
                 if(driver::is_navigation_input_candidate_event(&g_k_event))
                 {
-                    // g_navigation_table.entries
-                    // continue;
+                    g_navigation_func_table.entries[navigation_key_index(g_k_event.key_code)](this);
                 }
             }
 
@@ -141,5 +169,43 @@ namespace kernel
     }
 
     // Navigation Friend Functions
+    void arrow_down_handler(shell* s) noexcept
+    {
+        return;
+    }
 
+    void page_down_handler(shell* s) noexcept
+    {
+        return;
+    }
+
+    void home_handler(shell* s) noexcept
+    {
+        return;
+    }
+
+    void arrow_up_handler(shell* s) noexcept
+    {
+        return;
+    }
+
+    void page_up_handler(shell* s) noexcept
+    {
+        return;
+    }
+
+    void arrow_left_handler(shell* s) noexcept
+    {
+        if(s->move_arrow_left()) s->console->move_cursor_left();
+    }
+
+    void arrow_right_handler(shell* s) noexcept
+    {
+        if(s->move_arrow_right()) s->console->move_cursor_right();
+    }
+
+    void end_handler(shell* s) noexcept
+    {
+        return;
+    }
 }

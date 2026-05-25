@@ -1,6 +1,8 @@
 #pragma once
 
 #include <stdint.h>
+#include "kernel_navigation_table.h"
+#include "kernel_control_input_table.h"
 
 namespace terminal
 {
@@ -14,15 +16,30 @@ namespace kernel
         char command_buffer[command_capacity + 1];
         terminal::output* const console;
         char* current_data;
+        const char* end;
+        uint8_t length;
         bool command_ready;
 
-        friend void escape_handler(kernel::shell* s) noexcept;
-        friend void backspace_handler(kernel::shell* s) noexcept;
-        friend void tab_handler(kernel::shell* s) noexcept;
-        friend void enter_handler(kernel::shell* s) noexcept;
+        // Friend Control Functions
+        #define X(name, index)  \
+            friend void name##_handler(shell*) noexcept;
+        CONTROL_KEY_MAPPING
+        #undef X
+
+        // Friend Navigation Functions
+        #define X(name, index)  \
+            friend void name##_handler(shell*) noexcept;
+        NAVIGATION_KEY_TABLE
+        #undef X
+
+        [[gnu::always_inline]]
+        inline void move_left() noexcept { --current_data; }
+
+        [[gnu::always_inline]]
+        inline void move_right() noexcept { ++current_data; }
 
         public:
-            explicit shell(terminal::output* out) noexcept: command_buffer{'\0'}, console{out}, current_data(command_buffer), command_ready{false} {}
+            explicit shell(terminal::output* out) noexcept: command_buffer{'\0'}, console{out}, current_data(command_buffer), end{command_buffer + command_capacity}, length{0}, command_ready{false} {}
             void reset() noexcept;
             bool push_character(char) noexcept;
             bool backspace() noexcept;
@@ -48,12 +65,31 @@ namespace kernel
             [[gnu::always_inline]]
             inline uint8_t command_size() const noexcept { return static_cast<uint8_t>(current_data - command_buffer); }
 
+            // Navigation Controls
             [[gnu::always_inline]]
-            inline terminal::output* get_console() const noexcept { return console; }
+            inline bool move_arrow_left() noexcept
+            {
+                if(current_data == command_buffer) return false;
+                move_left();
+                return true;
+            }
+
+            [[gnu::always_inline]]
+            inline bool move_arrow_right() noexcept
+            {
+                if(*(current_data + 1) == '\0' ) return false;
+                move_right();
+                return true;
+            }
     };
 
-    void escape_handler(kernel::shell* s) noexcept;
-    void backspace_handler(kernel::shell* s) noexcept;
-    void tab_handler(kernel::shell* s) noexcept;
-    void enter_handler(kernel::shell* s) noexcept;
+    #define X(name, index)  \
+        void name##_handler(kernel::shell*) noexcept;
+    CONTROL_KEY_MAPPING
+    #undef X
+
+    #define X(name, index)  \
+        void name##_handler(kernel::shell*) noexcept;
+    NAVIGATION_KEY_TABLE
+    #undef X
 }
