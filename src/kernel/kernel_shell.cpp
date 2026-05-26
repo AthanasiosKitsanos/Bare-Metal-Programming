@@ -139,10 +139,10 @@ namespace kernel
 
     bool shell::push_character(char c) noexcept
     {
-        if(command_ready || writable_data >= buffer_end) return false;
+        if(command_ready || data_end >= command_buffer + command_capacity) return false;
         *writable_data = c;
         ++writable_data;
-        data_end = writable_data + 1;
+        ++data_end;
         return true;
     }
 
@@ -192,7 +192,7 @@ namespace kernel
             --s->writable_data;
             s->console->delete_last_char_no_sync();
         }
-        s->data_end = s->writable_data + 1;
+        s->data_end = s->writable_data;
         *s->writable_data = '\0';
         s->console->call_cursor_sync();
     }

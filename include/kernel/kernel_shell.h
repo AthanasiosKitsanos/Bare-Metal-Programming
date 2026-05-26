@@ -17,8 +17,6 @@ namespace kernel
         terminal::output* const console;
         char* writable_data;
         char* data_end;
-        const char* buffer_end;
-        uint8_t length;
         bool command_ready;
 
         // Friend Control Functions
@@ -40,7 +38,7 @@ namespace kernel
         inline void move_right() noexcept { ++writable_data; }
 
         public:
-            explicit shell(terminal::output* out) noexcept: command_buffer{'\0'}, console{out}, writable_data(command_buffer), data_end{command_buffer}, buffer_end{command_buffer + command_capacity}, length{0}, command_ready{false} {}
+            explicit shell(terminal::output* out) noexcept: command_buffer{'\0'}, console{out}, writable_data(command_buffer), data_end{command_buffer}, command_ready{false} {}
             void reset() noexcept;
             bool push_character(char) noexcept;
             bool backspace() noexcept;
@@ -49,8 +47,12 @@ namespace kernel
             [[gnu::always_inline]]
             void submit() noexcept
             {
-                while(*data_end == ' ') --data_end;
-                *(++data_end) = '\0';
+                while(data_end > command_buffer && *(data_end - 1) == ' ') --data_end;
+                for(char pre_ch{*(data_end - 1)}; data_end > command_buffer && pre_ch == ' '; pre_ch = *(data_end - 1))
+                {
+                    --data_end;
+                }
+                *data_end = '\0';
                 command_ready = true;
             }
             
@@ -79,7 +81,7 @@ namespace kernel
             [[gnu::always_inline]]
             inline bool move_arrow_right() noexcept
             {
-                if((writable_data + 1) == data_end) return false;
+                if(writable_data == data_end) return false;
                 move_right();
                 return true;
             }
