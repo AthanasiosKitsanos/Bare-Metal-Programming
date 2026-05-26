@@ -94,7 +94,7 @@ $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
 
 #Kernel Shell
-$(KERNEL_SHELL_OBJ): $(KERNEL_SHELL_CPP) $(KERNEL_SHELL_H)
+$(KERNEL_SHELL_OBJ): $(KERNEL_SHELL_CPP) $(KERNEL_SHELL_H) $(KERNEL_COMMAND_MAP)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_SHELL_CPP) -o $(KERNEL_SHELL_OBJ)
 
 #-------------------------Drivers----------------------------------------------------------------------------------

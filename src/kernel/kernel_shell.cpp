@@ -4,6 +4,7 @@
 #include "keyboard.h"
 #include "kernel_interrupt_guard.h"
 #include "terminal_output.h"
+#include "kernel_command_functions.h"
 
 namespace
 {
@@ -77,31 +78,80 @@ namespace
         if(!driver::has_pending_keyboard_event()) kernel::enable_interrupt_and_halt();
         else kernel::enable_interrupts();
     }
+
+    using command_function_ptr = void(*)(terminal::output*) noexcept;
+    struct command_map
+    {
+        const char* command;
+        command_function_ptr function;
+    };
+
+    [[gnu::always_inline]]
+    inline void clear_hadnler(terminal::output* console) noexcept { console->clear();}
+
+
+    constexpr uint8_t command_table_size{1};
+    struct command_map_table
+    {
+        command_map entries[command_table_size];
+
+        constexpr command_map_table(): entries{}
+        {
+            #define X(index, command, func)    \
+                entries[index] = {command, func##_hadnler};
+            COMMAND_MAPPING
+            #undef X
+        }
+    };
+    constexpr command_map_table command_table{};
+
+    void execute_command(const char* command, terminal::output* out) noexcept
+    {
+        const command_map* left{command_table.entries};
+        const command_map* right{command_table.entries + command_table_size};
+        const command_map* mid{nullptr};
+        uint16_t result{0};
+        while(left < right)
+        {
+            mid = left + ((right - left) / 2);
+            result = string_compare(command, mid->command);
+            if(result == 0)
+            {
+                mid->function(out);
+                return;
+            }
+            else if(result < 0) left = mid + 1;
+            else right = mid;
+        }
+        if(out) *out << "Command not found\n";
+    }
 }
 
 namespace kernel
 {
     void shell::reset() noexcept
     {
-        current_data = command_buffer;
-        *current_data = '\0';
+        writable_data = command_buffer;
+        data_end = command_buffer;
+        *writable_data = '\0';
         command_ready = false;
     }
 
     bool shell::push_character(char c) noexcept
     {
-        if(command_ready || current_data >= end) return false;
-        *current_data = c;
-        ++current_data;
-        *current_data = ' ';
+        if(command_ready || writable_data >= buffer_end) return false;
+        *writable_data = c;
+        ++writable_data;
+        data_end = writable_data + 1;
         return true;
     }
 
     bool shell::backspace() noexcept
     {
         if(command_ready || command_size() == 0) return false;
-        --current_data;
-        *current_data = '\0';
+        --writable_data;
+        --data_end;
+        *writable_data= ' ';
         return true;
     }
 
@@ -115,14 +165,13 @@ namespace kernel
                 if(driver::try_translate_text_event(&g_k_event, &c))
                 {
                     if(push_character(c)) *(console) << c;
-                    continue;
                 }
-                if(driver::is_control_input_candidate_event(&g_k_event))
+                else if(driver::is_control_input_candidate_event(&g_k_event))
                 {
                     g_control_table.entries[control_key_index(g_k_event.key_code)](this);
                     continue;
                 }
-                if(driver::is_navigation_input_candidate_event(&g_k_event))
+                else if(driver::is_navigation_input_candidate_event(&g_k_event))
                 {
                     g_navigation_func_table.entries[navigation_key_index(g_k_event.key_code)](this);
                 }
@@ -130,21 +179,22 @@ namespace kernel
 
             if(!command_ready) wait_for_keyboard_event();
         }
-        if(string_compare(command_buffer, "clear") == 0) console->clear();
+        // if(string_compare(command_buffer, "clear") == 0) console->clear();
+        execute_command(command_buffer, console);
         reset();
     }
 
     // Control Friend Fucntions
     void escape_handler(shell* s) noexcept
     {
-        while(s->current_data > s->command_buffer)
+        while(s->writable_data > s->command_buffer)
         {
-            --s->current_data;
+            --s->writable_data;
             s->console->delete_last_char_no_sync();
         }
-        *s->current_data = '\0';
+        s->data_end = s->writable_data + 1;
+        *s->writable_data = '\0';
         s->console->call_cursor_sync();
-        s->command_ready = true;
     }
 
     void backspace_handler(shell* s) noexcept { if(s->backspace()) s->console->delete_last_char_sync(); }
@@ -160,11 +210,8 @@ namespace kernel
 
     void enter_handler(kernel::shell* s) noexcept
     {
-        if(!s->is_empty())
-        {
-            *(s->console) << '\n' << s->command_buffer;
-        }
         s->submit();
+        if(!s->is_empty()) *(s->console) << '\n' << s->command_buffer;
         *(s->console) << '\n';
     }
 
