@@ -1,6 +1,9 @@
 #-----------------------------Terminal Source Files----------------------------------------
-TERMINAL_OUTPUT_CPP = src/terminal/terminal_output.cpp
-TERMINAL_OUTPUT_OBJ = obj/terminal/terminal_output.o
+OUTPUT_CPP = src/terminal/terminal_output.cpp
+OUTPUT_OBJ = obj/terminal/terminal_output.o
+
+INPUT_CPP = src/terminal/terminal_input.cpp
+INPUT_OBJ = obj/terminal/terminal_input.o
 
 VGA_CPP = src/terminal/terminal_vga_text_buffer.cpp
 VGA_OBJ = obj/terminal/terminal_vga_text_buffer.o

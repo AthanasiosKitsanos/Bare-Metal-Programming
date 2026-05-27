@@ -1,0 +1,1 @@
+include apps/shell/shell_mk_files/shell_declarations.mk

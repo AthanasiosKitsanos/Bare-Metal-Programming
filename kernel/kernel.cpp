@@ -33,14 +33,6 @@ extern "C" [[noreturn]] void kernel_main()
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
-
-    kernel::shell shell{&console};
     
     asm volatile("sti");
-
-    console << "Hello, World!\n";
-    for(;;)
-    {
-        shell.read_command();
-    }
 }

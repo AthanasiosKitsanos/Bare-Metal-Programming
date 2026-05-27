@@ -1,0 +1,3 @@
+include src/drivers/drivers_mk_files/drivers_declarations.mk
+include src/kernel/kernel_mk_files/kernel_declarations.mk
+include src/terminal/terminal_mk_files/terminal_declarations.mk
