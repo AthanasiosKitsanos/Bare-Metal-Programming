@@ -20,15 +20,15 @@ INCLUDE_MAP_FILE = -Map=output.map
 include apps/app_declarations.mk
 include assembly/assembly_declarations.mk
 include include/header_files.mk
-include lib/lib_mk_files/lib_declarations.mk
 include src/src_declarations.mk
+
+#------------------------------ Include MK Librarys ---------------------------------
+include lib/lib_mk_files/lib_declarations.mk
 
 # -----------------------Kenrel Main-------------------------------
 KERNEL_CPP = kernel/kernel.cpp
 KERNEL_OBJ = obj/kernel.o
 
-#------------------------------ Include MK Librarys ---------------------------------
-include lib/lib_mk_files/lib_declarations.mk
 
 # #-----------------------Include All Folders----------------------------------------
 # INCLUDE_ALL_FOLDERS = $(INCLUDE_TERMINAL_FOLDER) $(INCLUDE_KERNEL_ALL_FOLDERS) $(INCLUDE_DRIVERS_ALL_FOLDERS)
@@ -62,15 +62,15 @@ all: $(OS_IMAGE)
 #------------------------ Source MK Files ---------------------------------
 include apps/app_rules.mk
 include assembly/assembly_rules.mk
-include lib/lib_mk_files/lib_rules.mk
 include src/src_rules.mk
+
+#------------------------------ Include MK Librarys ---------------------------------
+include lib/lib_mk_files/lib_rules.mk
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 $(KERNEL_OBJ): $(KERNEL_CPP)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
-#------------------------------ Include MK Librarys ---------------------------------
-include lib/lib_mk_files/lib_rules.mk
 
 # #--------------------------------------Terminal Rules----------------------------------------------------------
 # # Terminal

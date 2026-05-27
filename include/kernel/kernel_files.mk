@@ -19,7 +19,7 @@ TIMER_H = include/kernel/kernel_timer.h
 
 PIT_H = include/kernel/kernel_pit.h
 
-INTERRUPT_GUARD_H = include/kernel/kernel_interrupt_guard.h
+KERNEL_INTERRUPT_GUARD_H = include/kernel/kernel_interrupt_guard.h
 
 KERNEL_SHELL_H = include/kernel/kernel_shell.h
 

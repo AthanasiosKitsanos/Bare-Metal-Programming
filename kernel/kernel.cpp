@@ -34,5 +34,6 @@ extern "C" [[noreturn]] void kernel_main()
         logger.warning() << "Failed to synchronize keyboard\n";
     }
     
+    for(;;) asm volatile("hlt");
     asm volatile("sti");
 }

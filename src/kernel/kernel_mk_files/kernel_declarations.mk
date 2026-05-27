@@ -19,9 +19,3 @@ PIC_OBJ = obj/kernel/kernel_pic.o
 
 PIT_CPP = src/kernel/kernel_pit.cpp
 PIT_OBJ = obj/kernel/kernel_pit.o
-
-KERNEL_INPUT_CPP = src/kernel/kernel_input.cpp
-KERNEL_INPUT_OBJ = obj/kernel/kernel_input.o
-
-KERNEL_SHELL_CPP = src/kernel/kernel_shell.cpp
-KERNEL_SHELL_OBJ = obj/kernel/kernel_shell.o
