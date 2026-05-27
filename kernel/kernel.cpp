@@ -7,6 +7,7 @@
 #include "kernel_pit.h"
 #include "keyboard.h"
 #include "kernel_interrupt_guard.h"
+#include "kernel_shell.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -32,30 +33,14 @@ extern "C" [[noreturn]] void kernel_main()
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
+
+    kernel::shell shell{&console};
     
     asm volatile("sti");
 
+    console << "Hello, World!\n";
     for(;;)
     {
-        driver::keyboard_event event{};
-        char character{'\0'};
-        while(driver::poll_keyboard_event(&event))
-        {
-            if(driver::try_translate_text_event(&event, &character))
-            {
-                console << character;
-            }
-        }
-
-        kernel::disable_interrupts();
-
-        if(!driver::has_pending_keyboard_event())
-        {
-            kernel::enable_interrupt_and_halt();
-        }
-        else
-        {
-            kernel::enable_interrupts();
-        }
+        shell.read_command();
     }
 }

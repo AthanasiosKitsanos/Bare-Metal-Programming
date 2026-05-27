@@ -29,7 +29,8 @@ KERNEL_OBJ = obj/kernel.o
 # ------------------------Library----------------------------
 KERNEL_A = lib/libkernel.a
 LINK_LIBS = -Llib -lkernel
-LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OUTPUT_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) $(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ) $(KEYBOARD_OBJ)
+LIB_FILES = $(KERNEL_OBJ) $(VGA_OBJ) $(TERMINAL_OUTPUT_OBJ) $(CURSOR_OBJ) $(LOGGER_OBJ) $(ASSERT_OBJ) $(IDT_ENTRY_OBJ) \
+	$(EXCEPTIONS_OBJ) $(PIC_OBJ) $(TIMER_OBJ) $(PIT_OBJ) $(KEYBOARD_OBJ) $(KERNEL_SHELL_OBJ)
 
 # --------------------Code 32--------------------------------
 CODE_32_ELF = elf/code_32.elf
@@ -59,13 +60,9 @@ $(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
 $(VGA_OBJ): $(VGA_CPP) $(VGA_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_TERMINAL_FOLDER) -c $(VGA_CPP) -o $(VGA_OBJ)
 
-# Terminal Input
-$(TERMINAL_INPUT_OBJ): $(TERMINAL_INPUT_CPP) $(TERMINAL_INPUT_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) -c $(TERMINAL_INPUT_CPP) -o $(TERMINAL_INPUT_OBJ)
-
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 # Kernel
-$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H) $(INTERRUPT_GUARD_H)
+$(KERNEL_OBJ): $(KERNEL_CPP) $(TERMINAL_H) $(VGA_H) $(IO_H) $(CURSOR_H) $(LOGGER_H) $(ASSERT_H) $(EXCEPTIONS_H) $(TIMER_H) $(PIT_H) $(KEYBOARD_H) $(INTERRUPT_GUARD_H) $(KERNEL_SHELL_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
 
 # Kernel Logger
@@ -96,6 +93,11 @@ $(PIC_OBJ): $(PIC_CPP) $(PIC_H)
 $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(PIT_CPP) -o $(PIT_OBJ)
 
+#Kernel Shell
+$(KERNEL_SHELL_OBJ): $(KERNEL_SHELL_CPP) $(KERNEL_SHELL_H) $(KERNEL_COMMAND_MAP)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_SHELL_CPP) -o $(KERNEL_SHELL_OBJ)
+
+#-------------------------Drivers----------------------------------------------------------------------------------
 # Keyboard
 $(KEYBOARD_OBJ): $(KEYBOARD_CPP) $(KEYBOARD_H) $(IO_H) $(KEYBOARD_KEY_LIST_H) $(INTERRUPT_GUARD_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) $(INCLUDE_DRIVERS_INTERNAL_FOLDER) -c $(KEYBOARD_CPP) -o $(KEYBOARD_OBJ)

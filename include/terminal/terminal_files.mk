@@ -2,7 +2,6 @@
 IO_H = include/terminal/terminal_io_registers.h
 
 TERMINAL_OUTPUT_H = include/terminal/terminal_output.h
-TERMINAL_INPUT_H = include/terminal/terminal_input.h
 
 VGA_H = include/terminal/terminal_vga_text_buffer.h
 

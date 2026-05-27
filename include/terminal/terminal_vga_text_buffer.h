@@ -55,6 +55,12 @@ namespace terminal
             return static_cast<uint16_t>(c) | static_cast<uint16_t>(color << 8);
         }
 
+        [[gnu::always_inline]]
+        inline void move_current_ptr_left() noexcept { --current; }
+
+        [[gnu::always_inline]]
+        inline void move_current_ptr_right() noexcept { ++current; }
+
         public:
             // Constructor
             vga_text_buffer() noexcept;
@@ -62,6 +68,7 @@ namespace terminal
             // Public Methods
             void clear() noexcept;
             void put(char c) noexcept;
+            void remove_last_char() noexcept;
             void move_to_line_start() noexcept;
             void move_to_next_line() noexcept;
             void scroll() noexcept;
@@ -73,5 +80,7 @@ namespace terminal
             inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
             inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
             inline color_code __attribute__((always_inline)) get_default_color_code() const noexcept { return default_color; }
+            inline void __attribute((always_inline)) move_left() noexcept { move_current_ptr_left(); }
+            inline void __attribute((always_inline)) move_right() noexcept { move_current_ptr_right(); }
     };
 }

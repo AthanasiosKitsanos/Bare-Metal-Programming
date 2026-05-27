@@ -1,6 +1,8 @@
 #--------------------Kernel Internals--------------------------
 KERNEL_CPU_INTERRUPTS_H = include/kernel/internal/kernel_cpu_interrupts.h
 KERNEL_HARDWARE_INTERRUPRS_H = include/kernel/internal/kernel_hardware_interrupts.h
+KERNEL_CONTROL_INPUT_TABLE = include/kernel/internal/kernel_control_input_table.h
+KERNEL_COMMAND_MAP = include/kernel/internal/kernel_command_functions.h
 
 #---------------------Kernel Files--------------------------------
 LOGGER_H = include/kernel/kernel_logger.h
@@ -18,6 +20,8 @@ TIMER_H = include/kernel/kernel_timer.h
 PIT_H = include/kernel/kernel_pit.h
 
 INTERRUPT_GUARD_H = include/kernel/kernel_interrupt_guard.h
+
+KERNEL_SHELL_H = include/kernel/kernel_shell.h
 
 #----------------------Include Folders--------------------------------------
 INCLUDE_KERNEL_FOLDER = -Iinclude/kernel

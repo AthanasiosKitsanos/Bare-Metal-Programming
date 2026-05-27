@@ -64,6 +64,12 @@ namespace terminal
 
         inline void __attribute__((always_inline)) line_start() noexcept { buffer.move_to_line_start(); }
         inline void __attribute__((always_inline)) sync_cursor() noexcept { cursor.set_position(buffer.cursor_position()); }
+
+        [[gnu::always_inline]]
+        inline void move_left() noexcept { buffer.move_left(); }
+
+        [[gnu::always_inline]]
+        inline void move_right() noexcept { buffer.move_right(); }
         
         public:
             // Constructor
@@ -79,9 +85,45 @@ namespace terminal
             inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
             inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
             inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return buffer.current_color_code(); }
+            inline void __attribute__((always_inline)) clear() noexcept
+            {
+                buffer.clear();
+                sync_cursor();
+            }
+
+            inline void __attribute__((always_inline)) delete_last_char_no_sync() noexcept
+            {
+                buffer.remove_last_char();
+            }
+
+            inline void __attribute__((always_inline)) delete_last_char_sync() noexcept
+            {
+                buffer.remove_last_char();
+                sync_cursor();
+            }
+
+            inline void __attribute__((always_inline)) call_cursor_sync() noexcept
+            {
+                sync_cursor();
+            }
+
             inline bool __attribute__((always_inline)) in_default_color() const noexcept
             {
                 return current_color_code() == buffer.get_default_color_code();
+            }
+
+            [[gnu::always_inline]]
+            inline void move_cursor_left() noexcept
+            { 
+                move_left();
+                sync_cursor();
+            }
+
+            [[gnu::always_inline]]
+            inline void move_cursor_right() noexcept
+            {
+                move_right();
+                sync_cursor();
             }
 
             // Operators

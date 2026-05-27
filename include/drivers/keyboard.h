@@ -298,4 +298,7 @@ namespace driver
 
     [[gnu::always_inline]]
     inline bool is_control_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_control_key(event->key); }
+
+    [[gnu::always_inline]]
+    inline bool is_navigation_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_navigation_key(event->key); }
 }
