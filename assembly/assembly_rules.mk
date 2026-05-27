@@ -3,10 +3,10 @@ include assembly/exception_stubs/exceptions_mk_files/exceptions_rules.mk
 
 # Code 16
 $(CODE_16_ELF): $(BOOT_STAGE_1_OBJ) 
-	$(LD) -T $(CODE_16_LIKNER) -o $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_OBJ)
+	$(LD) -T $(CODE_16_LIKNER) -o $(CODE_16_ELF) $(BOOT_STAGE_1_OBJ)
 
 $(CODE_16_BIN): $(CODE_16_ELF)
-	$(OBJC) -O binary $(BOOT_STAGE_1_ELF) $(BOOT_STAGE_1_BIN)
+	$(OBJC) -O binary $(CODE_16_ELF) $(CODE_16_BIN)
 
 # Code 32
 $(CODE_32_ELF): $(BOOT_STAGE_2_OBJ) $(INTERRUPT_ENTRY_OBJ) $(PM_ENTRY_OBJ) $(KERNEL_A)

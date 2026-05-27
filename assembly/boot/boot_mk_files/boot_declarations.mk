@@ -12,4 +12,4 @@ PM_ENTRY_OBJ = obj/boot/pm_entry.o
 
 #-------------------------Inc Folder ------------------------
 STAGE_2_SECTORS = assembly/boot/inc/stage_2_sectors.inc
-INCLUDE_INC_FOLDER = -Iassembly/boot/inc
+INCLUDE_INC_FOLDER = -I assembly/boot/inc

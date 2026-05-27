@@ -1,7 +1,7 @@
 .code16
 .section .text
 .global _start
-.include "boot_stage_2_load.inc"
+.include "stage_2_sectors.inc"
 _start:
     cli
     xorw %ax, %ax
