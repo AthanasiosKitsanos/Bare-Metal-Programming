@@ -13,3 +13,7 @@ PM_ENTRY_OBJ = obj/boot/pm_entry.o
 #-------------------------Inc Folder ------------------------
 STAGE_2_SECTORS = assembly/boot/inc/stage_2_sectors.inc
 INCLUDE_INC_FOLDER = -I assembly/boot/inc
+
+#-------------------------Common Interrupt Entry-------------------------------
+INTERRUPT_ENTRY_S = assembly/exception_stubs/common_interrupt_entry.S
+INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o

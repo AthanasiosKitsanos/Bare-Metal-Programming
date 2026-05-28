@@ -19,3 +19,7 @@ $(STAGE_2_SECTORS): $(CODE_32_BIN)
 		exit 1; \
 	fi; \
 	printf '.set BOOT_STAGE_2_SECTORS, %s\n' "$$sectors" > $(STAGE_2_SECTORS)
+
+# Common Interrupt Entry
+$(INTERRUPT_ENTRY_OBJ): $(INTERRUPT_ENTRY_S) 
+	$(AS) $(INTERRUPT_ENTRY_S) -o $(INTERRUPT_ENTRY_OBJ)

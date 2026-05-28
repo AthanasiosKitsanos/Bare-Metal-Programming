@@ -17,11 +17,11 @@ SECTOR_SIZE = 512
 INCLUDE_MAP_FILE = -Map=output.map
 
 #-----------------------Include Mk Files---------------------------------------
-include apps/app_declarations.mk
+include apps/decl.mk
 include assembly/assembly_declarations.mk
-include include/header_files.mk
-include src/src_declarations.mk
-include utilities/utilities_files.mk
+include drivers/drivers_decl.mk
+include kernel/kernel_decl.mk
+include utilities/utilities_decl.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
 include lib/lib_mk_files/lib_declarations.mk
