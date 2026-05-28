@@ -21,13 +21,14 @@ include apps/app_declarations.mk
 include assembly/assembly_declarations.mk
 include include/header_files.mk
 include src/src_declarations.mk
+include utilities/utilities_files.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
 include lib/lib_mk_files/lib_declarations.mk
 
 # -----------------------Kenrel Main-------------------------------
-KERNEL_CPP = kernel/kernel.cpp
-KERNEL_OBJ = obj/kernel.o
+MAIN_CPP = main.cpp
+MAIN_OBJ = main.o
 
 
 # #-----------------------Include All Folders----------------------------------------
@@ -68,8 +69,8 @@ include src/src_rules.mk
 include lib/lib_mk_files/lib_rules.mk
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
-$(KERNEL_OBJ): $(KERNEL_CPP)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(KERNEL_CPP) -o $(KERNEL_OBJ)
+$(MAIN_OBJ): $(MAIN_CPP)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_ALL_FOLDERS) -c $(MAIN_CPP) -o $(MAIN_OBJ)
 
 
 # #--------------------------------------Terminal Rules----------------------------------------------------------
