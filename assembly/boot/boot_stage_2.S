@@ -37,7 +37,7 @@ hang:
     jmp hang
 
 detect_memory:
-    nomw $0, E820_COUNT_ADDRESS
+    movw $0, E820_COUNT_ADDRESS
 
     xorw %ax, %ax
     movw %ax, %es
