@@ -37,22 +37,22 @@ hang:
     jmp hang
 
 detect_memory:
-    novw $0, $(E820_COUNT_ADDRESS)
+    nomw $0, E820_COUNT_ADDRESS
 
     xorw %ax, %ax
     movw %ax, %es
 
-    movw $(E820_ENTRIES_ADDRESS), %di
+    movw $E820_ENTRIES_ADDRESS, %di
 
     xorl %ebx, %ebx
 
 .e820_loop:
-    movl $0xE820, %%eax
+    movl $0xE820, %eax
     movl $20, %ecx
     movl $E820_MAGIC, %edx
-    int 0x15
+    int $0x15
     jc .e820_done
-    cmpl %eax, $E820_MAGIC
+    cmpl $E820_MAGIC, %eax
     jne .e820_done
     incw (E820_COUNT_ADDRESS)
     addw $E820_ENTRY_SIZE, %di
