@@ -1,0 +1,1 @@
+.set BOOT_STAGE_2_SECTORS, 32
