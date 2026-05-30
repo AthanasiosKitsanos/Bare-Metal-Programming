@@ -17,14 +17,15 @@ SECTOR_SIZE = 512
 INCLUDE_MAP_FILE = -Map=output.map
 
 #-----------------------Include Mk Files---------------------------------------
-include apps/decl.mk
-include assembly/assembly_declarations.mk
-include drivers/drivers_decl.mk
-include kernel/kernel_decl.mk
-include utilities/utilities_decl.mk
+include mk_files/apps/decl.mk
+include mk_files/assembly/decl.mk
+include mk_files/drivers/decl.mk
+include mk_files/kernel/decl.mk
+include mk_files/links/decl.mk
+include mk_files/utilities/decl.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
-include lib/lib_mk_files/lib_declarations.mk
+include mk_files/lib/decl.mk
 
 # -----------------------Kenrel Main-------------------------------
 MAIN_CPP = main.cpp
@@ -61,12 +62,14 @@ MAIN_OBJ = main.o
 all: $(OS_IMAGE)
 
 #------------------------ Source MK Files ---------------------------------
-include apps/app_rules.mk
-include assembly/assembly_rules.mk
-include src/src_rules.mk
+include mk_files/apps/rules.mk
+include mk_files/assembly/rules.mk
+include mk_files/drivers/rules.mk
+include mk_files/kernel/rules.mk
+include mk_files/utilities/rules.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
-include lib/lib_mk_files/lib_rules.mk
+include mk_files/lib/rules.mk
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 $(MAIN_OBJ): $(MAIN_CPP)
