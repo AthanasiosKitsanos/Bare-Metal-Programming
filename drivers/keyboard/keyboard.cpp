@@ -1,9 +1,9 @@
-#include "kernel_pic.h"
+#include "pic/kernel_pic.h"
 #include "keyboard.h"
-#include "terminal_io_registers.h"
-#include "keyboard_key_list_n_map.h"
-#include "kernel_interrupt_frame.h"
-#include "kernel_interrupt_guard.h"
+#include "internals/terminal_io_registers.h"
+#include "internal/keyboard_key_list_n_map.h"
+#include "internal/kernel_interrupt_frame.h"
+#include "internal/kernel_interrupt_guard.h"
 
 namespace
 {

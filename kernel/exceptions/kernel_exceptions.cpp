@@ -1,13 +1,13 @@
-#include "kernel_idt.h"
-#include "kernel_logger.h"
+#include "idt/kernel_idt.h"
+#include "logger/kernel_logger.h"
 #include "kernel_exceptions.h"
-#include "kernel_interrupt_frame.h"
-#include "kernel_pic.h"
-#include "kernel_timer.h"
-#include "keyboard.h"
+#include "internal/kernel_interrupt_frame.h"
+#include "pic/kernel_pic.h"
+#include "timer/kernel_timer.h"
+#include "keyboard/keyboard.h"
 #include <stdint.h>
-#include "kernel_cpu_interrupts.h"
-#include "kernel_hardware_interrupts.h"
+#include "internal/kernel_cpu_interrupts_list.h"
+#include "internal/kernel_hardware_interrupts_list.h"
 
 namespace
 {

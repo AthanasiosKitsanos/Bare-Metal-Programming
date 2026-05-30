@@ -1,5 +1,5 @@
 #include "terminal_vga_hardware_cursor.h"
-#include "terminal_io_registers.h"
+#include "internals/terminal_io_registers.h"
 
 namespace terminal
 {

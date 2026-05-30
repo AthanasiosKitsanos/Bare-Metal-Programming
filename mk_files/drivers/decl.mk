@@ -3,10 +3,8 @@ KEYBOARD_KEY_LIST_H = drivers/internal/keyboard_key_list_n_map.h
 
 #-------------------Keyboard Headers----------------------------------
 KEYBOARD_H = drivers/keyboard/keyboard.h
-KEYBOARD_CPP = drivers/keyboard.cpp
+KEYBOARD_CPP = drivers/keyboard/keyboard.cpp
 KEYBOARD_OBJ = obj/drivers/keyboard.o
 
 #--------------------Include Folders------------------------
-INCLUDE_DRIVERS_FOLDER = -Idrivers
-INCLUDE_DRIVERS_INTERNAL_FOLDER = -Idrivers/internal
-INCLUDE_DRIVERS_ALL_FOLDERS = $(INCLUDE_DRIVERS_FOLDER) $(INCLUDE_DRIVERS_INTERNAL_FOLDER)
+INCLUDE_DRIVERS_FOLDER = -I drivers

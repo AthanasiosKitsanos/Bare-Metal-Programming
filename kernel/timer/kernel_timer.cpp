@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include "kernel_timer.h"
-#include "kernel_logger.h"
-#include "kernel_assert.h"
-#include "kernel_interrupt_frame.h"
+#include "logger/kernel_logger.h"
+#include "assert/kernel_assert.h"
+#include "internal/kernel_interrupt_frame.h"
 
 // #define KERNEL_DEBUG
 

@@ -37,5 +37,3 @@ KERNEL_INTERRUPT_GUARD_H = kernel/kernel_interrupt_guard.h
 
 #----------------------Include Folders--------------------------------------
 INCLUDE_KERNEL_FOLDER = -Ikernel
-INCLUDE_KERNEL_INTERNAL_FOLDER = -Ikernel/internal
-INCLUDE_KERNEL_ALL_FOLDERS = $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_KERNEL_INTERNAL_FOLDER)

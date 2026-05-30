@@ -1,5 +1,5 @@
 #include "kernel_assert.h"
-#include "kernel_logger.h"
+#include "logger/kernel_logger.h"
 
 namespace
 {

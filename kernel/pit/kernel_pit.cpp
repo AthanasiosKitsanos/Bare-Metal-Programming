@@ -1,5 +1,5 @@
 #include "kernel_pit.h"
-#include "terminal_io_registers.h"
+#include "internals/terminal_io_registers.h"
 
 namespace
 {
