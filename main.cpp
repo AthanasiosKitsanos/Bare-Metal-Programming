@@ -9,6 +9,10 @@
 
 constexpr uint32_t timer_frequency_hz{100};
 
+extern "C" uint8_t _kernel_start;
+extern "C" uint8_t _kernel_end;
+
+
 extern "C" [[noreturn]] void kernel_main()
 {
     terminal::output console{};

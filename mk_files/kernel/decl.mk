@@ -46,6 +46,11 @@ MEMORY_E820_H = kernel/memory/e820/kernel_e820.h
 MEMORY_E820_CPP = kernel/memory/e820/kernel_e820.cpp
 MEMORY_E820_OBJ = obj/kernel/kernel_e820.o
 
+# PMM
+MEMORY_PMM_H = kernel/memory/pmm/kernel_pmm.h
+MEMORY_PMM_CPP = kernel/memory/pmm/kernel_pmm.cpp
+MEMORY_PMM_OBJ = obj/kernel/kernel_pmm.o
+
 #--------------------------------Kernel Internal-------------------------------------
 KERNEL_INTERRUPT_GUARD_H = kernel/internal/kernel_interrupt_guard.h
 

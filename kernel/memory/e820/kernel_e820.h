@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace kernel
+namespace kernel::memory
 {
     enum class e820_memory_type: uint32_t
     {
