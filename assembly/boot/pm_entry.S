@@ -2,6 +2,8 @@
 .section .text
 .global pm_entry
 .extern kernel_main
+.extern _bss_start
+.extern _bss_end
 
 .set DATA_SEG, 0x10
 
@@ -14,6 +16,18 @@ pm_entry:
     movw %ax, %ss
 
     movl $0x90000, %esp
+
+    movl $_bss_start, %edi
+    movl $_bss_end, %ecx
+
+.init_bss:
+    cmpl %edi, %ecx
+    je .init_end
+    movb $0, (%edi)
+    incl %edi
+    jmp .init_bss
+
+.init_end:
     movl %esp, %ebp
 
     call kernel_main

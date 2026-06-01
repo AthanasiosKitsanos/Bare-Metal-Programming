@@ -1,64 +1,65 @@
-#include "kernel_pmm.h"
+#include "memory/pmm/kernel_pmm.h"
+#include "memory/e820/kernel_e820.h"
 
 namespace
 {
-    constexpr size_t bits_per_byte{8};
-    constexpr size_t bit_mask{bits_per_byte - 1};
     uint8_t* g_bitmap{nullptr};
     size_t g_total_frames{0};
-    size_t g_used_frames_count{0};
+    size_t g_used_frames{0};
+
+    constexpr size_t get_times_powered_by_two(size_t size) noexcept
+    {
+        size_t power{0};
+        while(size > 1)
+        {
+            size = (size >> 1);
+            ++power;
+        }
+        return power;
+    }
+
+    constexpr size_t frame_size_bit_mask{get_times_powered_by_two(kernel::memory::frame_size)};
 
     [[gnu::always_inline]]
-    inline size_t frame_index(uintptr_t address) noexcept { return address / kernel::memory::frame_size; }
+    inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_size_bit_mask; }
 
     [[gnu::always_inline]]
-    inline uintptr_t frame_address(size_t index) noexcept { return index * kernel::memory::frame_size; }
+    inline uintptr_t frame_address(const size_t index) noexcept { return index >> frame_size_bit_mask; }
 
+    constexpr uint8_t bit_size_byte{8};
+    constexpr uint8_t bit_size_byte_mask{get_times_powered_by_two(bit_size_byte)};
+    constexpr uint8_t bit_mask{bit_size_byte - 1};
+    uint8_t g_byte{0};
+    uint8_t g_bit{0};
+
+    [[gnu::always_inline]]
+    inline void get_bit_n_byte(const size_t index) noexcept
+    {
+        g_byte = (index >> bit_size_byte_mask);
+        g_bit = (index & bit_mask);
+    }
+
+    [[gnu::always_inline]]
     void set_frame_used(const size_t index) noexcept
     {
-        const uint8_t byte{index / bits_per_byte};
-        const uint8_t bit{index & bit_mask};
-        *(g_bitmap + byte) |= (1 << bit);
-        ++g_used_frames_count;
+        get_bit_n_byte(index);
+        *(g_bitmap + g_byte) |= (1 << g_bit);
     }
 
     void set_frame_free(const size_t index) noexcept
     {
-        const uint8_t byte{index / bits_per_byte};
-        const uint8_t bit{index & bit_mask};
-        *(g_bitmap + byte) *= ~(1 << bit);
-        --g_used_frames_count;
+        get_bit_n_byte(index);
+        *(g_bitmap + g_byte) &= ~(1 << g_bit);
     }
 
     bool is_frame_used(const size_t index) noexcept
     {
-        const uint8_t byte{index / bits_per_byte};
-        const uint8_t bit{index & bit_mask};
-        return (*(g_bitmap + byte) & (1 << bit)) != 0;
-    }
-
-    uintptr_t align_up(const uintptr_t address,  const uintptr_t alignment) noexcept
-    {
-        const uintptr_t temp{alignment - 1};
-        return (address + temp) & ~(1 << temp);
-    }
-
-    uintptr_t align_down(const uintptr_t address, const uintptr_t alignment) noexcept
-    {
-        return address & ~(alignment - 1);
+        get_bit_n_byte(index);
+        return (*(g_bitmap + g_byte) & (1 << g_bit)) != 0;
     }
 }
 
 namespace kernel::memory
 {
-    void pmm_initilalize(e820_memory_map* map, uintptr_t kernel_start, uintptr_t kernel_end) noexcept
-    {
-        const e820_entry* current{map->entries};
-        const e820_entry* const end{map->entries + map->count};
-        uintptr_t highest_address{0};
-        while(current < end)
-        {
-            if(current->type == e820_memory_type::)
-        }
-    }
+
 }
