@@ -12,8 +12,8 @@ constexpr uint32_t timer_frequency_hz{100};
 extern "C" uint8_t _kernel_start;
 extern "C" uint8_t _kernel_end;
 
-uintptr_t kernel_start = reinterpret_cast<uintptr_t>(&_kernel_start);
-uintptr_t kernel_end = reinterpret_cast<uintptr_t>(&_kernel_end);
+const uintptr_t kernel_start = reinterpret_cast<uintptr_t>(&_kernel_start);
+const uintptr_t kernel_end = reinterpret_cast<uintptr_t>(&_kernel_end);
 
 extern "C" [[noreturn]] void kernel_main()
 {

@@ -9,7 +9,7 @@ namespace kernel::memory
 
     struct e820_memory_map;
 
-    void pmm_initialize(const e820_memory_map*, const uintptr_t, const uintptr_t) noexcept;
+    void pmm_initialize() noexcept;
     uintptr_t pmm_allocate_frame() noexcept;
     void pmm_free_frame(const uintptr_t) noexcept;
 

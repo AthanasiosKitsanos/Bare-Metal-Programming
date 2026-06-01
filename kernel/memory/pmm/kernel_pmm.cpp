@@ -53,16 +53,35 @@ namespace
     {
         const bit_n_byte pair{get_bit_n_byte(index)};
         *(g_bitmap + pair.byte) &= ~(1 << pair.bit);
+        --g_used_frames;
     }
 
     bool is_frame_used(const size_t index) noexcept
     {
         const bit_n_byte pair{get_bit_n_byte(index)};
         return (*(g_bitmap + pair.byte) & (1 << pair.bit)) != 0;
+        ++g_used_frames;
+    }
+
+    uintptr_t max(const kernel::memory::e820_entry* entry) noexcept
+    {
+        return static_cast<uintptr_t>(entry->base + entry->length);
     }
 }
 
 namespace kernel::memory
 {
-
+    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
+    {
+        uintptr_t highest_address{0};
+        {
+            const e820_entry* const end{map->entries + map->count};
+            uintptr_t current{0};
+            for(const e820_entry* start{map->entries}; start < end; ++start)
+            {
+                current = max(start);
+                if(highest_address < current) highest_address = current;
+            }
+        }
+    }
 }
