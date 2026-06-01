@@ -7,7 +7,7 @@ namespace
     size_t g_total_frames{0};
     size_t g_used_frames{0};
 
-    constexpr size_t get_times_powered_by_two(size_t size) noexcept
+    constexpr size_t get_times_two_is_powered(size_t size) noexcept
     {
         size_t power{0};
         while(size > 1)
@@ -18,7 +18,7 @@ namespace
         return power;
     }
 
-    constexpr size_t frame_size_bit_mask{get_times_powered_by_two(kernel::memory::frame_size)};
+    constexpr size_t frame_size_bit_mask{get_times_two_is_powered(kernel::memory::frame_size)};
 
     [[gnu::always_inline]]
     inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_size_bit_mask; }
@@ -27,7 +27,7 @@ namespace
     inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_size_bit_mask; }
 
     constexpr uint8_t bit_size_byte{8};
-    constexpr uint8_t bit_size_byte_mask{get_times_powered_by_two(bit_size_byte)};
+    constexpr uint8_t bit_size_byte_mask{get_times_two_is_powered(bit_size_byte)};
     constexpr uint8_t bit_mask{bit_size_byte - 1};
     
     struct bit_n_byte
