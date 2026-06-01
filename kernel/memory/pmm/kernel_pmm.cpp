@@ -29,33 +29,36 @@ namespace
     constexpr uint8_t bit_size_byte{8};
     constexpr uint8_t bit_size_byte_mask{get_times_powered_by_two(bit_size_byte)};
     constexpr uint8_t bit_mask{bit_size_byte - 1};
-    uint8_t g_byte{0};
-    uint8_t g_bit{0};
+    
+    struct bit_n_byte
+    {
+        uint8_t byte;
+        uint8_t bit;
+    };
 
     [[gnu::always_inline]]
-    inline void get_bit_n_byte(const size_t index) noexcept
+    inline bit_n_byte get_bit_n_byte(const size_t index) noexcept
     {
-        g_byte = (index >> bit_size_byte_mask);
-        g_bit = (index & bit_mask);
+        return {(index >> bit_size_byte_mask), (index & bit_mask)};
     }
 
     [[gnu::always_inline]]
     void set_frame_used(const size_t index) noexcept
     {
-        get_bit_n_byte(index);
-        *(g_bitmap + g_byte) |= (1 << g_bit);
+        const bit_n_byte pair{get_bit_n_byte(index)};
+        *(g_bitmap + pair.byte) |= (1 << pair.bit);
     }
 
     void set_frame_free(const size_t index) noexcept
     {
-        get_bit_n_byte(index);
-        *(g_bitmap + g_byte) &= ~(1 << g_bit);
+        const bit_n_byte pair{get_bit_n_byte(index)};
+        *(g_bitmap + pair.byte) &= ~(1 << pair.bit);
     }
 
     bool is_frame_used(const size_t index) noexcept
     {
-        get_bit_n_byte(index);
-        return (*(g_bitmap + g_byte) & (1 << g_bit)) != 0;
+        const bit_n_byte pair{get_bit_n_byte(index)};
+        return (*(g_bitmap + pair.byte) & (1 << pair.bit)) != 0;
     }
 }
 
