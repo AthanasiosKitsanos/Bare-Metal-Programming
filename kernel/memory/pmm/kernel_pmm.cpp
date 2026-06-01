@@ -82,6 +82,19 @@ namespace kernel::memory
                 current = max(start);
                 if(highest_address < current) highest_address = current;
             }
+
+            g_total_frames = (highest_address >> frame_size_bit_mask);
+            g_bitmap = reinterpret_cast<uint8_t*>(kernel_end);
+            const uint16_t bitmap_size{(g_total_frames + 7) >> bit_size_byte_mask};
+
+            {
+                const uint8_t* const end{g_bitmap + bitmap_size};
+                for(uint8_t* current{g_bitmap}; current < end; ++current)
+                {
+                    *current = 0xFF;
+                }
+            }
+            g_used_frames = g_total_frames;
         }
     }
 }
