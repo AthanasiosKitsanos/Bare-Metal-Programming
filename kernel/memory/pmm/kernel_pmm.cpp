@@ -24,7 +24,7 @@ namespace
     inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_size_bit_mask; }
 
     [[gnu::always_inline]]
-    inline uintptr_t frame_address(const size_t index) noexcept { return index >> frame_size_bit_mask; }
+    inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_size_bit_mask; }
 
     constexpr uint8_t bit_size_byte{8};
     constexpr uint8_t bit_size_byte_mask{get_times_powered_by_two(bit_size_byte)};
