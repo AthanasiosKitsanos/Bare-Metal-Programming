@@ -148,11 +148,12 @@ namespace kernel::memory
             {
                 constexpr uint8_t right_shift{0x01};
                 const uint8_t bit_limit{(0x01) << bit_mask};
-                for(uint8_t bit_pos{0x01}; bit_pos < bit_limit; bit_pos <<= right_shift)
+                uint8_t bit_pos{0x01};
+                for(; bit_pos < bit_limit; bit_pos <<= right_shift)
                 {
                     if((temp_cpy & bit_pos) == 0) break;
                 }
-                return frame_address(current - g_bitmap.start);
+                return frame_address(((current - g_bitmap.start) << bit_size_byte_mask) + bit_pos);
             }
         }
         return 0;
