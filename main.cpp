@@ -37,6 +37,7 @@ extern "C" [[noreturn]] void kernel_main()
         logger.warning() << "Failed to synchronize keyboard\n";
     }
     
+    console << "Hello from Bare_Metal OS!\n";
     asm volatile("sti");
 
     for(;;)
