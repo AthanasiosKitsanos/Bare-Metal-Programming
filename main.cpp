@@ -6,6 +6,7 @@
 #include "pit/kernel_pit.h"
 #include "keyboard/keyboard.h"
 #include "internal/kernel_interrupt_guard.h"
+#include "memory/pmm/kernel_pmm.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -17,6 +18,8 @@ const uintptr_t kernel_end = reinterpret_cast<uintptr_t>(&_kernel_end);
 
 extern "C" [[noreturn]] void kernel_main()
 {
+    // Test pmm
+
     terminal::output console{};
     kernel::logger logger{&console};
     console.initialize();
@@ -37,11 +40,11 @@ extern "C" [[noreturn]] void kernel_main()
         logger.warning() << "Failed to synchronize keyboard\n";
     }
     
-    console << "Hello from Bare_Metal OS!\n";
+    
     asm volatile("sti");
 
     for(;;)
     {
-
+        asm volatile("hlt");
     }
 }

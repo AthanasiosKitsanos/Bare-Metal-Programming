@@ -3,9 +3,17 @@
 
 namespace
 {
+    struct bit_n_byte
+    {
+        size_t byte_index;
+        uint8_t bit_index;
+    };
+
     struct bitmap
     {
+        bit_n_byte lower_limit;
         uint8_t* start{nullptr};
+        const uint8_t* search_begin{nullptr};
         const uint8_t* end{nullptr};
     };
 
@@ -36,12 +44,6 @@ namespace
     constexpr uint8_t bit_size_byte{8};
     constexpr uint8_t bit_size_byte_mask{get_power_of_two(bit_size_byte)};
     constexpr uint8_t bit_mask{bit_size_byte - 1};
-    
-    struct bit_n_byte
-    {
-        size_t byte;
-        uint8_t bit;
-    };
 
     [[gnu::always_inline]]
     inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bit_size_byte_mask), static_cast<uint8_t>(index & bit_mask)}; }
@@ -49,7 +51,7 @@ namespace
     [[gnu::always_inline]]
     inline bool is_frame_used(const bit_n_byte* const pair) noexcept
     {
-        return (*(g_bitmap.start + pair->byte) & (1 << pair->bit)) != 0;
+        return (*(g_bitmap.start + pair->byte_index) & (1 << pair->bit_index)) != 0;
     }
 
     [[gnu::always_inline]]
@@ -61,14 +63,14 @@ namespace
     [[gnu::always_inline]]
     inline void set_frame_used(const bit_n_byte* const pair) noexcept
     {
-        *(g_bitmap.start + pair->byte) |= (1 << pair->bit);
+        *(g_bitmap.start + pair->byte_index) |= (1 << pair->bit_index);
         ++g_used_frames;
     }
 
     [[gnu::always_inline]]
     inline void set_frame_free(const bit_n_byte* const pair) noexcept
     {
-        *(g_bitmap.start + pair->byte) &= ~(1 << pair->bit);
+        *(g_bitmap.start + pair->byte_index) &= ~(1 << pair->bit_index);
         --g_used_frames;
     }
 }
@@ -104,64 +106,76 @@ namespace kernel::memory
         }
         g_used_frames = g_total_frames;
 
+        size_t index{frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end - 1))};
+        bit_n_byte pair{get_bit_n_byte(index)};
+        g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
+        g_bitmap.lower_limit = pair;
+
+        for(const e820_entry* current{map->entries}; current < end; ++current)
         {
-            bit_n_byte pair{};
-            size_t index{0};
-            for(const e820_entry* current{map->entries}; current < end; ++current)
+            if(current->type == e820_memory_type::usable)
             {
-                if(current->type == e820_memory_type::usable)
+                const uint64_t end{max(current)};
+                for(uint64_t start{current->base}; start < end; start += frame_size)
                 {
-                    const uint64_t end{current->base + current->length};
-                    for(uint64_t start{current->base}; start < end; start += frame_size)
-                    {
-                        index = frame_index(static_cast<uintptr_t>(start));
-                        pair = get_bit_n_byte(index);
-                        set_frame_free(&pair);
-                    }
+                    index = frame_index(static_cast<uintptr_t>(start));
+                    pair = get_bit_n_byte(index);
+                    set_frame_free(&pair);
                 }
             }
+        }
 
-            for(uintptr_t current{kernel_start}; current < kernel_end; current += frame_size)
+        const uintptr_t kernel_plus_bitmap_end{reinterpret_cast<uintptr_t>(g_bitmap.end)};
+        for(uintptr_t current{kernel_start}; current < kernel_plus_bitmap_end; current += frame_size)
+        {
+            index = frame_index(current);
+            pair = get_bit_n_byte(index);
+            if(!is_frame_used(&pair))
             {
-                index = frame_index(current);
-                pair = get_bit_n_byte(index);
-                set_frame_used(&pair);
-            }
-
-            for(uint8_t* current{g_bitmap.start}; current < g_bitmap.end; current += frame_size)
-            {
-                index = frame_index(reinterpret_cast<uintptr_t>(current));
-                pair = get_bit_n_byte(index);
                 set_frame_used(&pair);
             }
         }
     }
 
-    // Needs more refactoring
     uintptr_t pmm_allocate_frame() noexcept
     {
         uint8_t temp_cpy{0};
-        for(const uint8_t* current{g_bitmap.start}; current < g_bitmap.end; ++current)
+        bit_n_byte pair{static_cast<size_t>(g_bitmap.search_begin - g_bitmap.start), 0x00};
+        for(const uint8_t* current{g_bitmap.search_begin}; current < g_bitmap.end; ++current)
         {
             temp_cpy = *current;
             if(temp_cpy != 0xFF)
             {
-                constexpr uint8_t right_shift{0x01};
-                const uint8_t bit_limit{(0x01) << bit_mask};
-                uint8_t bit_pos{0x01};
-                for(; bit_pos < bit_limit; bit_pos <<= right_shift)
+                for(; pair.bit_index < bit_size_byte; ++pair.bit_index)
                 {
-                    if((temp_cpy & bit_pos) == 0) break;
+                    if(!is_frame_used(&pair))
+                    {
+                        set_frame_used(&pair);
+                        return frame_address((pair.byte_index << bit_size_byte_mask) + pair.bit_index);
+                    }
                 }
-                return frame_address(((current - g_bitmap.start) << bit_size_byte_mask) + bit_pos);
             }
+            ++pair.byte_index;
+            pair.bit_index = 0;
         }
         return 0;
     }
 
     void pmm_free_frame(const uintptr_t address) noexcept
     {
-        static_cast<void>(address);
-        return;
+        size_t index{frame_index(address)};
+        if(index >= g_total_frames) return;
+        const bit_n_byte f_frame{get_bit_n_byte(index)};
+
+        if(f_frame.byte_index < g_bitmap.lower_limit.byte_index) return;
+        if(f_frame.byte_index == g_bitmap.lower_limit.byte_index && f_frame.bit_index <= g_bitmap.lower_limit.bit_index) return;
+        if(!is_frame_used(&f_frame)) return;
+
+        set_frame_free(&f_frame);
+
+        if((g_bitmap.start + f_frame.byte_index) < g_bitmap.search_begin)
+        {
+            g_bitmap.search_begin = (g_bitmap.start + f_frame.byte_index);
+        }
     }
 }
