@@ -1,304 +1,260 @@
-# Bare Metal Programming
+# my_OS — Bare Metal x86 Kernel (32-bit Protected Mode)
 
-A small educational operating-system project written from the ground up for x86 bare-metal development.
-
-This repository is not a hosted application, framework, or normal user-space program. It builds a raw bootable image, enters 32-bit protected mode, initializes early kernel systems, and runs directly under an emulator such as QEMU.
-
----
-
-## Project Goal
-
-The goal of this project is to build a minimal operating system step by step, while keeping the code readable, explicit, and close to the hardware.
-
-The current focus is:
-
-- understanding the boot process;
-- building a clean 32-bit kernel foundation;
-- handling CPU exceptions and hardware interrupts;
-- driving basic hardware through port I/O;
-- designing kernel subsystems with clear interfaces;
-- improving correctness and performance as the project grows.
-
-Long mode and 64-bit execution are intentionally left for a later stage.
+A from-scratch, educational operating system written in C++17 and x86 AT&T Assembly.
+This is not a hosted application. It builds a raw bootable image, enters 32-bit protected
+mode, and runs directly under QEMU with no underlying OS support.
 
 ---
 
-## Current Status
+## Project Philosophy
 
-The project currently has the following major components:
+Every line of code in this project is written to be understood, not just to work.
+The focus is on correctness, clarity, and hardware-level understanding.
+Performance and low memory usage are considered at every step.
 
-| Area | Status |
-|---|---|
-| Boot stage | Basic boot flow and stage-2 loading |
-| 32-bit protected mode | Active development target |
-| VGA text output | Working |
-| Terminal abstraction | Working |
-| Kernel logger | Working |
-| Runtime assertions | Working |
-| IDT setup | Working |
-| CPU exception stubs | Working |
-| Common interrupt entry | Working |
-| PIC remapping / IRQ handling | Working |
-| PIT timer | Working at a configurable frequency |
-| PS/2 keyboard IRQ1 | Working |
-| Keyboard key mapping | In progress / expanding |
-| Keyboard modifier state | Working |
-| Interrupt-safe keyboard event queue | Current development focus |
+Long mode (64-bit) is intentionally deferred to a later stage.
 
 ---
 
 ## Toolchain
 
-This project is built with a freestanding cross-compiler toolchain.
+| Tool              | Purpose                          |
+|-------------------|----------------------------------|
+| `i686-elf-g++`    | Cross-compiler (C++17 freestanding) |
+| `i686-elf-as`     | AT&T syntax assembler            |
+| `i686-elf-ld`     | Linker                           |
+| `i686-elf-objcopy`| Raw binary conversion            |
+| `i686-elf-ar`     | Static library archiver          |
+| `make`            | Build system                     |
+| `qemu-system-x86_64` | Emulator for testing          |
 
-Expected tools:
-
-- `i686-elf-g++`
-- `i686-elf-as`
-- `i686-elf-ld`
-- `i686-elf-objcopy`
-- `i686-elf-ar`
-- `make`
-- `qemu-system-x86_64`
-
-The code is currently compiled as freestanding C++17 with no exceptions and no RTTI.
-
-```make
--std=gnu++17
--ffreestanding
--O3
--Wall
--Wextra
--fno-exceptions
--fno-rtti
-```
+**Compiler flags:**
+-std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
 
 ---
 
 ## Build
 
-To build the bootable image:
-
 ```bash
-make
+make        # Build the OS image
+make run    # Launch in QEMU
+make clean  # Remove all generated files
 ```
 
-The final raw image is produced at:
-
-```text
-bin/os_image.bin
-```
-
-To run it in QEMU:
-
-```bash
-make run
-```
-
-To clean generated build files:
-
-```bash
-make clean
-```
+Output image: `bin/os_image.bin`
 
 ---
 
 ## Repository Layout
+## Repository Layout
 
-```text
-.
-├── boot/
-│   ├── boot_stage_1.S
-│   ├── boot_stage_2.S
-│   └── pm_entry.S
-│
-├── exception_stubs/
-│   └── common_interrupt_entry.S
-│
-├── include/
-│   ├── drivers/
-│   ├── kernel/
-│   └── terminal/
-│
-├── kernel/
-│   └── kernel.cpp
-│
-├── links/
-│   └── code_32.ld
-│
-├── src/
-│   ├── drivers/
-│   ├── kernel/
-│   └── terminal/
-│
-├── bin/
-├── obj/
-├── elf/
-├── lib/
-└── Makefile
-```
+- **assembly/**
+  - **boot/**
+    - `boot_stage_1.S` — 16-bit Stage 1 bootloader (512 bytes, MBR)
+    - `boot_stage_2.S` — 16-bit Stage 2 — E820, GDT, protected mode switch
+    - `pm_entry.S` — 32-bit entry point — BSS zero, stack, kernel_main call
+  - **exception_stubs/**
+    - `common_interrupt_entry.S` — ISR/IRQ per-vector stubs + common entry routine
+  - **internal/**
+    - `stage_2_sectors.inc` — boot sector count constant
 
-Generated folders such as `bin/`, `obj/`, `elf/`, and `lib/` are build output locations.
+- **kernel/**
+  - **assert/** — `KERNEL_ASSERT` / `KERNEL_ASSERT_MSG` macros
+  - **exceptions/** — CPU exception + IRQ dispatcher registration
+  - **idt/** — IDT entry table, `set_interrupt_gate`, `load_idt`
+  - **internal/**
+    - `kernel_cpu_interrupts_list.h` — X-macro: #DE, #UD, #GP, #PF
+    - `kernel_hardware_interrupts_list.h` — X-macro: IRQ0 (timer), IRQ1 (keyboard)
+    - `kernel_interrupt_frame.h` — packed struct, 52 bytes, static_assert
+    - `kernel_interrupt_guard.h` — RAII interrupt enable/disable guard
+  - **logger/** — info / warning / error / debug / panic
+  - **memory/**
+    - **e820/** — E820 physical memory map reader
+    - **pmm/** — Physical Memory Manager, bitmap allocator *(In Progress)*
+  - **pic/** — 8259 PIC remap, send_eoi, IRQ masking
+  - **pit/** — PIT channel 0, configurable frequency (20–100 Hz)
+  - **timer/** — tick counter, uptime, sleep_ticks, sleep_ms
 
----
+- **drivers/**
+  - **keyboard/** — PS/2 keyboard IRQ1 driver (full implementation)
+  - **internal/** — scancode→key mappings (normal, shifted, extended)
 
-## Kernel Initialization Flow
+- **utilities/**
+  - **internals/** — `inb` / `outb` port I/O inline helpers
+  - **vga/**
+    - **vga_text_buffer/** — 80×25 VGA text buffer (put, scroll, color)
+    - **vga_hardware_cursor/** — CRT hardware cursor (port 0x3D4 / 0x3D5)
+  - **io/**
+    - **output/** — `terminal::output` (`<<`, hex, dec, bool_alpha)
+    - **input/** — `terminal::input` *(Skeleton — not yet implemented)*
 
-At a high level, the current kernel startup flow is:
+- **apps/**
+  - **shell/** — kernel shell application *(Skeleton — not yet implemented)*
+    - **internal/** — X-macro command table (currently only `clear`)
 
-1. Initialize the VGA terminal.
-2. Create the kernel logger.
-3. Connect the assertion system to the logger.
-4. Initialize exception and interrupt handling.
-5. Initialize the PIT timer.
-6. Initialize the keyboard driver.
-7. Enable interrupts with `sti`.
-8. Enter an idle loop using `hlt`.
+- **links/**
+  - `code_16.ld` — linker script for 16-bit stages (0x7C00)
+  - `code_32.ld` — linker script for 32-bit kernel (0x7E00)
 
-This keeps initialization explicit and easy to debug while the system is still small.
+- **mk_files/** — modular Makefile includes (decl + rules per subsystem)
 
----
+- `main.cpp` — `kernel_main`, top-level kernel initialization
+- `Makefile` — root build entry point
 
-## Keyboard Driver
+## System Status
 
-The keyboard driver currently handles PS/2 keyboard input from IRQ1.
-
-Current functionality includes:
-
-- reading raw scancodes from port `0x60`;
-- checking keyboard controller status through port `0x64`;
-- handling press and release events;
-- tracking modifier state;
-- tracking Caps Lock state;
-- translating known keys into internal key codes;
-- translating text input candidates into characters;
-- storing keyboard events in a fixed-size ring queue;
-- exposing polling APIs for higher kernel layers.
-
-The current event structure stores:
-
-- raw scancode;
-- key code;
-- mapped key;
-- key state;
-- extended-scancode flag;
-- validity flag;
-- modifier snapshot.
-
-This is important because higher layers should receive a stable view of the keyboard state at the exact time the key event happened.
-
----
-
-## Keyboard Event Queue
-
-The keyboard event queue is a fixed-size interrupt-safe ring buffer.
-
-Current design:
-
-- 64 event slots;
-- head pointer;
-- tail pointer;
-- event count;
-- dropped-event counter;
-- IRQ handler pushes events;
-- polling code pops events.
-
-The queue is intentionally small, static, and allocation-free. This is suitable for early kernel development where dynamic memory allocation does not exist yet.
-
-The higher layer can query:
-
-- whether pending events exist;
-- how many events are pending;
-- how many events were dropped;
-- the next keyboard event, if available.
+| Subsystem                         | Status              |
+|-----------------------------------|---------------------|
+| Stage 1 Bootloader                | ✅ Complete         |
+| Stage 2 Bootloader (E820 + GDT)   | ✅ Complete         |
+| 32-bit Protected Mode Entry       | ✅ Complete         |
+| BSS zeroing                       | ✅ Complete         |
+| VGA Text Buffer (80×25)           | ✅ Complete         |
+| VGA Hardware Cursor               | ✅ Complete         |
+| Terminal Output (`terminal::output`) | ✅ Complete      |
+| Kernel Logger                     | ✅ Complete         |
+| Kernel Assert System              | ✅ Complete         |
+| Port I/O helpers (`inb`/`outb`)   | ✅ Complete         |
+| IDT Setup                         | ✅ Complete         |
+| 8259 PIC Remap + EOI + Masking    | ✅ Complete         |
+| Common Interrupt Entry (Assembly) | ✅ Complete         |
+| ISR/IRQ per-vector stubs          | ✅ Complete         |
+| CPU Exception Dispatcher (#DE, #UD, #GP, #PF) | ✅ Complete |
+| Hardware Interrupt Dispatcher (IRQ0, IRQ1) | ✅ Complete |
+| Interrupt Frame (52-byte struct)  | ✅ Complete         |
+| Interrupt Guard (RAII)            | ✅ Complete         |
+| PIT Timer (configurable Hz)       | ✅ Complete         |
+| Kernel Timer (ticks, uptime, sleep) | ✅ Complete      |
+| PS/2 Keyboard Driver              | ✅ Complete         |
+| Keyboard Key Mapping (normal + shifted + extended) | ✅ Complete |
+| Keyboard Modifier State Tracking  | ✅ Complete         |
+| Keyboard Event Queue (ring buffer, 64 slots) | ✅ Complete |
+| E820 Memory Map Reader            | ✅ Complete         |
+| Physical Memory Manager (PMM)     | 🔄 In Progress     |
+| Terminal Input                    | 🔧 Skeleton Only   |
+| Kernel Shell                      | 🔧 Skeleton Only   |
 
 ---
 
-## Design Principles
+## Kernel Initialization Flow (`kernel_main`)
 
-This project follows a few strict rules:
+Construct terminal::output  (VGA buffer + hardware cursor)
+Construct kernel::logger    (wraps terminal output)
+console.initialize()        (clear screen, enable cursor)
+set_exception_logger()
+initialize_exceptions()     (IDT, PIC remap, install stubs, load IDT)
+set_timer_logger()
+initialize_pit(100 Hz)      (PIT channel 0 @ ~100 ticks/sec)
+set_timer_frequency(100)
+initialize_keyboard()       (flush buffer, disable LEDs)
+sti                        (enable hardware interrupts)
+idle loop (hlt inside for(;;))
 
-### 1. No hidden runtime dependencies
-
-The kernel is freestanding. It does not rely on an operating system, a C++ runtime, exceptions, RTTI, or dynamic allocation.
-
-### 2. Prefer explicit hardware behavior
-
-Hardware interactions should be visible in the code. Port I/O, interrupt setup, descriptor tables, and controller commands are kept close to the implementation.
-
-### 3. Keep interrupt paths small
-
-Interrupt handlers should do the minimum necessary work. Slow processing should move to polling or higher-level kernel code whenever possible.
-
-### 4. Use compile-time checks where possible
-
-Static checks are preferred for fixed hardware contracts, table sizes, descriptor sizes, and compile-time mappings.
-
-### 5. Keep public APIs clean
-
-Subsystems expose only the functions needed by the rest of the kernel. Internal helpers stay inside `.cpp` files or internal headers.
 
 ---
 
-## Current Development Chapter
+## Interrupt Architecture
 
-The current chapter is:
+### CPU Exceptions (vectors 0–31)
+Handled via `kernel_cpu_interrupts_list.h` X-macro.
+Currently registered: `#DE` (0), `#UD` (6), `#GP` (13), `#PF` (14).
+All produce a full register dump and kernel panic.
 
-```text
-Chapter 2.23 - Interrupt-safe keyboard event queue polling
-```
+### Hardware Interrupts (vectors 32–47, remapped from IRQ 0–15)
+Handled via `kernel_hardware_interrupts_list.h` X-macro.
+Currently registered:
+- **IRQ0 (vector 32):** PIT timer → `kernel::handle_timer_interrupt`
+- **IRQ1 (vector 33):** PS/2 keyboard → `driver::handle_keyboard_interrupt`
 
-Main focus:
+All other vectors fall through to `default_interrupt_handler`.
 
-- safe communication between IRQ1 and normal kernel code;
-- protecting shared state with interrupt guards;
-- exposing polling APIs;
-- keeping the keyboard IRQ handler fast;
-- preparing the input system for higher-level text handling.
+### Common Entry Path
+[per-vector stub]  
+└─ push error_code (0 if none)  
+└─ push vector number  
+└─ jmp common_interrupt_entry  
+└─ pusha (save all GPRs)  
+└─ push esp → call interrupt_dispatcher(frame*)  
+└─ addl $4, esp  
+└─ popa  
+└─ addl $8, esp  (discard error_code + vector)  
+└─ iret
+
+---
+
+## Keyboard Driver Design
+
+- **IRQ1 handler:** reads port `0x60`, decodes scancode set 1, updates modifier state, pushes to ring queue.
+- **Ring queue:** 64 slots, power-of-two masked, interrupt-safe (no allocations).
+- **Polling API:**
+  - `poll_keyboard_event()`
+  - `has_pending_keyboard_event()`
+  - `pending_keyboard_event_count()`
+  - `dropped_keyboard_event_count()`
+- **Translation API:** `try_translate_text_event()` → maps event to `char`.
+- **Extended scancodes:** tracked via `g_extended_pending` flag (prefix `0xE0`).
+
+---
+
+## Memory Management (In Progress)
+
+### E820
+The bootloader calls INT 0x15 / EAX=0xE820 in real mode and stores entries at address `0x502` (count at `0x500`). The kernel reads this via `get_e820_memory_map()`.
+
+### Physical Memory Manager (PMM)
+A bitmap-based frame allocator is being implemented.
+
+- Enum class `pmm_result: uint8_t`  
+{  
+    - success = 0x00,  
+    - failed = 0x01,  
+    - lb_deny = 0x02,  
+    - hb_deny = 0x03  
+}
+- Frame size: **4096 bytes**
+- Bitmap: 1 bit per frame (set = used, clear = free)
+- Public API (defined, implementation pending):
+  - `pmm_initialize(map, kernel_start, kernel_end)`
+  - `pmm_allocate_frame(uintptr_t*)` → `pmm_result`
+  - `pmm_free_frame(uintptr_t)` → `pmm_result`
+  - `pmm_total_frames()`, `pmm_used_frames()`, `pmm_free_frames()`
+
+---
+
+## Current Chapter
+Chapter 3 — Physical Memory Manager (PMM)
+Bitmap-based frame allocator over E820 usable regions.
 
 ---
 
 ## Roadmap
 
-Near-term goals:
+### Near-Term
+- [ ] Complete PMM (`pmm_initialize`, `pmm_allocate_frame`, `pmm_free_frame`)
+- [ ] Integrate PMM into `kernel_main`
+- [ ] Log memory map and PMM statistics at boot
 
-- improve keyboard event polling usage in `kernel_main`;
-- print translated keyboard input through the terminal;
-- distinguish text input from control input;
-- improve keyboard mapping coverage;
-- make input handling cleaner for future shell work.
+### Medium-Term
+- [ ] Virtual memory / paging (identity map kernel, page directory/tables)
+- [ ] Kernel heap allocator (`kmalloc` / `kfree`)
+- [ ] Improve terminal input and begin shell implementation
+- [ ] Expand CPU exception coverage
 
-Medium-term goals:
-
-- introduce basic memory-management concepts;
-- improve panic and fault reporting;
-- add more CPU exception diagnostics;
-- continue organizing kernel subsystems;
-- prepare for a simple kernel command interface.
-
-Long-term goals:
-
-- physical memory manager;
-- paging;
-- heap allocator;
-- scheduler;
-- user mode;
-- system calls;
-- filesystem experiments;
-- 64-bit long mode.
+### Long-Term
+- [ ] Scheduler
+- [ ] User mode
+- [ ] System calls
+- [ ] Filesystem
+- [ ] 64-bit Long Mode
 
 ---
 
-## Running Philosophy
+## Design Principles
 
-This project is built as a learning operating system, but the code should still be treated seriously.
-
-Every chapter should improve at least one of these:
-
-- correctness;
-- clarity;
-- structure;
-- performance;
-- hardware understanding.
-
-The goal is not to write a large amount of code quickly. The goal is to understand every byte that matters.
+1. **Freestanding** — no libc, no C++ runtime, no exceptions, no RTTI, no dynamic allocation (yet).
+2. **Explicit hardware** — every port access, every IDT entry, every PIC command is visible in code.
+3. **Lean interrupt paths** — IRQ handlers do the minimum; all heavy work is deferred to polling.
+4. **Compile-time correctness** — `static_assert` on every packed struct, every table size.
+5. **Clean subsystem boundaries** — internal helpers stay in `.cpp` or `internal/` headers.
+6. **X-macro driven tables** — CPU exceptions and hardware interrupts are registered from
+   a single source of truth, eliminating duplication.
