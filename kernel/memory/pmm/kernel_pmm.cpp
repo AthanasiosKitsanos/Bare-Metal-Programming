@@ -1,6 +1,6 @@
 #include "memory/pmm/kernel_pmm.h"
 #include "memory/e820/kernel_e820.h"
-
+#include "utilities/io/output/terminal_output.h"
 namespace
 {
     struct bit_n_byte
@@ -77,9 +77,9 @@ namespace
 
 namespace kernel::memory
 {
-    size_t pmm_total_frames() noexcept { return (g_bitmap.end - g_bitmap.start) << 3; }
+    size_t pmm_total_frames() noexcept { return g_total_frames; }
     size_t pmm_used_frames() noexcept { return g_used_frames; }
-    size_t pmm_free_frames() noexcept { return pmm_total_frames() - g_used_frames; }
+    size_t pmm_free_frames() noexcept { return g_total_frames - g_used_frames; }
 
     void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
     {
@@ -125,10 +125,9 @@ namespace kernel::memory
             }
         }
 
-        const uintptr_t kernel_plus_bitmap_end{reinterpret_cast<uintptr_t>(g_bitmap.end)};
-        for(uintptr_t current{kernel_start}; current < kernel_plus_bitmap_end; current += frame_size)
+        const size_t last_frame{(g_bitmap.lower_limit.byte_index << bit_size_byte_mask) + g_bitmap.lower_limit.bit_index};
+        for(index = frame_index(kernel_start); index <= last_frame; ++index)
         {
-            index = frame_index(current);
             pair = get_bit_n_byte(index);
             if(!is_frame_used(&pair))
             {
@@ -161,17 +160,38 @@ namespace kernel::memory
         return 0;
     }
 
-    void pmm_free_frame(const uintptr_t address) noexcept
+    void pmm_free_frame(const uintptr_t address, terminal::output* const console) noexcept
     {
         size_t index{frame_index(address)};
-        if(index >= g_total_frames) return;
+        *console << "Free: addr=" << terminal::hex << address
+        << "\nidx=" << terminal::dec << index
+        <<  "\nlower{=" << g_bitmap.lower_limit.byte_index << ',' << g_bitmap.lower_limit.bit_index << "}\n";
+        
+        if(index >= g_total_frames)
+        {
+            *console << "BLOCKED: upper bound\n";
+            return;
+        }
         const bit_n_byte f_frame{get_bit_n_byte(index)};
 
-        if(f_frame.byte_index < g_bitmap.lower_limit.byte_index) return;
-        if(f_frame.byte_index == g_bitmap.lower_limit.byte_index && f_frame.bit_index <= g_bitmap.lower_limit.bit_index) return;
-        if(!is_frame_used(&f_frame)) return;
+        if(f_frame.byte_index < g_bitmap.lower_limit.byte_index)
+        {
+            *console << "BLOCKED: byte too low\n";
+            return;
+        }
+        if(f_frame.byte_index == g_bitmap.lower_limit.byte_index && f_frame.bit_index <= g_bitmap.lower_limit.bit_index)
+        {
+            *console << "BLOCKED: Same byte, but bit too low\n";
+            return;
+        }
 
+        if(!is_frame_used(&f_frame))
+        {
+            *console << "BLOCKED: already free\n";
+            return;
+        }
         set_frame_free(&f_frame);
+        *console << "FREED OK!\n";
 
         if((g_bitmap.start + f_frame.byte_index) < g_bitmap.search_begin)
         {
