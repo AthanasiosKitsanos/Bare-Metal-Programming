@@ -106,7 +106,7 @@ namespace kernel::memory
         }
         g_used_frames = g_total_frames;
 
-        size_t index{frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end - 1))};
+        size_t index{frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end))};
         bit_n_byte pair{get_bit_n_byte(index)};
         g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
         g_bitmap.lower_limit = pair;
@@ -136,66 +136,46 @@ namespace kernel::memory
         }
     }
 
-    uintptr_t pmm_allocate_frame() noexcept
+    pmm_result pmm_allocate_frame(uintptr_t* const address) noexcept
     {
-        uint8_t temp_cpy{0};
-        bit_n_byte pair{static_cast<size_t>(g_bitmap.search_begin - g_bitmap.start), 0x00};
         for(const uint8_t* current{g_bitmap.search_begin}; current < g_bitmap.end; ++current)
         {
-            temp_cpy = *current;
-            if(temp_cpy != 0xFF)
+            if(*current != 0xFF)
             {
-                for(; pair.bit_index < bit_size_byte; ++pair.bit_index)
+                bit_n_byte pair{static_cast<size_t>(current - g_bitmap.start), 0x00};
+                do
                 {
                     if(!is_frame_used(&pair))
                     {
                         set_frame_used(&pair);
-                        return frame_address((pair.byte_index << bit_size_byte_mask) + pair.bit_index);
+                        *address = frame_address((pair.byte_index << bit_size_byte_mask) + pair.bit_index);
+                        return pmm_result::success;
                     }
-                }
+                    ++pair.bit_index;
+                }while(pair.bit_index < bit_size_byte);
             }
-            ++pair.byte_index;
-            pair.bit_index = 0;
         }
-        return 0;
+        return pmm_result::failed;
     }
 
-    void pmm_free_frame(const uintptr_t address, terminal::output* const console) noexcept
+    pmm_result pmm_free_frame(const uintptr_t address) noexcept
     {
         size_t index{frame_index(address)};
-        *console << "Free: addr=" << terminal::hex << address
-        << "\nidx=" << terminal::dec << index
-        <<  "\nlower{=" << g_bitmap.lower_limit.byte_index << ',' << g_bitmap.lower_limit.bit_index << "}\n";
         
-        if(index >= g_total_frames)
-        {
-            *console << "BLOCKED: upper bound\n";
-            return;
-        }
-        const bit_n_byte f_frame{get_bit_n_byte(index)};
+        if(index >= g_total_frames) return pmm_result::hb_deny;
 
-        if(f_frame.byte_index < g_bitmap.lower_limit.byte_index)
-        {
-            *console << "BLOCKED: byte too low\n";
-            return;
-        }
-        if(f_frame.byte_index == g_bitmap.lower_limit.byte_index && f_frame.bit_index <= g_bitmap.lower_limit.bit_index)
-        {
-            *console << "BLOCKED: Same byte, but bit too low\n";
-            return;
-        }
+        const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
 
-        if(!is_frame_used(&f_frame))
-        {
-            *console << "BLOCKED: already free\n";
-            return;
-        }
-        set_frame_free(&f_frame);
-        *console << "FREED OK!\n";
+        if(bitmap_frame_pos.byte_index < g_bitmap.lower_limit.byte_index) return pmm_result::lb_deny;
+        if(bitmap_frame_pos.byte_index == g_bitmap.lower_limit.byte_index && bitmap_frame_pos.bit_index < g_bitmap.lower_limit.bit_index) return pmm_result::lb_deny;
 
-        if((g_bitmap.start + f_frame.byte_index) < g_bitmap.search_begin)
+        if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
+        set_frame_free(&bitmap_frame_pos);
+
+        if((g_bitmap.start + bitmap_frame_pos.byte_index) < g_bitmap.search_begin)
         {
-            g_bitmap.search_begin = (g_bitmap.start + f_frame.byte_index);
+            g_bitmap.search_begin = (g_bitmap.start + bitmap_frame_pos.byte_index);
         }
+        return pmm_result::success;
     }
 }
