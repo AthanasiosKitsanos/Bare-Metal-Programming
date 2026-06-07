@@ -130,7 +130,7 @@ Output image: `bin/os_image.bin`
 | Keyboard Modifier State Tracking  | ✅ Complete         |
 | Keyboard Event Queue (ring buffer, 64 slots) | ✅ Complete |
 | E820 Memory Map Reader            | ✅ Complete         |
-| Physical Memory Manager (PMM)     | 🔄 In Progress     |
+| Physical Memory Manager (PMM)     | ✅ Complete       |
 | Terminal Input                    | 🔧 Skeleton Only   |
 | Kernel Shell                      | 🔧 Skeleton Only   |
 
