@@ -25,3 +25,12 @@ $(PIC_OBJ): $(PIC_CPP) $(PIC_H) $(IO_H)
 # Kernel PIT
 $(PIT_OBJ): $(PIT_CPP) $(PIT_H) $(IO_H) $(LOGGER_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_UTILITIES_FOLDER) -c $(PIT_CPP) -o $(PIT_OBJ)
+
+#----------------------------Memory-------------------------------------------------------
+# Memory E820
+$(MEMORY_E820_OBJ): $(MEMORY_E820_CPP) $(MEMORY_E820_H)
+	$(CC) $(COMPILE_FLAGS) -c $(MEMORY_E820_CPP) -o $(MEMORY_E820_OBJ)
+
+# PMM
+$(MEMORY_PMM_OBJ): $(MEMORY_PMM_CPP) $(MEMORY_PMM_H) $(OUTPUT_CPP)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER) -c $(MEMORY_PMM_CPP) -o $(MEMORY_PMM_OBJ)
