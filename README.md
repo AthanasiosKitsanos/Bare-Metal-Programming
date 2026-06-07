@@ -231,7 +231,7 @@ Bitmap-based frame allocator over E820 usable regions.
 
 ### Near-Term
 - [✅] Complete PMM (`pmm_initialize`, `pmm_allocate_frame`, `pmm_free_frame`)
-- [ ] Integrate PMM into `kernel_main`
+- [✅] Integrate PMM into `kernel_main`
 - [ ] Log memory map and PMM statistics at boot
 
 ### Medium-Term
