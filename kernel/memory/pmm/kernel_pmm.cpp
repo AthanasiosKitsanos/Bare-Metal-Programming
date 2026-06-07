@@ -1,6 +1,6 @@
 #include "memory/pmm/kernel_pmm.h"
 #include "memory/e820/kernel_e820.h"
-#include "utilities/io/output/terminal_output.h"
+
 namespace
 {
     struct bit_n_byte

@@ -3,11 +3,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-namespace terminal
-{
-    class output;
-}
-
 namespace kernel::memory
 {
     constexpr size_t frame_size{4096};
