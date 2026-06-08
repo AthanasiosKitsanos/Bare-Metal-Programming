@@ -8,6 +8,7 @@
 #include "internal/kernel_interrupt_guard.h"
 #include "memory/e820/kernel_e820.h"
 #include "memory/pmm/kernel_pmm.h"
+#include "shell/shell.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -46,37 +47,12 @@ extern "C" [[noreturn]] void kernel_main()
     }
     
 
-    console << "Used frames: " << kernel::memory::pmm_used_frames() << '\n';
+    app::shell shell{&console};
 
-    {
-        uintptr_t allocated_address{0};
-        if(kernel::memory::pmm_allocate_frame(&allocated_address) == kernel::memory::pmm_result::failed)
-        {
-            console << "No available memory to allocate\n";
-        }
-        console << "Used frames: " << kernel::memory::pmm_used_frames() << '\n';
-
-        kernel::memory::pmm_result result{kernel::memory::pmm_free_frame(allocated_address)};
-
-        using m_result = kernel::memory::pmm_result;
-        switch(result)
-        {
-            case m_result::hb_deny: case m_result::lb_deny:
-                console << "Address " << terminal::hex << allocated_address << " can not be freed. [Out of Bounds]\n" << terminal::dec;
-                break;
-            case m_result::failed:
-                console << "Address " << terminal::hex << allocated_address << " is already free\n" << terminal::dec;
-                break;
-            default:
-                break;
-        }
-        console << "Used frames: " << kernel::memory::pmm_used_frames() << '\n';
-    }
-    
     asm volatile("sti");
 
     for(;;)
     {
-        asm volatile("hlt");
+        shell.run();
     }
 }

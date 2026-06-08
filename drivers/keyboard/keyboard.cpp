@@ -22,22 +22,22 @@ namespace
     constexpr uint8_t key_code_mask{0x7F};
     constexpr uint8_t extended_prefix{0xE0};
 
-    static_assert(static_cast<uint16_t>(driver::keyboard_key::unknown) == 0x0000);
+    static_assert(static_cast<uint16_t>(driver::keyboard::keyboard_key::unknown) == 0x0000);
 
     volatile bool g_extended_pending{false};
 
-    driver::keyboard_modifier_state g_modifier_state{};
+    driver::keyboard::keyboard_modifier_state g_modifier_state{};
 
     constexpr uint8_t normal_key_map_size{128};
     static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
     struct key_list
     {
-        driver::keyboard_key entries[normal_key_map_size];
+        driver::keyboard::keyboard_key entries[normal_key_map_size];
 
         constexpr key_list(): entries{}
         {
             #define X(key, key_code)    \
-                entries[key_code] = driver::keyboard_key::key;
+                entries[key_code] = driver::keyboard::keyboard_key::key;
             DRIVER_KEYBOARD_KEY_LIST
             #undef X
         }
@@ -74,52 +74,52 @@ namespace
 
     struct extended_key_map_table
     {
-        driver::keyboard_key entries[normal_key_map_size];
+        driver::keyboard::keyboard_key entries[normal_key_map_size];
 
         constexpr extended_key_map_table(): entries{}
         {
             #define X(key, key_code)    \
-                entries[key_code] = driver::keyboard_key::key;
+                entries[key_code] = driver::keyboard::keyboard_key::key;
             DRIVER_KEYBOARD_EXTENDED_KEY_MAPPING
             #undef X
         }
     };
     constexpr extended_key_map_table extended_key_table{};
 
-    driver::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
+    driver::keyboard::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
     {
         if(extended) return *(extended_key_table.entries + key_code);
         return *(normal_key_map.entries + key_code);
     }
 
-    char get_normal_character(const driver::keyboard_key key) noexcept { return *(normal_characters_table.entries + static_cast<uint16_t>(key)); }
+    char get_normal_character(const driver::keyboard::keyboard_key key) noexcept { return *(normal_characters_table.entries + static_cast<uint16_t>(key)); }
 
-    char get_shifted_character(const driver::keyboard_key key) noexcept { return *(shifted_characters_table.entries + static_cast<uint16_t>(key)); }
+    char get_shifted_character(const driver::keyboard::keyboard_key key) noexcept { return *(shifted_characters_table.entries + static_cast<uint16_t>(key)); }
 
-    void update_modifier_state(const driver::keyboard_key key, const driver::key_state state) noexcept
+    void update_modifier_state(const driver::keyboard::keyboard_key key, const driver::keyboard::key_state state) noexcept
     {
         switch(key)
         {
-            case driver::keyboard_key::left_shift:
-                g_modifier_state.left_shift_down = (state == driver::key_state::pressed);
+            case driver::keyboard::keyboard_key::left_shift:
+                g_modifier_state.left_shift_down = (state == driver::keyboard::key_state::pressed);
                 break;
-            case driver::keyboard_key::right_shift:
-                g_modifier_state.right_shift_down = (state == driver::key_state::pressed);
+            case driver::keyboard::keyboard_key::right_shift:
+                g_modifier_state.right_shift_down = (state == driver::keyboard::key_state::pressed);
                 break;
-            case driver::keyboard_key::left_ctrl:
-                g_modifier_state.left_ctrl_down = (state == driver::key_state::pressed);
+            case driver::keyboard::keyboard_key::left_ctrl:
+                g_modifier_state.left_ctrl_down = (state == driver::keyboard::key_state::pressed);
                 break;
-            case driver::keyboard_key::right_ctrl:
-                g_modifier_state.right_ctrl_down = (state == driver::key_state::pressed);
+            case driver::keyboard::keyboard_key::right_ctrl:
+                g_modifier_state.right_ctrl_down = (state == driver::keyboard::key_state::pressed);
                 break;
-            case driver::keyboard_key::left_alt:
-                g_modifier_state.left_alt_down = (state == driver::key_state::pressed);
+            case driver::keyboard::keyboard_key::left_alt:
+                g_modifier_state.left_alt_down = (state == driver::keyboard::key_state::pressed);
                 break;
-            case driver::keyboard_key::right_alt:
-                g_modifier_state.right_alt_down = (state == driver::key_state::pressed);
+            case driver::keyboard::keyboard_key::right_alt:
+                g_modifier_state.right_alt_down = (state == driver::keyboard::key_state::pressed);
                 break;
-            case driver::keyboard_key::caps_lock:
-                if(state == driver::key_state::pressed)
+            case driver::keyboard::keyboard_key::caps_lock:
+                if(state == driver::keyboard::key_state::pressed)
                 {
                     if(!g_modifier_state.caps_lock_down)
                     {
@@ -183,10 +183,10 @@ namespace
     static_assert((keyboard_event_queue_size & keyboard_event_queue_mask) == 0);
     struct keyboard_event_queue
     {
-        driver::keyboard_event entries[keyboard_event_queue_size];
+        driver::keyboard::keyboard_event entries[keyboard_event_queue_size];
         uint32_t dropped; 
-        driver::keyboard_event* volatile head;
-        driver::keyboard_event* volatile tail;
+        driver::keyboard::keyboard_event* volatile head;
+        driver::keyboard::keyboard_event* volatile tail;
         uint8_t count;
 
         constexpr keyboard_event_queue() noexcept: entries{}, dropped{}, head{entries}, tail{entries}, count{} {}
@@ -194,7 +194,7 @@ namespace
     keyboard_event_queue g_keyboard_event_queue{};
 
     [[gnu::always_inline]]
-    inline driver::keyboard_event* next_keyboard_event_queue_pointer(driver::keyboard_event* current) noexcept
+    inline driver::keyboard::keyboard_event* next_keyboard_event_queue_pointer(driver::keyboard::keyboard_event* current) noexcept
     {
         return g_keyboard_event_queue.entries + static_cast<uint8_t>((current - g_keyboard_event_queue.entries + 1) & keyboard_event_queue_mask);
     }
@@ -210,16 +210,23 @@ namespace driver
 {
     bool initialize_keyboard() noexcept
     {
-        g_modifier_state = driver::keyboard_modifier_state{};
+        g_modifier_state = driver::keyboard::keyboard_modifier_state{};
         flush_keyboard_output_buffer();
         if(!send_keyboard_byte_and_wait_ack(set_leds_command)) return false;
         if(!send_keyboard_byte_and_wait_ack(all_leds_off)) return false;
         return true;
     }
+}
 
+namespace driver::keyboard
+{
     bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept
     {
-        if(!is_text_input_candidate_event(event)) return false;
+        if(!is_text_input_candidate_event(event))
+        {
+            *out_character = '\0';
+            return false;
+        }
         const bool shift_pressed{is_shift_active(&event->modifiers)};
         const bool caps_on{is_caps_lock_active(&event->modifiers)};
 
@@ -231,7 +238,7 @@ namespace driver
         {
             *out_character = shift_pressed ? get_shifted_character(event->key) : get_normal_character(event->key);
         }
-        return *out_character != '\0';
+        return true;
     }
 
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept

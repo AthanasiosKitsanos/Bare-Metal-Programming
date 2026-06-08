@@ -9,6 +9,11 @@ namespace kernel
 
 namespace driver
 {
+    bool initialize_keyboard() noexcept;
+}
+
+namespace driver::keyboard
+{
     enum class key_state: uint8_t
     {
         released,
@@ -123,7 +128,6 @@ namespace driver
         keyboard_modifier_state modifiers;
     };
 
-    bool initialize_keyboard() noexcept;
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
 
     bool poll_keyboard_event(keyboard_event* out_event) noexcept;
@@ -276,22 +280,7 @@ namespace driver
     inline bool is_non_modifier_press_event(const keyboard_event* event) noexcept { return is_pressed_event(event) && is_non_modifier_event(event); }
 
     [[gnu::always_inline]]
-    inline bool is_known_key(const keyboard_key key) noexcept { return key != keyboard_key::unknown; }
-
-    [[gnu::always_inline]]
-    inline bool is_unknown_key(const keyboard_key key) noexcept { return !is_known_key(key); }
-
-    [[gnu::always_inline]]
-    inline bool is_known_key_event(const keyboard_event* event) noexcept { return is_known_key(event->key); }
-
-    [[gnu::always_inline]]
-    inline bool is_unknown_key_event(const keyboard_event* event) noexcept { return is_unknown_key(event->key); }
-
-    [[gnu::always_inline]]
-    inline bool is_input_candidate_event(const keyboard_event* event) noexcept
-    {
-        return is_pressed_event(event) && is_known_key_event(event) && is_non_modifier_event(event);
-    }
+    inline bool is_input_candidate_event(const keyboard_event* event) noexcept { return is_pressed_event(event) && is_non_modifier_event(event); }
 
     [[gnu::always_inline]]
     inline bool is_text_input_candidate_event(const keyboard_event* event) noexcept { return is_input_candidate_event(event) && is_text_key(event->key); }

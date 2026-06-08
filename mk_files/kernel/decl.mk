@@ -1,9 +1,3 @@
-#--------------------Kernel Internals--------------------------
-KERNEL_CPU_INTERRUPTS_H = kernel/internal/kernel_cpu_interrupts.h
-KERNEL_HARDWARE_INTERRUPRS_H = kernel/internal/kernel_hardware_interrupts.h
-KERNEL_CONTROL_INPUT_TABLE = kernel/internal/kernel_control_input_table.h
-KERNEL_COMMAND_MAP = kernel/internal/kernel_command_functions.h
-
 #---------------------Kernel Files--------------------------------
 # Logger
 LOGGER_H = kernel/logger/kernel_logger.h

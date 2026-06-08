@@ -14,8 +14,17 @@ namespace app
         terminal::input m_input;
         terminal::output* const m_output;
         bool m_command_ready;
+        bool is_running;
+
+        void handle_enter() noexcept;
+        void handle_backspace() noexcept;
+        void handle_tab() noexcept;
+        void handle_escape() noexcept;
+        void control_key_dispatch() noexcept;
 
         public:
             explicit shell(terminal::output* scr) noexcept;
+
+            void run() noexcept;
     };
 }
