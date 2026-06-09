@@ -6,23 +6,19 @@
 
 namespace
 {
-    [[gnu::always_inline]]
-    inline void control_key_dispatch(const driver::keyboard::keyboard_key key) noexcept
-    {
-        
-    }
+    
 }
 
 namespace app
 {
-    shell::shell(terminal::output* scr) noexcept: m_input{}, m_output(scr), m_command_ready{false}, is_running{true}
+    shell::shell(terminal::output* scr) noexcept: m_input{}, m_output(scr), m_command_ready{false}, m_is_running{true}
     {}
 
     void shell::run() noexcept
     {
         driver::keyboard::keyboard_event event{};
         char c{'\0'};
-        while(is_running)
+        while(m_is_running)
         {
             *m_output << "my_OS:> ";
 
@@ -39,11 +35,7 @@ namespace app
                 }
                 else if(driver::keyboard::is_control_input_candidate_event(&event))
                 {
-                    switch(event.key)
-                    {
-                        case driver::keyboard::keyboard_key::enter:
-
-                    }
+                    control_key_dispatch(event.key);
                 }
                 else if(driver::keyboard::is_navigation_input_candidate_event(&event))
                 {
@@ -73,5 +65,26 @@ namespace app
     void shell::handle_escape() noexcept
     {
 
+    }
+
+    void shell::control_key_dispatch(const driver::keyboard::keyboard_key key) noexcept
+    {
+        switch(key)
+        {
+            case driver::keyboard::keyboard_key::escape:
+                handle_escape();
+                return;
+            case driver::keyboard::keyboard_key::backspace:
+                handle_backspace();
+                return;
+            case driver::keyboard::keyboard_key::tab:
+                handle_tab();
+                return;
+            case driver::keyboard::keyboard_key::enter:
+                handle_enter();
+                return;
+            default:
+                return;
+        }
     }
 }
