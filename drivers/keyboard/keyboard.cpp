@@ -26,7 +26,7 @@ namespace
 
     volatile bool g_extended_pending{false};
 
-    driver::keyboard::keyboard_modifier_state g_modifier_state{};
+    mod_state g_modifier_state{};
 
     constexpr uint8_t normal_key_map_size{128};
     static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
@@ -101,22 +101,22 @@ namespace
         switch(key)
         {
             case driver::keyboard::keyboard_key::left_shift:
-                g_modifier_state.left_shift_down = (state == driver::keyboard::key_state::pressed);
+                
                 break;
             case driver::keyboard::keyboard_key::right_shift:
-                g_modifier_state.right_shift_down = (state == driver::keyboard::key_state::pressed);
+                
                 break;
             case driver::keyboard::keyboard_key::left_ctrl:
-                g_modifier_state.left_ctrl_down = (state == driver::keyboard::key_state::pressed);
+                
                 break;
             case driver::keyboard::keyboard_key::right_ctrl:
-                g_modifier_state.right_ctrl_down = (state == driver::keyboard::key_state::pressed);
+                
                 break;
             case driver::keyboard::keyboard_key::left_alt:
-                g_modifier_state.left_alt_down = (state == driver::keyboard::key_state::pressed);
+                
                 break;
             case driver::keyboard::keyboard_key::right_alt:
-                g_modifier_state.right_alt_down = (state == driver::keyboard::key_state::pressed);
+                
                 break;
             case driver::keyboard::keyboard_key::caps_lock:
                 if(state == driver::keyboard::key_state::pressed)
@@ -227,8 +227,8 @@ namespace driver::keyboard
             *out_character = '\0';
             return false;
         }
-        const bool shift_pressed{is_shift_active(&event->modifiers)};
-        const bool caps_on{is_caps_lock_active(&event->modifiers)};
+        const bool shift_pressed{is_shift_active(event->modifiers)};
+        const bool caps_on{is_caps_lock_active(event->modifiers)};
 
         if(is_letter_key(event->key))
         {
@@ -267,7 +267,6 @@ namespace driver::keyboard
             return;
         }
 
-        g_keyboard_event_queue.tail->raw_scancode = scancode;
         g_keyboard_event_queue.tail->key_code = key_code;
         g_keyboard_event_queue.tail->key = key;
         g_keyboard_event_queue.tail->state = state;
