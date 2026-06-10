@@ -4,6 +4,7 @@
 #include "internal/keyboard_key_list_n_map.h"
 #include "internal/kernel_interrupt_frame.h"
 #include "internal/kernel_interrupt_guard.h"
+#include "logger/kernel_logger.h"
 
 namespace
 {
@@ -26,7 +27,7 @@ namespace
 
     volatile bool g_extended_pending{false};
 
-    driver::keyboard::extended_bitmap g_modifier_state{};
+    driver::keyboard::modifier_state g_modifier_state{};
 
     constexpr uint8_t normal_key_map_size{128};
     static_assert(normal_key_map_size == static_cast<uint16_t>(key_code_mask) + 1);
@@ -96,44 +97,6 @@ namespace
 
     char get_shifted_character(const driver::keyboard::keyboard_key key) noexcept { return *(shifted_characters_table.entries + static_cast<uint16_t>(key)); }
 
-    void update_modifier_state(const driver::keyboard::keyboard_key key, const driver::keyboard::state_bitmap state) noexcept
-    {
-        switch(key)
-        {
-            case driver::keyboard::keyboard_key::left_shift:
-                state |= 
-                break;
-            case driver::keyboard::keyboard_key::right_shift:
-                
-                break;
-            case driver::keyboard::keyboard_key::left_ctrl:
-                
-                break;
-            case driver::keyboard::keyboard_key::right_ctrl:
-                
-                break;
-            case driver::keyboard::keyboard_key::left_alt:
-                
-                break;
-            case driver::keyboard::keyboard_key::right_alt:
-                
-                break;
-            case driver::keyboard::keyboard_key::caps_lock:
-                if(state == driver::keyboard::key_state::pressed)
-                {
-                    if(!g_modifier_state.caps_lock_down)
-                    {
-                        g_modifier_state.caps_lock_down = true;
-                        g_modifier_state.caps_lock_on = !g_modifier_state.caps_lock_on;
-                    }
-                }
-                else g_modifier_state.caps_lock_down = false;
-                break;
-            default:
-                break;
-        }
-    }
-
     bool wait_input_buffer_clear() noexcept
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
@@ -181,36 +144,43 @@ namespace
     constexpr uint8_t keyboard_event_queue_size{64};
     constexpr uint8_t keyboard_event_queue_mask{keyboard_event_queue_size - 1};
     static_assert((keyboard_event_queue_size & keyboard_event_queue_mask) == 0);
-    // struct keyboard_event_queue
-    // {
-    //     driver::keyboard::keyboard_event entries[keyboard_event_queue_size];
-    //     uint32_t dropped; 
-    //     driver::keyboard::keyboard_event* volatile head;
-    //     driver::keyboard::keyboard_event* volatile tail;
-    //     uint8_t count;
-
-    //     constexpr keyboard_event_queue() noexcept: entries{}, dropped{}, head{entries}, tail{entries}, count{} {}
-    // };
-
     struct keyboard_event_queue
     {
-        driver::keyboard::keyboard_key key[keyboard_event_queue_size];
         uint8_t key_code[keyboard_event_queue_size];
+        driver::keyboard::keyboard_key key[keyboard_event_queue_size];
+        driver::keyboard::modifier_state modifiers[keyboard_event_queue_size];
         uint32_t dropped;
         driver::keyboard::state_bitmap state;
         driver::keyboard::extended_bitmap extended;
-        driver::keyboard::modifier_bitmap modifiers;
         uint8_t head;
         uint8_t tail;
         uint8_t count;
 
-        constexpr keyboard_event_queue(): key{}, key_code{}, dropped{}, state{}, extended{}, modifiers{}, head{}, tail{}, count{}
+        constexpr keyboard_event_queue(): key_code{}, key{}, modifiers{}, dropped{}, state{}, extended{}, head{}, tail{}, count{}
         {}
     };
     keyboard_event_queue g_keyboard_event_queue{};
 
     [[gnu::always_inline]]
-    inline uint8_t next_keyboard_event_queue(const uint8_t index) noexcept
+    inline void set_bit(uint64_t* bitmap_type, const uint8_t index) noexcept
+    {
+        *bitmap_type |= (1ULL << index);
+    }
+
+    [[gnu::always_inline]]
+    inline void clear_bit(uint64_t* bitmap_type, const uint8_t index) noexcept
+    {
+        *bitmap_type &= ~(1ULL << index);
+    }
+
+    [[gnu::always_inline]]
+    inline bool get_bit(const uint64_t* bitmap_type, const uint8_t index) noexcept
+    {
+        return (*bitmap_type & (1ULL << index)) != 0;
+    }
+
+    [[gnu::always_inline]]
+    inline uint8_t next_keyboard_event(const uint8_t index) noexcept
     {
         return (index + 1) & keyboard_event_queue_mask;
     }
@@ -218,7 +188,74 @@ namespace
     [[gnu::always_inline]]
     inline void commit_keyboard_event() noexcept
     {
-        g_keyboard_event_queue.tail = next_keyboard_event_queue(g_keyboard_event_queue.tail);
+        g_keyboard_event_queue.tail = next_keyboard_event(g_keyboard_event_queue.tail);
+        ++g_keyboard_event_queue.count;
+    }
+
+    void update_modifier_state(const driver::keyboard::keyboard_key key, const driver::keyboard::key_state state) noexcept
+    {
+        switch(key)
+        {
+            case driver::keyboard::keyboard_key::left_shift:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    g_modifier_state |= static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::left_shift_down);
+                }
+                else g_modifier_state &= ~(static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::left_shift_down));
+                break;
+            case driver::keyboard::keyboard_key::right_shift:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    g_modifier_state |= static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::right_shift_down);
+                }
+                else g_modifier_state &= ~(static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::right_shift_down));
+                break;
+            case driver::keyboard::keyboard_key::left_ctrl:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    g_modifier_state |= static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::left_ctrl_down);
+                }
+                else g_modifier_state &= ~(static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::left_ctrl_down));
+                break;
+            case driver::keyboard::keyboard_key::right_ctrl:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    g_modifier_state |= static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::right_ctrl_down);
+                }
+                else g_modifier_state &= ~(static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::right_ctrl_down));
+                break;
+            case driver::keyboard::keyboard_key::left_alt:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    g_modifier_state |= static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::left_alt_down);
+                }
+                else g_modifier_state &= ~(static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::left_alt_down));
+                break;
+            case driver::keyboard::keyboard_key::right_alt:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    g_modifier_state |= static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::right_alt_down);
+                }
+                else g_modifier_state &= ~(static_cast<uint8_t>(driver::keyboard::keyboard_modifier_state::right_alt_down));
+                break;
+            case driver::keyboard::keyboard_key::caps_lock:
+                if(state == driver::keyboard::key_state::pressed)
+                {
+                    if(!driver::keyboard::is_caps_down(g_modifier_state))
+                    {
+                        g_modifier_state |= static_cast<driver::keyboard::modifier_state>(driver::keyboard::keyboard_modifier_state::caps_lock_down);
+                        if(driver::keyboard::is_caps_lock_active(g_modifier_state))
+                        {
+                            g_modifier_state &= ~(static_cast<driver::keyboard::modifier_state>(driver::keyboard::keyboard_modifier_state::caps_lock_on));
+                        }
+                        else g_modifier_state |= static_cast<driver::keyboard::modifier_state>(driver::keyboard::keyboard_modifier_state::caps_lock_on);
+                    }
+                }
+                else g_modifier_state &= ~(static_cast<driver::keyboard::modifier_state>(driver::keyboard::keyboard_modifier_state::caps_lock_down));
+                break;
+            default:
+                break;
+        }
     }
 }
 
@@ -273,20 +310,20 @@ namespace driver::keyboard
         const bool extended{g_extended_pending};
         const uint8_t key_code{static_cast<uint8_t>(scancode & key_code_mask)};
         const keyboard_key key{map_scancode_set_1_key(key_code, extended)};
-        const state_bitmap state{(scancode & release_mask) != 0 ? key_state::released : key_state::pressed};
-        g_extended_pending = false;
+        const key_state state{(scancode & release_mask) == 0 ? key_state::pressed : key_state::released};
         update_modifier_state(key, state);
+        g_extended_pending = false;
 
-        *(g_keyboard_event_queue.key + g_keyboard_event_queue.head) = key;
-        *(g_keyboard_event_queue.key_code + g_keyboard_event_queue.head) = key_code;
-        g_keyboard_event_queue.state = state;
-        *(g_keyboard_event_queue.key + g_keyboard_event_queue.head)->extended = extended;
-
-        g_keyboard_event_queue.tail->modifiers = g_modifier_state;
+        *(g_keyboard_event_queue.key_code + g_keyboard_event_queue.tail) = key_code;
+        *(g_keyboard_event_queue.key + g_keyboard_event_queue.tail) = key;
+        *(g_keyboard_event_queue.modifiers + g_keyboard_event_queue.tail) = g_modifier_state;
+        state == key_state::pressed ? set_bit(&g_keyboard_event_queue.state, g_keyboard_event_queue.tail) : clear_bit(&g_keyboard_event_queue.state, g_keyboard_event_queue.tail);
+        extended ? set_bit(&g_keyboard_event_queue.extended, g_keyboard_event_queue.tail) : clear_bit(&g_keyboard_event_queue.extended, g_keyboard_event_queue.tail);
+        
         commit_keyboard_event();
     }
 
-    keyboard_modifier_state current_keyboard_modifier_state() noexcept
+    modifier_state current_keyboard_modifier_state() noexcept
     {
         kernel::interrupt_guard guard{};
         return g_modifier_state;
@@ -296,8 +333,12 @@ namespace driver::keyboard
     {
         kernel::interrupt_guard guard{};
         if(g_keyboard_event_queue.count == 0) return false;
-        *out_event = *g_keyboard_event_queue.head;
-        g_keyboard_event_queue.head = next_keyboard_event_queue_pointer(g_keyboard_event_queue.head);
+        out_event->key_code = *(g_keyboard_event_queue.key_code + g_keyboard_event_queue.head);
+        out_event->key = *(g_keyboard_event_queue.key + g_keyboard_event_queue.head);
+        out_event->state = (get_bit(&g_keyboard_event_queue.state, g_keyboard_event_queue.head) ? key_state::pressed : key_state::released);
+        out_event->extended = get_bit(&g_keyboard_event_queue.extended, g_keyboard_event_queue.head);
+        out_event->modifiers = *(g_keyboard_event_queue.modifiers + g_keyboard_event_queue.head);
+        g_keyboard_event_queue.head = next_keyboard_event(g_keyboard_event_queue.head);
         --g_keyboard_event_queue.count;
         return true;
     }
