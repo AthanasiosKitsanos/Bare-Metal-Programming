@@ -45,7 +45,6 @@ extern "C" [[noreturn]] void kernel_main()
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
-    
 
     app::shell shell{&console};
 
@@ -53,6 +52,6 @@ extern "C" [[noreturn]] void kernel_main()
 
     for(;;)
     {
-        shell.run();
+        asm volatile("hlt");
     }
 }

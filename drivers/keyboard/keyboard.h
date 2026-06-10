@@ -14,6 +14,10 @@ namespace driver
 
 namespace driver::keyboard
 {
+    typedef uint8_t modifier_state;
+    typedef uint64_t state_bitmap;
+    typedef uint64_t extended_bitmap;
+
     enum class key_state: uint8_t
     {
         released,
@@ -106,26 +110,25 @@ namespace driver::keyboard
         delete_key = 0xE053,
     };
 
-    struct keyboard_modifier_state
+    enum class keyboard_modifier_state: uint8_t
     {
-        bool left_shift_down;
-        bool right_shift_down;
-        bool left_ctrl_down;
-        bool right_ctrl_down;
-        bool left_alt_down;
-        bool right_alt_down;
-        bool caps_lock_down;
-        bool caps_lock_on;
+        left_shift_down = (1 << 0),
+        right_shift_down = (1 << 1),
+        left_ctrl_down = (1 << 2),
+        right_ctrl_down = (1 << 3),
+        left_alt_down = (1 << 4),
+        right_alt_down = (1 << 5),
+        caps_lock_down = (1 << 6),
+        caps_lock_on = (1 << 7)
     };
 
     struct keyboard_event
     {
-        uint8_t raw_scancode;
-        uint8_t key_code;
         keyboard_key key;
+        uint8_t key_code;
         key_state state;
         bool extended;
-        keyboard_modifier_state modifiers;
+        modifier_state modifiers;
     };
 
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
@@ -137,20 +140,43 @@ namespace driver::keyboard
 
     bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept;
 
-    keyboard_modifier_state current_keyboard_modifier_state() noexcept;
+    modifier_state current_keyboard_modifier_state() noexcept;
 
     // Modifier State Helpers
     [[gnu::always_inline]]
-    inline bool is_shift_active(const keyboard_modifier_state* state) noexcept { return state->left_shift_down || state->right_shift_down; }
+    inline bool is_shift_active(const modifier_state mod) noexcept
+    {
+        constexpr uint8_t shift_mask{static_cast<uint8_t>(keyboard_modifier_state::left_shift_down) | static_cast<uint8_t>(keyboard_modifier_state::right_shift_down)};
+        return ((static_cast<uint8_t>(mod) & shift_mask) != 0);
+    }
 
     [[gnu::always_inline]]
-    inline bool is_ctrl_active(const keyboard_modifier_state* state) noexcept { return state->left_ctrl_down || state->right_ctrl_down; }
+    inline bool is_ctrl_active(const modifier_state mod) noexcept
+    {
+        constexpr uint8_t ctrl_mask{static_cast<uint8_t>(keyboard_modifier_state::left_ctrl_down) | static_cast<uint8_t>(keyboard_modifier_state::right_ctrl_down)};
+        return ((static_cast<uint8_t>(mod) & ctrl_mask) != 0);
+    }
 
     [[gnu::always_inline]]
-    inline bool is_alt_active(const keyboard_modifier_state* state) noexcept { return state->left_alt_down || state->right_alt_down; }
+    inline bool is_alt_active(const modifier_state mod) noexcept
+    {
+        constexpr uint8_t alt_mask{static_cast<uint8_t>(keyboard_modifier_state::left_alt_down) | static_cast<uint8_t>(keyboard_modifier_state::right_alt_down)};
+        return ((static_cast<uint8_t>(mod) & alt_mask) != 0);
+    }
 
     [[gnu::always_inline]]
-    inline bool is_caps_lock_active(const keyboard_modifier_state* state) noexcept { return state->caps_lock_on; }
+    inline bool is_caps_down(const modifier_state mod) noexcept
+    {
+        constexpr uint8_t caps_down_mask{static_cast<uint8_t>(keyboard_modifier_state::caps_lock_down)};
+        return (static_cast<uint8_t>(mod) & caps_down_mask) != 0;
+    }
+
+    [[gnu::always_inline]]
+    inline bool is_caps_lock_active(const modifier_state mod) noexcept
+    {
+        constexpr uint8_t caps_on_mask{static_cast<uint8_t>(keyboard_modifier_state::caps_lock_on)};
+        return (static_cast<uint8_t>(mod) & caps_on_mask) != 0;
+    }
 
     // Key Classification Helper
     [[gnu::always_inline]]
