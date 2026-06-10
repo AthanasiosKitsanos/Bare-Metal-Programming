@@ -2,8 +2,6 @@
 
 #include <stdint.h>
 
-typedef uint8_t mod_state;
-
 namespace kernel
 {
     class interrupt_frame;
@@ -16,6 +14,10 @@ namespace driver
 
 namespace driver::keyboard
 {
+    typedef uint8_t modifier_bitmap;
+    typedef uint64_t state_bitmap;
+    typedef uint64_t extended_bitmap;
+
     enum class key_state: uint8_t
     {
         released,
@@ -108,16 +110,16 @@ namespace driver::keyboard
         delete_key = 0xE053,
     };
 
-    enum class keyboard_modifier_state: uint8_t
+    enum class keyboard_modifier_state: uint64_t
     {
-        left_shift_down = (1 << 0),
-        right_shift_down = (1 << 1),
-        left_ctrl_down = (1 << 2),
-        right_ctrl_down = (1 << 3),
-        left_alt_down = (1 << 4),
-        right_alt_down = (1 << 5),
-        caps_lock_down = (1 << 6),
-        caps_lock_on = (1 << 7)
+        left_shift_down = (1ULL << 0),
+        right_shift_down = (1ULL << 1),
+        left_ctrl_down = (1ULL << 2),
+        right_ctrl_down = (1ULL << 3),
+        left_alt_down = (1ULL << 4),
+        right_alt_down = (1ULL << 5),
+        caps_lock_down = (1ULL << 6),
+        caps_lock_on = (1ULL << 7)
     };
 
     struct keyboard_event
@@ -126,7 +128,7 @@ namespace driver::keyboard
         uint8_t key_code;
         key_state state;
         bool extended;
-        mod_state modifiers;
+        modifier_bitmap modifiers;
     };
 
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
