@@ -79,7 +79,7 @@ namespace terminal
             void initialize() noexcept;
             void write(const char*, size_t) noexcept;
             void write_string(const char*) noexcept;
-
+            
             // Inline Public Methods
             inline void __attribute__((always_inline)) reset_color() noexcept { set_color_code(buffer.get_default_color_code()); }
             inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
@@ -113,18 +113,24 @@ namespace terminal
             }
 
             [[gnu::always_inline]]
-            inline void move_cursor_left() noexcept
+            inline void move_to_next() noexcept
             { 
+                move_right();
+                sync_cursor();
+            }
+            
+            [[gnu::always_inline]]
+            inline void move_to_previous() noexcept
+            {
                 move_left();
                 sync_cursor();
             }
 
             [[gnu::always_inline]]
-            inline void move_cursor_right() noexcept
-            {
-                move_right();
-                sync_cursor();
-            }
+            inline void move_cursor_to_right_pos(const uint8_t pos) noexcept { buffer.move_current_to_right_pos(pos); }
+
+            [[gnu::always_inline]]
+            inline void move_cursor_to_left_pos(const uint8_t pos) noexcept { buffer.move_current_to_left_pos(pos); }
 
             // Operators
             output& operator<<(const char) noexcept;

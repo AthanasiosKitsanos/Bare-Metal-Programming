@@ -52,6 +52,6 @@ extern "C" [[noreturn]] void kernel_main()
 
     for(;;)
     {
-        asm volatile("hlt");
+        shell.run();
     }
 }

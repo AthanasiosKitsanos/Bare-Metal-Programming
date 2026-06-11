@@ -56,10 +56,10 @@ namespace terminal
         }
 
         [[gnu::always_inline]]
-        inline void move_current_ptr_left() noexcept { --current; }
+        inline void move_to_previous() noexcept { --current; }
 
         [[gnu::always_inline]]
-        inline void move_current_ptr_right() noexcept { ++current; }
+        inline void move_to_next() noexcept { ++current; }
 
         public:
             // Constructor
@@ -80,7 +80,13 @@ namespace terminal
             inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
             inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
             inline color_code __attribute__((always_inline)) get_default_color_code() const noexcept { return default_color; }
-            inline void __attribute((always_inline)) move_left() noexcept { move_current_ptr_left(); }
-            inline void __attribute((always_inline)) move_right() noexcept { move_current_ptr_right(); }
+            inline void __attribute((always_inline)) move_left() noexcept { move_to_previous(); }
+            inline void __attribute((always_inline)) move_right() noexcept { move_to_next(); }
+
+            [[gnu::always_inline]]
+            inline void move_current_to_right_pos(const uint8_t pos) noexcept { current += pos; }
+
+            [[gnu::always_inline]]
+            inline void move_current_to_left_pos(const uint8_t pos) noexcept { current -= pos; } 
     };
 }
