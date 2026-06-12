@@ -3,15 +3,15 @@
 namespace
 {
     [[gnu::always_inline]]
-    inline void move_data_right(char* end, const char* begin) noexcept
+    inline void move_data_right(char* end, const char* begin, const uint8_t step) noexcept
     {
-        for(; end > begin; --end) *end = *(end - 1);
+        for(; end > begin; --end) *end = *(end - step);
     }
 
     [[gnu::always_inline]]
-    inline void move_data_left(char* begin, const char* end) noexcept
+    inline void move_data_left(char* begin, const char* end, const uint8_t step) noexcept
     {
-        for(; begin < end; ++begin) *begin = *(begin + 1);
+        for(; begin < end; ++begin) *begin = *(begin + step);
     }
 
     [[gnu::always_inline]]
@@ -20,16 +20,6 @@ namespace
         uint8_t length{0};
         for(; *string != '\0'; ++string) ++length;
         return length;
-    }
-
-    [[gnu::always_inline]]
-    inline void copy_data(char* to_start, const char* const to_end, const char* from) noexcept
-    {
-        for(; to_start < to_end; ++to_start)
-        {
-            *to_start = *from;
-            ++from;
-        }
     }
 }
 
@@ -43,31 +33,28 @@ namespace terminal
         if(buffer_full()) return false;
         if(*cursor != '\0')
         {
-            move_data_right(data_end, cursor);
+            move_data_right(data_end, cursor, 1);
         }
         *cursor = c;
         ++cursor;
-        ++data_end;
+        *(++data_end) = '\0';
         return true;
     }
 
     bool input::add_string(const char* string) noexcept
     {
-        uint8_t string_count{string_length(string)};
-        if(data_end + string_count >= buffer_end) return false;
+        const uint8_t length{string_length(string)};
+        if(data_end + length >= buffer_end) return false;
+        data_end += length;
         if(*cursor != '\0')
         {
-            uint8_t copy_array_size{static_cast<uint8_t>(data_end - cursor)};
-            char copy_array[copy_array_size];
-            copy_data(copy_array, copy_array + copy_array_size, cursor);
-            copy_data(cursor + string_count, data_end + string_count, copy_array);
+            move_data_right(data_end, cursor + length - 1, length);   
         }
         for(; *string != '\0'; ++string)
         {
             *cursor = *string;
             ++cursor;
         }
-        data_end += string_count;
         return true;
     }
 
@@ -75,8 +62,8 @@ namespace terminal
     {
         if(buffer_begin()) return false;
         --cursor;
-        move_data_left(cursor, data_end);
-        --data_end;
+        move_data_left(cursor, data_end, 1);
+        *(--data_end) = '\0';
         return true;
     }
 
@@ -84,8 +71,7 @@ namespace terminal
     {
         cursor = command_buffer;
         data_end = command_buffer;
-        for(; cursor < buffer_end; ++cursor) *cursor = '\0';
-        cursor = command_buffer;
+        *cursor = '\0';
     }
 
     void input::go_to_last_printable_input() noexcept

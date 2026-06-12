@@ -113,6 +113,12 @@ namespace terminal
             }
 
             [[gnu::always_inline]]
+            inline void print_string_no_sync(const char* string) noexcept
+            {
+                write_string_no_sync(string);
+            }
+
+            [[gnu::always_inline]]
             inline void move_to_next() noexcept
             { 
                 move_right();

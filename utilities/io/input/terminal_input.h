@@ -38,6 +38,7 @@ namespace terminal
 
             [[gnu::always_inline]]
             const char* get_cursor() const noexcept { return cursor; }
+
             [[gnu::always_inline]]
             inline const char* read_buffer() const noexcept { return command_buffer; }
 

@@ -38,7 +38,16 @@ namespace app
                 }
                 if(driver::keyboard::try_translate_text_event(&event, &c))
                 {
-                    if(m_input.add_character(c)) *m_output << c;
+                    if(m_input.add_character(c))
+                    {
+                        *m_output << c;
+                        if(!m_input.is_buffer_synched())
+                        {
+                            m_output->print_string_no_sync(m_input.get_cursor());
+                            m_output->move_cursor_to_left_pos(m_input.cursor_to_data_end());
+                            m_output->call_cursor_sync();
+                        }
+                    }
                 }
                 else if(driver::keyboard::is_control_input_candidate_event(&event))
                 {
@@ -56,9 +65,8 @@ namespace app
 
     void shell::handle_escape() noexcept
     {
-        uint8_t steps{m_input.cursor_to_data_end()};
-        m_output->move_cursor_to_right_pos(steps);
-        for(steps = m_input.get_input_count(); steps > 0; --steps)
+        m_output->move_cursor_to_right_pos(m_input.cursor_to_data_end());
+        for(uint8_t steps{m_input.get_input_count()}; steps > 0; --steps)
         {
             m_output->delete_last_char_no_sync();
         }
@@ -66,18 +74,37 @@ namespace app
         m_input.reset_buffer();
     }
     
+    // Need to fix backspace
     void shell::handle_backspace() noexcept
     {
         if(m_input.delete_character())
         {
-            m_output->delete_last_char_sync();
+            uint8_t steps{m_input.cursor_to_data_end()};
+            m_output->move_cursor_to_right_pos(steps);
+            m_output->delete_last_char_no_sync();
+            m_output->move_cursor_to_left_pos(steps - 1);
+            m_output->delete_last_char_no_sync();
+            if(!m_input.is_buffer_synched())
+            {
+                m_output->print_string_no_sync(m_input.get_cursor());
+            }
+            m_output->call_cursor_sync();
         }
     }
     
     void shell::handle_tab() noexcept
     {
         constexpr const char* spaces{"    "};
-        if(m_input.add_string(spaces)) *m_output << spaces;
+        if(m_input.add_string(spaces))
+        {
+            *m_output << spaces;
+            if(!m_input.is_buffer_synched())
+            {
+                m_output->print_string_no_sync(m_input.get_cursor());
+                m_output->move_cursor_to_left_pos(m_input.cursor_to_data_end());
+                m_output->call_cursor_sync();
+            }
+        }
     }
     
     void shell::handle_enter() noexcept
@@ -129,7 +156,7 @@ namespace app
 
     void shell::handle_arrow_right() noexcept
     {
-        if(m_input.move_cursor_right()) m_output->move_to_previous();
+        if(m_input.move_cursor_right()) m_output->move_to_next();
     }
 
     void shell::handle_end() noexcept
