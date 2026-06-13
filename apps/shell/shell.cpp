@@ -15,6 +15,33 @@ namespace
         constexpr uint8_t index_mask{0x03};
         return static_cast<uint8_t>((static_cast<uint16_t>(key) - 1) & index_mask);
     }
+
+    uint8_t str_compare(const char* comparer, const char* other) noexcept
+    {
+        char c{*comparer};
+        char o{*other};
+        while(c != '\0' && c == o)
+        {
+            c = *(++comparer);
+            o = *(++other);
+        }
+        return c - o;
+    }
+
+    constexpr uint8_t command_list_size{1};
+    struct command_list
+    {
+        const char* entries[command_list_size];
+
+        constexpr command_list(): entries{}
+        {
+            #define X(index, command)  \
+                entries[index] = command;
+            COMMAND_LIST
+            #undef X
+        }
+    };
+    constexpr command_list g_command_list{};
 }
 
 namespace app
@@ -74,19 +101,17 @@ namespace app
         m_input.reset_buffer();
     }
     
-    // Need to fix backspace
     void shell::handle_backspace() noexcept
     {
         if(m_input.delete_character())
         {
-            uint8_t steps{m_input.cursor_to_data_end()};
-            m_output->move_cursor_to_right_pos(steps);
-            m_output->delete_last_char_no_sync();
-            m_output->move_cursor_to_left_pos(steps - 1);
             m_output->delete_last_char_no_sync();
             if(!m_input.is_buffer_synched())
             {
                 m_output->print_string_no_sync(m_input.get_cursor());
+                m_output->move_to_next_no_sync();
+                m_output->delete_last_char_no_sync();
+                m_output->move_cursor_to_left_pos(m_input.cursor_to_data_end());
             }
             m_output->call_cursor_sync();
         }
@@ -112,7 +137,6 @@ namespace app
         if(!m_input.is_empty())
         {
             if(!m_input.is_buffer_synched()) m_input.go_to_last_printable_input();
-            *m_output << '\n' << m_input.read_buffer();
         }
         *m_output << '\n';
         m_command_ready = true;
@@ -136,7 +160,10 @@ namespace app
 
     void shell::handle_home() noexcept
     {
-        return;
+        const uint8_t steps{m_input.begin_to_cursor()};
+        m_input.set_cursor_to_left_pos(steps);
+        m_output->move_cursor_to_left_pos(steps);
+        m_output->call_cursor_sync();
     }
 
     void shell::handle_arrow_up() noexcept
@@ -161,7 +188,10 @@ namespace app
 
     void shell::handle_end() noexcept
     {
-        return;
+        const uint8_t steps{m_input.cursor_to_data_end()};
+        m_input.set_cursor_to_right_pos(steps);
+        m_output->move_cursor_to_right_pos(steps);
+        m_output->call_cursor_sync();
     }
 
     void shell::handle_arrow_down() noexcept
@@ -188,5 +218,13 @@ namespace app
             default:
                 return;
         }
+    }
+
+    bool shell::command_exists(const char* const command) const noexcept
+    {
+        const char* left{g_command_list.entries[0]};
+        const char* right{g_command_list.entries[command_list_size - 1]};
+        const char* mid{nullptr};
+
     }
 }

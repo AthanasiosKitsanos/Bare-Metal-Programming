@@ -73,6 +73,24 @@ namespace terminal
                 return true;
             }
 
+            [[gnu::always_inline]]
+            inline void set_cursor_to_right_pos(uint8_t pos) noexcept
+            {
+                cursor += pos;
+            }
+
+            [[gnu::always_inline]]
+            inline void set_cursor_to_left_pos(uint8_t pos) noexcept
+            {
+                cursor -= pos;
+            }
+
+            [[gnu::always_inline]]
+            inline uint8_t begin_to_cursor() const noexcept
+            {
+                return (cursor - command_buffer);
+            }
+
             void reset_buffer() noexcept;
 
             void go_to_last_printable_input() noexcept;

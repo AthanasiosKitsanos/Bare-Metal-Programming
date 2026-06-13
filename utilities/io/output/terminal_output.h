@@ -124,6 +124,9 @@ namespace terminal
                 move_right();
                 sync_cursor();
             }
+
+            [[gnu::always_inline]]
+            inline void move_to_next_no_sync() noexcept { move_right(); }
             
             [[gnu::always_inline]]
             inline void move_to_previous() noexcept
@@ -131,6 +134,9 @@ namespace terminal
                 move_left();
                 sync_cursor();
             }
+
+            [[gnu::always_inline]]
+            inline void move_to_previous_no_sync() noexcept { move_left(); }
 
             [[gnu::always_inline]]
             inline void move_cursor_to_right_pos(const uint8_t pos) noexcept { buffer.move_current_to_right_pos(pos); }

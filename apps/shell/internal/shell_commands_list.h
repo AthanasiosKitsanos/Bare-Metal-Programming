@@ -5,3 +5,6 @@
     X(1, backspace) \
     X(2, tab)   \
     X(3, enter)
+
+#define COMMAND_LIST    \
+    X(0, "clear")

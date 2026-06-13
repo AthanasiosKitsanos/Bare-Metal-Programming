@@ -37,6 +37,8 @@ namespace app
         void handle_page_down() noexcept;
         void navigation_key_dispatch(const driver::keyboard::keyboard_key key) noexcept;
 
+        bool command_exists(const char* const) const noexcept;
+
         public:
             explicit shell(terminal::output* scr) noexcept;
 
