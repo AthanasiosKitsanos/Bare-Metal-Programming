@@ -7,4 +7,9 @@
     X(3, enter)
 
 #define COMMAND_LIST    \
-    X(0, "clear")
+    X(0, "clear")   \
+    X(1, "peek")
+
+#define COMMAND_FUNCTIONS    \
+    X(0, clear) \
+    X(1, peek)

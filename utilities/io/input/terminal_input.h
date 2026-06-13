@@ -46,10 +46,7 @@ namespace terminal
             inline uint8_t cursor_to_data_end() const noexcept {  return get_distance(); }
             
             [[gnu::always_inline]]
-            inline uint8_t get_input_count() const noexcept
-            {
-                return static_cast<uint8_t>(data_end - command_buffer);
-            }
+            inline uint8_t get_input_count() const noexcept { return static_cast<uint8_t>(data_end - command_buffer); }
 
             [[gnu::always_inline]]
             inline bool is_empty() const noexcept { return buffer_empty(); }
@@ -74,22 +71,13 @@ namespace terminal
             }
 
             [[gnu::always_inline]]
-            inline void set_cursor_to_right_pos(uint8_t pos) noexcept
-            {
-                cursor += pos;
-            }
+            inline void move_cursor_to_buffer_begin() noexcept { cursor = command_buffer; }
 
             [[gnu::always_inline]]
-            inline void set_cursor_to_left_pos(uint8_t pos) noexcept
-            {
-                cursor -= pos;
-            }
+            inline void move_cursor_to_buffer_end() noexcept { cursor = data_end; }
 
             [[gnu::always_inline]]
-            inline uint8_t begin_to_cursor() const noexcept
-            {
-                return (cursor - command_buffer);
-            }
+            inline uint8_t get_cursor_position() const noexcept { return (cursor - command_buffer); }
 
             void reset_buffer() noexcept;
 

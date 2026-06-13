@@ -16,7 +16,7 @@ namespace
         return static_cast<uint8_t>((static_cast<uint16_t>(key) - 1) & index_mask);
     }
 
-    uint8_t str_compare(const char* comparer, const char* other) noexcept
+    int8_t str_compare(const char* comparer, const char* other) noexcept
     {
         char c{*comparer};
         char o{*other};
@@ -25,10 +25,10 @@ namespace
             c = *(++comparer);
             o = *(++other);
         }
-        return c - o;
+        return static_cast<int8_t>(c) - static_cast<int8_t>(o);
     }
 
-    constexpr uint8_t command_list_size{1};
+    constexpr uint8_t command_list_size{2};
     struct command_list
     {
         const char* entries[command_list_size];
@@ -42,6 +42,28 @@ namespace
         }
     };
     constexpr command_list g_command_list{};
+
+    void execute_clear(app::shell* shell) noexcept { shell->clear_output(); }
+
+    void execute_peek(app::shell* shell) noexcept
+    {
+        shell->peek_command();
+    }
+
+    using command_list_functions = void(*)(app::shell*) noexcept;
+    struct command_functions
+    {
+        command_list_functions entries[command_list_size];
+
+        constexpr command_functions(): entries{}
+        {
+            #define X(index, command)   \
+                entries[index] = execute_##command;
+            COMMAND_FUNCTIONS
+            #undef X
+        }
+    };
+    constexpr command_functions g_command_functions{};
 }
 
 namespace app
@@ -85,6 +107,7 @@ namespace app
                     navigation_key_dispatch(event.key);
                 }
             }
+            execute_command();
             m_input.reset_buffer();
             m_command_ready = false;
         }
@@ -160,8 +183,8 @@ namespace app
 
     void shell::handle_home() noexcept
     {
-        const uint8_t steps{m_input.begin_to_cursor()};
-        m_input.set_cursor_to_left_pos(steps);
+        const uint8_t steps{m_input.get_cursor_position()};
+        m_input.move_cursor_to_buffer_begin();
         m_output->move_cursor_to_left_pos(steps);
         m_output->call_cursor_sync();
     }
@@ -189,7 +212,7 @@ namespace app
     void shell::handle_end() noexcept
     {
         const uint8_t steps{m_input.cursor_to_data_end()};
-        m_input.set_cursor_to_right_pos(steps);
+        m_input.move_cursor_to_buffer_end();
         m_output->move_cursor_to_right_pos(steps);
         m_output->call_cursor_sync();
     }
@@ -220,11 +243,43 @@ namespace app
         }
     }
 
-    bool shell::command_exists(const char* const command) const noexcept
+    int8_t shell::command_exists(const char* const command) const noexcept
     {
-        const char* left{g_command_list.entries[0]};
-        const char* right{g_command_list.entries[command_list_size - 1]};
-        const char* mid{nullptr};
+        uint8_t left{0};
+        uint8_t right{command_list_size};
+        uint8_t mid{0};
+        int8_t c_result{0};
+        while(left < right)
+        {
+            mid = (right - left) / 2;
+            c_result = str_compare(command, g_command_list.entries[mid]);
+            if(c_result == 0) return mid;
+            else if(c_result < 0) right = mid;
+            else left = mid + 1;
+        }
+        return -1;
+    }
 
+    void shell::execute_command() noexcept
+    {
+        const int8_t index{command_exists(m_input.read_buffer())};
+        if(index < 0)
+        {
+            *m_output << "Command not found\n";
+            return;
+        }
+        g_command_functions.entries[index](this);
+    }
+
+    [[gnu::always_inline]]
+    inline void shell::clear_input() noexcept { m_input.reset_buffer(); }
+
+    [[gnu::always_inline]]
+    inline void shell::clear_output() noexcept { m_output->clear(); }
+
+    [[gnu::always_inline]]
+    inline void shell::peek_command() noexcept
+    {
+        *m_output << "Nothing to peek in here!\n";
     }
 }
