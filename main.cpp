@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "io/output/terminal_output.h"
+#include "io/input/terminal_input.h"
 #include "logger/kernel_logger.h"
 #include "exceptions/kernel_exceptions.h"
 #include "timer/kernel_timer.h"
@@ -28,6 +29,7 @@ extern "C" [[noreturn]] void kernel_main()
 
     terminal::output console{};
     kernel::logger logger{&console};
+    terminal::input in{&console};
     console.initialize();
 
     kernel::set_exception_logger(&logger);
@@ -46,12 +48,22 @@ extern "C" [[noreturn]] void kernel_main()
         logger.warning() << "Failed to synchronize keyboard\n";
     }
 
+    // console << "Size of vga_buffer: " << sizeof(terminal::vga_text_buffer)
+    // << "\nSize of vga_cursor: " << sizeof(terminal::vga_hardware_cursor)
+    // << "\nSize of terminal::output: " << sizeof(terminal::output)
+    // << "\nSize of Terminal::input: " << sizeof(terminal::input)
+    // << "\nSize of Shell: " << sizeof(app::shell)
+    // << "\nSize of shell_hot: " << sizeof(app::hot)
+    // << "\nSize of shell_cold: " << sizeof(app::cold);
+    
     app::shell shell{&console};
-
+    
     asm volatile("sti");
+
+     shell.run();
 
     for(;;)
     {
-        shell.run();
+        asm volatile("hlt");
     }
 }

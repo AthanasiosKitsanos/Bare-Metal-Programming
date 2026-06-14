@@ -1,5 +1,6 @@
 #pragma once
 
+#include <stdint.h>
 #include "io/input/terminal_input.h"
 
 namespace terminal
@@ -7,51 +8,33 @@ namespace terminal
     class output;
 }
 
-namespace driver::keyboard
-{
-    enum class keyboard_key: uint16_t;
-}
-
 namespace app
 {
-    class shell
+    struct alignas(64) hot
     {
         terminal::input m_input;
+        uint8_t m_is_running;
+    };
+
+    struct cold
+    {
         terminal::output* const m_output;
-        bool m_command_ready;
-        bool m_is_running;
+    };
 
-        void handle_escape() noexcept;
-        void handle_backspace() noexcept;
-        void handle_tab() noexcept;
-        void handle_enter() noexcept;
-        void control_key_dispatch(const driver::keyboard::keyboard_key key) noexcept;
+    class shell
+    {   
+        hot shell_hot;
+        cold shell_cold;
 
-        void handle_home() noexcept;
-        void handle_arrow_up() noexcept;
-        void handle_page_up() noexcept;
-        void handle_arrow_left() noexcept;
-        void handle_arrow_right() noexcept;
-        void handle_end() noexcept;
-        void handle_arrow_down() noexcept;
-        void handle_page_down() noexcept;
-        void navigation_key_dispatch(const driver::keyboard::keyboard_key key) noexcept;
-
-        int8_t command_exists(const char* const) const noexcept;
+        int8_t command_exists() const noexcept;
         void execute_command() noexcept;
 
         public:
-            explicit shell(terminal::output* scr) noexcept;
+            explicit shell(terminal::output* out) noexcept;
 
             void run() noexcept;
-
-            [[gnu::always_inline]]
-            inline void clear_input() noexcept;
-
-            [[gnu::always_inline]]
-            inline void clear_output() noexcept;
-
-            [[gnu::always_inline]]
-            inline void peek_command() noexcept;
+            void clear() noexcept;
+            void exit() noexcept;
+            void peek() noexcept;
     };
 }

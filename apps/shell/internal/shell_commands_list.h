@@ -1,15 +1,11 @@
 #pragma once
 
-#define COMMAND_MAPPING \
-    X(0, escape)    \
-    X(1, backspace) \
-    X(2, tab)   \
-    X(3, enter)
-
 #define COMMAND_LIST    \
     X(0, "clear")   \
-    X(1, "peek")
+    X(1, "exit")    \
+    X(2, "peek")
 
 #define COMMAND_FUNCTIONS    \
     X(0, clear) \
-    X(1, peek)
+    X(1, exit)    \
+    X(2, peek)
