@@ -14,8 +14,13 @@ namespace driver
 
 namespace driver::keyboard
 {
+    // shift, caps, ctrl etc
     typedef uint8_t modifier_state;
+
+    // pressed or released
     typedef uint64_t state_bitmap;
+
+    // if it is extended key ie 
     typedef uint64_t extended_bitmap;
 
     enum class key_state: uint8_t
@@ -122,7 +127,7 @@ namespace driver::keyboard
         caps_lock_on = (1 << 7)
     };
 
-    struct keyboard_event
+    struct alignas(8) keyboard_event
     {
         keyboard_key key;
         uint8_t key_code;
@@ -134,9 +139,7 @@ namespace driver::keyboard
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
 
     bool poll_keyboard_event(keyboard_event* out_event) noexcept;
-    bool has_pending_keyboard_event() noexcept;
-    uint8_t pending_keyboard_event_count() noexcept;
-    uint32_t dropped_keyboard_event_count() noexcept;
+    uint8_t has_pending_keyboard_event() noexcept;
 
     bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept;
 

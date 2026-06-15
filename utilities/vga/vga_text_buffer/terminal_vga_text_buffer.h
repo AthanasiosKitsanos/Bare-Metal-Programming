@@ -36,21 +36,28 @@ namespace terminal
         static constexpr size_t vga_width{80};
         static constexpr size_t vga_height{25};
         static constexpr uintptr_t vga_address{0xB8000};
+        static constexpr uintptr_t vga_end{vga_address + vga_width * vga_height * sizeof(uint16_t)};
         static constexpr color_code default_color{static_cast<color_code>(vga_color::white) | (static_cast<color_code>(vga_color::black) << 4)};
-        
-        volatile uint16_t* const begin;
-        volatile uint16_t* const end;
+
         volatile uint16_t* current;
         color_code active_color;
+        
+        [[gnu::always_inline]]
+        inline static volatile uint16_t* begin() noexcept { return reinterpret_cast<volatile uint16_t*>(vga_address); }
+
+        [[gnu::always_inline]]
+        inline static volatile uint16_t* end() noexcept { return reinterpret_cast<volatile uint16_t*>(vga_end); }
 
         // Private Methods
         // Inline Private Methods
-        static inline color_code __attribute__((always_inline)) make_color(vga_color foreground, vga_color background) noexcept 
+        [[gnu::always_inline]]
+        static inline color_code make_color(vga_color foreground, vga_color background) noexcept 
         {
             return static_cast<color_code>(foreground) | (static_cast<color_code>(background) << 4);
         }
 
-        static inline uint16_t __attribute__((always_inline)) make_entry(unsigned char c, color_code color) noexcept
+        [[gnu::always_inline]]
+        static inline uint16_t make_entry(unsigned char c, color_code color) noexcept
         {
             return static_cast<uint16_t>(c) | static_cast<uint16_t>(color << 8);
         }
@@ -74,14 +81,29 @@ namespace terminal
             void scroll() noexcept;
 
             // Inline Public Methods
-            inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { active_color = color; }
-            inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { active_color = make_color(foreground, background); }
-            inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return active_color; }
-            inline bool __attribute__((always_inline)) at_buffer_end() const noexcept { return current == end; }
-            inline size_t __attribute__((always_inline)) cursor_position() const noexcept { return static_cast<size_t>(current - begin); }
-            inline color_code __attribute__((always_inline)) get_default_color_code() const noexcept { return default_color; }
-            inline void __attribute((always_inline)) move_left() noexcept { move_to_previous(); }
-            inline void __attribute((always_inline)) move_right() noexcept { move_to_next(); }
+            [[gnu::always_inline]]
+            inline void set_color_code(color_code color) noexcept { active_color = color; }
+
+            [[gnu::always_inline]]
+            inline void set_color(vga_color foreground, vga_color background) noexcept { active_color = make_color(foreground, background); }
+
+            [[gnu::always_inline]]
+            inline color_code current_color_code() const noexcept { return active_color; }
+
+            [[gnu::always_inline]]
+            inline bool at_buffer_end() const noexcept { return current == end(); }
+
+            [[gnu::always_inline]]
+            inline size_t cursor_position() const noexcept { return static_cast<size_t>(current - begin()); }
+
+            [[gnu::always_inline]]
+            inline color_code get_default_color_code() const noexcept { return default_color; }
+
+            [[gnu::always_inline]]
+            inline void move_left() noexcept { move_to_previous(); }
+
+            [[gnu::always_inline]]
+            inline void move_right() noexcept { move_to_next(); }
 
             [[gnu::always_inline]]
             inline void move_current_to_right_pos(const uint8_t pos) noexcept { current += pos; }

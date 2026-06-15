@@ -100,10 +100,13 @@ namespace terminal
         char c{'\0'};
         while(!input_ready)
         {
-            while(!driver::keyboard::poll_keyboard_event(&event))
+            while(!driver::keyboard::has_pending_keyboard_event())
             {
                 asm volatile("hlt");
             }
+
+            driver::keyboard::poll_keyboard_event(&event);
+            
             if(driver::keyboard::try_translate_text_event(&event, &c))
             {
                 if(add_character(c))

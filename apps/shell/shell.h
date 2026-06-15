@@ -13,14 +13,14 @@ namespace app
     struct alignas(64) hot
     {
         terminal::input m_input;
+        terminal::output* const m_output;
         uint8_t m_is_running;
     };
-
     struct cold
     {
         terminal::output* const m_output;
     };
-
+    
     class shell
     {   
         hot shell_hot;

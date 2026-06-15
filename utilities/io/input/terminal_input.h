@@ -15,6 +15,7 @@ namespace terminal
     class input
     {
         static constexpr uint8_t input_capacity{128};
+        struct 
         output* const m_output;
         char* cursor;
         char* data_end;

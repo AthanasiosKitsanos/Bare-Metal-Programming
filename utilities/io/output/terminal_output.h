@@ -17,7 +17,6 @@ namespace terminal
     {
         // Private Members
         vga_text_buffer buffer;
-        vga_hardware_cursor cursor;
         using output_manipulator = output& (*)(output&) noexcept;
         integer_base state{integer_base::dec};
         bool bool_alpha_enabled{false};
@@ -63,7 +62,7 @@ namespace terminal
         }
 
         inline void __attribute__((always_inline)) line_start() noexcept { buffer.move_to_line_start(); }
-        inline void __attribute__((always_inline)) sync_cursor() noexcept { cursor.set_position(buffer.cursor_position()); }
+        inline void __attribute__((always_inline)) sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.cursor_position()); }
 
         [[gnu::always_inline]]
         inline void move_left() noexcept { buffer.move_left(); }

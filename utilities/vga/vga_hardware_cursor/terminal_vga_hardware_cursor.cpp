@@ -9,7 +9,7 @@ namespace terminal
         outb(data_port, value);
     }
 
-    uint8_t vga_hardware_cursor::read_register(uint8_t index) const noexcept
+    uint8_t vga_hardware_cursor::read_register(uint8_t index) noexcept
     {
         outb(command_port, index);
         return inb(data_port);

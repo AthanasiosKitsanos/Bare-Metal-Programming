@@ -259,7 +259,7 @@ namespace terminal
     void output::initialize() noexcept
     {
         buffer.clear();
-        cursor.enable();
+        vga_hardware_cursor::enable();
         sync_cursor();
     }
 
