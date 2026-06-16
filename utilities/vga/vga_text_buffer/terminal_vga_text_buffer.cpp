@@ -2,52 +2,57 @@
 
 namespace terminal
 {
-    vga_text_buffer::vga_text_buffer() noexcept: current(begin()), active_color(make_color(vga_color::white, vga_color::black)) {}
+    vga_text_buffer::vga_text_buffer() noexcept: base_row{0}, row{0}, column{0}, active_color{default_color}
+    {}
 
     void vga_text_buffer::clear() noexcept
     {
-        current = begin();
-        for(; current < end(); ++current) *current = make_entry(' ', active_color);
-        current = begin();
+        constexpr uint16_t entry{make_entry(' ', default_color)};
+        constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
+        constexpr uint16_t t_length{length >> 1};
+        const volatile uint32_t* const end{begin_32() + t_length};
+        for(volatile uint32_t* ptr{begin_32()}; ptr < end; ++ptr)
+        {
+            *ptr = entry_32;
+        }
+        base_row = 0;
+        column = 0;
+        row = 0;
     }
 
     void vga_text_buffer::put(char c) noexcept
     {
-        if(current == end()) return;
-        *current = make_entry(c, active_color);
-        ++current;
+        *cell() = make_entry(c, active_color);
+        move_forward();
     }
 
     void vga_text_buffer::remove_last_char() noexcept
     {
-        if(current == begin()) return;
-        --current;
-        *current = make_entry(' ', active_color);
+        move_backwards();
+        *cell() = make_entry(' ', active_color);
     }
 
-    void vga_text_buffer::move_to_line_start() noexcept
+    void vga_text_buffer::move_forward() noexcept
     {
-        if(current == end()) --current;
-        const size_t row{static_cast<size_t>(current - begin()) / vga_width};
-        current = begin() + row * vga_width;
+        ++column;
+
+        bool overflowed{column == vga_width};
+        column -= overflowed * vga_width;
+        row += overflowed;
+
+        overflowed = (row == vga_height);
+        base_row += overflowed;
+        row -= overflowed * vga_height;
+        if(overflowed) clear_row();
     }
 
-    void vga_text_buffer::move_to_next_line() noexcept
+    void vga_text_buffer::move_backwards() noexcept
     {
-        const size_t row{(static_cast<size_t>(current - begin()) / vga_width) + 1};
-        current = begin() + row * vga_width;
-    }
+        bool column_at_end{column == 0};
+        column = (column - 1) + column_at_end * vga_width;
 
-    void vga_text_buffer::scroll() noexcept
-    {
-        current = begin();
-        volatile uint16_t* source{current + vga_width};
-        for(; source < end(); ++source)
-        {
-            *current = *source;
-            ++current;
-        }
-        for(; current < end(); ++current) *current = make_entry(' ', active_color);
-        current -= vga_width;
+        bool row_at_end = (row == 0) * (column_at_end);
+        base_row -= row_at_end;
+        row = (row - column_at_end) + row_at_end * vga_height;
     }
 }

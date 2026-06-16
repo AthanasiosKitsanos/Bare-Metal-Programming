@@ -26,8 +26,6 @@ namespace terminal
         void put_char_no_sync(char) noexcept;
         void write_string_no_sync(const char*) noexcept;
 
-        size_t string_length(const char*) const noexcept;
-
         void write_unsigned_8_no_sync(uint8_t) noexcept;
         void write_signed_8_no_sync(int8_t) noexcept;
         void write_signed_16_no_sync(int16_t) noexcept;
@@ -50,19 +48,18 @@ namespace terminal
         friend output& bool_no_alpha(output&) noexcept;
 
         // Inline Methods
-        inline char __attribute__((always_inline)) hex_digit(uint8_t nibble) const noexcept
-        {
-            return (nibble < 10) ? static_cast<char>('0' + nibble) : static_cast<char>('A' + (nibble - 10));
-        }
-
-        inline void __attribute__((always_inline)) put_hex_prefix() noexcept
+        [[gnu::always_inline]]
+        inline void put_hex_prefix() noexcept
         {
             put_char_no_sync('0');
             put_char_no_sync('x');
         }
 
-        inline void __attribute__((always_inline)) line_start() noexcept { buffer.move_to_line_start(); }
-        inline void __attribute__((always_inline)) sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.cursor_position()); }
+        [[gnu::always_inline]]
+        inline void line_start() noexcept { buffer.move_to_line_start(); }
+
+        [[gnu::always_inline]]
+        inline void sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.cursor_position()); }
 
         [[gnu::always_inline]]
         inline void move_left() noexcept { buffer.move_left(); }
@@ -76,46 +73,45 @@ namespace terminal
 
             // Public methods
             void initialize() noexcept;
-            void write(const char*, size_t) noexcept;
-            void write_string(const char*) noexcept;
             
             // Inline Public Methods
-            inline void __attribute__((always_inline)) reset_color() noexcept { set_color_code(buffer.get_default_color_code()); }
-            inline void __attribute__((always_inline)) set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
-            inline void __attribute__((always_inline)) set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
-            inline color_code __attribute__((always_inline)) current_color_code() const noexcept { return buffer.current_color_code(); }
-            inline void __attribute__((always_inline)) clear() noexcept
+            [[gnu::always_inline]]
+            inline void reset_color() noexcept { set_color_code(buffer.get_default_color_code()); }
+
+            [[gnu::always_inline]]
+            inline void set_color(vga_color foreground, vga_color background) noexcept { buffer.set_color(foreground, background); }
+
+            [[gnu::always_inline]]
+            inline void set_color_code(color_code color) noexcept { buffer.set_color_code(color); }
+
+            [[gnu::always_inline]]
+            inline color_code current_color_code() const noexcept { return buffer.current_color_code(); }
+
+            [[gnu::always_inline]]
+            inline void clear() noexcept
             {
                 buffer.clear();
                 sync_cursor();
             }
 
-            inline void __attribute__((always_inline)) delete_last_char_no_sync() noexcept
-            {
-                buffer.remove_last_char();
-            }
+            [[gnu::always_inline]]
+            inline void delete_last_char_no_sync() noexcept { buffer.remove_last_char(); }
 
-            inline void __attribute__((always_inline)) delete_last_char_sync() noexcept
+            [[gnu::always_inline]]
+            inline void delete_last_char_sync() noexcept
             {
                 buffer.remove_last_char();
                 sync_cursor();
-            }
-
-            inline void __attribute__((always_inline)) call_cursor_sync() noexcept
-            {
-                sync_cursor();
-            }
-
-            inline bool __attribute__((always_inline)) in_default_color() const noexcept
-            {
-                return current_color_code() == buffer.get_default_color_code();
             }
 
             [[gnu::always_inline]]
-            inline void print_string_no_sync(const char* string) noexcept
-            {
-                write_string_no_sync(string);
-            }
+            inline void call_cursor_sync() noexcept { sync_cursor(); }
+
+            [[gnu::always_inline]]
+            inline bool in_default_color() const noexcept { return current_color_code() == buffer.get_default_color_code(); }
+
+            [[gnu::always_inline]]
+            inline void print_string_no_sync(const char* string) noexcept { write_string_no_sync(string); }
 
             [[gnu::always_inline]]
             inline void move_to_next() noexcept
@@ -163,11 +159,12 @@ namespace terminal
             output& operator<<(const char (&text)[N]) noexcept
             {
                 size_t length{0};
-                for(const char* curr{text}; length < N && *curr != '\0'; ++length)
+                for(; length < N && *curr != '\0'; ++length)
                 {
-                    ++curr;
+                    ++text;
                 }
-                write(text, length);
+                text -= length;
+                write_string_no_sync(text);
                 sync_cursor();
                 return *this;
             }
