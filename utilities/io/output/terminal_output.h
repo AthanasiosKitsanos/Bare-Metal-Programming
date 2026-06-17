@@ -54,18 +54,6 @@ namespace terminal
             put_char_no_sync('0');
             put_char_no_sync('x');
         }
-
-        [[gnu::always_inline]]
-        inline void line_start() noexcept { buffer.move_to_line_start(); }
-
-        [[gnu::always_inline]]
-        inline void sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.cursor_position()); }
-
-        [[gnu::always_inline]]
-        inline void move_left() noexcept { buffer.move_left(); }
-
-        [[gnu::always_inline]]
-        inline void move_right() noexcept { buffer.move_right(); }
         
         public:
             // Constructor
@@ -88,56 +76,13 @@ namespace terminal
             inline color_code current_color_code() const noexcept { return buffer.current_color_code(); }
 
             [[gnu::always_inline]]
-            inline void clear() noexcept
-            {
-                buffer.clear();
-                sync_cursor();
-            }
-
-            [[gnu::always_inline]]
             inline void delete_last_char_no_sync() noexcept { buffer.remove_last_char(); }
-
-            [[gnu::always_inline]]
-            inline void delete_last_char_sync() noexcept
-            {
-                buffer.remove_last_char();
-                sync_cursor();
-            }
-
-            [[gnu::always_inline]]
-            inline void call_cursor_sync() noexcept { sync_cursor(); }
 
             [[gnu::always_inline]]
             inline bool in_default_color() const noexcept { return current_color_code() == buffer.get_default_color_code(); }
 
             [[gnu::always_inline]]
             inline void print_string_no_sync(const char* string) noexcept { write_string_no_sync(string); }
-
-            [[gnu::always_inline]]
-            inline void move_to_next() noexcept
-            { 
-                move_right();
-                sync_cursor();
-            }
-
-            [[gnu::always_inline]]
-            inline void move_to_next_no_sync() noexcept { move_right(); }
-            
-            [[gnu::always_inline]]
-            inline void move_to_previous() noexcept
-            {
-                move_left();
-                sync_cursor();
-            }
-
-            [[gnu::always_inline]]
-            inline void move_to_previous_no_sync() noexcept { move_left(); }
-
-            [[gnu::always_inline]]
-            inline void move_cursor_to_right_pos(const uint8_t pos) noexcept { buffer.move_current_to_right_pos(pos); }
-
-            [[gnu::always_inline]]
-            inline void move_cursor_to_left_pos(const uint8_t pos) noexcept { buffer.move_current_to_left_pos(pos); }
 
             // Operators
             output& operator<<(const char) noexcept;
