@@ -63,23 +63,12 @@ namespace terminal
         }
 
         [[gnu::always_inline]]
-        inline volatile uint16_t* cell() noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE + get_position() * 2); }
+        inline volatile uint16_t* cell() noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE + (get_position() << 1)); }
 
         [[gnu::always_inline]]
-        inline void clear_row() noexcept
-        {
-            constexpr uint8_t t_width{vga_width >> 1};
-            constexpr uint16_t entry{make_entry(' ', default_color)};
-            constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
+        inline volatile uint32_t* cell_32() noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE + (get_position() << 1)); }
 
-            volatile uint32_t* ptr{reinterpret_cast<volatile uint32_t*>(cell())};
-            const volatile uint32_t* const end{ptr + t_width};
-            for(; ptr < end; ++ptr)
-            {
-                *ptr = entry_32;
-            }
-        }
-
+        void clear_row() noexcept;
         void reset() noexcept;
 
         public:

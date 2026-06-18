@@ -16,6 +16,12 @@ namespace cpu
         uint8_t simd_flags;
 
         static features detect() noexcept;
-        static const features* get() noexcept;
+
+        [[gnu::always_inline]]
+        inline static const features* get() noexcept
+        {
+            static features cached{detect()};
+            return &cached;
+        }
     };
 }
