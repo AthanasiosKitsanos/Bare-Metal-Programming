@@ -9,7 +9,7 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -msse2 -O3 -Wall -Wextra -fno-exceptions -fno-rtti
 LINKING_FLAGS = -ffreestanding -O3 -nostdlib
 
 SECTOR_SIZE = 512
@@ -62,7 +62,7 @@ clean:
 	rm -f obj/exception_stubs/*
 	rm -f obj/hardware_exceptions/*
 	rm -f obj/kernel/*
-	rm -f obj/terminal/*
+	rm -f obj/utilities/*
 	rm -f bin/*
 	rm -f elf/*
 	rm -f lib/*.a

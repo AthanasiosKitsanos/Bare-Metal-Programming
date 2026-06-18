@@ -6,9 +6,9 @@ namespace cpu
 {
     enum flags: uint8_t
     {
-        sse_2 = ( 1 << 0),
-        avx = ( 1 << 1),
-        avx_2 = ( 1 << 2)
+        sse_2 = 0,
+        avx = 1,
+        avx_2 = 2
     };
 
     struct features

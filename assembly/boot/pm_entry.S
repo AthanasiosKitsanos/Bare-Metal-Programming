@@ -28,6 +28,15 @@ pm_entry:
     jmp .init_bss
 
 .init_end:
+    movl %cr0, %eax
+    andl $0xFFFFFFFB, %eax
+    orl $0x00000002, %eax
+    movl %eax, %cr0
+
+    movl %cr4, %eax
+    orl $0x00000600, %eax
+    movl %eax, %cr4 
+
     movl %esp, %ebp
 
     call kernel_main
