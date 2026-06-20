@@ -4,24 +4,19 @@
 
 namespace cpu
 {
-    enum flags: uint8_t
-    {
-        sse_2 = 0,
-        avx = 1,
-        avx_2 = 2
-    };
+    typedef uint8_t simd_flag;
 
     struct features
     {
-        uint8_t simd_flags;
+        simd_flag ymm_flag;
 
         static features detect() noexcept;
 
         [[gnu::always_inline]]
-        inline static const features* get() noexcept
+        inline static features get() noexcept
         {
             static features cached{detect()};
-            return &cached;
+            return cached;
         }
     };
 }

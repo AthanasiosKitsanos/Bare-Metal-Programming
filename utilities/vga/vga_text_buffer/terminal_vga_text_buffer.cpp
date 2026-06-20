@@ -5,11 +5,6 @@
 
 namespace
 {
-    constexpr uint8_t use_sse2_count{16};
-    constexpr uint8_t use_avx_2_count{32};
-    constexpr uint8_t fallback_fill_count{4};
-
-    constexpr uint16_t b{(3840 >> 5)};
     [[gnu::always_inline]]
     inline void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
@@ -55,20 +50,66 @@ namespace
     {
         fill_fn entries[3];
 
-        constexpr fill_functions(): entries{}
-        {
-            entries[0] = fallback_fill;
-            entries[1] = use_sse_2;
-            entries[2] = use_avx_2;
-        }
+        constexpr fill_functions(): entries{fallback_fill, use_sse_2, use_avx_2}
+        {}
     };
     constexpr fill_functions g_dispatch{};
 
     [[gnu::always_inline]]
-    inline uint8_t get_index(const uint8_t has_sse2, const uint8_t has_avx) noexcept
+    inline volatile uint32_t* use_sse_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
-        return has_sse2 * (1 + has_avx);
+        count >>= 4;
+        const __m128i* source{reinterpret_cast<__m128i*>(const_cast<uint32_t*>(src))};
+        __m128i* destination{reinterpret_cast<__m128i*>(const_cast<uint32_t*>(dst))};
+        const __m128i* const end{source + count};
+        while(source < end)
+        {
+            _mm_store_si128(destination, _mm_load_si128(source));
+            ++destination;
+            ++source;
+        }
+        return reinterpret_cast<volatile uint32_t*>(destination);
     }
+
+    [[gnu::always_inline]]
+    inline volatile uint32_t* use_avx_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
+    {
+        count >>= 5;
+        const __m256i* source{reinterpret_cast<__m256i*>(const_cast<uint32_t*>(src))};
+        __m256i * destination{reinterpret_cast<__m256i*>(const_cast<uint32_t*>(dst))};
+        const __m256i* const end{source + count};
+        while(source < end)
+        {
+            _mm256_store_si256(destination, _mm256_load_si256(source));
+            ++source;
+            ++destination;
+        }
+        return reinterpret_cast<volatile uint32_t*>(destination);
+    }
+
+    [[gnu::always_inline]]
+    inline volatile uint32_t* fallback_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
+    {
+        count >>= 2;
+        const volatile uint32_t* const end{src + count};
+        while(src < end)
+        {
+            *dst = *src;
+            ++dst;
+            ++src;
+        }
+        return dst;
+    }
+
+    using fill_copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst, uint16_t count);
+    struct fill_copy_function
+    {
+        fill_copy_fn entries[3];
+
+        constexpr fill_copy_function(): entries{fallback_copy, use_sse_2_copy, use_avx_2_copy}
+        {}
+    };
+    constexpr fill_copy_function g_dispatch_cpy{};
 }
 
 namespace terminal
@@ -78,35 +119,23 @@ namespace terminal
 
     void vga_text_buffer::reset() noexcept
     {
-        constexpr uint16_t entry{make_entry(' ', default_color)};
-        constexpr uint32_t entry_32{(static_cast<uint32_t>(entry)) << 16 | entry};
-        constexpr uint16_t bytes{(vga_height - 1) * vga_width << 1};
+        constexpr uint16_t copy_bytes{(vga_height - 1) * vga_width << 1};
 
-        const cpu::features* f{cpu::features::get()};
-        const uint8_t idx{get_index((f->simd_flags >> cpu::sse_2) & 1, (f->simd_flags >> cpu::avx_2) & 1)};
+        const volatile uint32_t* source{begin_32() + ((base_row * vga_width) >> 1)};
+        constexpr uint16_t dst_width{vga_width >> 1};
+        volatile uint32_t* destination{begin_32() + dst_width};
 
-        constexpr uint8_t dest_width{vga_width >> 1};
-        volatile uint32_t* destination{begin_32() + dest_width};
-
-        // Need to find a way to use the g_fill_dispatch
-        constexpr uint16_t end{(length >> 1)};
-        const volatile uint32_t* buffer_end(begin_32() + end);
-
-        for(volatile uint32_t* source{begin_32() + (base_row * dest_width)}; source < buffer_end; ++source)
-        {
-            *destination = *source;
-            ++destination;
-        }
+        uint8_t idx{cpu::features::get().ymm_flag};
+        destination = g_dispatch_cpy.entries[idx](source, destination, copy_bytes);
 
         constexpr uint8_t vga_height_m1{vga_height - 1};
         base_row = 1;
         row = vga_height_m1;
 
-        buffer_end = destination + dest_width;
-        for(; destination < buffer_end; ++destination)
-        {
-            *destination = entry_32;
-        }
+        constexpr uint8_t remaining_bytes{vga_width << 1};
+        constexpr uint16_t entry{make_entry(' ', default_color)};
+        constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16 | entry)};
+        g_dispatch.entries[idx](destination, remaining_bytes, entry_32);
     }
 
     void vga_text_buffer::clear() noexcept
@@ -115,9 +144,7 @@ namespace terminal
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
         constexpr uint16_t bytes{length << 1};
 
-        const cpu::features* f{cpu::features::get()};
-        const uint8_t idx{get_index((f->simd_flags >> cpu::sse_2) & 1, (f->simd_flags >> cpu::avx_2) & 1)};
-        g_dispatch.entries[idx](begin_32(), bytes, entry_32);
+        g_dispatch.entries[cpu::features::get().ymm_flag](begin_32(), bytes, entry_32);
 
         base_row = 0;
         column = 0;
@@ -130,9 +157,7 @@ namespace terminal
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
         constexpr uint8_t bytes{vga_width << 1};
 
-        const cpu::features* f{cpu::features::get()};
-        const uint8_t idx{get_index((f->simd_flags >> cpu::sse_2) & 1, (f->simd_flags >> cpu::avx_2) & 1)};
-        g_dispatch.entries[idx](cell_32(), bytes, entry_32);
+        g_dispatch.entries[cpu::features::get().ymm_flag](cell_32(), bytes, entry_32);
     }
 
     void vga_text_buffer::put(char c) noexcept
@@ -175,5 +200,21 @@ namespace terminal
         bool row_at_end = (row == 0) * (column_at_end);
         base_row -= row_at_end;
         row = (row - column_at_end) + row_at_end * vga_height;
+    }
+
+    void vga_text_buffer::move_to_next_line() noexcept
+    {
+        column = 0;
+        ++row;
+        bool overflowed{(row == vga_height)};
+        base_row += overflowed;
+        row -= overflowed * vga_height;
+
+        if(overflowed)
+        {
+            if(base_row > vga_height) reset();
+            else clear_row();
+            vga_hardware_cursor::set_display_start(base_row * vga_width);
+        }
     }
 }

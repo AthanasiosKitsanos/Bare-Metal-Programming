@@ -84,7 +84,10 @@ namespace terminal
 
             // Inline Public Methods
             [[gnu::always_inline]]
-            inline void go_to_line_start() noexcept { column = 0;}
+            void move_to_next_line() noexcept;
+
+            [[gnu::always_inline]]
+            inline void line_start() noexcept { column = 0; }
 
             [[gnu::always_inline]]
             inline void set_color_code(color_code color) noexcept { active_color = color; }

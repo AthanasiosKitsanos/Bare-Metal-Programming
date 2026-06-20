@@ -36,6 +36,12 @@ namespace terminal
         void write_signed_64_no_sync(int64_t) noexcept;
         void write_pointer_no_sync(uintptr_t) noexcept;
 
+        [[gnu::always_inline]]
+        inline void sync_cursor() noexcept { vga_hardware_cursor::set_display_start(buffer.get_position()); }
+
+        [[gnu::always_inline]]
+        inline void line_start() noexcept { buffer.line_start(); }
+
         void write_hex_8_no_sync(uint8_t) noexcept;
         void write_hex_16_no_sync(uint16_t) noexcept;
         void write_hex_32_no_sync(uint32_t) noexcept;
@@ -108,7 +114,6 @@ namespace terminal
                 {
                     ++text;
                 }
-                text -= length;
                 write_string_no_sync(text);
                 sync_cursor();
                 return *this;

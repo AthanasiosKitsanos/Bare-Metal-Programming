@@ -3,11 +3,6 @@
 
 namespace cpu
 {
-    const features* features::get() noexcept
-    {
-        
-    }
-
     features features::detect() noexcept
     {
         features f{};
@@ -19,7 +14,6 @@ namespace cpu
             : "a"(1), "c"(0)
         );
         const uint8_t has_sse2{static_cast<uint8_t>(edx >> 26) & 1};
-        const uint8_t has_avx{static_cast<uint8_t>(ecx >> 28) & 1};
 
         asm volatile
         (
@@ -29,7 +23,7 @@ namespace cpu
         );
         const uint8_t has_avx2{static_cast<uint8_t>(ebx >> 5) & 1};
         
-        f.simd_flags |= ((has_sse2 << sse_2) | (has_avx << avx) | (has_avx2 << avx_2));
+        f.ymm_flag = (has_sse2 * (1 + has_avx2));
         return f;
     }
 }
