@@ -5,8 +5,7 @@
 
 namespace
 {
-    [[gnu::always_inline]]
-    inline void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 4;
         __m128i blank{_mm_set1_epi32(static_cast<int>(entry))};
@@ -19,8 +18,7 @@ namespace
         }
     }
 
-    [[gnu::always_inline]]
-    inline void use_avx_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    void use_avx_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 5;
         __m256i blank{_mm256_set1_epi32(static_cast<int>(entry))};
@@ -33,8 +31,7 @@ namespace
         }   
     }
 
-    [[gnu::always_inline]]
-    inline void fallback_fill(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    void fallback_fill(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 2;
         const volatile uint32_t* const end{dst + bytes};
@@ -55,8 +52,7 @@ namespace
     };
     constexpr fill_functions g_dispatch{};
 
-    [[gnu::always_inline]]
-    inline volatile uint32_t* use_sse_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
+    volatile uint32_t* use_sse_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 4;
         const __m128i* source{reinterpret_cast<__m128i*>(const_cast<uint32_t*>(src))};
@@ -71,8 +67,7 @@ namespace
         return reinterpret_cast<volatile uint32_t*>(destination);
     }
 
-    [[gnu::always_inline]]
-    inline volatile uint32_t* use_avx_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
+    volatile uint32_t* use_avx_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 5;
         const __m256i* source{reinterpret_cast<__m256i*>(const_cast<uint32_t*>(src))};
@@ -87,8 +82,7 @@ namespace
         return reinterpret_cast<volatile uint32_t*>(destination);
     }
 
-    [[gnu::always_inline]]
-    inline volatile uint32_t* fallback_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
+    volatile uint32_t* fallback_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 2;
         const volatile uint32_t* const end{src + count};
@@ -125,7 +119,7 @@ namespace terminal
         constexpr uint16_t dst_width{vga_width >> 1};
         volatile uint32_t* destination{begin_32() + dst_width};
 
-        uint8_t idx{cpu::features::get().ymm_flag};
+        uint8_t idx{cpu::features::get()};
         destination = g_dispatch_cpy.entries[idx](source, destination, copy_bytes);
 
         constexpr uint8_t vga_height_m1{vga_height - 1};
@@ -142,9 +136,8 @@ namespace terminal
     {
         constexpr uint16_t entry{make_entry(' ', default_color)};
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
-        constexpr uint16_t bytes{length << 1};
 
-        g_dispatch.entries[cpu::features::get().ymm_flag](begin_32(), bytes, entry_32);
+        g_dispatch.entries[cpu::features::get()](begin_32(), length, entry_32);
 
         base_row = 0;
         column = 0;
@@ -157,7 +150,7 @@ namespace terminal
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
         constexpr uint8_t bytes{vga_width << 1};
 
-        g_dispatch.entries[cpu::features::get().ymm_flag](cell_32(), bytes, entry_32);
+        g_dispatch.entries[cpu::features::get()](cell_32(), bytes, entry_32);
     }
 
     void vga_text_buffer::put(char c) noexcept

@@ -10,6 +10,7 @@
 #include "memory/e820/kernel_e820.h"
 #include "memory/pmm/kernel_pmm.h"
 #include "shell/shell.h"
+#include "utilities/cpu_features/cpu_features.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -21,6 +22,8 @@ const uintptr_t kernel_end = reinterpret_cast<uintptr_t>(&_kernel_end);
 
 extern "C" [[noreturn]] void kernel_main()
 {
+    cpu::features::init();
+    
     // Test pmm
     {
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};

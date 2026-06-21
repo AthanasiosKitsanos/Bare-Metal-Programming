@@ -6,17 +6,15 @@ namespace cpu
 {
     typedef uint8_t simd_flag;
 
-    struct features
+    class features
     {
-        simd_flag ymm_flag;
+        static simd_flag ymm_flag;
 
-        static features detect() noexcept;
+        public:
+            static void detect() noexcept;
+            static void init() noexcept;
 
-        [[gnu::always_inline]]
-        inline static features get() noexcept
-        {
-            static features cached{detect()};
-            return cached;
-        }
+            [[gnu::always_inline]]
+            inline static simd_flag get() noexcept { return  ymm_flag; }
     };
 }

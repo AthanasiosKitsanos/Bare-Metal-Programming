@@ -3,9 +3,10 @@
 
 namespace cpu
 {
-    features features::detect() noexcept
+    simd_flag features::ymm_flag{0};
+    
+    void features::detect() noexcept
     {
-        features f{};
         uint32_t eax, ebx, ecx, edx;
         asm volatile
         (
@@ -23,7 +24,11 @@ namespace cpu
         );
         const uint8_t has_avx2{static_cast<uint8_t>(ebx >> 5) & 1};
         
-        f.ymm_flag = (has_sse2 * (1 + has_avx2));
-        return f;
+        ymm_flag = (has_sse2 * (1 + has_avx2));
+    }
+
+    void features::init() noexcept
+    {
+        detect();
     }
 }

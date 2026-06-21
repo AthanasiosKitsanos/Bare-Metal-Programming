@@ -90,6 +90,9 @@ namespace terminal
             [[gnu::always_inline]]
             inline void print_string_no_sync(const char* string) noexcept { write_string_no_sync(string); }
 
+            [[gnu::always_inline]]
+            inline void call_cursor_sync() noexcept { sync_cursor(); }
+
             // Operators
             output& operator<<(const char) noexcept;
             output& operator<<(const char*) noexcept;
@@ -110,9 +113,9 @@ namespace terminal
             output& operator<<(const char (&text)[N]) noexcept
             {
                 size_t length{0};
-                for(; length < N && *curr != '\0'; ++length)
+                for(const char* curr; length < N && *curr != '\0'; ++length)
                 {
-                    ++text;
+                    
                 }
                 write_string_no_sync(text);
                 sync_cursor();

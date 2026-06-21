@@ -14,7 +14,6 @@ namespace terminal
     void output::new_line() noexcept
     {
         buffer.move_to_next_line();
-        if(buffer.at_buffer_end()) buffer.scroll();
     }
 
     void output::write_string_no_sync(const char* text) noexcept
@@ -38,7 +37,7 @@ namespace terminal
                 break;
             default:
                 buffer.put(c);
-                if(buffer.at_buffer_end()) buffer.scroll();
+                
         }
     }
 

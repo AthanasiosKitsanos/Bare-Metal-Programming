@@ -37,8 +37,23 @@ pm_entry:
     orl $0x00000600, %eax
     movl %eax, %cr4 
 
-    movl %esp, %ebp
+    movl $1, %eax
+    cpuid
+    andl $0x14000000, %ecx
+    cmpl $0x14000000, %ecx
+    jne .avx_done
 
+    movl %cr4, %eax
+    orl $0x00040000, %eax
+    movl %eax, %cr4
+
+    xorl %ecx, %ecx
+    xorl %edx, %edx
+    movl $0x7, %eax
+    xsetbv
+
+.avx_done:
+    movl %esp, %ebp
     call kernel_main
 
 hang:

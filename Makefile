@@ -9,7 +9,7 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -msse2 -mavx2 -O3 -Wall -Wextra -fno-exceptions -fno-rtti
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -msse2 -O3 -Wall -Wextra -fno-exceptions -fno-rtti
 LINKING_FLAGS = -ffreestanding -O3 -nostdlib
 
 SECTOR_SIZE = 512
@@ -53,7 +53,7 @@ $(MAIN_OBJ): $(MAIN_CPP)
 .PHONY: run clean
 
 run:
-	$(QEMU) -drive format=raw,file=$(OS_IMAGE) 
+	$(QEMU) -cpu Haswell -drive format=raw,file=$(OS_IMAGE)
 
 clean:
 	rm -f obj/apps/shell/*

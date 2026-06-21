@@ -112,12 +112,12 @@ namespace terminal
                 if(add_character(c))
                 {
                     *m_output << c;
-                    if(cursor != data_end)
-                    {
-                        m_output->print_string_no_sync(cursor);
-                        m_output->move_cursor_to_left_pos(data_end - cursor);
-                        m_output->call_cursor_sync();
-                    }
+                    // if(cursor != data_end)
+                    // {
+                    //     m_output->print_string_no_sync(cursor);
+                    //     m_output->move_cursor_to_left_pos(data_end - cursor);
+                    //     m_output->call_cursor_sync();
+                    // }
                 }
             }
             else if(driver::keyboard::is_control_input_candidate_event(&event))
@@ -133,7 +133,7 @@ namespace terminal
 
     void input::handle_escape() noexcept
     {
-        m_output->move_cursor_to_right_pos(data_end - cursor);
+        //m_output->move_cursor_to_right_pos(data_end - cursor);
         for(uint8_t steps{count()}; steps > 0; --steps)
         {
             m_output->delete_last_char_no_sync();
@@ -147,13 +147,13 @@ namespace terminal
         if(delete_character())
         {
             m_output->delete_last_char_no_sync();
-            if(cursor != data_end)
-            {
-                m_output->print_string_no_sync(cursor);
-                m_output->move_to_next_no_sync();
-                m_output->delete_last_char_no_sync();
-                m_output->move_cursor_to_left_pos(data_end - cursor);
-            }
+            // if(cursor != data_end)
+            // {
+            //     m_output->print_string_no_sync(cursor);
+            //     m_output->move_to_next_no_sync();
+            //     m_output->delete_last_char_no_sync();
+            //     m_output->move_cursor_to_left_pos(data_end - cursor);
+            // }
             m_output->call_cursor_sync();
         }
     }
@@ -164,12 +164,12 @@ namespace terminal
         if(add_string(spaces))
         {
             *m_output << spaces;
-            if(cursor != data_end)
-            {
-                m_output->print_string_no_sync(cursor);
-                m_output->move_cursor_to_left_pos(data_end - cursor);
-                m_output->call_cursor_sync();
-            }
+            // if(cursor != data_end)
+            // {
+            //     m_output->print_string_no_sync(cursor);
+            //     m_output->move_cursor_to_left_pos(data_end - cursor);
+            //     m_output->call_cursor_sync();
+            // }
         }
     }
     
@@ -201,7 +201,7 @@ namespace terminal
 
     void input::handle_home() noexcept
     {
-        m_output->move_cursor_to_left_pos(cursor - input_buffer);
+        // m_output->move_cursor_to_left_pos(cursor - input_buffer);
         cursor = input_buffer;
         m_output->call_cursor_sync();
     }
@@ -218,17 +218,19 @@ namespace terminal
 
     void input::handle_arrow_left() noexcept
     {
-        if(move_cursor_left()) m_output->move_to_previous();
+        if(move_cursor_left()) ;
+        // m_output->move_to_previous();
     }
 
     void input::handle_arrow_right() noexcept
     {
-        if(move_cursor_right()) m_output->move_to_next();
+        if(move_cursor_right());
+        // m_output->move_to_next();
     }
 
     void input::handle_end() noexcept
     {
-        m_output->move_cursor_to_right_pos(data_end - cursor);
+        // m_output->move_cursor_to_right_pos(data_end - cursor);
         cursor = data_end;
         m_output->call_cursor_sync();
     }
