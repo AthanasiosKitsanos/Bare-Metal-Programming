@@ -4,6 +4,7 @@
 .extern kernel_main
 .extern _bss_start
 .extern _bss_end
+.extern mm_flag
 
 .set DATA_SEG, 0x10
 
@@ -37,20 +38,47 @@ pm_entry:
     orl $0x00000600, %eax
     movl %eax, %cr4 
 
+.leaf_1:
     movl $1, %eax
     cpuid
+
+    andl $0x04000000, %edx
+    cmpl $0x04000000, %edx
+    jne .avx_done
+
+    shrl $26, %edx
+    pushl %edx
+    xorl %ebx, %ebx
     andl $0x14000000, %ecx
     cmpl $0x14000000, %ecx
-    jne .avx_done
+    jne .compute_mm_flag
 
     movl %cr4, %eax
     orl $0x00040000, %eax
     movl %eax, %cr4
 
+.leaf_7:
+    xorl %ecx, %ecx
+    movl $0x7, %eax
+
+    cpuid
+    andl $0x00000020, %ebx
+    cmpl $0x00000020, %ebx
+    jne .compute_mm_flag
+
     xorl %ecx, %ecx
     xorl %edx, %edx
     movl $0x7, %eax
     xsetbv
+
+.compute_mm_flag:
+    popl %edx
+
+    shrl $5, %ebx
+    addl $1, %ebx
+    imull %edx, %ebx
+    
+    movb %bl, mm_flag
 
 .avx_done:
     movl %esp, %ebp
