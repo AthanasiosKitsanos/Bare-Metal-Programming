@@ -15,9 +15,9 @@ CURSOR_H = utilities/vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h
 CURSOR_CPP = utilities/vga/vga_hardware_cursor/terminal_vga_hardware_cursor.cpp
 CURSOR_OBJ = obj/utilities/terminal_vga_hardware_cursor.o
 
-CPU_FEATURES_H = utilities/cpu_features/cpu_features.h
-CPU_FEATURES_CPP = utilities/cpu_features/cpu_features.cpp
-CPU_FEATURES_OBJ = obj/utilities//cpu_features.o
+CPU_FEATURES_H = utilities/cpu/features.h
+CPU_FEATURES_CPP = utilities/cpu/features.cpp
+CPU_FEATURES_OBJ = obj/utilities/cpu_features.o
 
 # Internals
 IO_H = utilities/internals/terminal_io_registers.h

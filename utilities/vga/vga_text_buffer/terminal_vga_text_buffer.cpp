@@ -5,6 +5,7 @@
 
 namespace
 {
+    [[gnu::target("sse2")]]
     void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 4;
@@ -18,6 +19,7 @@ namespace
         }
     }
 
+    [[gnu::target("avx2")]]
     void use_avx_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 5;
@@ -52,6 +54,7 @@ namespace
     };
     constexpr fill_functions g_dispatch{};
 
+    [[gnu::target("sse2")]]
     volatile uint32_t* use_sse_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 4;
@@ -67,6 +70,7 @@ namespace
         return reinterpret_cast<volatile uint32_t*>(destination);
     }
 
+    [[gnu::target("avx2")]]
     volatile uint32_t* use_avx_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 5;
