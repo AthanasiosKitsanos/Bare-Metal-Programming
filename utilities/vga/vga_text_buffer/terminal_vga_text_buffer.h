@@ -3,8 +3,6 @@
 #include <stdint.h>
 #include <stddef.h>
 
-#define _MM_MALLOC_H_INCLUDED
-
 using color_code = uint8_t;
 
 static_assert(sizeof(color_code) == 1, "color_code must be exactly 1 byte\n");

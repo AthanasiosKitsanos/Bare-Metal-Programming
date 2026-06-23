@@ -1,6 +1,6 @@
 #include "terminal_vga_text_buffer.h"
 #include "vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h"
-#include "cpu_features/cpu_features.h"
+#include "cpu/features.h"
 #include <immintrin.h>
 
 namespace
@@ -140,12 +140,15 @@ namespace terminal
     {
         constexpr uint16_t entry{make_entry(' ', default_color)};
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
+        constexpr uint16_t bytes{length};
 
-        g_dispatch.entries[cpu::features::get()](begin_32(), length, entry_32);
+        g_dispatch.entries[cpu::features::get()](begin_32(), bytes, entry_32);
 
         base_row = 0;
         column = 0;
         row = 0;
+
+        vga_hardware_cursor::set_display_start(0);
     }
 
     void vga_text_buffer::clear_row() noexcept
@@ -194,7 +197,7 @@ namespace terminal
         bool column_at_end{column == 0};
         column = (column - 1) + column_at_end * vga_width;
 
-        bool row_at_end = (row == 0) * (column_at_end);
+        bool row_at_end = (row == 0) & (column_at_end);
         base_row -= row_at_end;
         row = (row - column_at_end) + row_at_end * vga_height;
     }
