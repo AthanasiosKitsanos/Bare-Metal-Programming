@@ -53,7 +53,7 @@ $(MAIN_OBJ): $(MAIN_CPP)
 .PHONY: run clean
 
 run:
-	$(QEMU) -cpu Haswell -drive format=raw,file=$(OS_IMAGE)
+	$(QEMU) -cpu Haswell -accel whpx -drive format=raw,file=$(OS_IMAGE)
 
 clean:
 	rm -f obj/apps/shell/*
