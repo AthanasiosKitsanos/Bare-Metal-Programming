@@ -1,19 +1,19 @@
 #include "terminal_output.h"
 
+namespace
+{
+    constexpr static char table[] =  {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+
+    [[gnu::always_inline]]
+    inline static char hex_digit(uint8_t nibble) noexcept { return *(table + nibble); }
+}
+
 namespace terminal
 {
     // Private Methods
     void output::new_line() noexcept
     {
         buffer.move_to_next_line();
-        if(buffer.at_buffer_end()) buffer.scroll();
-    }
-
-    size_t output::string_length(const char* text) const noexcept
-    {
-        size_t length{0};
-        for(; *text != '\0'; ++text) ++length;
-        return length;
     }
 
     void output::write_string_no_sync(const char* text) noexcept
@@ -37,7 +37,7 @@ namespace terminal
                 break;
             default:
                 buffer.put(c);
-                if(buffer.at_buffer_end()) buffer.scroll();
+                
         }
     }
 
@@ -63,7 +63,7 @@ namespace terminal
             write_unsigned_8_no_sync(static_cast<uint8_t>(0) - static_cast<uint8_t>(value));
             return;
         }
-        write_unsigned_32_no_sync(static_cast<uint8_t>(value));
+        write_unsigned_8_no_sync(static_cast<uint8_t>(value));
     }
 
     void output::write_unsigned_8_no_sync(uint8_t value) noexcept
@@ -167,19 +167,14 @@ namespace terminal
             put_char_no_sync('0');
             return;
         }
-        bool started{false};
-        uint8_t nibble{0};
-        constexpr int initial_shift{sizeof(uint8_t) * 8 - 4};
-        int shift{initial_shift};
-        for(; shift >= 0; shift -= 4)
+
+        constexpr int total_nibbles_m1{sizeof(uint8_t) * 2 - 1};
+        const int leading_zeros{(__builtin_clz(value) - 24) >> 2};
+
+        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        for(int shift{starting_shift}; shift >= 0; shift -= 4)
         {
-            nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
-            if(!started)
-            {
-                if(nibble == 0) continue;
-                started = true;
-            }
-            put_char_no_sync(hex_digit(nibble));
+            put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
     }
 
@@ -191,87 +186,61 @@ namespace terminal
             put_char_no_sync('0');
             return;
         }
-        bool started{false};
-        uint8_t nibble{0};
-        constexpr int initial_shift{sizeof(uint16_t) * 8 - 4};
-        int shift{initial_shift};
-        for(; shift >= 0; shift -= 4)
+        
+        constexpr int total_nibbles_m1{sizeof(uint16_t) * 2 - 1};
+        const int leading_zeros{(__builtin_clz(value) - 16) >> 2};
+
+        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        for(int shift{starting_shift}; shift >= 0; shift -= 4)
         {
-            nibble = static_cast<uint16_t>((value >> shift) & 0x0F);
-            if(!started)
-            {
-                if(nibble == 0) continue;
-                started = true;
-            }
-            put_char_no_sync(hex_digit(nibble));
+            put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
     }
 
     void output::write_hex_32_no_sync(uint32_t value) noexcept
+    {
+        put_hex_prefix();
+        if(value == 0)
         {
-            put_hex_prefix();
-            if(value == 0)
-            {
-                put_char_no_sync('0');
-                return;
-            }
-            bool started{false};
-            uint8_t nibble{0};
-            constexpr int initial_shift{sizeof(uint32_t) * 8 - 4};
-            int shift{initial_shift};
-            for(; shift >= 0; shift -= 4)
-            {
-                nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
-                if(!started)
-                {
-                    if(nibble == 0) continue;
-                    started = true;
-                }
-                put_char_no_sync(hex_digit(nibble));
-            }
+            put_char_no_sync('0');
+            return;
         }
 
-        void output::write_hex_64_no_sync(uint64_t value) noexcept
+        constexpr int total_nibbles_m1{sizeof(uint32_t) * 2 - 1};
+        const int leading_zeros{__builtin_clz(value) >> 2};
+
+        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        for(int shift{starting_shift}; shift >= 0; shift -= 4)
         {
-            put_hex_prefix();
-            if(value == 0)
-            {
-                put_char_no_sync('0');
-                return;
-            }
-            bool started{false};
-            uint8_t nibble{0};
-            constexpr int initial_shift{sizeof(uint64_t) * 8 - 4};
-            int shift{initial_shift};
-            for(; shift >= 0; shift -= 4)
-            {
-                nibble = static_cast<uint8_t>((value >> shift) & 0x0F);
-                if(!started)
-                {
-                    if(nibble == 0) continue;
-                    started = true;
-                }
-                put_char_no_sync(hex_digit(nibble));
-            }
+            put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
+    }
+
+    void output::write_hex_64_no_sync(uint64_t value) noexcept
+    {
+        put_hex_prefix();
+        if(value == 0)
+        {
+            put_char_no_sync('0');
+            return;
+        }
+
+        constexpr int total_nibbles_m1{sizeof(uint64_t) * 2 - 1};
+        const int leading_zeros{__builtin_clzll(value) >> 2};
+
+        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        for(int shift{starting_shift}; shift >= 0; shift -= 4)
+        {
+            put_char_no_sync(hex_digit((value >> shift) & 0x0F));
+        }
+    }
 
     // Public Methods
     void output::initialize() noexcept
     {
         buffer.clear();
-        cursor.enable();
+        vga_hardware_cursor::enable();
         sync_cursor();
-    }
-
-    void output::write(const char* data, size_t size) noexcept
-    {
-        const char* const end_of_data{data + size};
-        for(; data < end_of_data; ++data) put_char_no_sync(*data);
-    }
-
-    void output::write_string(const char* text) noexcept
-    {
-        write(text, string_length(text));
     }
 
     // Operators

@@ -1,4 +1,11 @@
 #pragma once
 
-#define COMMAND_MAPPING \
-    X(0, "clear", clear)
+#define COMMAND_LIST    \
+    X(0, "clear")   \
+    X(1, "exit")    \
+    X(2, "peek")
+
+#define COMMAND_FUNCTIONS    \
+    X(0, clear) \
+    X(1, exit)    \
+    X(2, peek)

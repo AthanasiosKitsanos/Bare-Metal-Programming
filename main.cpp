@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include "io/output/terminal_output.h"
+#include "io/input/terminal_input.h"
 #include "logger/kernel_logger.h"
 #include "exceptions/kernel_exceptions.h"
 #include "timer/kernel_timer.h"
@@ -8,6 +9,8 @@
 #include "internal/kernel_interrupt_guard.h"
 #include "memory/e820/kernel_e820.h"
 #include "memory/pmm/kernel_pmm.h"
+#include "shell/shell.h"
+#include "utilities/cpu/features.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -27,6 +30,7 @@ extern "C" [[noreturn]] void kernel_main()
 
     terminal::output console{};
     kernel::logger logger{&console};
+    terminal::input in{&console};
     console.initialize();
 
     kernel::set_exception_logger(&logger);
@@ -44,36 +48,22 @@ extern "C" [[noreturn]] void kernel_main()
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
+
+    console << "Size of vga_buffer: " << sizeof(terminal::vga_text_buffer)
+    << "\nSize of vga_cursor: " << sizeof(terminal::vga_hardware_cursor)
+    << "\nSize of terminal::output: " << sizeof(terminal::output)
+    << "\nSize of Terminal::input: " << sizeof(terminal::input)
+    << "\nSize of Shell: " << sizeof(app::shell)
+    << "\nSize of shell_hot: " << sizeof(app::hot)
+    << "\nSize of shell_cold: " << sizeof(app::cold)
+    << "\nSize of keyboard_event: " << sizeof(driver::keyboard::keyboard_event)
+    << "\nmm flag: " << cpu::features::get();
     
-
-    console << "Used frames: " << kernel::memory::pmm_used_frames() << '\n';
-
-    {
-        uintptr_t allocated_address{0};
-        if(kernel::memory::pmm_allocate_frame(&allocated_address) == kernel::memory::pmm_result::failed)
-        {
-            console << "No available memory to allocate\n";
-        }
-        console << "Used frames: " << kernel::memory::pmm_used_frames() << '\n';
-
-        kernel::memory::pmm_result result{kernel::memory::pmm_free_frame(allocated_address)};
-
-        using m_result = kernel::memory::pmm_result;
-        switch(result)
-        {
-            case m_result::hb_deny: case m_result::lb_deny:
-                console << "Address " << terminal::hex << allocated_address << " can not be freed. [Out of Bounds]\n" << terminal::dec;
-                break;
-            case m_result::failed:
-                console << "Address " << terminal::hex << allocated_address << " is already free\n" << terminal::dec;
-                break;
-            default:
-                break;
-        }
-        console << "Used frames: " << kernel::memory::pmm_used_frames() << '\n';
-    }
+    // app::shell shell{&console};
     
     asm volatile("sti");
+
+    // shell.run();
 
     for(;;)
     {

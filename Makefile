@@ -24,7 +24,7 @@ include mk_files/kernel/decl.mk
 include mk_files/links/decl.mk
 include mk_files/utilities/decl.mk
 
-#------------------------------ Include MK Librarys ---------------------------------
+#------------------------------ Include MK Libraries ---------------------------------
 include mk_files/lib/decl.mk
 
 # -----------------------Kenrel Main-------------------------------
@@ -47,13 +47,13 @@ include mk_files/lib/rules.mk
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 $(MAIN_OBJ): $(MAIN_CPP)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_DRIVERS_FOLDER) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER) -c $(MAIN_CPP) -o $(MAIN_OBJ)
+	$(CC) $(COMPILE_FLAGS) $(INCLUDE_DRIVERS_FOLDER) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER) $(INCLUDE_APP_FOLDER) -c $(MAIN_CPP) -o $(MAIN_OBJ)
 
 # Rest
 .PHONY: run clean
 
 run:
-	$(QEMU) -drive format=raw,file=$(OS_IMAGE) 
+	$(QEMU) -cpu Haswell -accel whpx -drive format=raw,file=$(OS_IMAGE)
 
 clean:
 	rm -f obj/apps/shell/*
@@ -62,7 +62,7 @@ clean:
 	rm -f obj/exception_stubs/*
 	rm -f obj/hardware_exceptions/*
 	rm -f obj/kernel/*
-	rm -f obj/terminal/*
+	rm -f obj/utilities/*
 	rm -f bin/*
 	rm -f elf/*
 	rm -f lib/*.a
