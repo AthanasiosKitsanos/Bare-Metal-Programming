@@ -10,6 +10,7 @@
 #include "memory/e820/kernel_e820.h"
 #include "memory/pmm/kernel_pmm.h"
 #include "shell/shell.h"
+#include "utilities/cpu/features.h"
 
 constexpr uint32_t timer_frequency_hz{100};
 
@@ -55,7 +56,8 @@ extern "C" [[noreturn]] void kernel_main()
     << "\nSize of Shell: " << sizeof(app::shell)
     << "\nSize of shell_hot: " << sizeof(app::hot)
     << "\nSize of shell_cold: " << sizeof(app::cold)
-    << "\nSize of keyboard_event: " << sizeof(driver::keyboard::keyboard_event);
+    << "\nSize of keyboard_event: " << sizeof(driver::keyboard::keyboard_event)
+    << "\nmm flag: " << cpu::features::get();
     
     // app::shell shell{&console};
     
