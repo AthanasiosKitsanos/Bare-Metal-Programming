@@ -43,12 +43,12 @@ pm_entry:
     cpuid
 
     andl $0x04000000, %edx
-    cmpl $0x04000000, %edx
-    jne .avx_done
+    jz .avx_done
 
     shrl $26, %edx
     pushl %edx
     xorl %ebx, %ebx
+
     andl $0x14000000, %ecx
     cmpl $0x14000000, %ecx
     jne .compute_mm_flag
@@ -63,8 +63,7 @@ pm_entry:
 
     cpuid
     andl $0x00000020, %ebx
-    cmpl $0x00000020, %ebx
-    jne .compute_mm_flag
+    jz .compute_mm_flag
 
     xorl %ecx, %ecx
     xorl %edx, %edx
