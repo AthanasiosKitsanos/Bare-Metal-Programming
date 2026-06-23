@@ -37,7 +37,7 @@ namespace terminal
         void write_pointer_no_sync(uintptr_t) noexcept;
 
         [[gnu::always_inline]]
-        inline void sync_cursor() noexcept { vga_hardware_cursor::set_display_start(buffer.get_position()); }
+        inline void sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.get_position()); }
 
         [[gnu::always_inline]]
         inline void line_start() noexcept { buffer.line_start(); }
@@ -112,11 +112,6 @@ namespace terminal
             template<size_t N>
             output& operator<<(const char (&text)[N]) noexcept
             {
-                size_t length{0};
-                for(const char* curr; length < N && *curr != '\0'; ++length)
-                {
-                    
-                }
                 write_string_no_sync(text);
                 sync_cursor();
                 return *this;
