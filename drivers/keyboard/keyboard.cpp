@@ -155,26 +155,6 @@ namespace
         {}
     };
     keyboard_event_queue g_keyboard_event_queue{};
-    static_assert(sizeof(keyboard_event_queue) == (sizeof(uint64_t) * keyboard_event_queue_size + sizeof(uint64_t) * 8));
-    static_assert(alignof(keyboard_event_queue) == 64);
-
-    [[gnu::always_inline]]
-    inline void set_bit(uint64_t* bitmap_type, const uint8_t index) noexcept
-    {
-        *bitmap_type |= (1ULL << index);
-    }
-
-    [[gnu::always_inline]]
-    inline void clear_bit(uint64_t* bitmap_type, const uint8_t index) noexcept
-    {
-        *bitmap_type &= ~(1ULL << index);
-    }
-
-    [[gnu::always_inline]]
-    inline bool get_bit(const uint64_t* bitmap_type, const uint8_t index) noexcept
-    {
-        return (*bitmap_type & (1ULL << index)) != 0;
-    }
 
     [[gnu::always_inline]]
     inline uint8_t next_keyboard_event(const uint8_t index) noexcept
@@ -185,6 +165,7 @@ namespace
     [[gnu::always_inline]]
     inline void commit_keyboard_event() noexcept
     {
+        if(g_keyboard_event_queue.count >= keyboard_event_queue_size) return;
         g_keyboard_event_queue.tail = next_keyboard_event(g_keyboard_event_queue.tail);
         ++g_keyboard_event_queue.count;
     }
@@ -314,6 +295,7 @@ namespace driver::keyboard
         g_keyboard_event_queue.entries[g_keyboard_event_queue.tail].key = key;
         g_keyboard_event_queue.entries[g_keyboard_event_queue.tail].key_code = key_code;
         g_keyboard_event_queue.entries[g_keyboard_event_queue.tail].state = state;
+        g_keyboard_event_queue.entries[g_keyboard_event_queue.tail].extended = extended;
         g_keyboard_event_queue.entries[g_keyboard_event_queue.tail].modifiers = g_modifier_state;
         commit_keyboard_event();
     }
@@ -327,6 +309,7 @@ namespace driver::keyboard
     bool poll_keyboard_event(keyboard_event* out_event) noexcept
     {
         kernel::interrupt_guard guard{};
+        if(g_keyboard_event_queue.count == 0) return false;
         out_event->key_code = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].key_code;
         out_event->key = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].key;
         out_event->state = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].state;

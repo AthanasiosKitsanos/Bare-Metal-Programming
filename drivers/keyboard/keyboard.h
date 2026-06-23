@@ -14,15 +14,6 @@ namespace driver
 
 namespace driver::keyboard
 {
-    // shift, caps, ctrl etc
-    typedef uint8_t modifier_state;
-
-    // pressed or released
-    typedef uint64_t state_bitmap;
-
-    // if it is extended key ie 
-    typedef uint64_t extended_bitmap;
-
     enum class key_state: uint8_t
     {
         released,
@@ -127,6 +118,7 @@ namespace driver::keyboard
         caps_lock_on = (1 << 7)
     };
 
+    typedef uint8_t modifier_state;
     struct alignas(8) keyboard_event
     {
         keyboard_key key;

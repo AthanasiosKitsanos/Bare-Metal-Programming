@@ -50,7 +50,7 @@ namespace kernel
 
     void send_eoi(uint8_t vector) noexcept
     {
-        if(vector > 39) terminal::outb(slave_command, eoi_command);
+        if(vector > 7) terminal::outb(slave_command, eoi_command);
         terminal::outb(master_command, eoi_command);
     }
 
