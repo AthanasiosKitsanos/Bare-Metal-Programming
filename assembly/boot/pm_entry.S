@@ -57,18 +57,24 @@ pm_entry:
     orl $0x00040000, %eax
     movl %eax, %cr4
 
-.leaf_7:
-    xorl %ecx, %ecx
-    movl $0x7, %eax
+// .leaf_7:
+//     xorl %ecx, %ecx
+//     movl $0x7, %eax
 
-    cpuid
-    andl $0x00000020, %ebx
-    jz .compute_mm_flag
+//     cpuid
+//     andl $0x00000020, %ebx
+//     jz .compute_mm_flag
 
-    xorl %ecx, %ecx
-    xorl %edx, %edx
-    movl $0x7, %eax
-    xsetbv
+//     xorl %ecx, %ecx
+//     xorl %edx, %edx
+//     movl $0x7, %eax
+//     xsetbv
+
+//     xorl %ecx, %ecx
+//     xgetbv
+//     andl  $0x04, %eax
+//     jnz .compute_mm_flag
+//     xorl %ebx, %ebx
 
 .compute_mm_flag:
     popl %edx

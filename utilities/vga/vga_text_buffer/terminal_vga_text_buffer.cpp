@@ -220,7 +220,18 @@ namespace terminal
 
     void vga_text_buffer::move_cursor_left_n(const uint8_t count) noexcept
     {
-        int16_t abs_pos{static_cast<int16_t>(row) * vga_width + column - count};
+        int16_t abs_pos{static_cast<int16_t>(row * vga_width + column - count)};
+        const uint8_t new_row{static_cast<uint8_t>(abs_pos / vga_width)};
+        const uint8_t new_column{static_cast<uint8_t>(abs_pos - new_row * vga_width)};
+
+        base_row -= static_cast<uint8_t>(row - new_row);
+        row = new_row;
+        column = new_column;
+    }
+
+    void vga_text_buffer::move_cursor_right_n(const uint8_t count) noexcept
+    {
+        int16_t abs_pos{static_cast<int16_t>(row * vga_width + column + count)};
         const uint8_t new_row{static_cast<uint8_t>(abs_pos / vga_width)};
         const uint8_t new_column{static_cast<uint8_t>(abs_pos - new_row * vga_width)};
 

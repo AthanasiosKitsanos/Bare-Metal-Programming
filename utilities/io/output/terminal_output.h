@@ -71,6 +71,9 @@ namespace terminal
             [[gnu::always_inline]]
             inline void move_cursor_left_n(const uint8_t count) noexcept { buffer.move_cursor_left_n(count); }
             
+            [[gnu::always_inline]]
+            inline void move_cursor_right_n(const uint8_t count) noexcept { buffer.move_cursor_right_n(count); }
+
             // Inline Public Methods
             [[gnu::always_inline]]
             inline void reset_color() noexcept { set_color_code(buffer.get_default_color_code()); }
@@ -101,6 +104,9 @@ namespace terminal
 
             [[gnu::always_inline]]
             inline void go_forward() noexcept { buffer.move_forward(); }
+
+            [[gnu::always_inline]]
+            inline void print_char_no_sync(char c) noexcept { put_char_no_sync(c); }
 
             [[gnu::always_inline]]
             inline void clear() noexcept { buffer.clear(); }

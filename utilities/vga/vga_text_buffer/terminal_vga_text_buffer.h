@@ -82,6 +82,7 @@ namespace terminal
             void move_forward() noexcept;
             void move_backwards() noexcept;
             void move_cursor_left_n(const uint8_t) noexcept;
+            void move_cursor_right_n(const uint8_t) noexcept;
 
             // Inline Public Methods
             void move_to_next_line() noexcept;

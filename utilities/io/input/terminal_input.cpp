@@ -108,7 +108,7 @@ namespace terminal
                     if(cursor != data_end)
                     {
                         m_output->print_string_no_sync(cursor);
-                        m_output->move_cursor_left_n(data_end - cursor);
+                        m_output->move_cursor_left_n(static_cast<uint8_t>(data_end - cursor));
                         m_output->call_cursor_sync();
                     }
                 }
@@ -126,7 +126,7 @@ namespace terminal
 
     void input::handle_escape() noexcept
     {
-        //m_output->move_cursor_to_right_pos(data_end - cursor);
+        m_output->move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
         for(uint8_t steps{count()}; steps > 0; --steps)
         {
             m_output->delete_last_char_no_sync();
@@ -143,8 +143,8 @@ namespace terminal
             if(cursor != data_end)
             {
                 m_output->print_string_no_sync(cursor);
-                m_output->delete_last_char_no_sync();
-                m_output->move_cursor_left_n(data_end - cursor);
+                m_output->print_char_no_sync(' ');
+                m_output->move_cursor_left_n(static_cast<uint8_t>(data_end - cursor) + 1);
             }
             m_output->call_cursor_sync();
         }
@@ -159,7 +159,7 @@ namespace terminal
             if(cursor != data_end)
             {
                 m_output->print_string_no_sync(cursor);
-                m_output->move_cursor_left_n(data_end - cursor);
+                m_output->move_cursor_left_n(static_cast<uint8_t>(data_end - cursor));
                 m_output->call_cursor_sync();
             }
         }
@@ -193,7 +193,7 @@ namespace terminal
 
     void input::handle_home() noexcept
     {
-        // m_output->move_cursor_to_left_pos(cursor - input_buffer);
+        m_output->move_cursor_left_n(static_cast<uint8_t>(cursor - input_buffer));
         cursor = input_buffer;
         m_output->call_cursor_sync();
     }
@@ -211,16 +211,18 @@ namespace terminal
     void input::handle_arrow_left() noexcept
     {
         if(move_cursor_left()) m_output->go_backwards();
+        m_output->call_cursor_sync();
     }
 
     void input::handle_arrow_right() noexcept
     {
         if(move_cursor_right()) m_output->go_forward();
+        m_output->call_cursor_sync();
     }
 
     void input::handle_end() noexcept
     {
-        // m_output->move_cursor_to_right_pos(data_end - cursor);
+        m_output->move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
         cursor = data_end;
         m_output->call_cursor_sync();
     }
