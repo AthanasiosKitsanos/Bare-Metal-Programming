@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 #include "io/output/terminal_output.h"
 #include "io/input/terminal_input.h"
