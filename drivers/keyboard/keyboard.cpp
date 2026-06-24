@@ -165,7 +165,6 @@ namespace
     [[gnu::always_inline]]
     inline void commit_keyboard_event() noexcept
     {
-        if(g_keyboard_event_queue.count >= keyboard_event_queue_size) return;
         g_keyboard_event_queue.tail = next_keyboard_event(g_keyboard_event_queue.tail);
         ++g_keyboard_event_queue.count;
     }
@@ -285,6 +284,8 @@ namespace driver::keyboard
             return;
         }
 
+        if(g_keyboard_event_queue.count >= keyboard_event_queue_size) return;
+
         const bool extended{g_extended_pending};
         const uint8_t key_code{static_cast<uint8_t>(scancode & key_code_mask)};
         const keyboard_key key{map_scancode_set_1_key(key_code, extended)};
@@ -310,11 +311,7 @@ namespace driver::keyboard
     {
         kernel::interrupt_guard guard{};
         if(g_keyboard_event_queue.count == 0) return false;
-        out_event->key_code = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].key_code;
-        out_event->key = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].key;
-        out_event->state = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].state;
-        out_event->extended = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].extended;
-        out_event->modifiers = g_keyboard_event_queue.entries[g_keyboard_event_queue.head].modifiers;
+        *out_event = g_keyboard_event_queue.entries[g_keyboard_event_queue.head];
         g_keyboard_event_queue.head = next_keyboard_event(g_keyboard_event_queue.head);
         --g_keyboard_event_queue.count;
         return true;

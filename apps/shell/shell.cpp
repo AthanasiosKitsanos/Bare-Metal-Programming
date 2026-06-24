@@ -59,7 +59,7 @@ namespace
 
 namespace app
 {
-    shell::shell(terminal::output* out) noexcept: shell_hot{terminal::input{out}, 1}, shell_cold{out}
+    shell::shell(terminal::output* out) noexcept: m_input{out}, m_output{out}, m_is_running{true} 
     {}
 
     int8_t shell::command_exists() const noexcept
@@ -71,7 +71,7 @@ namespace app
         while(left < right)
         {
             mid = left + (right - left) / 2;
-            result = str_compare(shell_hot.m_input.read_buffer(), g_command_list.entries[mid]);
+            result = str_compare(m_input.read_buffer(), g_command_list.entries[mid]);
             if(result == 0) return mid;
             else if (result > 0) left = mid + 1;
             else right = mid;
@@ -87,31 +87,31 @@ namespace app
             g_command_functions.entries[index](this);
             return;
         }
-        *shell_cold.m_output << "Command not found\n";
+        *m_output << "Command not found\n";
     }
 
     void shell::run() noexcept
     {
-        while(shell_hot.m_is_running == 1)
+        while(m_is_running == 1)
         {
-            *shell_cold.m_output << "my_OS:> ";
-            shell_hot.m_input.start();
+            *m_output << "my_OS:> ";
+            m_input.start();
             execute_command();
-            shell_hot.m_input.reset();
+            m_input.reset();
         }
     }
 
     void shell::clear() noexcept
     {
-        shell_hot.m_input.reset();
-        shell_cold.m_output->clear();
+        m_input.reset();
+        m_output->clear();
     }
 
     void shell::exit() noexcept
     {
-        shell_hot.m_is_running = 0;
-        *shell_cold.m_output << "Program terminated\n";
+        m_is_running = 0;
+        *m_output << "Program terminated\n";
     }
 
-    void shell::peek() noexcept { *shell_cold.m_output << "There is nothing to peek!\n"; }
+    void shell::peek() noexcept { *m_output << "There is nothing to peek!\n"; }
 }

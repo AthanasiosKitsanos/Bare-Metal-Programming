@@ -4,20 +4,11 @@
 namespace
 {
     constexpr size_t total_entries{256};
-    static kernel::idt_entry idt_entry_table[total_entries]; // 0 - 255
+    kernel::idt_entry idt_entry_table[total_entries]; // 0 - 255
 }
 
 namespace kernel
 {
-    void initialize_idt() noexcept
-    {
-        const idt_entry* const end{idt_entry_table + total_entries};
-        for(idt_entry* curr{idt_entry_table}; curr < end; ++curr)
-        {
-            *curr = idt_entry{};
-        }
-    }
-
     void set_interrupt_gate(uint8_t vector, uint32_t handler_address, uint16_t selector, uint8_t type_attributes) noexcept
     {
         idt_entry* const entry{idt_entry_table + vector};

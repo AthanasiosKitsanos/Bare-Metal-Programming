@@ -1,10 +1,8 @@
 #include <stdint.h>
 #include "kernel_timer.h"
 #include "logger/kernel_logger.h"
-#include "assert/kernel_assert.h"
 #include "internal/kernel_interrupt_frame.h"
-
-// #define KERNEL_DEBUG
+#include "internal/kernel_interrupt_guard.h"
 
 namespace
 {
@@ -24,13 +22,6 @@ namespace kernel
     {
         static_cast<void>(frame);
         ++g_timer_ticks;
-        #ifdef KERNEL_DEBUG
-            if(g_timer_logger && g_timer_frequency != 0 && g_timer_ticks % g_timer_frequency == 0)
-            {
-                g_timer_logger->info() << "Timer ticks: " << g_timer_ticks
-                << "\nUptime: " << uptime_seconds() << "s\n";
-            }
-        #endif
     }
 
     void set_timer_frequency(uint32_t frequency) noexcept { g_timer_frequency = frequency; }
@@ -46,8 +37,11 @@ namespace kernel
 
     void sleep_ticks(uint32_t ticks) noexcept
     {
+        constexpr uint32_t interrupt_flag{1u << 9};
         const uint32_t start{g_timer_ticks};
-        while((g_timer_ticks - start) < ticks) asm volatile("hlt");
+        bool was_enabled{kernel::read_eflags() & interrupt_flag};
+        while((g_timer_ticks - start) < ticks) asm volatile("sti; hlt");
+        if(!was_enabled) asm volatile("cli");
     }
 
     void sleep_ms(uint32_t ms) noexcept

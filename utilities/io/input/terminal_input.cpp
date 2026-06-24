@@ -25,14 +25,6 @@ namespace
         for(; *string != '\0'; ++string) ++length;
         return length;
     }
-
-    [[gnu::always_inline]]
-    inline uint8_t get_control_map_index(const driver::keyboard::keyboard_key key) noexcept
-    {
-        constexpr uint8_t index_mask{0x03};
-        return static_cast<uint8_t>((static_cast<uint16_t>(key) - 1) & index_mask);
-    }
-
 }
 
 namespace terminal
@@ -62,6 +54,7 @@ namespace terminal
         {
             move_data_right(data_end, cursor + length - 1, length);   
         }
+        *data_end = '\0';
         for(; *string != '\0'; ++string)
         {
             *cursor = *string;
@@ -90,11 +83,11 @@ namespace terminal
     void input::trim_end() noexcept
     {
         if(data_end == input_buffer) return;
-        while(*(data_end - 1) == ' ') --data_end;
+        while(data_end > input_buffer && *(data_end - 1) == ' ') --data_end;
         *data_end = '\0';
     }
 
-    void input::start_data_recieving() noexcept
+    void input::start_data_receiving() noexcept
     {
         driver::keyboard::keyboard_event event{};
         char c{'\0'};
@@ -112,12 +105,12 @@ namespace terminal
                 if(add_character(c))
                 {
                     *m_output << c;
-                    // if(cursor != data_end)
-                    // {
-                    //     m_output->print_string_no_sync(cursor);
-                    //     m_output->move_cursor_to_left_pos(data_end - cursor);
-                    //     m_output->call_cursor_sync();
-                    // }
+                    if(cursor != data_end)
+                    {
+                        m_output->print_string_no_sync(cursor);
+                        m_output->move_cursor_left_n(data_end - cursor);
+                        m_output->call_cursor_sync();
+                    }
                 }
             }
             else if(driver::keyboard::is_control_input_candidate_event(&event))
@@ -147,13 +140,12 @@ namespace terminal
         if(delete_character())
         {
             m_output->delete_last_char_no_sync();
-            // if(cursor != data_end)
-            // {
-            //     m_output->print_string_no_sync(cursor);
-            //     m_output->move_to_next_no_sync();
-            //     m_output->delete_last_char_no_sync();
-            //     m_output->move_cursor_to_left_pos(data_end - cursor);
-            // }
+            if(cursor != data_end)
+            {
+                m_output->print_string_no_sync(cursor);
+                m_output->delete_last_char_no_sync();
+                m_output->move_cursor_left_n(data_end - cursor);
+            }
             m_output->call_cursor_sync();
         }
     }
@@ -164,12 +156,12 @@ namespace terminal
         if(add_string(spaces))
         {
             *m_output << spaces;
-            // if(cursor != data_end)
-            // {
-            //     m_output->print_string_no_sync(cursor);
-            //     m_output->move_cursor_to_left_pos(data_end - cursor);
-            //     m_output->call_cursor_sync();
-            // }
+            if(cursor != data_end)
+            {
+                m_output->print_string_no_sync(cursor);
+                m_output->move_cursor_left_n(data_end - cursor);
+                m_output->call_cursor_sync();
+            }
         }
     }
     
@@ -218,14 +210,12 @@ namespace terminal
 
     void input::handle_arrow_left() noexcept
     {
-        if(move_cursor_left()) ;
-        // m_output->move_to_previous();
+        if(move_cursor_left()) m_output->go_backwards();
     }
 
     void input::handle_arrow_right() noexcept
     {
-        if(move_cursor_right());
-        // m_output->move_to_next();
+        if(move_cursor_right()) m_output->go_forward();
     }
 
     void input::handle_end() noexcept

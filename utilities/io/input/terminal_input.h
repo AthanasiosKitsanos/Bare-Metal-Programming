@@ -15,7 +15,6 @@ namespace terminal
     class input
     {
         static constexpr uint8_t input_capacity{128};
-        struct 
         output* const m_output;
         char* cursor;
         char* data_end;
@@ -29,7 +28,7 @@ namespace terminal
         inline bool buffer_begin() const noexcept { return cursor == input_buffer; }
 
         [[gnu::always_inline]]
-        inline bool buffer_empty() const noexcept { return (data_end - input_buffer) == 0; }
+        inline bool buffer_empty() const noexcept { return data_end == input_buffer; }
 
         bool add_character(const char c) noexcept;
 
@@ -57,7 +56,7 @@ namespace terminal
 
         void trim_end() noexcept;
 
-        void start_data_recieving() noexcept;
+        void start_data_receiving() noexcept;
 
         void handle_escape() noexcept;
         void handle_backspace() noexcept;
@@ -79,7 +78,7 @@ namespace terminal
             explicit input(output* out) noexcept;
 
             [[gnu::always_inline]]
-            inline void start() noexcept { start_data_recieving(); }
+            inline void start() noexcept { start_data_receiving(); }
 
             [[gnu::always_inline]]
             inline void reset() noexcept { reset_buffer(); }

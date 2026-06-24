@@ -67,6 +67,9 @@ namespace terminal
 
             // Public methods
             void initialize() noexcept;
+
+            [[gnu::always_inline]]
+            inline void move_cursor_left_n(const uint8_t count) noexcept { buffer.move_cursor_left_n(count); }
             
             // Inline Public Methods
             [[gnu::always_inline]]
@@ -92,6 +95,15 @@ namespace terminal
 
             [[gnu::always_inline]]
             inline void call_cursor_sync() noexcept { sync_cursor(); }
+
+            [[gnu::always_inline]]
+            inline void go_backwards() noexcept { buffer.move_backwards(); }
+
+            [[gnu::always_inline]]
+            inline void go_forward() noexcept { buffer.move_forward(); }
+
+            [[gnu::always_inline]]
+            inline void clear() noexcept { buffer.clear(); }
 
             // Operators
             output& operator<<(const char) noexcept;
