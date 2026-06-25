@@ -45,6 +45,11 @@ MEMORY_PMM_H = kernel/memory/pmm/kernel_pmm.h
 MEMORY_PMM_CPP = kernel/memory/pmm/kernel_pmm.cpp
 MEMORY_PMM_OBJ = obj/kernel/kernel_pmm.o
 
+# Heap
+MEMORY_HEAP_H = kernel/memory/heap/kernel_heap.h
+MEMORY_HEAP_CPP = kernel/memory/heap/kernel_heap.cpp
+MEMORY_HEAP_OBJ = obj/kernel/kernel_heap.o
+
 #--------------------------------Kernel Internal-------------------------------------
 KERNEL_INTERRUPT_GUARD_H = kernel/internal/kernel_interrupt_guard.h
 

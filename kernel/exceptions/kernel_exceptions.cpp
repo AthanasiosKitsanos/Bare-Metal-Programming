@@ -15,7 +15,6 @@ namespace
     constexpr uint16_t interrupt_vector_count{256};
     constexpr uint16_t kernel_code_selector{0x08};
     constexpr uint8_t interrupt_gate_attributes{0x8E};
-    constexpr uint8_t cpu_exception_count{32};
     constexpr uint8_t irq_base{32};
     constexpr uint8_t irq_max{47};
 
@@ -80,8 +79,7 @@ namespace
         {
             #define X(vector, name, title, mnemonic)    \
                 case vector:    \
-                    handle_exception(title, mnemonic, frame);   \
-                    break;
+                    handle_exception(title, mnemonic, frame);
             CPU_INTERRUPT_LIST
             #undef X
 
@@ -134,7 +132,7 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 {
     uint32_t vector{frame->vector};
     g_interrupt_handlers.entries[vector](frame);
-    if(vector >=irq_base && vector <= irq_max) kernel::send_eoi(static_cast<uint8_t>(vector - irq_base));
+    if(vector >= irq_base && vector <= irq_max) kernel::send_eoi(static_cast<uint8_t>(vector - irq_base));
 }
 
 namespace kernel
@@ -143,8 +141,6 @@ namespace kernel
 
     void initialize_exceptions() noexcept
     {
-        initialize_idt();
-
         constexpr uint8_t master_offset{32};
         constexpr uint8_t slave_offset{40};
         pic_remap(master_offset, slave_offset);
@@ -155,7 +151,7 @@ namespace kernel
         CPU_INTERRUPT_LIST
         #undef X
 
-        #define X(vector, name_scace, name, title, mnemonic)    \
+        #define X(vector, name_space, name, title, mnemonic)    \
             install_exception(name##_desc);
 
         HARDWARE_INTERRUPT_LIST

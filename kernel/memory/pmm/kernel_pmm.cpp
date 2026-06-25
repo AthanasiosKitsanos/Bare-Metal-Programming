@@ -11,10 +11,10 @@ namespace
 
     struct bitmap
     {
-        bit_n_byte lower_limit;
         uint8_t* start{nullptr};
         const uint8_t* search_begin{nullptr};
         const uint8_t* end{nullptr};
+        bit_n_byte lower_limit;
     };
 
     size_t g_used_frames{0};
@@ -83,12 +83,12 @@ namespace kernel::memory
 
     void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
     {
-        const e820_entry* const end{map->entries + map->count};
+        const e820_entry* const entry_end{map->entries + map->count};
         {
             uintptr_t highest_address{0};
             uintptr_t current{0};
             {
-                for(const e820_entry* start{map->entries}; start < end; ++start)
+                for(const e820_entry* start{map->entries}; start < entry_end; ++start)
                 {
                     current = max(start);
                     if(highest_address < current) highest_address = current;
@@ -111,7 +111,7 @@ namespace kernel::memory
         g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
         g_bitmap.lower_limit = pair;
 
-        for(const e820_entry* current{map->entries}; current < end; ++current)
+        for(const e820_entry* current{map->entries}; current < entry_end; ++current)
         {
             if(current->type == e820_memory_type::usable)
             {
@@ -149,6 +149,7 @@ namespace kernel::memory
                     {
                         set_frame_used(&pair);
                         *address = frame_address((pair.byte_index << bit_size_byte_mask) + pair.bit_index);
+                        g_bitmap.search_begin = current + (*current == 0xFF);
                         return pmm_result::success;
                     }
                     ++pair.bit_index;

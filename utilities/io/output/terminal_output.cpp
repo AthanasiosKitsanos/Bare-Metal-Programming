@@ -2,10 +2,10 @@
 
 namespace
 {
-    constexpr static char table[] =  {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
+    constexpr char table[] =  {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'};
 
     [[gnu::always_inline]]
-    inline static char hex_digit(uint8_t nibble) noexcept { return *(table + nibble); }
+    inline char hex_digit(uint8_t nibble) noexcept { return *(table + nibble); }
 }
 
 namespace terminal
@@ -22,22 +22,6 @@ namespace terminal
         {
             put_char_no_sync(c);
             ++text;
-        }
-    }
-
-    void output::put_char_no_sync(char c) noexcept
-    {
-        switch(c)
-        {
-            case '\r':
-                line_start();
-                break;
-            case '\n':
-                new_line();
-                break;
-            default:
-                buffer.put(c);
-                
         }
     }
 
@@ -60,25 +44,10 @@ namespace terminal
         if(value < 0)
         {
             put_char_no_sync('-');
-            write_unsigned_8_no_sync(static_cast<uint8_t>(0) - static_cast<uint8_t>(value));
+            write_unsigned_no_sync(static_cast<uint8_t>(0) - static_cast<uint8_t>(value));
             return;
         }
-        write_unsigned_8_no_sync(static_cast<uint8_t>(value));
-    }
-
-    void output::write_unsigned_8_no_sync(uint8_t value) noexcept
-    {
-        constexpr uint8_t count{3};
-        char digits[count];
-        char* end{digits + count};
-        char* current{end};
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
+        write_unsigned_no_sync(static_cast<uint8_t>(value));
     }
 
     void output::write_signed_16_no_sync(int16_t value) noexcept
@@ -86,25 +55,10 @@ namespace terminal
         if(value < 0)
         {
             put_char_no_sync('-');
-            write_unsigned_16_no_sync(static_cast<uint16_t>(0) - static_cast<uint16_t>(value));
+            write_unsigned_no_sync(static_cast<uint16_t>(0) - static_cast<uint16_t>(value));
             return;
         }
-        write_unsigned_16_no_sync(static_cast<uint16_t>(value));
-    }
-
-    void output::write_unsigned_16_no_sync(uint16_t value) noexcept
-    {
-        constexpr uint16_t count{5};
-        char digits[count];
-        char* end{digits + count};
-        char* current{end};
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
+        write_unsigned_no_sync(static_cast<uint16_t>(value));
     }
 
     void output::write_signed_32_no_sync(int32_t value) noexcept
@@ -112,25 +66,10 @@ namespace terminal
         if(value < 0)
         {
             put_char_no_sync('-');
-            write_unsigned_32_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
+            write_unsigned_no_sync(static_cast<uint32_t>(0) - static_cast<uint32_t>(value));
             return;
         }
-        write_unsigned_32_no_sync(static_cast<uint32_t>(value));
-    }
-
-    void output::write_unsigned_32_no_sync(uint32_t value) noexcept
-    {
-        constexpr uint16_t count{10};
-        char digits[count];
-        char* end{digits + count};
-        char* current{end};
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
+        write_unsigned_no_sync(static_cast<uint32_t>(value));
     }
 
     void output::write_signed_64_no_sync(int64_t value) noexcept
@@ -138,25 +77,10 @@ namespace terminal
         if(value < 0)
         {
             put_char_no_sync('-');
-            write_unsigned_64_no_sync(static_cast<uint64_t>(0) - static_cast<uint64_t>(value));
+            write_unsigned_no_sync(static_cast<uint64_t>(0) - static_cast<uint64_t>(value));
             return;
         }
-        write_unsigned_64_no_sync(static_cast<uint64_t>(value));
-    }
-
-    void output::write_unsigned_64_no_sync(uint64_t value) noexcept
-    {
-        constexpr uint16_t count{20};
-        char digits[count];
-        char* end{digits + count};
-        char* current{end};
-        do
-        {
-            --current;
-            *current = static_cast<char>('0' + (value % 10));
-            value /= 10;
-        }while(value != 0);
-        for(; current < end; ++current) put_char_no_sync(*current);
+        write_unsigned_no_sync(static_cast<uint64_t>(value));
     }
 
     void output::write_hex_8_no_sync(uint8_t value) noexcept
@@ -177,7 +101,7 @@ namespace terminal
             put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
     }
-
+    
     void output::write_hex_16_no_sync(uint16_t value) noexcept
     {
         put_hex_prefix();
@@ -263,7 +187,7 @@ namespace terminal
         switch(state)
         {
             case integer_base::dec:
-                write_unsigned_8_no_sync(value);
+                write_unsigned_no_sync(value);
                 break;
             case integer_base::hex:
                 write_hex_8_no_sync(value);
@@ -299,7 +223,7 @@ namespace terminal
         switch(state)
         {
             case integer_base::dec:
-                write_unsigned_16_no_sync(value);
+                write_unsigned_no_sync(value);
                 break;
             case integer_base::hex:
                 write_hex_16_no_sync(value);
@@ -335,7 +259,7 @@ namespace terminal
         switch(state)
         {
             case integer_base::dec:
-                write_unsigned_32_no_sync(value);
+                write_unsigned_no_sync(value);
                 break;
             case integer_base::hex:
                 write_hex_32_no_sync(value);
@@ -371,7 +295,7 @@ namespace terminal
         switch(state)
         {
             case integer_base::dec:
-                write_unsigned_64_no_sync(value);
+                write_unsigned_no_sync(value);
                 break;
             case integer_base::hex:
                 write_hex_64_no_sync(value);
