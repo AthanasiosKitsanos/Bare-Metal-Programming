@@ -23,18 +23,52 @@ namespace terminal
 
         // Private Methods
         void new_line() noexcept;
-        void put_char_no_sync(char) noexcept;
         void write_string_no_sync(const char*) noexcept;
 
-        void write_unsigned_8_no_sync(uint8_t) noexcept;
         void write_signed_8_no_sync(int8_t) noexcept;
         void write_signed_16_no_sync(int16_t) noexcept;
-        void write_unsigned_16_no_sync(uint16_t) noexcept;
-        void write_unsigned_32_no_sync(uint32_t) noexcept;
         void write_signed_32_no_sync(int32_t) noexcept;
-        void write_unsigned_64_no_sync(uint64_t) noexcept;
         void write_signed_64_no_sync(int64_t) noexcept;
         void write_pointer_no_sync(uintptr_t) noexcept;
+
+        template<typename T>
+        void write_unsigned_no_sync(T value) noexcept
+        {
+            constexpr uint8_t max_digits
+            {
+                sizeof(T) == 1 ? 3 :
+                sizeof(T) == 2 ? 5 :
+                sizeof(T) == 4 ? 10 : 20
+            };
+
+            char digits[max_digits];
+            char* const end{digits + max_digits};
+            char* current{end};
+            do
+            {
+                --current;
+                *current = static_cast<char>('0' + (value - (value / 10) * 10));
+                value /= 10;
+            }while(value != 0);
+            for(; current < end; ++current) put_char_no_sync(*current);
+        }
+
+        [[gnu::always_inline]]
+        inline void put_char_no_sync(const char c) noexcept
+        {
+            switch(c)
+            {
+                case '\r':
+                    line_start();
+                    break;
+                case '\n':
+                    new_line();
+                    break;
+                default:
+                    buffer.put(c);
+                    
+            }
+        }
 
         [[gnu::always_inline]]
         inline void sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.get_position()); }
@@ -142,7 +176,7 @@ namespace terminal
                 switch(state)
                 {
                     case integer_base::dec:
-                        for(const uint8_t* curr{value}; curr < end; ++curr) write_unsigned_8_no_sync(*curr);
+                        for(const uint8_t* curr{value}; curr < end; ++curr) write_unsigned_no_sync(*curr);
                         break;
                     case integer_base::hex:
                         for(const uint8_t* curr{value}; curr < end; ++curr) write_hex_8_no_sync(*curr);
@@ -189,7 +223,7 @@ namespace terminal
                 switch(state)
                 {
                     case integer_base::dec:
-                        for(const uint16_t* curr{value}; curr < end; ++curr) write_unsigned_16_no_sync(*curr);
+                        for(const uint16_t* curr{value}; curr < end; ++curr) write_unsigned_no_sync(*curr);
                         break;
                     case integer_base::hex:
                         for(const uint16_t* curr{value}; curr < end; ++curr) write_hex_16_no_sync(*curr);
@@ -236,7 +270,7 @@ namespace terminal
                 switch(state)
                 {
                     case integer_base::dec:
-                        for(const uint32_t* curr{value}; curr < end; ++curr) write_unsigned_32_no_sync(*curr);
+                        for(const uint32_t* curr{value}; curr < end; ++curr) write_unsigned_no_sync(*curr);
                         break;
                     case integer_base::hex:
                         for(const uint32_t* curr{value}; curr < end; ++curr) write_hex_32_no_sync(*curr);
@@ -283,7 +317,7 @@ namespace terminal
                 switch(state)
                 {
                     case integer_base::dec:
-                        for(const uint64_t* curr{value}; curr < end; ++curr) write_unsigned_64_no_sync(*curr);
+                        for(const uint64_t* curr{value}; curr < end; ++curr) write_unsigned_no_sync(*curr);
                         break;
                     case integer_base::hex:
                         for(const uint64_t* curr{value}; curr < end; ++curr) write_hex_64_no_sync(*curr);

@@ -2,6 +2,7 @@
 #include "io/output/terminal_output.h"
 #include "internal/shell_commands_list.h"
 #include <stdint.h>
+#include "cpu/features.h"
 
 namespace
 {
@@ -17,7 +18,7 @@ namespace
         return static_cast<int8_t>(c) - static_cast<int8_t>(o); 
     }
 
-    constexpr uint8_t command_list_size{3};
+    constexpr uint8_t command_list_size{4};
     struct command_list
     {
         const char* entries[command_list_size];
@@ -40,6 +41,9 @@ namespace
     
     [[gnu::always_inline]]
     inline void execute_peek(app::shell* shell) noexcept { shell->peek(); }
+
+    [[gnu::always_inline]]
+    inline void execute_flag(app::shell* shell) noexcept { shell->flag(); }
 
     using command_list_functions = void(*)(app::shell*) noexcept;
     struct command_functions
@@ -111,6 +115,11 @@ namespace app
     {
         m_is_running = 0;
         *m_output << "Program terminated\n";
+    }
+
+    void shell::flag() noexcept
+    {
+        *m_output << "mm_flag: " << cpu::features::get() << '\n';
     }
 
     void shell::peek() noexcept { *m_output << "There is nothing to peek!\n"; }

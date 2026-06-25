@@ -26,5 +26,6 @@ namespace app
             void clear() noexcept;
             void exit() noexcept;
             void peek() noexcept;
+            void flag() noexcept;
     };
 }
