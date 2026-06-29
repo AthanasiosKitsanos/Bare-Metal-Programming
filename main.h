@@ -13,3 +13,4 @@
 #include "memory/pmm/kernel_pmm.h"
 #include "shell/shell.h"
 #include "utilities/cpu/features.h"
+#include "memory/heap/kernel_heap.h"

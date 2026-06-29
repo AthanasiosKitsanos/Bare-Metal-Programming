@@ -173,10 +173,8 @@ namespace kernel::memory
         if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
         set_frame_free(&bitmap_frame_pos);
 
-        if((g_bitmap.start + bitmap_frame_pos.byte_index) < g_bitmap.search_begin)
-        {
-            g_bitmap.search_begin = (g_bitmap.start + bitmap_frame_pos.byte_index);
-        }
+        g_bitmap.search_begin = (g_bitmap.start + bitmap_frame_pos.byte_index * ((g_bitmap.start + bitmap_frame_pos.byte_index) < g_bitmap.search_begin));
+        
         return pmm_result::success;
     }
 }
