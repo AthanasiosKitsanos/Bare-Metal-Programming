@@ -34,17 +34,20 @@ extern "C" [[noreturn]] void kernel_main()
     {
         logger.warning() << "Failed to synchronize keyboard\n";
     }
-
-    // console << "Size of vga_buffer: " << sizeof(terminal::vga_text_buffer)
-    // << "\nSize of vga_cursor: " << sizeof(terminal::vga_hardware_cursor)
-    // << "\nSize of terminal::output: " << sizeof(terminal::output)
-    // << "\nSize of Terminal::input: " << sizeof(terminal::input)
-    // << "\nSize of Shell: " << sizeof(app::shell)
-    // << "\nSize of shell_hot: " << sizeof(app::hot)
-    // << "\nSize of shell_cold: " << sizeof(app::cold)
-    // << "\nSize of keyboard_event: " << sizeof(driver::keyboard::keyboard_event)
-    // << "\nmm flag: " << cpu::features::get();
     
+    uintptr_t heap_start{0};
+    kernel::memory::pmm_allocate_frame(&heap_start);
+    kernel::memory::heap_initialize(reinterpret_cast<void*>(heap_start), kernel::memory::frame_size);
+
+    void* a{kernel::memory::kmalloc(32)};
+    void* b{kernel::memory::kmalloc(64)};
+    logger.info() << a << '\n';
+    logger.info() << b << '\n';
+    
+    kernel::memory::kfree(a);
+    void* c{kernel::memory::kmalloc(16)};
+    logger.info() << c << '\n';
+
     app::shell shell{&console};
     
     asm volatile("sti");

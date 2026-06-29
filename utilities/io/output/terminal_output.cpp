@@ -28,14 +28,13 @@ namespace terminal
     void output::write_pointer_no_sync(uintptr_t value) noexcept
     {
         put_hex_prefix();
-        constexpr size_t total_nibbles{sizeof(uintptr_t) * 2};
-        size_t shift{0};
-        uint8_t nibble{0};
-        for(size_t i{0}; i < total_nibbles; ++i)
+        constexpr size_t total_nibbles_m1{sizeof(uintptr_t) * 2 - 1};
+        const int leading_zeros{__builtin_clz(value) >> 2};
+
+        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        for(int shift{starting_shift}; shift >= 0; shift -= 4)
         {
-            shift = (total_nibbles - 1 - i) * 4;
-            nibble = static_cast<uint8_t>((value >> shift) & static_cast<uintptr_t>(0x0F));
-            put_char_no_sync(hex_digit(nibble));
+            put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
     }
 
