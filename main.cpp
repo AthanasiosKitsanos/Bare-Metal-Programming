@@ -39,14 +39,18 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::memory::pmm_allocate_frame(&heap_start);
     kernel::memory::heap_initialize(reinterpret_cast<void*>(heap_start), kernel::memory::frame_size);
 
-    void* a{kernel::memory::kmalloc(32)};
-    void* b{kernel::memory::kmalloc(64)};
-    logger.info() << a << '\n';
-    logger.info() << b << '\n';
-    
-    kernel::memory::kfree(a);
-    void* c{kernel::memory::kmalloc(16)};
-    logger.info() << c << '\n';
+    using namespace kernel::memory;
+
+    void* x{kmalloc(64)};
+    void* y{kmalloc(64)};
+
+    logger.info() << "x: " << x << '\n';
+    logger.info() << "y: " << y << '\n';
+
+    kfree(y);
+    kfree(x);
+    void* z{kmalloc(140)};
+    logger.info() << "z: " << z << '\n';
 
     app::shell shell{&console};
     

@@ -31,7 +31,7 @@ namespace terminal
         constexpr size_t total_nibbles_m1{sizeof(uintptr_t) * 2 - 1};
         const int leading_zeros{__builtin_clz(value) >> 2};
 
-        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        const int starting_shift{(static_cast<int>(total_nibbles_m1) - leading_zeros) * 4};
         for(int shift{starting_shift}; shift >= 0; shift -= 4)
         {
             put_char_no_sync(hex_digit((value >> shift) & 0x0F));
