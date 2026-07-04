@@ -73,6 +73,18 @@ namespace
         *(g_bitmap.start + pair->byte_index) &= ~(1 << pair->bit_index);
         --g_used_frames;
     }
+
+    [[gnu::always_inline]]
+    inline uint8_t leading_zeros(const uint8_t value) noexcept
+    {
+        return static_cast<uint8_t>(__builtin_clz(static_cast<unsigned int>(value) << 24));
+    }
+
+    [[gnu::always_inline]]
+    inline uint8_t trailing_zeros(const uint8_t value) noexcept
+    {
+        return static_cast<uint8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
+    }
 }
 
 namespace kernel::memory
@@ -159,6 +171,33 @@ namespace kernel::memory
         return pmm_result::failed;
     }
 
+    pmm_result pmm_find_contiguous_free_frames(const size_t frames, uintptr_t* const address) noexcept
+    {
+        const uint8_t* current{g_bitmap.search_begin};
+        size_t run_length{0};
+        bit_n_byte run_start_index{};
+
+        uint8_t current_value{0};
+        current_value = *current;
+        bool is_first_run{run_length == 0};
+        if(current_value == 0x00)
+        {
+            run_start_index.byte_index = (run_start_index.byte_index * !is_first_run) + (static_cast<size_t>((current - g_bitmap.start) * is_first_run));
+            run_start_index.bit_index *= !is_first_run;
+            run_length += 8;
+
+            if(run_length >= frames)
+            {
+
+            }
+        }
+        
+        run_length = 0;
+
+
+        return pmm_result::failed;
+    }
+
     pmm_result pmm_free_frame(const uintptr_t address) noexcept
     {
         size_t index{frame_index(address)};
@@ -173,7 +212,8 @@ namespace kernel::memory
         if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
         set_frame_free(&bitmap_frame_pos);
 
-        g_bitmap.search_begin = (g_bitmap.start + bitmap_frame_pos.byte_index * ((g_bitmap.start + bitmap_frame_pos.byte_index) < g_bitmap.search_begin));
+        const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
+        g_bitmap.search_begin -= ((g_bitmap.search_begin - addr) * (addr < g_bitmap.search_begin));
         
         return pmm_result::success;
     }
