@@ -7,6 +7,12 @@ namespace
     {
         size_t byte_index;
         uint8_t bit_index;
+
+        [[gnu::always_inline]]
+        inline bool operator<(const bit_n_byte& other) const noexcept
+        {
+            return byte_index < other.byte_index || (byte_index == other.byte_index && bit_index < other.bit_index);
+        }
     };
 
     struct bitmap
@@ -85,6 +91,8 @@ namespace
     {
         return static_cast<uint8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
     }
+
+    // TODO create LUT, use the current_value in the pmm_find_contiguous_free_frames as an index
 }
 
 namespace kernel::memory
@@ -191,8 +199,15 @@ namespace kernel::memory
 
             }
         }
+        else if(current_value == 0xFF)
+        {
+            run_length = 0;
+        }
+        else
+        {
+            // TODO this will continue after we create a lookup table
+        }
         
-        run_length = 0;
 
 
         return pmm_result::failed;
@@ -206,8 +221,7 @@ namespace kernel::memory
 
         const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
 
-        if(bitmap_frame_pos.byte_index < g_bitmap.lower_limit.byte_index) return pmm_result::lb_deny;
-        if(bitmap_frame_pos.byte_index == g_bitmap.lower_limit.byte_index && bitmap_frame_pos.bit_index < g_bitmap.lower_limit.bit_index) return pmm_result::lb_deny;
+        if(bitmap_frame_pos < g_bitmap.lower_limit) return pmm_result::lb_deny;
 
         if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
         set_frame_free(&bitmap_frame_pos);
