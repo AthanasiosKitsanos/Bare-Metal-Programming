@@ -259,8 +259,8 @@ namespace kernel::memory
             }
             else
             {
-                // TODO this will continue after we create a lookup table
                 run_start_index.bit_index = (find_buried_run_packed(current_value) >> 4);
+                // TODO this will continue after we create a lookup table
             }
         }
 

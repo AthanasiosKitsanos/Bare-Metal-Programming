@@ -27,5 +27,6 @@ namespace app
             void exit() noexcept;
             void peek() noexcept;
             void flag() noexcept;
+            void ticks() noexcept;
     };
 }
