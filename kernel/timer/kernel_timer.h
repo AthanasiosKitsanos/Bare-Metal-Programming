@@ -6,8 +6,6 @@ namespace kernel
 {
     class logger;
     class interrupt_frame;
-
-    void set_timer_logger(logger* log) noexcept;
     
     void set_timer_frequency(uint32_t frequency) noexcept;
     uint32_t timer_frequency() noexcept;

@@ -71,7 +71,7 @@ namespace terminal
         }
 
         [[gnu::always_inline]]
-        inline void sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.get_position()); }
+        inline static void sync_cursor() noexcept { vga_hardware_cursor::set_position(buffer.get_position()); }
 
         [[gnu::always_inline]]
         inline void line_start() noexcept { buffer.line_start(); }
@@ -97,7 +97,7 @@ namespace terminal
         
         public:
             // Constructor
-            output() noexcept = default;
+            constexpr output() noexcept = default;
 
             // Public methods
             static void initialize() noexcept;

@@ -9,7 +9,7 @@ namespace kernel
 
 namespace driver
 {
-    bool initialize_keyboard() noexcept;
+    void initialize_keyboard() noexcept;
 }
 
 namespace driver::keyboard

@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "io/output/terminal_output.h"
 
 namespace driver::keyboard
 {
@@ -10,15 +11,13 @@ namespace driver::keyboard
 
 namespace terminal
 {
-    class output;
-
     class input
     {
         static constexpr uint8_t input_capacity{128};
-        output* const m_output;
         char* cursor;
         char* data_end;
         char input_buffer[input_capacity + 1];
+        output m_output;
         bool input_ready;
 
         [[gnu::always_inline]]
@@ -75,7 +74,9 @@ namespace terminal
         void navigation_key_dispatch(const driver::keyboard::keyboard_key key) noexcept;
 
         public:
-            explicit input(output* out) noexcept;
+            input() noexcept;
+            input(const input&) = delete;
+            input& operator=(const input&) = delete;
 
             [[gnu::always_inline]]
             inline void start() noexcept { start_data_receiving(); }

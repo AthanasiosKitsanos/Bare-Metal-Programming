@@ -8,16 +8,12 @@ namespace
 {
     constexpr uint32_t milliseconds_per_second{1000};
 
-    kernel::logger* g_timer_logger{nullptr};
-
     volatile uint32_t g_timer_ticks{0};
     uint32_t g_timer_frequency{0};
 }
 
 namespace kernel
 {
-    void set_timer_logger(logger* log) noexcept { g_timer_logger = log; }
-
     void handle_timer_interrupt(interrupt_frame* frame) noexcept
     {
         static_cast<void>(frame);

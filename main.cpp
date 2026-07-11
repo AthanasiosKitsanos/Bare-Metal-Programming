@@ -16,43 +16,18 @@ extern "C" [[noreturn]] void kernel_main()
     }
 
     terminal::output::initialize();
-    terminal::output console{};
-    kernel::logger logger{&console};
-
-    kernel::set_exception_logger(&logger);
     kernel::initialize_exceptions();
 
-    kernel::set_timer_logger(&logger);
-
-    if(!kernel::initialize_pit(timer_frequency_hz))
-    {
-        logger.panic("Failed to initialize PIT");
-    }
+    kernel::initialize_pit(timer_frequency_hz);
     kernel::set_timer_frequency(timer_frequency_hz);
 
-    if(!driver::initialize_keyboard())
-    {
-        logger.warning() << "Failed to synchronize keyboard\n";
-    }
+    driver::initialize_keyboard();
     
     uintptr_t heap_start{0};
     kernel::memory::pmm_allocate_frame(&heap_start);
     kernel::memory::heap_initialize(reinterpret_cast<void*>(heap_start), kernel::memory::frame_size);
 
-    using namespace kernel::memory;
-
-    void* x{kmalloc(64)};
-    void* y{kmalloc(64)};
-
-    logger.info() << "x: " << x << '\n';
-    logger.info() << "y: " << y << '\n';
-
-    kfree(y);
-    kfree(x);
-    void* z{kmalloc(140)};
-    logger.info() << "z: " << z << '\n';
-
-    app::shell shell{&console};
+    app::shell shell{};
     
     asm volatile("sti");
 
