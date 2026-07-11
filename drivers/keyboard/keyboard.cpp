@@ -238,13 +238,16 @@ namespace
 
 namespace driver
 {
-    bool initialize_keyboard() noexcept
+    void initialize_keyboard() noexcept
     {
         g_modifier_state = 0;
         flush_keyboard_output_buffer();
-        if(!send_keyboard_byte_and_wait_ack(set_leds_command)) return false;
-        if(!send_keyboard_byte_and_wait_ack(all_leds_off)) return false;
-        return true;
+        if(!send_keyboard_byte_and_wait_ack(set_leds_command) || !send_keyboard_byte_and_wait_ack(all_leds_off))
+        {
+            kernel::logger log;
+            log.warning() << "Failed to initialize Keyboard\n";
+            return;
+        }
     }
 }
 

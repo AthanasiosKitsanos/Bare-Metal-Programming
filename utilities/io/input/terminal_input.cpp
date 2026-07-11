@@ -29,7 +29,7 @@ namespace
 
 namespace terminal
 {
-    input::input(output* out) noexcept: m_output{out}, cursor{input_buffer}, data_end{input_buffer}, input_buffer{}, input_ready{false} 
+    input::input() noexcept: cursor{input_buffer}, data_end{input_buffer}, input_buffer{}, m_output{}, input_ready{false} 
     {}
 
     bool input::add_character(const char c) noexcept
@@ -104,12 +104,12 @@ namespace terminal
             {
                 if(add_character(c))
                 {
-                    *m_output << c;
+                    m_output << c;
                     if(cursor != data_end)
                     {
-                        m_output->print_string_no_sync(cursor);
-                        m_output->move_cursor_left_n(static_cast<uint8_t>(data_end - cursor));
-                        m_output->call_cursor_sync();
+                        m_output.print_string_no_sync(cursor);
+                        m_output.move_cursor_left_n(static_cast<uint8_t>(data_end - cursor));
+                        m_output.call_cursor_sync();
                     }
                 }
             }
@@ -126,12 +126,12 @@ namespace terminal
 
     void input::handle_escape() noexcept
     {
-        m_output->move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
+        m_output.move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
         for(uint8_t steps{count()}; steps > 0; --steps)
         {
-            m_output->delete_last_char_no_sync();
+            m_output.delete_last_char_no_sync();
         }
-        m_output->call_cursor_sync();
+        m_output.call_cursor_sync();
         reset_buffer();
     }
     
@@ -139,14 +139,14 @@ namespace terminal
     {
         if(delete_character())
         {
-            m_output->delete_last_char_no_sync();
+            m_output.delete_last_char_no_sync();
             if(cursor != data_end)
             {
-                m_output->print_string_no_sync(cursor);
-                m_output->print_char_no_sync(' ');
-                m_output->move_cursor_left_n(static_cast<uint8_t>(data_end - cursor) + 1);
+                m_output.print_string_no_sync(cursor);
+                m_output.print_char_no_sync(' ');
+                m_output.move_cursor_left_n(static_cast<uint8_t>(data_end - cursor) + 1);
             }
-            m_output->call_cursor_sync();
+            m_output.call_cursor_sync();
         }
     }
     
@@ -155,12 +155,12 @@ namespace terminal
         constexpr const char* spaces{"    "};
         if(add_string(spaces))
         {
-            *m_output << spaces;
+            m_output << spaces;
             if(cursor != data_end)
             {
-                m_output->print_string_no_sync(cursor);
-                m_output->move_cursor_left_n(static_cast<uint8_t>(data_end - cursor));
-                m_output->call_cursor_sync();
+                m_output.print_string_no_sync(cursor);
+                m_output.move_cursor_left_n(static_cast<uint8_t>(data_end - cursor));
+                m_output.call_cursor_sync();
             }
         }
     }
@@ -171,7 +171,7 @@ namespace terminal
         {
             trim_end();
         }
-        *m_output << '\n';
+        m_output << '\n';
         input_ready = true;
     }
     
@@ -193,9 +193,9 @@ namespace terminal
 
     void input::handle_home() noexcept
     {
-        m_output->move_cursor_left_n(static_cast<uint8_t>(cursor - input_buffer));
+        m_output.move_cursor_left_n(static_cast<uint8_t>(cursor - input_buffer));
         cursor = input_buffer;
-        m_output->call_cursor_sync();
+        m_output.call_cursor_sync();
     }
 
     void input::handle_arrow_up() noexcept
@@ -210,21 +210,21 @@ namespace terminal
 
     void input::handle_arrow_left() noexcept
     {
-        if(move_cursor_left()) m_output->go_backwards();
-        m_output->call_cursor_sync();
+        if(move_cursor_left()) m_output.go_backwards();
+        m_output.call_cursor_sync();
     }
 
     void input::handle_arrow_right() noexcept
     {
-        if(move_cursor_right()) m_output->go_forward();
-        m_output->call_cursor_sync();
+        if(move_cursor_right()) m_output.go_forward();
+        m_output.call_cursor_sync();
     }
 
     void input::handle_end() noexcept
     {
-        m_output->move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
+        m_output.move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
         cursor = data_end;
-        m_output->call_cursor_sync();
+        m_output.call_cursor_sync();
     }
 
     void input::handle_arrow_down() noexcept

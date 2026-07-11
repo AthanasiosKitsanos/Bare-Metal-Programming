@@ -30,8 +30,6 @@ namespace
 
     using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept;
 
-    kernel::logger* g_exception_logger{nullptr};
-
     #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
         
     CPU_INTERRUPT_LIST
@@ -62,15 +60,16 @@ namespace
         for(;;) asm volatile("cli; hlt");
     }
 
+    kernel::logger log{};
+
     [[noreturn]] void handle_exception(const char* name, const char* mnemonic, kernel::interrupt_frame* frame) noexcept
     {
-        if(!g_exception_logger) halt_forever();
-        g_exception_logger->error() << "CPU exception: " << name << ' ' << mnemonic
+        log.error() << "CPU exception: " << name << ' ' << mnemonic
         << terminal::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
         << "\nEAX:" << frame->eax << "     ECX:" << frame->ecx << "\nEDX:" << frame->edx << " EBX:" << frame->ebx
         << "\nESP:" << frame->esp << " EBP:" << frame->ebp << "\nESI:" << frame->esi << "  EDI:" << frame->edi
         << "\nVector:" << frame->vector << '\n';
-        g_exception_logger->panic("Unhandled CPU exception");
+        log.panic("Unhandled CPU exception");
     }
 
     [[noreturn]] void handle_cpu_exception(kernel::interrupt_frame* frame) noexcept
@@ -84,8 +83,11 @@ namespace
             #undef X
 
             default:
-                if(g_exception_logger) g_exception_logger->warning() << "No handler registered in vector " << frame->vector;
+            {
+                kernel::logger log{};
+                log.warning() << "No handler registered in vector " << frame->vector;
                 halt_forever();
+            }
         }
     }
 
@@ -93,11 +95,8 @@ namespace
     {
         if(!frame) halt_forever();
         const uint32_t vector{frame->vector};
-        if(g_exception_logger)
-        {
-            g_exception_logger->error() << "Unhandled interrupt vector: " << vector << "\nError Code: " << frame->error_code
-            << "\nEIP: " << terminal::hex << frame->eip << '\n' << terminal::dec;
-        }
+        log.error() << "Unhandled interrupt vector: " << vector << "\nError Code: " << frame->error_code
+        << "\nEIP: " << terminal::hex << frame->eip << '\n' << terminal::dec;
         if(vector >= irq_base && vector <= irq_max) return;
         halt_forever();
     }
@@ -137,8 +136,6 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 
 namespace kernel
 {
-    void set_exception_logger(logger* log) noexcept { g_exception_logger = log; }
-
     void initialize_exceptions() noexcept
     {
         constexpr uint8_t master_offset{32};

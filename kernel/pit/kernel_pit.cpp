@@ -1,5 +1,6 @@
 #include "kernel_pit.h"
 #include "internals/terminal_io_registers.h"
+#include "kernel/logger/kernel_logger.h"
 
 namespace
 {
@@ -17,18 +18,27 @@ namespace
 
 namespace kernel
 {
-    bool initialize_pit(uint32_t frequency) noexcept
+    void initialize_pit(uint32_t frequency) noexcept
     {
-        if(frequency < min_supported_frequency || frequency > max_supported_frequency) return false;
+        if(frequency < min_supported_frequency || frequency > max_supported_frequency)
+        {
+            kernel::logger log{};
+            log.panic("Failed to initialize PIT");
+            return;
+        }
 
         const uint32_t divisor_32{(input_frequency + frequency / 2) / frequency};
-        if(divisor_32 < min_divisor || divisor_32 > max_divisor) return false;
+        if(divisor_32 < min_divisor || divisor_32 > max_divisor)
+        {
+            kernel::logger log{};
+            log.panic("Failed to initialize PIT");
+            return;
+        }
+
         const uint16_t divisor{static_cast<uint16_t>(divisor_32)};
 
         terminal::outb(command_port, channel_0_lobyte_hibyte_mode_3_binary);
         terminal::outb(channel_0_data_port, static_cast<uint8_t>(divisor & 0x00FF));
         terminal::outb(channel_0_data_port, static_cast<uint8_t>((divisor >> 8) & 0x00FF));
-        
-        return true;
     }
 }
