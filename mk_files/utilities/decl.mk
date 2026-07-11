@@ -19,6 +19,10 @@ CPU_FEATURES_H = utilities/cpu/features.h
 CPU_FEATURES_CPP = utilities/cpu/features.cpp
 CPU_FEATURES_OBJ = obj/utilities/cpu_features.o
 
+STOPWATCH_H = utilities/diagnostics/stopwatch/stopwatch.h
+STOPWATCH_CPP = utilities/diagnostics/stopwatch/stopwatch.cpp
+STOPWATCH_OBJ = obj/stopwatch.o
+
 # Internals
 IO_H = utilities/internals/terminal_io_registers.h
 

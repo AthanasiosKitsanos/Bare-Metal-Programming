@@ -50,7 +50,7 @@ namespace kernel
         if(frequency == 0 || ms == 0) return;
 
         const uint32_t whole_seconds{ms / milliseconds_per_second};
-        const uint32_t remaining_milliseconds{ms % milliseconds_per_second};
+        const uint32_t remaining_milliseconds{ms - (whole_seconds * milliseconds_per_second)};
 
         if(whole_seconds > UINT32_MAX / frequency)
         {

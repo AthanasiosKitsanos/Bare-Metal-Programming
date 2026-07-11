@@ -73,7 +73,8 @@ namespace terminal
 
         public:
             // Constructor
-            vga_text_buffer() noexcept;
+            constexpr vga_text_buffer() noexcept: base_row{0}, row{0}, column{0}, active_color{default_color}
+            {}
 
             // Public Methods
             void clear() noexcept;

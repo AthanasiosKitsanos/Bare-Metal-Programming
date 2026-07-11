@@ -112,9 +112,6 @@ namespace
 
 namespace terminal
 {
-    vga_text_buffer::vga_text_buffer() noexcept: base_row{0}, row{0}, column{0}, active_color{default_color}
-    {}
-
     void vga_text_buffer::reset() noexcept
     {
         constexpr uint16_t copy_bytes{(vga_height - 1) * vga_width << 1};

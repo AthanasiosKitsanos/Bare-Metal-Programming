@@ -7,17 +7,17 @@ extern "C" uint8_t _kernel_end;
 
 extern "C" [[noreturn]] void kernel_main()
 {
-    const uintptr_t kernel_start = reinterpret_cast<uintptr_t>(&_kernel_start);
-    const uintptr_t kernel_end = reinterpret_cast<uintptr_t>(&_kernel_end);
+    const uintptr_t kernel_start{reinterpret_cast<uintptr_t>(&_kernel_start)};
+    const uintptr_t kernel_end{reinterpret_cast<uintptr_t>(&_kernel_end)};
     
     {
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};
         kernel::memory::pmm_initialize(&map, kernel_start, kernel_end);
     }
 
+    terminal::output::initialize();
     terminal::output console{};
     kernel::logger logger{&console};
-    console.initialize();
 
     kernel::set_exception_logger(&logger);
     kernel::initialize_exceptions();

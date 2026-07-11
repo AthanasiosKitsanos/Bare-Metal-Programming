@@ -16,7 +16,7 @@ namespace terminal
     class output
     {
         // Private Members
-        vga_text_buffer buffer;
+        inline static vga_text_buffer buffer;
         using output_manipulator = output& (*)(output&) noexcept;
         integer_base state{integer_base::dec};
         bool bool_alpha_enabled{false};
@@ -100,7 +100,7 @@ namespace terminal
             output() noexcept = default;
 
             // Public methods
-            void initialize() noexcept;
+            static void initialize() noexcept;
 
             [[gnu::always_inline]]
             inline void move_cursor_left_n(const uint8_t count) noexcept { buffer.move_cursor_left_n(count); }
