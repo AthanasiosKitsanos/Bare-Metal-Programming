@@ -18,8 +18,8 @@ namespace
         for(; begin < end; ++begin) *begin = *(begin + step);
     }
 
-    [[gnu::always_inline]]
-    inline uint8_t string_length(const char* string) noexcept
+    [[gnu::regparm(1)]]
+    uint8_t string_length(const char* string) noexcept
     {
         uint8_t length{0};
         for(; *string != '\0'; ++string) ++length;
@@ -32,6 +32,7 @@ namespace terminal
     input::input() noexcept: cursor{input_buffer}, data_end{input_buffer}, input_buffer{}, m_output{}, input_ready{false} 
     {}
 
+    [[gnu::regparm(2)]]
     bool input::add_character(const char c) noexcept
     {
         if(buffer_full()) return false;
@@ -45,6 +46,7 @@ namespace terminal
         return true;
     }
 
+    [[gnu::regparm(2)]]
     bool input::add_string(const char* string) noexcept
     {
         const uint8_t length{string_length(string)};
@@ -63,6 +65,7 @@ namespace terminal
         return true;
     }
 
+    [[gnu::regparm(1)]]
     bool input::delete_character() noexcept
     {
         if(buffer_begin()) return false;
@@ -72,6 +75,7 @@ namespace terminal
         return true;
     }
 
+    [[gnu::regparm(1)]]
     void input::reset_buffer() noexcept
     {
         cursor = input_buffer;
@@ -80,6 +84,7 @@ namespace terminal
         input_ready = false;
     }
 
+    [[gnu::regparm(1)]]
     void input::trim_end() noexcept
     {
         if(data_end == input_buffer) return;
@@ -87,6 +92,7 @@ namespace terminal
         *data_end = '\0';
     }
 
+    [[gnu::regparm(1)]]
     void input::start_data_receiving() noexcept
     {
         driver::keyboard::keyboard_event event{};
@@ -124,6 +130,7 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_escape() noexcept
     {
         m_output.move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
@@ -135,6 +142,7 @@ namespace terminal
         reset_buffer();
     }
     
+    [[gnu::regparm(1)]]
     void input::handle_backspace() noexcept
     {
         if(delete_character())
@@ -150,6 +158,7 @@ namespace terminal
         }
     }
     
+    [[gnu::regparm(1)]]
     void input::handle_tab() noexcept
     {
         constexpr const char* spaces{"    "};
@@ -165,6 +174,7 @@ namespace terminal
         }
     }
     
+    [[gnu::regparm(1)]]
     void input::handle_enter() noexcept
     {
         if(count() > 0)
@@ -175,6 +185,7 @@ namespace terminal
         input_ready = true;
     }
     
+    [[gnu::regparm(2)]]
     void input::control_key_dispatch(const driver::keyboard::keyboard_key key) noexcept
     {
         switch(key)
@@ -191,6 +202,7 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_home() noexcept
     {
         m_output.move_cursor_left_n(static_cast<uint8_t>(cursor - input_buffer));
@@ -198,28 +210,33 @@ namespace terminal
         m_output.call_cursor_sync();
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_arrow_up() noexcept
     {
         return;
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_page_up() noexcept
     {
         return;
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_arrow_left() noexcept
     {
         if(move_cursor_left()) m_output.go_backwards();
         m_output.call_cursor_sync();
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_arrow_right() noexcept
     {
         if(move_cursor_right()) m_output.go_forward();
         m_output.call_cursor_sync();
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_end() noexcept
     {
         m_output.move_cursor_right_n(static_cast<uint8_t>(data_end - cursor));
@@ -227,16 +244,19 @@ namespace terminal
         m_output.call_cursor_sync();
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_arrow_down() noexcept
     {
         return;
     }
 
+    [[gnu::regparm(1)]]
     void input::handle_page_down() noexcept
     {
         return;
     }
 
+    [[gnu::regparm(2)]]
     void input::navigation_key_dispatch(const driver::keyboard::keyboard_key key) noexcept
     {
         switch(key)

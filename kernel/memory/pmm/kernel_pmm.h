@@ -18,11 +18,15 @@ namespace kernel::memory
     };
 
     void pmm_initialize(const e820_memory_map*, const uintptr_t, const uintptr_t) noexcept;
+
+    [[gnu::regparm(1)]]
     pmm_result pmm_allocate_frame(uintptr_t* const address) noexcept;
+
+    [[gnu::regparm(2)]]
     pmm_result pmm_find_contiguous_free_frames(const size_t frames, uintptr_t* const address) noexcept;
+
+    [[gnu::regparm(1)]]
     pmm_result pmm_free_frame(const uintptr_t) noexcept;
-
-
 
     size_t pmm_total_frames() noexcept;
     size_t pmm_used_frames() noexcept;

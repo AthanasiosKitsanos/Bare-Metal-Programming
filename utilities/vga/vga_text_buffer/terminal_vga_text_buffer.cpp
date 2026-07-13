@@ -151,6 +151,7 @@ namespace terminal
         vga_hardware_cursor::set_display_start(0);
     }
 
+    [[gnu::regparm(1)]]
     void vga_text_buffer::clear_row() noexcept
     {
         constexpr uint16_t entry{make_entry(' ', default_color)};
@@ -160,18 +161,21 @@ namespace terminal
         g_dispatch.entries[cpu::features::get()](cell_32(), bytes, entry_32);
     }
 
+    [[gnu::regparm(2)]]
     void vga_text_buffer::put(char c) noexcept
     {
         *cell() = make_entry(c, active_color);
         move_forward();
     }
 
+    [[gnu::regparm(1)]]
     void vga_text_buffer::remove_last_char() noexcept
     {
         move_backwards();
         *cell() = make_entry(' ', active_color);
     }
 
+    [[gnu::regparm(1)]]
     void vga_text_buffer::move_forward() noexcept
     {
         ++column;
@@ -192,6 +196,7 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(1)]]
     void vga_text_buffer::move_backwards() noexcept
     {
         bool column_at_end{column == 0};
@@ -202,6 +207,7 @@ namespace terminal
         row = (row - column_at_end) + row_at_end * vga_height;
     }
 
+    [[gnu::regparm(1)]]
     void vga_text_buffer::move_to_next_line() noexcept
     {
         column = 0;
@@ -218,6 +224,7 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(2)]]
     void vga_text_buffer::move_cursor_left_n(const uint8_t count) noexcept
     {
         int16_t abs_pos{static_cast<int16_t>(row * vga_width + column - count)};
@@ -229,6 +236,7 @@ namespace terminal
         column = new_column;
     }
 
+    [[gnu::regparm(2)]]
     void vga_text_buffer::move_cursor_right_n(const uint8_t count) noexcept
     {
         int16_t abs_pos{static_cast<int16_t>(row * vga_width + column + count)};

@@ -201,6 +201,7 @@ namespace kernel::memory
         }
     }
 
+    [[gnu::regparm(1)]]
     pmm_result pmm_allocate_frame(uintptr_t* const address) noexcept
     {
         for(const uint8_t* current{g_bitmap.search_begin}; current < g_bitmap.end; ++current)
@@ -224,6 +225,7 @@ namespace kernel::memory
         return pmm_result::failed;
     }
 
+    [[gnu::regparm(2)]]
     pmm_result pmm_find_contiguous_free_frames(const size_t frames, uintptr_t* const address) noexcept
     {
         size_t run_length{0};
@@ -267,6 +269,7 @@ namespace kernel::memory
         return pmm_result::failed;
     }
 
+    [[gnu::regparm(1)]]
     pmm_result pmm_free_frame(const uintptr_t address) noexcept
     {
         size_t index{frame_index(address)};
