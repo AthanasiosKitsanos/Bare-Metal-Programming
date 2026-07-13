@@ -28,7 +28,7 @@ namespace
         const char* mnemonic;
     };
 
-    using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept;
+    using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept [[gnu::regparm(1)]];
 
     #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
         
@@ -50,7 +50,8 @@ namespace
     HARDWARE_INTERRUPT_LIST
     #undef X
     
-    inline void __attribute__((always_inline)) install_exception(const exception_descriptor& ex) noexcept
+    [[gnu::always_inline]]
+    inline void install_exception(const exception_descriptor& ex) noexcept
     {
         kernel::set_interrupt_gate(ex.vector, reinterpret_cast<uint32_t>(ex.stub), kernel_code_selector, interrupt_gate_attributes);
     }
@@ -62,7 +63,8 @@ namespace
 
     kernel::logger log{};
 
-    [[noreturn]] void handle_exception(const char* name, const char* mnemonic, kernel::interrupt_frame* frame) noexcept
+    [[gnu::regparm(1)]] [[noreturn]]
+    void handle_exception(const char* name, const char* mnemonic, kernel::interrupt_frame* frame) noexcept
     {
         log.error() << "CPU exception: " << name << ' ' << mnemonic
         << terminal::hex << "\nEIP:" << frame->eip << "\nEFLAGS:" << frame->eflags << "\nError Code:" << frame->error_code
@@ -72,7 +74,8 @@ namespace
         log.panic("Unhandled CPU exception");
     }
 
-    [[noreturn]] void handle_cpu_exception(kernel::interrupt_frame* frame) noexcept
+    [[gnu::regparm(1)]] [[noreturn]] 
+    void handle_cpu_exception(kernel::interrupt_frame* frame) noexcept
     {
         switch(frame->vector)
         {
@@ -91,6 +94,7 @@ namespace
         }
     }
 
+    [[gnu::regparm(1)]]
     void default_interrupt_handler(kernel::interrupt_frame* frame) noexcept
     {
         if(!frame) halt_forever();

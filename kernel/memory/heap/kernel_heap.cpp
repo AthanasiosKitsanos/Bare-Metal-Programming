@@ -21,6 +21,7 @@ namespace kernel::memory
         heap_end = reinterpret_cast<block_header*>(reinterpret_cast<uint8_t*>(heap_start) + heap_size);
     }
 
+    [[gnu::regparm(1)]]
     void* kmalloc(uint32_t requested_size) noexcept
     {
         uint32_t cached_size{0};
@@ -63,6 +64,7 @@ namespace kernel::memory
         return reinterpret_cast<void*>(allocated + 1);
     }
 
+    [[gnu::regparm(1)]]
     void kfree(void* ptr) noexcept
     {
         if(!ptr) return;
@@ -88,6 +90,7 @@ namespace kernel::memory
         searching_block = allocated_memory;
     }
 
+    [[gnu::regparm(2)]]
     void* krealloc(void* ptr, const uint32_t new_size) noexcept
     {
         if(!ptr) return kmalloc(new_size);

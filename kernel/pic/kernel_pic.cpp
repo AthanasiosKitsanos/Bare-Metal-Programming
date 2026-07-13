@@ -48,6 +48,7 @@ namespace kernel
         io_wait();
     }
 
+    [[gnu::regparm(1)]]
     void send_eoi(uint8_t vector) noexcept
     {
         if(vector > 7) terminal::outb(slave_command, eoi_command);

@@ -14,7 +14,13 @@ namespace kernel::memory
     };
 
     void heap_initialize(void* heap_start, uint32_t heap_size) noexcept;
+
+    [[gnu::regparm(1)]]
     void* kmalloc(uint32_t requested_size) noexcept;
+
+    [[gnu::regparm(1)]]
     void kfree(void* ptr) noexcept;
+
+    [[gnu::regparm(2)]]
     void* krealloc(void* ptr, const uint32_t new_size) noexcept;
 }
