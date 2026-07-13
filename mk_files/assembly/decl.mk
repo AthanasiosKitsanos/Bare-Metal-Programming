@@ -24,6 +24,7 @@ CODE_16_BIN = bin/code_16.bin
 # --------------------Code 32--------------------------------
 CODE_32_ELF = elf/code_32.elf
 CODE_32_BIN = bin/code_32.bin
+CODE_32_DISASM = code_32_elf.txt
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin

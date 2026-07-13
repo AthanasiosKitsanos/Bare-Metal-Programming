@@ -4,6 +4,7 @@ CC = i686-elf-g++
 AS = i686-elf-as
 LD = i686-elf-ld
 OBJC = i686-elf-objcopy
+OBJDUMP = i686-elf-objdump -d
 
 MAKE_LIB = i686-elf-ar rcs
 
@@ -34,7 +35,7 @@ MAIN_OBJ = obj/main.o
 
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE)
+all: $(OS_IMAGE) $(CODE_32_DISASM)
 
 #------------------------ Source MK Files ---------------------------------
 include mk_files/apps/rules.mk

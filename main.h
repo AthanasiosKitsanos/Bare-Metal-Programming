@@ -14,3 +14,4 @@
 #include "shell/shell.h"
 #include "utilities/cpu/features.h"
 #include "memory/heap/kernel_heap.h"
+#include "diagnostics/stopwatch/stopwatch.h"

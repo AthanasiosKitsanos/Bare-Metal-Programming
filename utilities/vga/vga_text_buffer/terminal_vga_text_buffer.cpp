@@ -5,7 +5,7 @@
 
 namespace
 {
-    [[gnu::target("sse2")]]
+    [[gnu::target("sse2")]] [[gnu::regparm(3)]]
     void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 4;
@@ -19,7 +19,7 @@ namespace
         }
     }
 
-    [[gnu::target("avx2")]]
+    [[gnu::target("avx2")]] [[gnu::regparm(3)]]
     void use_avx_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 5;
@@ -33,6 +33,7 @@ namespace
         }   
     }
 
+    [[gnu::regparm(3)]]
     void fallback_fill(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
     {
         bytes >>= 2;
@@ -44,7 +45,8 @@ namespace
         }
     }
 
-    using fill_fn = void(*)(volatile uint32_t* dst, uint16_t count, const uint32_t entry);
+    
+    using fill_fn = void(*)(volatile uint32_t* dst, uint16_t count, const uint32_t entry) [[gnu::regparm(3)]];
     struct fill_functions
     {
         fill_fn entries[3];
@@ -54,7 +56,7 @@ namespace
     };
     constexpr fill_functions g_dispatch{};
 
-    [[gnu::target("sse2")]]
+    [[gnu::target("sse2")]] [[gnu::regparm(3)]]
     volatile uint32_t* use_sse_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 4;
@@ -70,7 +72,7 @@ namespace
         return reinterpret_cast<volatile uint32_t*>(destination);
     }
 
-    [[gnu::target("avx2")]]
+    [[gnu::target("avx2")]] [[gnu::regparm(3)]]
     volatile uint32_t* use_avx_2_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 5;
@@ -86,6 +88,7 @@ namespace
         return reinterpret_cast<volatile uint32_t*>(destination);
     }
 
+    [[gnu::regparm(3)]]
     volatile uint32_t* fallback_copy(const volatile uint32_t* src, volatile uint32_t* dst, uint16_t count) noexcept
     {
         count >>= 2;
@@ -99,7 +102,7 @@ namespace
         return dst;
     }
 
-    using fill_copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst, uint16_t count);
+    using fill_copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst, uint16_t count) [[gnu::regparm(3)]];
     struct fill_copy_function
     {
         fill_copy_fn entries[3];
@@ -194,7 +197,7 @@ namespace terminal
         bool column_at_end{column == 0};
         column = (column - 1) + column_at_end * vga_width;
 
-        bool row_at_end{(row == 0) & (column_at_end)};
+        bool row_at_end{static_cast<bool>((row == 0) & (column_at_end))};
         base_row -= row_at_end;
         row = (row - column_at_end) + row_at_end * vga_height;
     }
