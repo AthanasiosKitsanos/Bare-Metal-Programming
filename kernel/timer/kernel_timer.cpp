@@ -14,6 +14,7 @@ namespace
 
 namespace kernel
 {
+    [[gnu::regparm(1)]]
     void handle_timer_interrupt(interrupt_frame* frame) noexcept
     {
         static_cast<void>(frame);

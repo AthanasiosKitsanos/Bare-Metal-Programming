@@ -17,18 +17,30 @@ namespace terminal
     {
         // Private Members
         inline static vga_text_buffer buffer;
-        using output_manipulator = output& (*)(output&) noexcept;
+        using output_manipulator = output& (*)(output&) noexcept [[gnu::regparm(1)]];
         integer_base state{integer_base::dec};
         bool bool_alpha_enabled{false};
 
         // Private Methods
+        [[gnu::regparm(1)]]
         void new_line() noexcept;
+
+        [[gnu::regparm(2)]]
         void write_string_no_sync(const char*) noexcept;
 
+        [[gnu::regparm(2)]]
         void write_signed_8_no_sync(int8_t) noexcept;
+
+        [[gnu::regparm(2)]]
         void write_signed_16_no_sync(int16_t) noexcept;
+
+        [[gnu::regparm(2)]]
         void write_signed_32_no_sync(int32_t) noexcept;
+
+        [[gnu::regparm(3)]]
         void write_signed_64_no_sync(int64_t) noexcept;
+
+        [[gnu::regparm(2)]]
         void write_pointer_no_sync(uintptr_t) noexcept;
 
         template<typename T>
@@ -76,16 +88,23 @@ namespace terminal
         [[gnu::always_inline]]
         inline void line_start() noexcept { buffer.line_start(); }
 
+        [[gnu::regparm(2)]]
         void write_hex_8_no_sync(uint8_t) noexcept;
+
+        [[gnu::regparm(2)]]
         void write_hex_16_no_sync(uint16_t) noexcept;
+
+        [[gnu::regparm(2)]]
         void write_hex_32_no_sync(uint32_t) noexcept;
+
+        [[gnu::regparm(3)]]
         void write_hex_64_no_sync(uint64_t) noexcept;
 
         // Private Friend Methods
-        friend output& dec(output&) noexcept;
-        friend output& hex(output&) noexcept;
-        friend output& bool_alpha(output&) noexcept;
-        friend output& bool_no_alpha(output&) noexcept;
+        friend output& dec(output&) noexcept [[gnu::regparm(1)]];
+        friend output& hex(output&) noexcept [[gnu::regparm(1)]];
+        friend output& bool_alpha(output&) noexcept [[gnu::regparm(1)]];
+        friend output& bool_no_alpha(output&) noexcept [[gnu::regparm(1)]];
 
         // Inline Methods
         [[gnu::always_inline]]
@@ -146,18 +165,43 @@ namespace terminal
             inline void clear() noexcept { buffer.clear(); }
 
             // Operators
+            [[gnu::regparm(2)]]
             output& operator<<(const char) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const char*) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const uint8_t) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const int8_t) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const uint16_t) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const int16_t) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const uint32_t) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const int32_t) noexcept;
+
+            [[gnu::regparm(3)]]
             output& operator<<(const uint64_t) noexcept;
+
+            [[gnu::regparm(3)]]
             output& operator<<(const int64_t) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const bool) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(const void*) noexcept;
+
+            [[gnu::regparm(2)]]
             output& operator<<(output_manipulator) noexcept;
 
             // Templates
@@ -372,8 +416,15 @@ namespace terminal
     };
 
     // Free Functions
+    [[gnu::regparm(1)]]
     output& dec(output&) noexcept;
+
+    [[gnu::regparm(1)]]
     output& hex(output&) noexcept;
+
+    [[gnu::regparm(1)]]
     output& bool_alpha(output&) noexcept;
+
+    [[gnu::regparm(1)]]
     output& bool_no_alpha(output&) noexcept;
 }
