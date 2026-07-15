@@ -80,7 +80,6 @@ namespace
         --g_used_frames;
     }
 
-    // TODO create LUT, use the current_value in the pmm_find_contiguous_free_frames as an index
     [[gnu::always_inline]]
     inline uint8_t leading_zeros(const uint8_t value) noexcept
     {
@@ -237,32 +236,41 @@ namespace kernel::memory
         {
             current_value = *current;
             is_first_run = (run_length == 0);
+            run_start_index.byte_index = (run_start_index.byte_index * !is_first_run) + (static_cast<size_t>((current - g_bitmap.start) * is_first_run));
+            run_start_index.bit_index *= !is_first_run;
             if(current_value == 0x00)
             {
-                run_start_index.byte_index = (run_start_index.byte_index * !is_first_run) + (static_cast<size_t>((current - g_bitmap.start) * is_first_run));
-                run_start_index.bit_index *= !is_first_run;
                 run_length += 8;
+                if(run_length >= frames)
+                {
+                    
+                }
+            }
+            else if(current_value == 0xFF) run_length = 0;
+            else
+            {
+                run_length += trailing_zeros(current_value);
+                if(run_length >= frames)
+                {
+                    
+                }
+
+                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
+                run_start_index.byte_index = static_cast<size_t>(current - g_bitmap.start);
+                run_start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
+                run_length = (pos_n_length & 0x0F);
 
                 if(run_length >= frames)
                 {
                     
-                    while(run_start_index.bit_index < 8)
-                    {
-                        set_frame_used(&run_start_index);
-                        ++run_start_index.bit_index;
-                    }
-                    *address = frame_address((run_start_index.byte_index << bit_size_byte_mask) + run_start_index.bit_index);
-                    return pmm_result::success;
                 }
-            }
-            else if(current_value == 0xFF)
-            {
-                run_length = 0;
-            }
-            else
-            {
-                run_start_index.bit_index = (find_buried_run_packed(current_value) >> 4);
-                // TODO this will continue after we create a lookup table
+
+                run_length = leading_zeros(current_value);
+                run_start_index.bit_index = (bit_size_byte - run_length);
+                if(run_length >= frames)
+                {
+                    
+                }
             }
         }
 
