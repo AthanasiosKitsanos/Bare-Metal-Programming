@@ -1,5 +1,7 @@
 .code32
 .section .text
+.extern _interrupt_stack_top
+.extern _stack_top
 
 .set DATA_SEG, 0x10
 
@@ -10,6 +12,8 @@
 .macro ISR_NO_ERROR vector
 .global isr_\vector
 isr_\vector:
+    call check_interrupt_stack
+
     pushl $0
     pushl $\vector
     jmp common_interrupt_entry
@@ -18,6 +22,8 @@ isr_\vector:
 .macro ISR_WITH_ERROR vector
 .global isr_\vector
 isr_\vector:
+    call check_interrupt_stack
+
     pushl $\vector
     jmp common_interrupt_entry
 .endm
@@ -25,6 +31,8 @@ isr_\vector:
 .macro IRQ vector
 .global irq_\vector
 irq_\vector:
+    call check_interrupt_stack
+
     pushl $0
     pushl $\vector
     jmp common_interrupt_entry
@@ -64,3 +72,17 @@ common_interrupt_entry:
     popa
     addl $8, %esp
     iret
+
+check_interrupt_stack:
+    popl %eax
+    cmpl $_interrupt_stack_bottom, %esp
+    jna go_to_interrupt_stack
+    cmpl $_interrupt_stack_top, %esp
+    jnbe go_to_interrupt_stack
+    jmp interrupt_stack_set
+
+go_to_interrupt_stack:
+    movl $_interrupt_stack_top, %esp
+
+interrupt_stack_set:
+    jmp *%eax

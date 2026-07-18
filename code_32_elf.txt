@@ -330,7 +330,7 @@ Disassembly of section .text:
     800d:	8e e0                	mov    %eax,%fs
     800f:	8e e8                	mov    %eax,%gs
     8011:	8e d0                	mov    %eax,%ss
-    8013:	bc 00 00 09 00       	mov    $0x90000,%esp
+    8013:	bc 85 f9 00 00       	mov    $0xf985,%esp
     8018:	bf 00 af 00 00       	mov    $0xaf00,%edi
     801d:	b9 85 b9 00 00       	mov    $0xb985,%ecx
 
@@ -401,7 +401,7 @@ Disassembly of section .text:
     80c3:	89 1c 24             	mov    %ebx,(%esp)
     80c6:	e8 45 0d 00 00       	call   8e10 <_ZN6kernel6memory19get_e820_memory_mapEv>
     80cb:	83 ec 08             	sub    $0x8,%esp
-    80ce:	68 85 b9 00 00       	push   $0xb985
+    80ce:	68 85 f9 00 00       	push   $0xf985
     80d3:	68 00 7e 00 00       	push   $0x7e00
     80d8:	53                   	push   %ebx
     80d9:	8d 9d 08 ff ff ff    	lea    -0xf8(%ebp),%ebx

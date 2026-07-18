@@ -25,5 +25,14 @@ SECTIONS
         *(.bss*)
         _bss_end = .;
     }
+
+    _stack_bottom = .;
+    . += 16384;
+    _stack_top = .;
+
+    _interrupt_stack_bottom = .;
+    . += 1024;
+    _interrupt_stack_top = .;
+
     _kernel_end = .;
 }

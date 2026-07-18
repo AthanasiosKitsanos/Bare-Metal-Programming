@@ -4,6 +4,7 @@
 .extern kernel_main
 .extern _bss_start
 .extern _bss_end
+.extern _stack_top
 .extern mm_flag
 
 .set DATA_SEG, 0x10
@@ -16,7 +17,7 @@ pm_entry:
     movw %ax, %gs
     movw %ax, %ss
 
-    movl $0x90000, %esp
+    movl $_stack_top, %esp
 
     movl $_bss_start, %edi
     movl $_bss_end, %ecx

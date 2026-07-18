@@ -243,6 +243,8 @@ namespace kernel::memory
                 run_length += 8;
                 if(run_length >= frames)
                 {
+                    size_t frame_start{(run_start_index.byte_index << bit_size_byte_mask) + run_start_index.bit_index};
+                    bit_n_byte end{get_bit_n_byte(frame_start + frames - 1)};
                     
                 }
             }
