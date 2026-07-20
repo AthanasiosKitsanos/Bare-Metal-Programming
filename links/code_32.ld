@@ -27,7 +27,8 @@ SECTIONS
     }
 
     _stack_bottom = .;
-    . += 16384;
+    _interrupt_preamble_size = 52;
+    . += (16384 + _interrupt_preamble_size);
     _stack_top = .;
 
     _interrupt_stack_bottom = .;
