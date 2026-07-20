@@ -9,7 +9,7 @@ namespace kernel
 
 namespace driver
 {
-    bool initialize_keyboard() noexcept;
+    void initialize_keyboard() noexcept;
 }
 
 namespace driver::keyboard
@@ -128,12 +128,16 @@ namespace driver::keyboard
         modifier_state modifiers;
     };
 
+    [[gnu::regparm(1)]]
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept;
 
+    [[gnu::regparm(1)]]
     bool poll_keyboard_event(keyboard_event* out_event) noexcept;
-    uint8_t has_pending_keyboard_event() noexcept;
 
+    [[gnu::regparm(2)]]
     bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept;
+
+    uint8_t has_pending_keyboard_event() noexcept;
 
     modifier_state current_keyboard_modifier_state() noexcept;
 

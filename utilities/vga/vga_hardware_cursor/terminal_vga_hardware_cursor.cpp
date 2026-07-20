@@ -11,12 +11,14 @@ namespace
 
 namespace terminal
 {
+    [[gnu::regparm(2)]]
     void vga_hardware_cursor::write_register(uint8_t index, uint8_t value) noexcept
     {
         outb(command_port, index);
         outb(data_port, value);
     }
 
+    [[gnu::regparm(1)]]
     uint8_t vga_hardware_cursor::read_register(uint8_t index) noexcept
     {
         outb(command_port, index);
@@ -32,12 +34,14 @@ namespace terminal
         write_register(0x0B, cursor_end);
     }
 
+    [[gnu::regparm(1)]]
     void vga_hardware_cursor::set_position(const uint16_t position) noexcept
     {
         write_register(cursor_register_low, static_cast<uint8_t>(position & 0x00FF));
         write_register(cursor_register_high, static_cast<uint8_t>((position >> 8) & 0x00FF));
     }
 
+    [[gnu::regparm(1)]]
     void vga_hardware_cursor::set_display_start(const uint16_t position) noexcept
     {
         write_register(display_register_low, static_cast<uint8_t>(position & 0x00FF));

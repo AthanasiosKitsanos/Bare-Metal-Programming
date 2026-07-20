@@ -4,13 +4,14 @@ CC = i686-elf-g++
 AS = i686-elf-as
 LD = i686-elf-ld
 OBJC = i686-elf-objcopy
+OBJDUMP = i686-elf-objdump -d
 
 MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti
-LINKING_FLAGS = -ffreestanding -O3 -nostdlib
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections
+LINKING_FLAGS = --gc-sections
 
 SECTOR_SIZE = 512
 
@@ -34,7 +35,7 @@ MAIN_OBJ = obj/main.o
 
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE)
+all: $(OS_IMAGE) $(CODE_32_DISASM)
 
 #------------------------ Source MK Files ---------------------------------
 include mk_files/apps/rules.mk

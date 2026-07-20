@@ -3,6 +3,7 @@
 #include "internal/shell_commands_list.h"
 #include <stdint.h>
 #include "cpu/features.h"
+#include "timer/kernel_timer.h"
 
 namespace
 {
@@ -18,7 +19,7 @@ namespace
         return static_cast<int8_t>(c) - static_cast<int8_t>(o); 
     }
 
-    constexpr uint8_t command_list_size{4};
+    constexpr uint8_t command_list_size{5};
     struct command_list
     {
         const char* entries[command_list_size];
@@ -45,6 +46,9 @@ namespace
     [[gnu::always_inline]]
     inline void execute_flag(app::shell* shell) noexcept { shell->flag(); }
 
+    [[gnu::always_inline]]
+    inline void execute_ticks(app::shell* shell) noexcept { shell->ticks(); }
+
     using command_list_functions = void(*)(app::shell*) noexcept;
     struct command_functions
     {
@@ -63,7 +67,7 @@ namespace
 
 namespace app
 {
-    shell::shell(terminal::output* out) noexcept: m_input{out}, m_output{out}, m_is_running{true} 
+    shell::shell() noexcept: m_input{}, m_output{}, m_is_running{true}
     {}
 
     int8_t shell::command_exists() const noexcept
@@ -91,14 +95,14 @@ namespace app
             g_command_functions.entries[index](this);
             return;
         }
-        *m_output << "Command not found\n";
+        m_output << "Command not found\n";
     }
 
     void shell::run() noexcept
     {
         while(m_is_running == 1)
         {
-            *m_output << "my_OS:> ";
+            m_output << "my_OS:> ";
             m_input.start();
             execute_command();
             m_input.reset();
@@ -108,19 +112,21 @@ namespace app
     void shell::clear() noexcept
     {
         m_input.reset();
-        m_output->clear();
+        m_output.clear();
     }
 
     void shell::exit() noexcept
     {
         m_is_running = 0;
-        *m_output << "Program terminated\n";
+        m_output << "Program terminated\n";
     }
 
-    void shell::flag() noexcept
+    void shell::flag() noexcept { m_output << "mm_flag: " << cpu::features::get() << '\n'; }
+
+    void shell::peek() noexcept { m_output << "There is nothing to peek!\n"; }
+
+    void shell::ticks() noexcept
     {
-        *m_output << "mm_flag: " << cpu::features::get() << '\n';
+        m_output << "Ticks: " << kernel::timer_ticks() << '\n';
     }
-
-    void shell::peek() noexcept { *m_output << "There is nothing to peek!\n"; }
 }

@@ -4,5 +4,5 @@
 
 namespace kernel
 {
-    [[nodiscard]] bool initialize_pit(uint32_t frequency) noexcept;
+    void initialize_pit(uint32_t frequency) noexcept;
 }

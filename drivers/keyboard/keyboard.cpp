@@ -87,12 +87,14 @@ namespace
     };
     constexpr extended_key_map_table extended_key_table{};
 
+    [[gnu::regparm(2)]]
     driver::keyboard::keyboard_key map_scancode_set_1_key(const uint8_t key_code, const bool extended) noexcept
     {
         if(extended) return *(extended_key_table.entries + key_code);
         return *(normal_key_map.entries + key_code);
     }
 
+    [[gnu::regparm(1)]]
     char get_normal_character(const driver::keyboard::keyboard_key key) noexcept { return *(normal_characters_table.entries + static_cast<uint16_t>(key)); }
 
     char get_shifted_character(const driver::keyboard::keyboard_key key) noexcept { return *(shifted_characters_table.entries + static_cast<uint16_t>(key)); }
@@ -169,6 +171,7 @@ namespace
         ++g_keyboard_event_queue.count;
     }
 
+    [[gnu::regparm(2)]]
     void update_modifier_state(const driver::keyboard::keyboard_key key, const driver::keyboard::key_state state) noexcept
     {
         switch(key)
@@ -238,18 +241,22 @@ namespace
 
 namespace driver
 {
-    bool initialize_keyboard() noexcept
+    void initialize_keyboard() noexcept
     {
         g_modifier_state = 0;
         flush_keyboard_output_buffer();
-        if(!send_keyboard_byte_and_wait_ack(set_leds_command)) return false;
-        if(!send_keyboard_byte_and_wait_ack(all_leds_off)) return false;
-        return true;
+        if(!send_keyboard_byte_and_wait_ack(set_leds_command) || !send_keyboard_byte_and_wait_ack(all_leds_off))
+        {
+            kernel::logger log;
+            log.warning() << "Failed to initialize Keyboard\n";
+            return;
+        }
     }
 }
 
 namespace driver::keyboard
 {
+    [[gnu::regparm(2)]]
     bool try_translate_text_event(const keyboard_event* event, char* out_character) noexcept
     {
         if(!is_text_input_candidate_event(event))
@@ -271,6 +278,7 @@ namespace driver::keyboard
         return true;
     }
 
+    [[gnu::regparm(1)]]
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept
     {
         static_cast<void>(frame);
@@ -307,6 +315,7 @@ namespace driver::keyboard
         return g_modifier_state;
     }
 
+    [[gnu::regparm(1)]]
     bool poll_keyboard_event(keyboard_event* out_event) noexcept
     {
         kernel::interrupt_guard guard{};

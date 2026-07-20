@@ -11,11 +11,13 @@ namespace
 namespace terminal
 {
     // Private Methods
+    [[gnu::regparm(1)]]
     void output::new_line() noexcept
     {
         buffer.move_to_next_line();
     }
 
+    [[gnu::regparm(2)]]
     void output::write_string_no_sync(const char* text) noexcept
     {
         for(char c{*text}; c != '\0'; c = *text)
@@ -25,19 +27,21 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(2)]]
     void output::write_pointer_no_sync(uintptr_t value) noexcept
     {
         put_hex_prefix();
         constexpr size_t total_nibbles_m1{sizeof(uintptr_t) * 2 - 1};
         const int leading_zeros{__builtin_clz(value) >> 2};
 
-        const int starting_shift{(total_nibbles_m1 - leading_zeros) * 4};
+        const int starting_shift{(static_cast<int>(total_nibbles_m1) - leading_zeros) * 4};
         for(int shift{starting_shift}; shift >= 0; shift -= 4)
         {
             put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
     }
 
+    [[gnu::regparm(2)]]
     void output::write_signed_8_no_sync(int8_t value) noexcept
     {
         if(value < 0)
@@ -49,6 +53,7 @@ namespace terminal
         write_unsigned_no_sync(static_cast<uint8_t>(value));
     }
 
+    [[gnu::regparm(2)]]
     void output::write_signed_16_no_sync(int16_t value) noexcept
     {
         if(value < 0)
@@ -60,6 +65,7 @@ namespace terminal
         write_unsigned_no_sync(static_cast<uint16_t>(value));
     }
 
+    [[gnu::regparm(2)]]
     void output::write_signed_32_no_sync(int32_t value) noexcept
     {
         if(value < 0)
@@ -71,6 +77,7 @@ namespace terminal
         write_unsigned_no_sync(static_cast<uint32_t>(value));
     }
 
+    [[gnu::regparm(3)]]
     void output::write_signed_64_no_sync(int64_t value) noexcept
     {
         if(value < 0)
@@ -82,6 +89,7 @@ namespace terminal
         write_unsigned_no_sync(static_cast<uint64_t>(value));
     }
 
+    [[gnu::regparm(2)]]
     void output::write_hex_8_no_sync(uint8_t value) noexcept
     {
         put_hex_prefix();
@@ -101,6 +109,7 @@ namespace terminal
         }
     }
     
+    [[gnu::regparm(2)]]
     void output::write_hex_16_no_sync(uint16_t value) noexcept
     {
         put_hex_prefix();
@@ -120,6 +129,7 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(2)]]
     void output::write_hex_32_no_sync(uint32_t value) noexcept
     {
         put_hex_prefix();
@@ -139,6 +149,7 @@ namespace terminal
         }
     }
 
+    [[gnu::regparm(3)]]
     void output::write_hex_64_no_sync(uint64_t value) noexcept
     {
         put_hex_prefix();
@@ -167,6 +178,7 @@ namespace terminal
     }
 
     // Operators
+    [[gnu::regparm(2)]]
     output& output::operator<<(const char c) noexcept
     {
         put_char_no_sync(c);
@@ -181,6 +193,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(uint8_t value) noexcept
     {
         switch(state)
@@ -196,6 +209,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(int8_t value) noexcept
     {
         switch(state)
@@ -217,6 +231,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(uint16_t value) noexcept
     {
         switch(state)
@@ -232,6 +247,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(int16_t value) noexcept
     {
         switch(state)
@@ -253,6 +269,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(uint32_t value) noexcept
     {
         switch(state)
@@ -268,6 +285,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(int32_t value) noexcept
     {
         switch(state)
@@ -289,6 +307,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(3)]]
     output& output::operator<<(uint64_t value) noexcept
     {
         switch(state)
@@ -304,6 +323,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(3)]]
     output& output::operator<<(int64_t value) noexcept
     {
         switch(state)
@@ -325,6 +345,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(const bool value) noexcept
     {
         if(bool_alpha_enabled) write_string_no_sync(static_cast<const char*>(value ? "true" : "false"));
@@ -333,6 +354,7 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(const void* ptr) noexcept
     {
         write_pointer_no_sync(reinterpret_cast<uintptr_t>(ptr));
@@ -340,30 +362,35 @@ namespace terminal
         return *this;
     }
 
+    [[gnu::regparm(2)]]
     output& output::operator<<(output_manipulator manipulator) noexcept
     {
         return manipulator(*this);
     }
 
-    // Free Methods
+    // Free Functions
+    [[gnu::regparm(1)]]
     output& dec(output& out) noexcept
     {
         out.state = integer_base::dec;
         return out;
     }
 
+    [[gnu::regparm(1)]]
     output& hex(output& out) noexcept
     {
         out.state = integer_base::hex;
         return out;
     }
 
+    [[gnu::regparm(1)]]
     output& bool_alpha(output& out) noexcept
     {
         out.bool_alpha_enabled = true;
         return out;
     }
 
+    [[gnu::regparm(1)]]
     output& bool_no_alpha(output& out) noexcept
     {
         out.bool_alpha_enabled = false;

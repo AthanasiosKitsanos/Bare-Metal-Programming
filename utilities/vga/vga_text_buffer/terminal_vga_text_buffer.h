@@ -68,23 +68,39 @@ namespace terminal
         [[gnu::always_inline]]
         inline volatile uint32_t* cell_32() noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE + (get_position() << 1)); }
 
+        [[gnu::regparm(1)]]
         void clear_row() noexcept;
+
         void reset() noexcept;
 
         public:
             // Constructor
-            vga_text_buffer() noexcept;
+            constexpr vga_text_buffer() noexcept: base_row{0}, row{0}, column{0}, active_color{default_color}
+            {}
 
             // Public Methods
             void clear() noexcept;
+
+            [[gnu::regparm(2)]]
             void put(char c) noexcept;
-            void remove_last_char() noexcept;
+
+            [[gnu::regparm(1)]]
             void move_forward() noexcept;
+
+            [[gnu::regparm(1)]]
+            void remove_last_char() noexcept;
+
+            [[gnu::regparm(1)]]
             void move_backwards() noexcept;
+
+            [[gnu::regparm(2)]]
             void move_cursor_left_n(const uint8_t) noexcept;
+
+            [[gnu::regparm(2)]]
             void move_cursor_right_n(const uint8_t) noexcept;
 
             // Inline Public Methods
+            [[gnu::regparm(1)]]
             void move_to_next_line() noexcept;
 
             [[gnu::always_inline]]
