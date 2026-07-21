@@ -35,6 +35,7 @@ namespace terminal
         // Private Members
         static constexpr uint8_t vga_width{80};
         static constexpr uint8_t vga_height{25};
+        static constexpr uint8_t base_row_max{179};
         static constexpr uint16_t length{(vga_width * vga_height) << 1};
         static constexpr uintptr_t VGA_BASE{0xB8000};
         static constexpr color_code default_color{static_cast<color_code>(vga_color::white) | (static_cast<color_code>(vga_color::black) << 4)};
