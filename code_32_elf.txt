@@ -2141,7 +2141,7 @@ Disassembly of section .text:
     9652:	75 e4                	jne    9638 <_ZN8terminal6output20write_string_no_syncEPKc+0x18>
     9654:	b8 2c b3 00 00       	mov    $0xb32c,%eax
     9659:	83 c3 01             	add    $0x1,%ebx
-    965c:	e8 af 10 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    965c:	e8 9f 10 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     9661:	0f be 13             	movsbl (%ebx),%edx
     9664:	84 d2                	test   %dl,%dl
     9666:	75 e7                	jne    964f <_ZN8terminal6output20write_string_no_syncEPKc+0x2f>
@@ -2209,7 +2209,7 @@ Disassembly of section .text:
     9722:	c3                   	ret
     9723:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
     9728:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    972d:	e8 de 0f 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    972d:	e8 ce 0f 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     9732:	eb af                	jmp    96e3 <_ZN8terminal6output19write_hex_8_no_syncEh+0x63>
     9734:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
     9738:	5b                   	pop    %ebx
@@ -2222,7 +2222,7 @@ Disassembly of section .text:
     9749:	b8 2c b3 00 00       	mov    $0xb32c,%eax
     974e:	5e                   	pop    %esi
     974f:	5d                   	pop    %ebp
-    9750:	e9 bb 0f 00 00       	jmp    a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    9750:	e9 ab 0f 00 00       	jmp    a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     9755:	66 90                	xchg   %ax,%ax
     9757:	66 90                	xchg   %ax,%ax
     9759:	66 90                	xchg   %ax,%ax
@@ -2265,7 +2265,7 @@ Disassembly of section .text:
     97c1:	80 fa 0a             	cmp    $0xa,%dl
     97c4:	75 da                	jne    97a0 <_ZN8terminal6output20write_hex_32_no_syncEm+0x40>
     97c6:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    97cb:	e8 40 0f 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    97cb:	e8 30 0f 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     97d0:	83 eb 04             	sub    $0x4,%ebx
     97d3:	79 dc                	jns    97b1 <_ZN8terminal6output20write_hex_32_no_syncEm+0x51>
     97d5:	5b                   	pop    %ebx
@@ -2351,7 +2351,7 @@ Disassembly of section .text:
     98bc:	eb be                	jmp    987c <_ZN8terminal6outputlsEc+0x1c>
     98be:	66 90                	xchg   %ax,%ax
     98c0:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    98c5:	e8 46 0e 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    98c5:	e8 36 0e 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     98ca:	0f b6 15 2e b3 00 00 	movzbl 0xb32e,%edx
     98d1:	eb a9                	jmp    987c <_ZN8terminal6outputlsEc+0x1c>
     98d3:	66 90                	xchg   %ax,%ax
@@ -2385,7 +2385,7 @@ Disassembly of section .text:
     9912:	75 e4                	jne    98f8 <_ZN8terminal6outputlsEPKc+0x18>
     9914:	b8 2c b3 00 00       	mov    $0xb32c,%eax
     9919:	83 c6 01             	add    $0x1,%esi
-    991c:	e8 ef 0d 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    991c:	e8 df 0d 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     9921:	0f be 16             	movsbl (%esi),%edx
     9924:	84 d2                	test   %dl,%dl
     9926:	75 e7                	jne    990f <_ZN8terminal6outputlsEPKc+0x2f>
@@ -2497,7 +2497,7 @@ Disassembly of section .text:
     9a55:	80 fa 0a             	cmp    $0xa,%dl
     9a58:	75 de                	jne    9a38 <_ZN8terminal6outputlsEh+0xb8>
     9a5a:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    9a5f:	e8 ac 0c 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    9a5f:	e8 9c 0c 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     9a64:	eb de                	jmp    9a44 <_ZN8terminal6outputlsEh+0xc4>
     9a66:	66 90                	xchg   %ax,%ax
     9a68:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
@@ -2581,7 +2581,7 @@ Disassembly of section .text:
     9b4d:	80 fa 0a             	cmp    $0xa,%dl
     9b50:	75 de                	jne    9b30 <_ZN8terminal6outputlsEm+0xb0>
     9b52:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    9b57:	e8 b4 0b 00 00       	call   a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
+    9b57:	e8 a4 0b 00 00       	call   a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>
     9b5c:	eb de                	jmp    9b3c <_ZN8terminal6outputlsEm+0xbc>
     9b5e:	66 90                	xchg   %ax,%ax
     9b60:	b8 2c b3 00 00       	mov    $0xb32c,%eax
@@ -2720,7 +2720,7 @@ Disassembly of section .text:
     9c90:	89 46 04             	mov    %eax,0x4(%esi)
     9c93:	b8 2c b3 00 00       	mov    $0xb32c,%eax
     9c98:	c6 43 ff 00          	movb   $0x0,-0x1(%ebx)
-    9c9c:	e8 bf 08 00 00       	call   a560 <_ZN8terminal15vga_text_buffer16remove_last_charEv>
+    9c9c:	e8 af 08 00 00       	call   a550 <_ZN8terminal15vga_text_buffer16remove_last_charEv>
     9ca1:	8b 16                	mov    (%esi),%edx
     9ca3:	3b 56 04             	cmp    0x4(%esi),%edx
     9ca6:	74 2f                	je     9cd7 <_ZN8terminal5input16handle_backspaceEv+0xd7>
@@ -2841,7 +2841,7 @@ Disassembly of section .text:
     9df8:	74 18                	je     9e12 <_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE+0xc2>
     9dfa:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
     9e00:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    9e05:	e8 56 07 00 00       	call   a560 <_ZN8terminal15vga_text_buffer16remove_last_charEv>
+    9e05:	e8 46 07 00 00       	call   a550 <_ZN8terminal15vga_text_buffer16remove_last_charEv>
     9e0a:	89 f0                	mov    %esi,%eax
     9e0c:	2c 01                	sub    $0x1,%al
     9e0e:	89 c6                	mov    %eax,%esi
@@ -2958,7 +2958,7 @@ Disassembly of section .text:
     9f61:	83 e8 01             	sub    $0x1,%eax
     9f64:	89 01                	mov    %eax,(%ecx)
     9f66:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    9f6b:	e8 60 07 00 00       	call   a6d0 <_ZN8terminal15vga_text_buffer14move_backwardsEv>
+    9f6b:	e8 50 07 00 00       	call   a6c0 <_ZN8terminal15vga_text_buffer14move_backwardsEv>
     9f70:	eb 2a                	jmp    9f9c <_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE+0x6c>
     9f72:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
     9f78:	66 81 fa 4f e0       	cmp    $0xe04f,%dx
@@ -2996,7 +2996,7 @@ Disassembly of section .text:
     9fdf:	83 c0 01             	add    $0x1,%eax
     9fe2:	89 01                	mov    %eax,(%ecx)
     9fe4:	b8 2c b3 00 00       	mov    $0xb32c,%eax
-    9fe9:	e8 f2 05 00 00       	call   a5e0 <_ZN8terminal15vga_text_buffer12move_forwardEv>
+    9fe9:	e8 e2 05 00 00       	call   a5d0 <_ZN8terminal15vga_text_buffer12move_forwardEv>
     9fee:	eb ac                	jmp    9f9c <_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE+0x6c>
     9ff0:	8b 10                	mov    (%eax),%edx
     9ff2:	8d 58 08             	lea    0x8(%eax),%ebx
@@ -3416,329 +3416,333 @@ Disassembly of section .text:
     a42b:	83 ec 1c             	sub    $0x1c,%esp
     a42e:	0f b6 40 03          	movzbl 0x3(%eax),%eax
     a432:	0f b6 71 01          	movzbl 0x1(%ecx),%esi
-    a436:	c1 e0 08             	shl    $0x8,%eax
-    a439:	89 f3                	mov    %esi,%ebx
-    a43b:	09 d0                	or     %edx,%eax
-    a43d:	0f b6 fb             	movzbl %bl,%edi
-    a440:	0f b6 51 02          	movzbl 0x2(%ecx),%edx
-    a444:	66 89 45 e4          	mov    %ax,-0x1c(%ebp)
-    a448:	0f b6 01             	movzbl (%ecx),%eax
-    a44b:	88 45 e7             	mov    %al,-0x19(%ebp)
+    a436:	0f b6 59 02          	movzbl 0x2(%ecx),%ebx
+    a43a:	c1 e0 08             	shl    $0x8,%eax
+    a43d:	09 d0                	or     %edx,%eax
+    a43f:	0f b6 11             	movzbl (%ecx),%edx
+    a442:	66 89 45 e6          	mov    %ax,-0x1a(%ebp)
+    a446:	89 f0                	mov    %esi,%eax
+    a448:	0f b6 f8             	movzbl %al,%edi
+    a44b:	0f b6 c2             	movzbl %dl,%eax
     a44e:	01 f8                	add    %edi,%eax
-    a450:	0f b6 fa             	movzbl %dl,%edi
+    a450:	0f b6 fb             	movzbl %bl,%edi
     a453:	8d 04 80             	lea    (%eax,%eax,4),%eax
     a456:	c1 e0 04             	shl    $0x4,%eax
     a459:	01 f8                	add    %edi,%eax
-    a45b:	0f b7 7d e4          	movzwl -0x1c(%ebp),%edi
+    a45b:	0f b7 7d e6          	movzwl -0x1a(%ebp),%edi
     a45f:	0f b7 c0             	movzwl %ax,%eax
     a462:	01 c0                	add    %eax,%eax
-    a464:	66 89 b8 00 80 0b 00 	mov    %di,0xb8000(%eax)
-    a46b:	8d 7a 01             	lea    0x1(%edx),%edi
-    a46e:	31 c0                	xor    %eax,%eax
-    a470:	80 fa 4f             	cmp    $0x4f,%dl
-    a473:	ba b0 ff ff ff       	mov    $0xffffffb0,%edx
-    a478:	89 fb                	mov    %edi,%ebx
-    a47a:	0f 45 d0             	cmovne %eax,%edx
-    a47d:	01 fa                	add    %edi,%edx
-    a47f:	80 fb 50             	cmp    $0x50,%bl
-    a482:	0f 94 c3             	sete   %bl
-    a485:	88 51 02             	mov    %dl,0x2(%ecx)
-    a488:	01 de                	add    %ebx,%esi
-    a48a:	89 f3                	mov    %esi,%ebx
-    a48c:	80 fb 19             	cmp    $0x19,%bl
-    a48f:	0f 94 c3             	sete   %bl
-    a492:	89 df                	mov    %ebx,%edi
-    a494:	0f b6 5d e7          	movzbl -0x19(%ebp),%ebx
-    a498:	01 df                	add    %ebx,%edi
-    a49a:	89 fb                	mov    %edi,%ebx
-    a49c:	88 19                	mov    %bl,(%ecx)
-    a49e:	89 f3                	mov    %esi,%ebx
-    a4a0:	80 fb 19             	cmp    $0x19,%bl
-    a4a3:	bb e7 ff ff ff       	mov    $0xffffffe7,%ebx
-    a4a8:	0f 44 c3             	cmove  %ebx,%eax
-    a4ab:	01 f0                	add    %esi,%eax
-    a4ad:	88 41 01             	mov    %al,0x1(%ecx)
-    a4b0:	89 f0                	mov    %esi,%eax
-    a4b2:	3c 19                	cmp    $0x19,%al
-    a4b4:	74 0a                	je     a4c0 <_ZN8terminal15vga_text_buffer3putEc+0xa0>
-    a4b6:	83 c4 1c             	add    $0x1c,%esp
-    a4b9:	5b                   	pop    %ebx
-    a4ba:	5e                   	pop    %esi
-    a4bb:	5f                   	pop    %edi
-    a4bc:	5d                   	pop    %ebp
-    a4bd:	c3                   	ret
-    a4be:	66 90                	xchg   %ax,%ax
-    a4c0:	89 f8                	mov    %edi,%eax
-    a4c2:	0f b6 35 04 be 00 00 	movzbl 0xbe04,%esi
-    a4c9:	89 cb                	mov    %ecx,%ebx
-    a4cb:	3c 19                	cmp    $0x19,%al
-    a4cd:	77 49                	ja     a518 <_ZN8terminal15vga_text_buffer3putEc+0xf8>
-    a4cf:	0f b6 f8             	movzbl %al,%edi
-    a4d2:	0f b6 d2             	movzbl %dl,%edx
-    a4d5:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-    a4da:	8d 3c bf             	lea    (%edi,%edi,4),%edi
-    a4dd:	c1 e7 04             	shl    $0x4,%edi
-    a4e0:	8d 04 17             	lea    (%edi,%edx,1),%eax
-    a4e3:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a4e8:	0f b7 c0             	movzwl %ax,%eax
-    a4eb:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
-    a4f2:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
-    a4f9:	0f b6 03             	movzbl (%ebx),%eax
-    a4fc:	83 c4 1c             	add    $0x1c,%esp
-    a4ff:	5b                   	pop    %ebx
-    a500:	5e                   	pop    %esi
-    a501:	8d 04 80             	lea    (%eax,%eax,4),%eax
-    a504:	5f                   	pop    %edi
-    a505:	5d                   	pop    %ebp
-    a506:	c1 e0 04             	shl    $0x4,%eax
-    a509:	0f b7 c0             	movzwl %ax,%eax
-    a50c:	e9 1f 04 00 00       	jmp    a930 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
-    a511:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-    a518:	0f b6 f8             	movzbl %al,%edi
-    a51b:	b9 00 0f 00 00       	mov    $0xf00,%ecx
-    a520:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
-    a525:	8d 04 bf             	lea    (%edi,%edi,4),%eax
-    a528:	c1 e0 05             	shl    $0x5,%eax
-    a52b:	05 00 80 0b 00       	add    $0xb8000,%eax
-    a530:	ff 14 b5 14 b3 00 00 	call   *0xb314(,%esi,4)
-    a537:	ba 01 18 00 00       	mov    $0x1801,%edx
-    a53c:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-    a541:	66 89 13             	mov    %dx,(%ebx)
-    a544:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a549:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
-    a550:	eb a7                	jmp    a4f9 <_ZN8terminal15vga_text_buffer3putEc+0xd9>
-    a552:	66 90                	xchg   %ax,%ax
-    a554:	66 90                	xchg   %ax,%ax
-    a556:	66 90                	xchg   %ax,%ax
-    a558:	66 90                	xchg   %ax,%ax
-    a55a:	66 90                	xchg   %ax,%ax
-    a55c:	66 90                	xchg   %ax,%ax
-    a55e:	66 90                	xchg   %ax,%ax
+    a464:	80 fb 4f             	cmp    $0x4f,%bl
+    a467:	66 89 b8 00 80 0b 00 	mov    %di,0xb8000(%eax)
+    a46e:	8d 7b 01             	lea    0x1(%ebx),%edi
+    a471:	b8 b0 ff ff ff       	mov    $0xffffffb0,%eax
+    a476:	bb 00 00 00 00       	mov    $0x0,%ebx
+    a47b:	0f 45 c3             	cmovne %ebx,%eax
+    a47e:	01 f8                	add    %edi,%eax
+    a480:	88 45 e5             	mov    %al,-0x1b(%ebp)
+    a483:	88 41 02             	mov    %al,0x2(%ecx)
+    a486:	89 f8                	mov    %edi,%eax
+    a488:	3c 50                	cmp    $0x50,%al
+    a48a:	0f 94 c3             	sete   %bl
+    a48d:	01 f3                	add    %esi,%ebx
+    a48f:	80 fb 19             	cmp    $0x19,%bl
+    a492:	0f 94 c0             	sete   %al
+    a495:	89 c6                	mov    %eax,%esi
+    a497:	8d 04 32             	lea    (%edx,%esi,1),%eax
+    a49a:	89 f2                	mov    %esi,%edx
+    a49c:	88 45 e6             	mov    %al,-0x1a(%ebp)
+    a49f:	88 01                	mov    %al,(%ecx)
+    a4a1:	89 d8                	mov    %ebx,%eax
+    a4a3:	29 d0                	sub    %edx,%eax
+    a4a5:	88 41 01             	mov    %al,0x1(%ecx)
+    a4a8:	80 fb 19             	cmp    $0x19,%bl
+    a4ab:	74 0b                	je     a4b8 <_ZN8terminal15vga_text_buffer3putEc+0x98>
+    a4ad:	83 c4 1c             	add    $0x1c,%esp
+    a4b0:	5b                   	pop    %ebx
+    a4b1:	5e                   	pop    %esi
+    a4b2:	5f                   	pop    %edi
+    a4b3:	5d                   	pop    %ebp
+    a4b4:	c3                   	ret
+    a4b5:	8d 76 00             	lea    0x0(%esi),%esi
+    a4b8:	89 cb                	mov    %ecx,%ebx
+    a4ba:	0f b6 4d e6          	movzbl -0x1a(%ebp),%ecx
+    a4be:	0f b6 35 04 be 00 00 	movzbl 0xbe04,%esi
+    a4c5:	80 f9 b3             	cmp    $0xb3,%cl
+    a4c8:	77 46                	ja     a510 <_ZN8terminal15vga_text_buffer3putEc+0xf0>
+    a4ca:	83 c1 18             	add    $0x18,%ecx
+    a4cd:	0f b6 45 e5          	movzbl -0x1b(%ebp),%eax
+    a4d1:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a4d6:	0f b6 c9             	movzbl %cl,%ecx
+    a4d9:	8d 0c 89             	lea    (%ecx,%ecx,4),%ecx
+    a4dc:	c1 e1 04             	shl    $0x4,%ecx
+    a4df:	01 c8                	add    %ecx,%eax
+    a4e1:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+    a4e6:	0f b7 c0             	movzwl %ax,%eax
+    a4e9:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
+    a4f0:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
+    a4f7:	0f b6 03             	movzbl (%ebx),%eax
+    a4fa:	83 c4 1c             	add    $0x1c,%esp
+    a4fd:	5b                   	pop    %ebx
+    a4fe:	5e                   	pop    %esi
+    a4ff:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a502:	5f                   	pop    %edi
+    a503:	5d                   	pop    %ebp
+    a504:	c1 e0 04             	shl    $0x4,%eax
+    a507:	0f b7 c0             	movzwl %ax,%eax
+    a50a:	e9 21 04 00 00       	jmp    a930 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
+    a50f:	90                   	nop
+    a510:	8d 04 89             	lea    (%ecx,%ecx,4),%eax
+    a513:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
+    a518:	b9 00 0f 00 00       	mov    $0xf00,%ecx
+    a51d:	c1 e0 05             	shl    $0x5,%eax
+    a520:	05 00 80 0b 00       	add    $0xb8000,%eax
+    a525:	ff 14 b5 14 b3 00 00 	call   *0xb314(,%esi,4)
+    a52c:	ba 01 18 00 00       	mov    $0x1801,%edx
+    a531:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+    a536:	66 89 13             	mov    %dx,(%ebx)
+    a539:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a53e:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
+    a545:	eb b0                	jmp    a4f7 <_ZN8terminal15vga_text_buffer3putEc+0xd7>
+    a547:	66 90                	xchg   %ax,%ax
+    a549:	66 90                	xchg   %ax,%ax
+    a54b:	66 90                	xchg   %ax,%ax
+    a54d:	66 90                	xchg   %ax,%ax
+    a54f:	90                   	nop
 
-0000a560 <_ZN8terminal15vga_text_buffer16remove_last_charEv>:
-    a560:	55                   	push   %ebp
-    a561:	89 c1                	mov    %eax,%ecx
-    a563:	89 e5                	mov    %esp,%ebp
-    a565:	57                   	push   %edi
-    a566:	56                   	push   %esi
-    a567:	53                   	push   %ebx
-    a568:	83 ec 04             	sub    $0x4,%esp
-    a56b:	0f b6 58 02          	movzbl 0x2(%eax),%ebx
-    a56f:	80 fb 01             	cmp    $0x1,%bl
-    a572:	19 d2                	sbb    %edx,%edx
-    a574:	83 e2 50             	and    $0x50,%edx
-    a577:	8d 7c 13 ff          	lea    -0x1(%ebx,%edx,1),%edi
-    a57b:	89 f8                	mov    %edi,%eax
-    a57d:	88 41 02             	mov    %al,0x2(%ecx)
-    a580:	89 d8                	mov    %ebx,%eax
-    a582:	0a 41 01             	or     0x1(%ecx),%al
-    a585:	88 45 f3             	mov    %al,-0xd(%ebp)
-    a588:	0f 94 c0             	sete   %al
-    a58b:	89 c2                	mov    %eax,%edx
-    a58d:	0f b6 01             	movzbl (%ecx),%eax
-    a590:	29 d0                	sub    %edx,%eax
-    a592:	80 fb 01             	cmp    $0x1,%bl
-    a595:	0f b6 59 01          	movzbl 0x1(%ecx),%ebx
-    a599:	89 fa                	mov    %edi,%edx
-    a59b:	88 01                	mov    %al,(%ecx)
-    a59d:	0f b6 c0             	movzbl %al,%eax
-    a5a0:	0f b6 d2             	movzbl %dl,%edx
-    a5a3:	80 db 00             	sbb    $0x0,%bl
-    a5a6:	80 7d f3 01          	cmpb   $0x1,-0xd(%ebp)
-    a5aa:	19 f6                	sbb    %esi,%esi
-    a5ac:	83 e6 19             	and    $0x19,%esi
-    a5af:	01 f3                	add    %esi,%ebx
-    a5b1:	88 59 01             	mov    %bl,0x1(%ecx)
-    a5b4:	0f b6 db             	movzbl %bl,%ebx
-    a5b7:	0f b6 49 03          	movzbl 0x3(%ecx),%ecx
-    a5bb:	01 d8                	add    %ebx,%eax
-    a5bd:	8d 04 80             	lea    (%eax,%eax,4),%eax
-    a5c0:	c1 e1 08             	shl    $0x8,%ecx
-    a5c3:	c1 e0 04             	shl    $0x4,%eax
-    a5c6:	83 c9 20             	or     $0x20,%ecx
-    a5c9:	01 d0                	add    %edx,%eax
-    a5cb:	0f b7 c0             	movzwl %ax,%eax
-    a5ce:	01 c0                	add    %eax,%eax
-    a5d0:	66 89 88 00 80 0b 00 	mov    %cx,0xb8000(%eax)
-    a5d7:	83 c4 04             	add    $0x4,%esp
-    a5da:	5b                   	pop    %ebx
-    a5db:	5e                   	pop    %esi
-    a5dc:	5f                   	pop    %edi
-    a5dd:	5d                   	pop    %ebp
-    a5de:	c3                   	ret
-    a5df:	90                   	nop
+0000a550 <_ZN8terminal15vga_text_buffer16remove_last_charEv>:
+    a550:	55                   	push   %ebp
+    a551:	89 c1                	mov    %eax,%ecx
+    a553:	89 e5                	mov    %esp,%ebp
+    a555:	57                   	push   %edi
+    a556:	56                   	push   %esi
+    a557:	53                   	push   %ebx
+    a558:	83 ec 04             	sub    $0x4,%esp
+    a55b:	0f b6 58 02          	movzbl 0x2(%eax),%ebx
+    a55f:	80 fb 01             	cmp    $0x1,%bl
+    a562:	19 d2                	sbb    %edx,%edx
+    a564:	83 e2 50             	and    $0x50,%edx
+    a567:	8d 7c 13 ff          	lea    -0x1(%ebx,%edx,1),%edi
+    a56b:	89 f8                	mov    %edi,%eax
+    a56d:	88 41 02             	mov    %al,0x2(%ecx)
+    a570:	89 d8                	mov    %ebx,%eax
+    a572:	0a 41 01             	or     0x1(%ecx),%al
+    a575:	88 45 f3             	mov    %al,-0xd(%ebp)
+    a578:	0f 94 c0             	sete   %al
+    a57b:	89 c2                	mov    %eax,%edx
+    a57d:	0f b6 01             	movzbl (%ecx),%eax
+    a580:	29 d0                	sub    %edx,%eax
+    a582:	80 fb 01             	cmp    $0x1,%bl
+    a585:	0f b6 59 01          	movzbl 0x1(%ecx),%ebx
+    a589:	89 fa                	mov    %edi,%edx
+    a58b:	88 01                	mov    %al,(%ecx)
+    a58d:	0f b6 c0             	movzbl %al,%eax
+    a590:	0f b6 d2             	movzbl %dl,%edx
+    a593:	80 db 00             	sbb    $0x0,%bl
+    a596:	80 7d f3 01          	cmpb   $0x1,-0xd(%ebp)
+    a59a:	19 f6                	sbb    %esi,%esi
+    a59c:	83 e6 19             	and    $0x19,%esi
+    a59f:	01 f3                	add    %esi,%ebx
+    a5a1:	88 59 01             	mov    %bl,0x1(%ecx)
+    a5a4:	0f b6 db             	movzbl %bl,%ebx
+    a5a7:	0f b6 49 03          	movzbl 0x3(%ecx),%ecx
+    a5ab:	01 d8                	add    %ebx,%eax
+    a5ad:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a5b0:	c1 e1 08             	shl    $0x8,%ecx
+    a5b3:	c1 e0 04             	shl    $0x4,%eax
+    a5b6:	83 c9 20             	or     $0x20,%ecx
+    a5b9:	01 d0                	add    %edx,%eax
+    a5bb:	0f b7 c0             	movzwl %ax,%eax
+    a5be:	01 c0                	add    %eax,%eax
+    a5c0:	66 89 88 00 80 0b 00 	mov    %cx,0xb8000(%eax)
+    a5c7:	83 c4 04             	add    $0x4,%esp
+    a5ca:	5b                   	pop    %ebx
+    a5cb:	5e                   	pop    %esi
+    a5cc:	5f                   	pop    %edi
+    a5cd:	5d                   	pop    %ebp
+    a5ce:	c3                   	ret
+    a5cf:	90                   	nop
 
-0000a5e0 <_ZN8terminal15vga_text_buffer12move_forwardEv>:
-    a5e0:	55                   	push   %ebp
-    a5e1:	89 c2                	mov    %eax,%edx
-    a5e3:	89 e5                	mov    %esp,%ebp
-    a5e5:	57                   	push   %edi
-    a5e6:	31 ff                	xor    %edi,%edi
-    a5e8:	56                   	push   %esi
-    a5e9:	be e7 ff ff ff       	mov    $0xffffffe7,%esi
-    a5ee:	53                   	push   %ebx
-    a5ef:	bb b0 ff ff ff       	mov    $0xffffffb0,%ebx
-    a5f4:	83 ec 1c             	sub    $0x1c,%esp
-    a5f7:	0f b6 48 02          	movzbl 0x2(%eax),%ecx
-    a5fb:	80 f9 4f             	cmp    $0x4f,%cl
-    a5fe:	8d 41 01             	lea    0x1(%ecx),%eax
-    a601:	0f 45 df             	cmovne %edi,%ebx
-    a604:	01 c3                	add    %eax,%ebx
-    a606:	3c 50                	cmp    $0x50,%al
-    a608:	0f 94 c1             	sete   %cl
-    a60b:	02 4a 01             	add    0x1(%edx),%cl
-    a60e:	88 5d e7             	mov    %bl,-0x19(%ebp)
-    a611:	80 f9 19             	cmp    $0x19,%cl
-    a614:	88 5a 02             	mov    %bl,0x2(%edx)
-    a617:	0f 94 c0             	sete   %al
-    a61a:	02 02                	add    (%edx),%al
-    a61c:	80 f9 19             	cmp    $0x19,%cl
-    a61f:	0f 45 f7             	cmovne %edi,%esi
-    a622:	88 02                	mov    %al,(%edx)
-    a624:	8d 1c 0e             	lea    (%esi,%ecx,1),%ebx
-    a627:	88 5a 01             	mov    %bl,0x1(%edx)
-    a62a:	74 0c                	je     a638 <_ZN8terminal15vga_text_buffer12move_forwardEv+0x58>
-    a62c:	83 c4 1c             	add    $0x1c,%esp
-    a62f:	5b                   	pop    %ebx
-    a630:	5e                   	pop    %esi
-    a631:	5f                   	pop    %edi
-    a632:	5d                   	pop    %ebp
-    a633:	c3                   	ret
-    a634:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-    a638:	0f b6 3d 04 be 00 00 	movzbl 0xbe04,%edi
-    a63f:	89 d6                	mov    %edx,%esi
-    a641:	3c 19                	cmp    $0x19,%al
-    a643:	77 4b                	ja     a690 <_ZN8terminal15vga_text_buffer12move_forwardEv+0xb0>
-    a645:	0f b6 c0             	movzbl %al,%eax
-    a648:	0f b6 5d e7          	movzbl -0x19(%ebp),%ebx
-    a64c:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-    a651:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a656:	8d 04 80             	lea    (%eax,%eax,4),%eax
-    a659:	c1 e0 04             	shl    $0x4,%eax
-    a65c:	01 d8                	add    %ebx,%eax
-    a65e:	0f b7 c0             	movzwl %ax,%eax
-    a661:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
-    a668:	ff 14 bd 20 b3 00 00 	call   *0xb320(,%edi,4)
-    a66f:	0f b6 06             	movzbl (%esi),%eax
-    a672:	83 c4 1c             	add    $0x1c,%esp
-    a675:	5b                   	pop    %ebx
-    a676:	5e                   	pop    %esi
-    a677:	8d 04 80             	lea    (%eax,%eax,4),%eax
-    a67a:	5f                   	pop    %edi
-    a67b:	5d                   	pop    %ebp
-    a67c:	c1 e0 04             	shl    $0x4,%eax
-    a67f:	0f b7 c0             	movzwl %ax,%eax
-    a682:	e9 a9 02 00 00       	jmp    a930 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
-    a687:	90                   	nop
-    a688:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-    a68f:	00 
-    a690:	0f b6 c0             	movzbl %al,%eax
-    a693:	b9 00 0f 00 00       	mov    $0xf00,%ecx
-    a698:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
-    a69d:	8d 04 80             	lea    (%eax,%eax,4),%eax
-    a6a0:	c1 e0 05             	shl    $0x5,%eax
-    a6a3:	05 00 80 0b 00       	add    $0xb8000,%eax
-    a6a8:	ff 14 bd 14 b3 00 00 	call   *0xb314(,%edi,4)
-    a6af:	ba 01 18 00 00       	mov    $0x1801,%edx
-    a6b4:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-    a6b9:	66 89 16             	mov    %dx,(%esi)
-    a6bc:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a6c1:	ff 14 bd 20 b3 00 00 	call   *0xb320(,%edi,4)
-    a6c8:	eb a5                	jmp    a66f <_ZN8terminal15vga_text_buffer12move_forwardEv+0x8f>
-    a6ca:	66 90                	xchg   %ax,%ax
-    a6cc:	66 90                	xchg   %ax,%ax
-    a6ce:	66 90                	xchg   %ax,%ax
+0000a5d0 <_ZN8terminal15vga_text_buffer12move_forwardEv>:
+    a5d0:	55                   	push   %ebp
+    a5d1:	89 e5                	mov    %esp,%ebp
+    a5d3:	57                   	push   %edi
+    a5d4:	56                   	push   %esi
+    a5d5:	53                   	push   %ebx
+    a5d6:	bb 00 00 00 00       	mov    $0x0,%ebx
+    a5db:	83 ec 1c             	sub    $0x1c,%esp
+    a5de:	0f b6 50 02          	movzbl 0x2(%eax),%edx
+    a5e2:	8d 4a 01             	lea    0x1(%edx),%ecx
+    a5e5:	80 fa 4f             	cmp    $0x4f,%dl
+    a5e8:	ba b0 ff ff ff       	mov    $0xffffffb0,%edx
+    a5ed:	0f 45 d3             	cmovne %ebx,%edx
+    a5f0:	01 ca                	add    %ecx,%edx
+    a5f2:	80 f9 50             	cmp    $0x50,%cl
+    a5f5:	0f 94 c1             	sete   %cl
+    a5f8:	02 48 01             	add    0x1(%eax),%cl
+    a5fb:	88 55 e7             	mov    %dl,-0x19(%ebp)
+    a5fe:	80 f9 19             	cmp    $0x19,%cl
+    a601:	88 50 02             	mov    %dl,0x2(%eax)
+    a604:	89 ca                	mov    %ecx,%edx
+    a606:	0f 94 c3             	sete   %bl
+    a609:	89 de                	mov    %ebx,%esi
+    a60b:	02 18                	add    (%eax),%bl
+    a60d:	88 18                	mov    %bl,(%eax)
+    a60f:	89 df                	mov    %ebx,%edi
+    a611:	89 f3                	mov    %esi,%ebx
+    a613:	29 da                	sub    %ebx,%edx
+    a615:	88 50 01             	mov    %dl,0x1(%eax)
+    a618:	80 f9 19             	cmp    $0x19,%cl
+    a61b:	74 0b                	je     a628 <_ZN8terminal15vga_text_buffer12move_forwardEv+0x58>
+    a61d:	83 c4 1c             	add    $0x1c,%esp
+    a620:	5b                   	pop    %ebx
+    a621:	5e                   	pop    %esi
+    a622:	5f                   	pop    %edi
+    a623:	5d                   	pop    %ebp
+    a624:	c3                   	ret
+    a625:	8d 76 00             	lea    0x0(%esi),%esi
+    a628:	89 c6                	mov    %eax,%esi
+    a62a:	89 f9                	mov    %edi,%ecx
+    a62c:	89 f8                	mov    %edi,%eax
+    a62e:	0f b6 1d 04 be 00 00 	movzbl 0xbe04,%ebx
+    a635:	0f b6 c0             	movzbl %al,%eax
+    a638:	80 f9 b3             	cmp    $0xb3,%cl
+    a63b:	77 4b                	ja     a688 <_ZN8terminal15vga_text_buffer12move_forwardEv+0xb8>
+    a63d:	83 c0 18             	add    $0x18,%eax
+    a640:	0f b6 55 e7          	movzbl -0x19(%ebp),%edx
+    a644:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+    a649:	0f b6 c0             	movzbl %al,%eax
+    a64c:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a64f:	c1 e0 04             	shl    $0x4,%eax
+    a652:	01 d0                	add    %edx,%eax
+    a654:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a659:	0f b7 c0             	movzwl %ax,%eax
+    a65c:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
+    a663:	ff 14 9d 20 b3 00 00 	call   *0xb320(,%ebx,4)
+    a66a:	0f b6 06             	movzbl (%esi),%eax
+    a66d:	83 c4 1c             	add    $0x1c,%esp
+    a670:	5b                   	pop    %ebx
+    a671:	5e                   	pop    %esi
+    a672:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a675:	5f                   	pop    %edi
+    a676:	5d                   	pop    %ebp
+    a677:	c1 e0 04             	shl    $0x4,%eax
+    a67a:	0f b7 c0             	movzwl %ax,%eax
+    a67d:	e9 ae 02 00 00       	jmp    a930 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
+    a682:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+    a688:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a68b:	b9 00 0f 00 00       	mov    $0xf00,%ecx
+    a690:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
+    a695:	c1 e0 05             	shl    $0x5,%eax
+    a698:	05 00 80 0b 00       	add    $0xb8000,%eax
+    a69d:	ff 14 9d 14 b3 00 00 	call   *0xb314(,%ebx,4)
+    a6a4:	ba 01 18 00 00       	mov    $0x1801,%edx
+    a6a9:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+    a6ae:	66 89 16             	mov    %dx,(%esi)
+    a6b1:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a6b6:	ff 14 9d 20 b3 00 00 	call   *0xb320(,%ebx,4)
+    a6bd:	eb ab                	jmp    a66a <_ZN8terminal15vga_text_buffer12move_forwardEv+0x9a>
+    a6bf:	90                   	nop
 
-0000a6d0 <_ZN8terminal15vga_text_buffer14move_backwardsEv>:
-    a6d0:	55                   	push   %ebp
-    a6d1:	89 c2                	mov    %eax,%edx
-    a6d3:	89 e5                	mov    %esp,%ebp
-    a6d5:	53                   	push   %ebx
-    a6d6:	0f b6 48 02          	movzbl 0x2(%eax),%ecx
-    a6da:	80 f9 01             	cmp    $0x1,%cl
-    a6dd:	89 cb                	mov    %ecx,%ebx
-    a6df:	19 c0                	sbb    %eax,%eax
-    a6e1:	83 e0 50             	and    $0x50,%eax
-    a6e4:	0a 5a 01             	or     0x1(%edx),%bl
-    a6e7:	8d 44 01 ff          	lea    -0x1(%ecx,%eax,1),%eax
-    a6eb:	88 42 02             	mov    %al,0x2(%edx)
-    a6ee:	0f 94 c0             	sete   %al
-    a6f1:	28 02                	sub    %al,(%edx)
-    a6f3:	0f b6 42 01          	movzbl 0x1(%edx),%eax
-    a6f7:	80 f9 01             	cmp    $0x1,%cl
-    a6fa:	1c 00                	sbb    $0x0,%al
-    a6fc:	80 fb 01             	cmp    $0x1,%bl
-    a6ff:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-    a702:	19 c9                	sbb    %ecx,%ecx
-    a704:	83 e1 19             	and    $0x19,%ecx
-    a707:	01 c8                	add    %ecx,%eax
-    a709:	88 42 01             	mov    %al,0x1(%edx)
-    a70c:	c9                   	leave
-    a70d:	c3                   	ret
-    a70e:	66 90                	xchg   %ax,%ax
+0000a6c0 <_ZN8terminal15vga_text_buffer14move_backwardsEv>:
+    a6c0:	55                   	push   %ebp
+    a6c1:	89 c2                	mov    %eax,%edx
+    a6c3:	89 e5                	mov    %esp,%ebp
+    a6c5:	53                   	push   %ebx
+    a6c6:	0f b6 48 02          	movzbl 0x2(%eax),%ecx
+    a6ca:	80 f9 01             	cmp    $0x1,%cl
+    a6cd:	89 cb                	mov    %ecx,%ebx
+    a6cf:	19 c0                	sbb    %eax,%eax
+    a6d1:	83 e0 50             	and    $0x50,%eax
+    a6d4:	0a 5a 01             	or     0x1(%edx),%bl
+    a6d7:	8d 44 01 ff          	lea    -0x1(%ecx,%eax,1),%eax
+    a6db:	88 42 02             	mov    %al,0x2(%edx)
+    a6de:	0f 94 c0             	sete   %al
+    a6e1:	28 02                	sub    %al,(%edx)
+    a6e3:	0f b6 42 01          	movzbl 0x1(%edx),%eax
+    a6e7:	80 f9 01             	cmp    $0x1,%cl
+    a6ea:	1c 00                	sbb    $0x0,%al
+    a6ec:	80 fb 01             	cmp    $0x1,%bl
+    a6ef:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+    a6f2:	19 c9                	sbb    %ecx,%ecx
+    a6f4:	83 e1 19             	and    $0x19,%ecx
+    a6f7:	01 c8                	add    %ecx,%eax
+    a6f9:	88 42 01             	mov    %al,0x1(%edx)
+    a6fc:	c9                   	leave
+    a6fd:	c3                   	ret
+    a6fe:	66 90                	xchg   %ax,%ax
 
-0000a710 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>:
-    a710:	55                   	push   %ebp
-    a711:	89 e5                	mov    %esp,%ebp
-    a713:	56                   	push   %esi
-    a714:	be 00 00 00 00       	mov    $0x0,%esi
-    a719:	53                   	push   %ebx
-    a71a:	0f b6 48 01          	movzbl 0x1(%eax),%ecx
-    a71e:	c6 40 02 00          	movb   $0x0,0x2(%eax)
-    a722:	80 f9 18             	cmp    $0x18,%cl
-    a725:	8d 59 01             	lea    0x1(%ecx),%ebx
-    a728:	0f 94 c2             	sete   %dl
-    a72b:	02 10                	add    (%eax),%dl
-    a72d:	80 f9 18             	cmp    $0x18,%cl
-    a730:	b9 e7 ff ff ff       	mov    $0xffffffe7,%ecx
-    a735:	0f 45 ce             	cmovne %esi,%ecx
-    a738:	88 10                	mov    %dl,(%eax)
-    a73a:	01 d9                	add    %ebx,%ecx
-    a73c:	88 48 01             	mov    %cl,0x1(%eax)
-    a73f:	80 fb 19             	cmp    $0x19,%bl
-    a742:	74 0c                	je     a750 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv+0x40>
-    a744:	5b                   	pop    %ebx
-    a745:	5e                   	pop    %esi
-    a746:	5d                   	pop    %ebp
-    a747:	c3                   	ret
-    a748:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-    a74f:	00 
-    a750:	0f b6 35 04 be 00 00 	movzbl 0xbe04,%esi
-    a757:	89 c3                	mov    %eax,%ebx
-    a759:	80 fa 19             	cmp    $0x19,%dl
-    a75c:	77 42                	ja     a7a0 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv+0x90>
-    a75e:	0f b6 d2             	movzbl %dl,%edx
-    a761:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-    a766:	8d 14 92             	lea    (%edx,%edx,4),%edx
-    a769:	c1 e2 04             	shl    $0x4,%edx
-    a76c:	0f b7 d2             	movzwl %dx,%edx
-    a76f:	8d 84 12 00 80 0b 00 	lea    0xb8000(%edx,%edx,1),%eax
-    a776:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a77b:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
-    a782:	0f b6 03             	movzbl (%ebx),%eax
-    a785:	5b                   	pop    %ebx
-    a786:	5e                   	pop    %esi
-    a787:	5d                   	pop    %ebp
-    a788:	8d 04 80             	lea    (%eax,%eax,4),%eax
-    a78b:	c1 e0 04             	shl    $0x4,%eax
-    a78e:	0f b7 c0             	movzwl %ax,%eax
-    a791:	e9 9a 01 00 00       	jmp    a930 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
-    a796:	66 90                	xchg   %ax,%ax
-    a798:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-    a79f:	00 
-    a7a0:	0f b6 d2             	movzbl %dl,%edx
-    a7a3:	b9 00 0f 00 00       	mov    $0xf00,%ecx
-    a7a8:	8d 04 92             	lea    (%edx,%edx,4),%eax
-    a7ab:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
-    a7b0:	c1 e0 05             	shl    $0x5,%eax
-    a7b3:	05 00 80 0b 00       	add    $0xb8000,%eax
-    a7b8:	ff 14 b5 14 b3 00 00 	call   *0xb314(,%esi,4)
-    a7bf:	ba 01 18 00 00       	mov    $0x1801,%edx
-    a7c4:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-    a7c9:	66 89 13             	mov    %dx,(%ebx)
-    a7cc:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a7d1:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
-    a7d8:	eb a8                	jmp    a782 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv+0x72>
+0000a700 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv>:
+    a700:	55                   	push   %ebp
+    a701:	89 e5                	mov    %esp,%ebp
+    a703:	57                   	push   %edi
+    a704:	56                   	push   %esi
+    a705:	53                   	push   %ebx
+    a706:	83 ec 0c             	sub    $0xc,%esp
+    a709:	0f b6 48 01          	movzbl 0x1(%eax),%ecx
+    a70d:	c6 40 02 00          	movb   $0x0,0x2(%eax)
+    a711:	80 f9 18             	cmp    $0x18,%cl
+    a714:	8d 51 01             	lea    0x1(%ecx),%edx
+    a717:	0f b6 08             	movzbl (%eax),%ecx
+    a71a:	0f 94 c3             	sete   %bl
+    a71d:	01 d9                	add    %ebx,%ecx
+    a71f:	88 08                	mov    %cl,(%eax)
+    a721:	89 ce                	mov    %ecx,%esi
+    a723:	89 d1                	mov    %edx,%ecx
+    a725:	29 d9                	sub    %ebx,%ecx
+    a727:	88 48 01             	mov    %cl,0x1(%eax)
+    a72a:	80 fa 19             	cmp    $0x19,%dl
+    a72d:	74 11                	je     a740 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv+0x40>
+    a72f:	83 c4 0c             	add    $0xc,%esp
+    a732:	5b                   	pop    %ebx
+    a733:	5e                   	pop    %esi
+    a734:	5f                   	pop    %edi
+    a735:	5d                   	pop    %ebp
+    a736:	c3                   	ret
+    a737:	90                   	nop
+    a738:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+    a73f:	00 
+    a740:	89 c3                	mov    %eax,%ebx
+    a742:	89 f2                	mov    %esi,%edx
+    a744:	89 f0                	mov    %esi,%eax
+    a746:	0f b6 c0             	movzbl %al,%eax
+    a749:	80 fa b3             	cmp    $0xb3,%dl
+    a74c:	77 4a                	ja     a798 <_ZN8terminal15vga_text_buffer17move_to_next_lineEv+0x98>
+    a74e:	83 c0 18             	add    $0x18,%eax
+    a751:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+    a756:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a75b:	0f b6 35 04 be 00 00 	movzbl 0xbe04,%esi
+    a762:	0f b6 c0             	movzbl %al,%eax
+    a765:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a768:	c1 e0 04             	shl    $0x4,%eax
+    a76b:	0f b7 c0             	movzwl %ax,%eax
+    a76e:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
+    a775:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
+    a77c:	0f b6 03             	movzbl (%ebx),%eax
+    a77f:	83 c4 0c             	add    $0xc,%esp
+    a782:	5b                   	pop    %ebx
+    a783:	5e                   	pop    %esi
+    a784:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a787:	5f                   	pop    %edi
+    a788:	5d                   	pop    %ebp
+    a789:	c1 e0 04             	shl    $0x4,%eax
+    a78c:	0f b7 c0             	movzwl %ax,%eax
+    a78f:	e9 9c 01 00 00       	jmp    a930 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
+    a794:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+    a798:	0f b6 35 04 be 00 00 	movzbl 0xbe04,%esi
+    a79f:	8d 04 80             	lea    (%eax,%eax,4),%eax
+    a7a2:	b9 00 0f 00 00       	mov    $0xf00,%ecx
+    a7a7:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
+    a7ac:	c1 e0 05             	shl    $0x5,%eax
+    a7af:	05 00 80 0b 00       	add    $0xb8000,%eax
+    a7b4:	ff 14 b5 14 b3 00 00 	call   *0xb314(,%esi,4)
+    a7bb:	ba 01 18 00 00       	mov    $0x1801,%edx
+    a7c0:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+    a7c5:	66 89 13             	mov    %dx,(%ebx)
+    a7c8:	ba a0 00 00 00       	mov    $0xa0,%edx
+    a7cd:	ff 14 b5 20 b3 00 00 	call   *0xb320(,%esi,4)
+    a7d4:	eb a6                	jmp    a77c <_ZN8terminal15vga_text_buffer17move_to_next_lineEv+0x7c>
+    a7d6:	66 90                	xchg   %ax,%ax
+    a7d8:	66 90                	xchg   %ax,%ax
     a7da:	66 90                	xchg   %ax,%ax
     a7dc:	66 90                	xchg   %ax,%ax
     a7de:	66 90                	xchg   %ax,%ax
