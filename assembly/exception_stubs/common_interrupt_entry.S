@@ -74,19 +74,19 @@ ISR_NO_ERROR \v
 
 common_interrupt_entry:
     movl %esp, %edx
-    cmpl $_interrupt_stack_bottom, %esp
-    jna set_esp_to_int_stack
-    cmpl $_interrupt_stack_top, %esp
-    jnbe set_esp_to_int_stack
-    jmp int_stack_set
 
-set_esp_to_int_stack:
-    movl $_interrupt_stack_top, %esp
+    movl $_interrupt_stack_bottom, %ebx
+    movl $_interrupt_stack_top, %ecx
 
-int_stack_set:
-    pushl %edx
+    cmpl %ebx, %edx
+    cmovna %ecx, %esp
+
+    cmpl %ecx, %edx
+    cmovnbe %ecx, %esp
 
 set_interrupt_grounds:
+    pushl %edx
+
     movw $DATA_SEG, %ax
     movw %ax, %ds
     movw %ax, %es
@@ -96,15 +96,12 @@ set_interrupt_grounds:
     addl $4, %esp
 
     popl %esp
-    cmpl $0x20, 0x20(%esp)
-    jae decrement_pic_coutner
-    decb exception_counter
-    jmp end_of_interrupt
+    cmpl $0x20, 0x20(%esp)          //supposedly there are 48 valid interrupts
+    setae %al
+    setb %bl
+    subb %al, pic_counter
+    subb %bl, exception_counter
 
-decrement_pic_coutner:
-    decb pic_counter
-
-end_of_interrupt:
     popa
     addl $8, %esp
     iret
