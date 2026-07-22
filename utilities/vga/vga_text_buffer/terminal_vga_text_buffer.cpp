@@ -186,11 +186,11 @@ namespace terminal
 
         overflowed = (row == vga_height);
         base_row += overflowed;
-        row -= overflowed * vga_height;
+        row -= overflowed;
 
         if(overflowed)
         {
-            if(base_row > vga_height) reset();
+            if(base_row > base_row_max) reset();
             else clear_row();
             vga_hardware_cursor::set_display_start(base_row * vga_width);
         }
@@ -214,11 +214,11 @@ namespace terminal
         ++row;
         bool overflowed{(row == vga_height)};
         base_row += overflowed;
-        row -= overflowed * vga_height;
-
+        row -= overflowed;
+        
         if(overflowed)
         {
-            if(base_row > vga_height) reset();
+            if(base_row > base_row_max) reset();
             else clear_row();
             vga_hardware_cursor::set_display_start(base_row * vga_width);
         }
