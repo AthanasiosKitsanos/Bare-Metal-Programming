@@ -10,13 +10,14 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections -fno-stack-protector -fcallgraph-info=su
 LINKING_FLAGS = --gc-sections
 
 SECTOR_SIZE = 512
 
 INCLUDE_MAP_FILE = -Map=output.map
 
+CI_FILES = ci_files
 #-----------------------Include Mk Files---------------------------------------
 include mk_files/apps/decl.mk
 include mk_files/assembly/decl.mk
@@ -35,7 +36,7 @@ MAIN_OBJ = obj/main.o
 
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE) $(CODE_32_DISASM)
+all: $(OS_IMAGE) $(CODE_32_DISASM) $(CI_FILES)
 
 #------------------------ Source MK Files ---------------------------------
 include mk_files/apps/rules.mk
@@ -51,6 +52,13 @@ include mk_files/lib/rules.mk
 $(MAIN_OBJ): $(MAIN_CPP) $(MAIN_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_DRIVERS_FOLDER) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER) $(INCLUDE_APP_FOLDER) -c $(MAIN_CPP) -o $(MAIN_OBJ)
 
+$(CI_FILES): $(OS_IMAGE)
+	mv obj/apps/shell/*.ci ci_files
+	mv obj/drivers/*.ci ci_files
+	mv obj/kernel/*.ci ci_files
+	mv obj/utilities/*.ci ci_files
+	mv obj/*.ci ci_files
+
 # Rest
 .PHONY: run clean
 
@@ -65,6 +73,9 @@ clean:
 	rm -f obj/hardware_exceptions/*
 	rm -f obj/kernel/*
 	rm -f obj/utilities/*
+	rm -f obj/*.o
 	rm -f bin/*
 	rm -f elf/*
 	rm -f lib/*.a
+	rm -f ci_files/*
+	rm -f diagnostic_tools/*.exe

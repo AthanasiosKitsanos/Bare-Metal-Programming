@@ -1,0 +1,5 @@
+graph: { title: "kernel/pic/kernel_pic.cpp"
+node: { title: "_ZN6kernel9pic_remapEhh" label: "void kernel::pic_remap(uint8_t, uint8_t)\nkernel/pic/kernel_pic.cpp:20:10\n16 bytes (static)" }
+node: { title: "_ZN6kernel8send_eoiEh" label: "void kernel::send_eoi(uint8_t)\nkernel/pic/kernel_pic.cpp:52:10\n4 bytes (static)" }
+node: { title: "_ZN6kernel34mask_all_except_timer_and_keyboardEv" label: "void kernel::mask_all_except_timer_and_keyboard()\nkernel/pic/kernel_pic.cpp:58:10\n4 bytes (static)" }
+}

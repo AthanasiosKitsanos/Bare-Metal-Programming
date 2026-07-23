@@ -1368,7 +1368,7 @@ Disassembly of section .text:
     8dd0:	55                   	push   %ebp
     8dd1:	89 c1                	mov    %eax,%ecx
     8dd3:	89 e5                	mov    %esp,%ebp
-    8dd5:	83 ec 28             	sub    $0x28,%esp
+    8dd5:	83 ec 18             	sub    $0x18,%esp
     8dd8:	8b 40 20             	mov    0x20(%eax),%eax
     8ddb:	83 f8 0d             	cmp    $0xd,%eax
     8dde:	74 74                	je     8e54 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x84>
@@ -1391,22 +1391,20 @@ Disassembly of section .text:
     8e0d:	51                   	push   %ecx
     8e0e:	68 bc aa 00 00       	push   $0xaabc
     8e13:	e8 68 fe ff ff       	call   8c80 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-    8e18:	8d 45 f6             	lea    -0xa(%ebp),%eax
-    8e1b:	6a 00                	push   $0x0
-    8e1d:	6a 0e                	push   $0xe
-    8e1f:	68 d8 a9 00 00       	push   $0xa9d8
-    8e24:	50                   	push   %eax
-    8e25:	89 4d e4             	mov    %ecx,-0x1c(%ebp)
-    8e28:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
-    8e2e:	e8 2d 02 00 00       	call   9060 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-    8e33:	ba 64 ab 00 00       	mov    $0xab64,%edx
-    8e38:	8d 45 f6             	lea    -0xa(%ebp),%eax
-    8e3b:	e8 a0 0a 00 00       	call   98e0 <_ZN8terminal6outputlsEPKc>
-    8e40:	8b 4d e4             	mov    -0x1c(%ebp),%ecx
-    8e43:	8b 51 20             	mov    0x20(%ecx),%edx
-    8e46:	e8 35 0c 00 00       	call   9a80 <_ZN8terminal6outputlsEm>
-    8e4b:	83 c4 10             	add    $0x10,%esp
-    8e4e:	66 90                	xchg   %ax,%ax
+    8e18:	6a 00                	push   $0x0
+    8e1a:	6a 0e                	push   $0xe
+    8e1c:	68 d8 a9 00 00       	push   $0xa9d8
+    8e21:	68 c2 b5 00 00       	push   $0xb5c2
+    8e26:	89 4d f4             	mov    %ecx,-0xc(%ebp)
+    8e29:	e8 32 02 00 00       	call   9060 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
+    8e2e:	ba 64 ab 00 00       	mov    $0xab64,%edx
+    8e33:	b8 c2 b5 00 00       	mov    $0xb5c2,%eax
+    8e38:	e8 a3 0a 00 00       	call   98e0 <_ZN8terminal6outputlsEPKc>
+    8e3d:	8b 4d f4             	mov    -0xc(%ebp),%ecx
+    8e40:	8b 51 20             	mov    0x20(%ecx),%edx
+    8e43:	e8 38 0c 00 00       	call   9a80 <_ZN8terminal6outputlsEm>
+    8e48:	83 c4 10             	add    $0x10,%esp
+    8e4b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
     8e50:	fa                   	cli
     8e51:	f4                   	hlt
     8e52:	eb fc                	jmp    8e50 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x80>

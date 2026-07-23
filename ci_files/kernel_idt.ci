@@ -1,0 +1,5 @@
+graph: { title: "kernel/idt/kernel_idt.cpp"
+node: { title: "_ZN6kernel18set_interrupt_gateEhmth" label: "void kernel::set_interrupt_gate(uint8_t, uint32_t, uint16_t, uint8_t)\nkernel/idt/kernel_idt.cpp:12:10\n16 bytes (static)" }
+node: { title: "_ZN6kernel8load_idtEv" label: "void kernel::load_idt()\nkernel/idt/kernel_idt.cpp:22:10\n24 bytes (static)" }
+node: { title: "kernel/idt/kernel_idt.cpp:_GLOBAL__sub_I__ZN6kernel18set_interrupt_gateEhmth" label: "cpp)\nkernel/idt/kernel_idt.cpp:32:1\n4 bytes (static)" }
+}

@@ -1,0 +1,10 @@
+graph: { title: "kernel/logger/kernel_logger.cpp"
+node: { title: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "void kernel::logger::set_prefix_text_and_color(const char*, vga_color, vga_color)\nkernel/logger/kernel_logger.cpp:6:10\n16 bytes (static)" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
+edge: { sourcename: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/logger/kernel_logger.cpp:10:23" }
+node: { title: "_ZN6kernel6logger5panicEPKc" label: "void kernel::logger::panic(const char*)\nkernel/logger/kernel_logger.cpp:20:23\n16 bytes (static)" }
+edge: { sourcename: "_ZN6kernel6logger5panicEPKc" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/logger/kernel_logger.cpp:23:23" }
+edge: { sourcename: "_ZN6kernel6logger5panicEPKc" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/logger/kernel_logger.cpp:23:38" }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
+edge: { sourcename: "_ZN6kernel6logger5panicEPKc" targetname: "_ZN8terminal6outputlsEc" label: "kernel/logger/kernel_logger.cpp:23:55" }
+}

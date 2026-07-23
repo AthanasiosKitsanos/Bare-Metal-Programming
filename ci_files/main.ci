@@ -1,0 +1,21 @@
+graph: { title: "main.cpp"
+node: { title: "kernel_main" label: "void kernel_main()\nmain.cpp:8:30\n416 bytes (dynamic,bounded)" }
+node: { title: "_ZN6kernel14initialize_pitEm" label: "void kernel::initialize_pit(uint32_t)\nkernel/pit/kernel_pit.h:7:10" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel14initialize_pitEm" label: "main.cpp:13:27" }
+node: { title: "_ZN6kernel19set_timer_frequencyEm" label: "void kernel::set_timer_frequency(uint32_t)\nkernel/timer/kernel_timer.h:13:10" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel19set_timer_frequencyEm" label: "main.cpp:14:32" }
+node: { title: "_ZN8terminal6output10initializeEv" label: "static void terminal::output::initialize()\nutilities/io/output/terminal_output.h:122:25" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6output10initializeEv" label: "main.cpp:15:33" }
+node: { title: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "kernel::memory::e820_memory_map kernel::memory::get_e820_memory_map()\nkernel/memory/e820/kernel_e820.h:30:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "main.cpp:17:76" }
+node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t, uintptr_t)\nkernel/memory/pmm/kernel_pmm.h:20:10" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "main.cpp:18:35" }
+node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initialize_exceptions()\nkernel/exceptions/kernel_exceptions.h:5:10" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:20:34" }
+node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "main.cpp:22:32" }
+node: { title: "_ZN3app5shellC1Ev" label: "app::shell::shell()\napps/shell/shell.h:19:13" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN3app5shellC1Ev" label: "main.cpp:24:22" }
+node: { title: "_ZN3app5shell3runEv" label: "void app::shell::run()\napps/shell/shell.h:23:18" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN3app5shell3runEv" label: "main.cpp:28:14" }
+}

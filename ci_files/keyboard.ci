@@ -1,0 +1,12 @@
+graph: { title: "drivers/keyboard/keyboard.cpp"
+node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.cpp:244:10\n48 bytes (dynamic,bounded)" }
+node: { title: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "void kernel::logger::set_prefix_text_and_color(const char*, vga_color, vga_color)\nkernel/logger/kernel_logger.h:14:14" shape : ellipse }
+edge: { sourcename: "_ZN6driver19initialize_keyboardEv" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "kernel/logger/kernel_logger.h:37:42" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
+edge: { sourcename: "_ZN6driver19initialize_keyboardEv" targetname: "_ZN8terminal6outputlsEPKc" label: "drivers/keyboard/keyboard.cpp:251:30" }
+node: { title: "_ZN6driver8keyboard24try_translate_text_eventEPKNS0_14keyboard_eventEPc" label: "bool driver::keyboard::try_translate_text_event(const keyboard_event*, char*)\ndrivers/keyboard/keyboard.cpp:260:10\n24 bytes (static)" }
+node: { title: "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE" label: "void driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)\ndrivers/keyboard/keyboard.cpp:282:10\n24 bytes (static)" }
+node: { title: "_ZN6driver8keyboard31current_keyboard_modifier_stateEv" label: "driver::keyboard::modifier_state driver::keyboard::current_keyboard_modifier_state()\ndrivers/keyboard/keyboard.cpp:312:20\n4 bytes (static)" }
+node: { title: "_ZN6driver8keyboard19poll_keyboard_eventEPNS0_14keyboard_eventE" label: "bool driver::keyboard::poll_keyboard_event(keyboard_event*)\ndrivers/keyboard/keyboard.cpp:319:10\n20 bytes (static)" }
+node: { title: "_ZN6driver8keyboard26has_pending_keyboard_eventEv" label: "uint8_t driver::keyboard::has_pending_keyboard_event()\ndrivers/keyboard/keyboard.cpp:329:13\n4 bytes (static)" }
+}
