@@ -28,23 +28,25 @@ struct alignas(8) graph_ci
 {
     std::vector<std::string> children;
     uint32_t frame_size;
-    uint32_t diff;
+    uint32_t dist;
     color col;
     std::string title;
 
     graph_ci() noexcept = default;
-    graph_ci(graph_ci&& other) noexcept: title{std::move(other.title)}, children{std::move(other.children)}, frame_size{other.frame_size}, col{other.col}
+    graph_ci(graph_ci&& other) noexcept: children{std::move(other.children)}, frame_size{other.frame_size}, dist{other.dist}, col{other.col}, title{std::move(other.title)}
     {
         other.frame_size = 0;
+        other.dist = 0;
         other.col = color::white;
     }
     
     graph_ci& operator=(const graph_ci& other) noexcept
     {
-        title = other.title;
         children = other.children;
         frame_size = other.frame_size;
         col = other.col;
+        dist = other.dist;
+        title = other.title;
         return *this;
     }
 };
@@ -107,10 +109,16 @@ int main()
                 current_char = (line.data() + new_line_index + 2);
                 std::from_chars_result result{std::from_chars(current_char, end, graph.frame_size)};
 
-                if(!u_map.contains(graph.title)) u_map.emplace(graph.title, std::move(graph));
+                if(u_map.contains(graph.title))
+                {
+                    graph_ci* temp{&u_map[graph.title]};
+                    temp->frame_size += graph.frame_size;
+                    temp->dist = temp->frame_size;
+                }
                 else
                 {
-                    u_map[graph.title].frame_size += graph.frame_size;
+                    graph.dist = graph.frame_size;
+                    u_map.emplace(graph.title, std::move(graph));
                 }
             }
             else if(line.starts_with("edge"))
@@ -160,24 +168,33 @@ int main()
     
     std::reverse(topological_order.begin(), topological_order.end());
 
-
-
-    constexpr const char* keyboard_interrupt{"_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE"};
-    constexpr const char* timer_interrupt{"_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE"};
-    constexpr const char* cpu_exception{"kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE"};
-    constexpr const char* handle_exception{"kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE"};
-    constexpr const char* put_method{"_ZN8terminal15vga_text_buffer3putEc"};
+    graph_ci* const* topological_current{topological_order.data()};
+    const graph_ci* const* topological_end{topological_current + topological_order.size()};
+    const std::string* child{nullptr};
+    const std::string* child_end{nullptr};
+    graph_ci* temp_child{};
     
-    const graph_ci* const k_interrupt{&u_map[keyboard_interrupt]};
-    const graph_ci* const t_interrupt{&u_map[timer_interrupt]};
-    const graph_ci* const c_exception{&u_map[cpu_exception]};
-    const graph_ci* const h_exception{&u_map[handle_exception]};
-    const graph_ci* const p_method{&u_map[put_method]};
+    uint32_t topological_dist{0};
+    uint32_t biggest_dist{0};
+    for(; topological_current < topological_end; ++topological_current)
+    {
+        topological_dist = (*topological_current)->dist;
+        biggest_dist = std::max(biggest_dist, topological_dist);
+        std::cout << (*topological_current)->title << "\nCurrent Biggest Distance: " << biggest_dist << "\n\n";
+        child = (*topological_current)->children.data();
+        child_end = child + (*topological_current)->children.size();
+        for(; child < child_end; ++child)
+        {
+            temp_child = &u_map[*child];
+            temp_child->dist = std::max(temp_child->dist, topological_dist + temp_child->frame_size);
+        }
+    }
 
-    std::cout << "handle_keyboard_interrupt: " << k_interrupt->frame_size
-    << " bytes\n\ntimer_interrupt: " << t_interrupt->frame_size
-    << " bytes\n\ncpu_exceptions: " << c_exception->frame_size
-    << " bytes\n\nhandle_exceptions: " << h_exception->frame_size << " bytes, with " << h_exception->children.size() << " childern\n\n"
-    << "put(): " << p_method->frame_size << " bytes, with " << p_method->children.size() << " children\n\n"
-    << "Loops_found: " << loop_found << "\n\n";
+    // for(const std::pair<const std::string, graph_ci>& pair : u_map)
+    // {
+    //     std::cout << pair.first
+    //     << "\nDist Size: " << pair.second.dist
+    //     << "\nFrame Size: " << pair.second.frame_size << "\n\n";
+    // }
+    // std::cout << "Biggest Dist: " << biggest_dist << '\n';
 }
