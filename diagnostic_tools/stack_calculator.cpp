@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <vector>
 #include <unordered_map>
+#include <unordered_set>
 #include <charconv>
 #include <filesystem>
 #include <fstream>
@@ -9,6 +10,16 @@
 #include <algorithm>
 
 constexpr const char* path{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/ci_files"};
+constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/inderect_calls.txt"};
+
+constexpr uint32_t indirect_call_list_size{4};
+constexpr const char* exception_list[indirect_call_list_size] =
+{
+    "_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE",
+    "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE",
+    "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE",
+    "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE"
+};
 
 [[gnu::always_inline]]
 inline void reset_input_file(std::ifstream* const input_file) noexcept
@@ -81,9 +92,22 @@ bool fdp_unorderd_map(graph_ci* graph, std::vector<graph_ci*>* vec) noexcept
     return false;
 }
 
+// TODO need to complete it
+uint32_t fdp_unordered_set(const graph_ci* child) noexcept
+{
+    const std::string* children{child->children.data()};
+    const std::string* const childern_end{children + child->children.size()};
+    uint32_t total_dist{0};
+    for(; children < childern_end; ++children)
+    {
+        if(children->empty()) return static_cast<uint32_t>(std::max(total_dist, child->dist));
+    }
+}
+
 int main()
 {
     std::ifstream input_file{};
+    std::vector<graph_ci*> topological_order{};
         
     std::filesystem::directory_iterator iterator{std::filesystem::path{path}};
     for(const std::filesystem::directory_entry& entry: iterator)
@@ -155,7 +179,7 @@ int main()
         reset_input_file(&input_file);
     }
 
-    std::vector<graph_ci*> topological_order{};
+
     topological_order.reserve(u_map.size());
     bool loop_found{false};
     for(std::pair<const std::string, graph_ci>& pair: u_map)
@@ -168,33 +192,59 @@ int main()
     
     std::reverse(topological_order.begin(), topological_order.end());
 
-    graph_ci* const* topological_current{topological_order.data()};
-    const graph_ci* const* topological_end{topological_current + topological_order.size()};
-    const std::string* child{nullptr};
-    const std::string* child_end{nullptr};
-    graph_ci* temp_child{};
-    
-    uint32_t topological_dist{0};
-    uint32_t biggest_dist{0};
-    for(; topological_current < topological_end; ++topological_current)
+    graph_ci* const indirect_call_node{&u_map.at("__indirect_call")};
     {
-        topological_dist = (*topological_current)->dist;
-        biggest_dist = std::max(biggest_dist, topological_dist);
-        std::cout << (*topological_current)->title << "\nCurrent Biggest Distance: " << biggest_dist << "\n\n";
-        child = (*topological_current)->children.data();
-        child_end = child + (*topological_current)->children.size();
-        for(; child < child_end; ++child)
+        uint32_t indirect_worse_case{0};
+        const char* const* currrent_call{exception_list};
+        const char* const* list_end{currrent_call + indirect_call_list_size};
+        for(; currrent_call < list_end; ++currrent_call)
+        {   
+            indirect_worse_case = std::max(indirect_worse_case, u_map.at(*currrent_call).frame_size);
+        }
+
+        indirect_call_node->frame_size = indirect_worse_case;
+    }
+
+
+    {
+        graph_ci* const* topological_current{topological_order.data()};
+        const graph_ci* const* topological_end{topological_current + topological_order.size()};
+        const std::string* child{nullptr};
+        const std::string* child_end{nullptr};
+        graph_ci* temp_child{};
+        
+        uint32_t topological_dist{0};
+        uint32_t biggest_dist{0};
+    
+        for(; topological_current < topological_end; ++topological_current)
         {
-            temp_child = &u_map[*child];
-            temp_child->dist = std::max(temp_child->dist, topological_dist + temp_child->frame_size);
+            topological_dist = (*topological_current)->dist;
+            biggest_dist = std::max(biggest_dist, topological_dist);
+    
+            child = (*topological_current)->children.data();
+            child_end = child + (*topological_current)->children.size();
+            for(; child < child_end; ++child)
+            {
+                temp_child = &u_map.at(*child);
+                temp_child->dist = std::max(temp_child->dist, topological_dist + temp_child->frame_size);
+            }
         }
     }
 
-    // for(const std::pair<const std::string, graph_ci>& pair : u_map)
+    // interrupt_stack D + (52 + d) * 17
+    
+    //kernel_stack
+    // const graph_ci* kernel_main{&u_map.at("kernel_main")};
+    // const std::string* kernel_current_child{kernel_main->children.data()};
+    // const std::string* const kernel_children_end{kernel_current_child + kernel_main->children.size()};
+    // std::cout << "Kernel Color: " << static_cast<unsigned>(kernel_main->col) << '\n';
+
+    // for(; kernel_current_child < kernel_children_end; ++kernel_current_child)
     // {
-    //     std::cout << pair.first
-    //     << "\nDist Size: " << pair.second.dist
-    //     << "\nFrame Size: " << pair.second.frame_size << "\n\n";
+    //     std::cout << *kernel_current_child << ": " << static_cast<unsigned>(u_map.at(*kernel_current_child).col) << "\n\n";
     // }
-    // std::cout << "Biggest Dist: " << biggest_dist << '\n';
+
+    graph_ci* kernel_main{&u_map.at("kernel_main")};
+    uint32_t kernel_greater_dist{fdp_unordered_set(kernel_main)};
+    kernel_main->dist = kernel_greater_dist;
 }
