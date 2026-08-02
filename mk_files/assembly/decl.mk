@@ -21,6 +21,10 @@ INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
 CODE_16_ELF = elf/code_16.elf
 CODE_16_BIN = bin/code_16.bin
 
+#---------------------Def Sym-------------------------------
+DEF_KERNEL_STACK = --defsym=_kernel_raw_stack
+DEF_INTERRUPT_STACK = --defsym=_interrupt_raw_stack
+
 # --------------------Code 32--------------------------------
 CODE_32_ELF = elf/code_32.elf
 CODE_32_BIN = bin/code_32.bin

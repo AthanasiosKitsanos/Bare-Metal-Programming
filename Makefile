@@ -25,6 +25,7 @@ include mk_files/drivers/decl.mk
 include mk_files/kernel/decl.mk
 include mk_files/links/decl.mk
 include mk_files/utilities/decl.mk
+include mk_files/stack_calculator/decl.mk
 
 #------------------------------ Include MK Libraries ---------------------------------
 include mk_files/lib/decl.mk
@@ -33,6 +34,8 @@ include mk_files/lib/decl.mk
 MAIN_H = main.h
 MAIN_CPP = main.cpp
 MAIN_OBJ = obj/main.o
+
+#-------------------------Stack Calculator--------------------------------
 
 # ----------------------Rules--------------------------------
 
@@ -44,6 +47,7 @@ include mk_files/assembly/rules.mk
 include mk_files/drivers/rules.mk
 include mk_files/kernel/rules.mk
 include mk_files/utilities/rules.mk
+include mk_files/stack_calculator/rules.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
 include mk_files/lib/rules.mk
@@ -51,13 +55,6 @@ include mk_files/lib/rules.mk
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 $(MAIN_OBJ): $(MAIN_CPP) $(MAIN_H)
 	$(CC) $(COMPILE_FLAGS) $(INCLUDE_DRIVERS_FOLDER) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER) $(INCLUDE_APP_FOLDER) -c $(MAIN_CPP) -o $(MAIN_OBJ)
-
-$(CI_FILES): $(OS_IMAGE)
-	mv obj/apps/shell/*.ci ci_files
-	mv obj/drivers/*.ci ci_files
-	mv obj/kernel/*.ci ci_files
-	mv obj/utilities/*.ci ci_files
-	mv obj/*.ci ci_files
 
 # Rest
 .PHONY: run clean
@@ -78,4 +75,3 @@ clean:
 	rm -f elf/*
 	rm -f lib/*.a
 	rm -f ci_files/*
-	rm -f diagnostic_tools/*.exe
