@@ -1,0 +1,9 @@
+graph: { title: "kernel/timer/kernel_timer.cpp"
+node: { title: "_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE" label: "void kernel::handle_timer_interrupt(interrupt_frame*)\nkernel/timer/kernel_timer.cpp:18:10\n4 bytes (static)" }
+node: { title: "_ZN6kernel19set_timer_frequencyEm" label: "void kernel::set_timer_frequency(uint32_t)\nkernel/timer/kernel_timer.cpp:24:10\n8 bytes (static)" }
+node: { title: "_ZN6kernel11timer_ticksEv" label: "uint32_t kernel::timer_ticks()\nkernel/timer/kernel_timer.cpp:26:14\n4 bytes (static)" }
+node: { title: "_ZN6kernel15timer_frequencyEv" label: "uint32_t kernel::timer_frequency()\nkernel/timer/kernel_timer.cpp:27:14\n4 bytes (static)" }
+node: { title: "_ZN6kernel14uptime_secondsEv" label: "uint32_t kernel::uptime_seconds()\nkernel/timer/kernel_timer.cpp:28:14\n4 bytes (static)" }
+node: { title: "_ZN6kernel11sleep_ticksEm" label: "void kernel::sleep_ticks(uint32_t)\nkernel/timer/kernel_timer.cpp:35:10\n12 bytes (static)" }
+node: { title: "_ZN6kernel8sleep_msEm" label: "void kernel::sleep_ms(uint32_t)\nkernel/timer/kernel_timer.cpp:44:10\n20 bytes (static)" }
+}

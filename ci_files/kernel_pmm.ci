@@ -1,0 +1,9 @@
+graph: { title: "kernel/memory/pmm/kernel_pmm.cpp"
+node: { title: "_ZN6kernel6memory16pmm_total_framesEv" label: "size_t kernel::memory::pmm_total_frames()\nkernel/memory/pmm/kernel_pmm.cpp:144:12\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory15pmm_used_framesEv" label: "size_t kernel::memory::pmm_used_frames()\nkernel/memory/pmm/kernel_pmm.cpp:145:12\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory15pmm_free_framesEv" label: "size_t kernel::memory::pmm_free_frames()\nkernel/memory/pmm/kernel_pmm.cpp:146:12\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t, uintptr_t)\nkernel/memory/pmm/kernel_pmm.cpp:148:10\n56 bytes (static)" }
+node: { title: "_ZN6kernel6memory18pmm_allocate_frameEPm" label: "kernel::memory::pmm_result kernel::memory::pmm_allocate_frame(uintptr_t*)\nkernel/memory/pmm/kernel_pmm.cpp:204:16\n20 bytes (static)" }
+node: { title: "_ZN6kernel6memory31pmm_find_contiguous_free_framesEmPm" label: "kernel::memory::pmm_result kernel::memory::pmm_find_contiguous_free_frames(size_t, uintptr_t*)\nkernel/memory/pmm/kernel_pmm.cpp:228:16\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory14pmm_free_frameEm" label: "kernel::memory::pmm_result kernel::memory::pmm_free_frame(uintptr_t)\nkernel/memory/pmm/kernel_pmm.cpp:283:16\n16 bytes (static)" }
+}

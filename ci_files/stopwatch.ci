@@ -1,0 +1,18 @@
+graph: { title: "utilities/diagnostics/stopwatch/stopwatch.cpp"
+node: { title: "_ZN11diagnostics9stopwatchC2Ev" label: "diagnostics::stopwatch::stopwatch()\nutilities/diagnostics/stopwatch/stopwatch.cpp:7:5\n16 bytes (static)" }
+node: { title: "_ZN6kernel11timer_ticksEv" label: "uint32_t kernel::timer_ticks()\n./kernel/timer/kernel_timer.h:15:14" shape : ellipse }
+edge: { sourcename: "_ZN11diagnostics9stopwatchC2Ev" targetname: "_ZN6kernel11timer_ticksEv" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:7:63" }
+node: { title: "_ZN11diagnostics9stopwatchC1Ev" label: "diagnostics::stopwatch::stopwatch()\nutilities/diagnostics/stopwatch/stopwatch.cpp:7:5" shape : triangle }
+edge: { sourcename: "_ZN11diagnostics9stopwatchC1Ev" targetname: "_ZN11diagnostics9stopwatchC2Ev" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:7:5" }
+node: { title: "_ZN11diagnostics9stopwatchD2Ev" label: "diagnostics::stopwatch::~stopwatch()\nutilities/diagnostics/stopwatch/stopwatch.cpp:10:5\n32 bytes (static)" }
+edge: { sourcename: "_ZN11diagnostics9stopwatchD2Ev" targetname: "_ZN6kernel11timer_ticksEv" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:12:53" }
+node: { title: "_ZN6kernel15timer_frequencyEv" label: "uint32_t kernel::timer_frequency()\n./kernel/timer/kernel_timer.h:14:14" shape : ellipse }
+edge: { sourcename: "_ZN11diagnostics9stopwatchD2Ev" targetname: "_ZN6kernel15timer_frequencyEv" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:13:57" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
+edge: { sourcename: "_ZN11diagnostics9stopwatchD2Ev" targetname: "_ZN8terminal6outputlsEPKc" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:38:24" }
+node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\nutilities/io/output/terminal_output.h:187:21" shape : ellipse }
+edge: { sourcename: "_ZN11diagnostics9stopwatchD2Ev" targetname: "_ZN8terminal6outputlsEm" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:38:44" }
+edge: { sourcename: "_ZN11diagnostics9stopwatchD2Ev" targetname: "_ZN8terminal6outputlsEPKc" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:38:58" }
+node: { title: "_ZN11diagnostics9stopwatchD1Ev" label: "diagnostics::stopwatch::~stopwatch()\nutilities/diagnostics/stopwatch/stopwatch.cpp:10:5" shape : triangle }
+edge: { sourcename: "_ZN11diagnostics9stopwatchD1Ev" targetname: "_ZN11diagnostics9stopwatchD2Ev" label: "utilities/diagnostics/stopwatch/stopwatch.cpp:10:5" }
+}

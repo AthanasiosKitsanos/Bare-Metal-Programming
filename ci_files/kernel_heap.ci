@@ -1,0 +1,10 @@
+graph: { title: "kernel/memory/heap/kernel_heap.cpp"
+node: { title: "_ZN6kernel6memory15heap_initializeEPvm" label: "void kernel::memory::heap_initialize(void*, uint32_t)\nkernel/memory/heap/kernel_heap.cpp:12:10\n8 bytes (static)" }
+node: { title: "_ZN6kernel6memory7kmallocEm" label: "void* kernel::memory::kmalloc(uint32_t)\nkernel/memory/heap/kernel_heap.cpp:25:11\n16 bytes (static)" }
+node: { title: "_ZN6kernel6memory5kfreeEPv" label: "void kernel::memory::kfree(void*)\nkernel/memory/heap/kernel_heap.cpp:68:10\n28 bytes (static)" }
+node: { title: "_ZN6kernel6memory8kreallocEPvm" label: "void* kernel::memory::krealloc(void*, uint32_t)\nkernel/memory/heap/kernel_heap.cpp:94:11\n48 bytes (static)" }
+edge: { sourcename: "_ZN6kernel6memory8kreallocEPvm" targetname: "_ZN6kernel6memory7kmallocEm" label: "kernel/memory/heap/kernel_heap.cpp:96:32" }
+edge: { sourcename: "_ZN6kernel6memory8kreallocEPvm" targetname: "_ZN6kernel6memory5kfreeEPv" label: "kernel/memory/heap/kernel_heap.cpp:99:18" }
+edge: { sourcename: "_ZN6kernel6memory8kreallocEPvm" targetname: "_ZN6kernel6memory7kmallocEm" label: "kernel/memory/heap/kernel_heap.cpp:106:30" }
+edge: { sourcename: "_ZN6kernel6memory8kreallocEPvm" targetname: "_ZN6kernel6memory5kfreeEPv" label: "kernel/memory/heap/kernel_heap.cpp:121:14" }
+}

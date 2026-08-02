@@ -1,0 +1,5 @@
+graph: { title: "kernel/pit/kernel_pit.cpp"
+node: { title: "_ZN6kernel14initialize_pitEm" label: "void kernel::initialize_pit(uint32_t)\nkernel/pit/kernel_pit.cpp:21:10\n48 bytes (dynamic,bounded)" }
+node: { title: "_ZN6kernel6logger5panicEPKc" label: "void kernel::logger::panic(const char*)\n./kernel/logger/kernel_logger.h:26:31" shape : ellipse }
+edge: { sourcename: "_ZN6kernel14initialize_pitEm" targetname: "_ZN6kernel6logger5panicEPKc" label: "kernel/pit/kernel_pit.cpp:26:22" }
+}

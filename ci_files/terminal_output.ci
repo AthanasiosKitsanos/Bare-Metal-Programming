@@ -1,0 +1,183 @@
+graph: { title: "utilities/io/output/terminal_output.cpp"
+node: { title: "_ZN8terminal6output8new_lineEv" label: "void terminal::output::new_line()\nutilities/io/output/terminal_output.cpp:15:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "void terminal::vga_text_buffer::move_to_next_line()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:105:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal6output8new_lineEv" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+node: { title: "_ZN8terminal6output20write_string_no_syncEPKc" label: "void terminal::output::write_string_no_sync(const char*)\nutilities/io/output/terminal_output.cpp:21:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output20write_string_no_syncEPKc" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+node: { title: "_ZN8terminal15vga_text_buffer3putEc" label: "void terminal::vga_text_buffer::put(char)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:86:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal6output20write_string_no_syncEPKc" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output21write_pointer_no_syncEm" label: "void terminal::output::write_pointer_no_sync(uintptr_t)\nutilities/io/output/terminal_output.cpp:31:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output21write_pointer_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output21write_pointer_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output21write_pointer_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output21write_pointer_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output22write_signed_8_no_syncEa" label: "void terminal::output::write_signed_8_no_sync(int8_t)\nutilities/io/output/terminal_output.cpp:45:10\n64 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output22write_signed_8_no_syncEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output22write_signed_8_no_syncEa" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output22write_signed_8_no_syncEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output22write_signed_8_no_syncEa" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output22write_signed_8_no_syncEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output23write_signed_16_no_syncEs" label: "void terminal::output::write_signed_16_no_sync(int16_t)\nutilities/io/output/terminal_output.cpp:57:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_16_no_syncEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_16_no_syncEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_16_no_syncEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_16_no_syncEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_16_no_syncEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output23write_signed_32_no_syncEl" label: "void terminal::output::write_signed_32_no_sync(int32_t)\nutilities/io/output/terminal_output.cpp:69:10\n64 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_32_no_syncEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_32_no_syncEl" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_32_no_syncEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_32_no_syncEl" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_32_no_syncEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output23write_signed_64_no_syncEx" label: "void terminal::output::write_signed_64_no_sync(int64_t)\nutilities/io/output/terminal_output.cpp:81:10\n96 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_64_no_syncEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_64_no_syncEx" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_64_no_syncEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_64_no_syncEx" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output23write_signed_64_no_syncEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output19write_hex_8_no_syncEh" label: "void terminal::output::write_hex_8_no_sync(uint8_t)\nutilities/io/output/terminal_output.cpp:93:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output19write_hex_8_no_syncEh" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+node: { title: "_ZN8terminal6output20write_hex_16_no_syncEt" label: "void terminal::output::write_hex_16_no_sync(uint16_t)\nutilities/io/output/terminal_output.cpp:113:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_16_no_syncEt" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+node: { title: "_ZN8terminal6output20write_hex_32_no_syncEm" label: "void terminal::output::write_hex_32_no_sync(uint32_t)\nutilities/io/output/terminal_output.cpp:133:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_32_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_32_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_32_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_32_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_32_no_syncEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output20write_hex_64_no_syncEy" label: "void terminal::output::write_hex_64_no_sync(uint64_t)\nutilities/io/output/terminal_output.cpp:153:10\n32 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_64_no_syncEy" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_64_no_syncEy" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_64_no_syncEy" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_64_no_syncEy" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6output20write_hex_64_no_syncEy" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal6output10initializeEv" label: "static void terminal::output::initialize()\nutilities/io/output/terminal_output.cpp:173:10\n32 bytes (dynamic,bounded)" }
+node: { title: "_ZN8terminal15vga_text_buffer5clearEv" label: "void terminal::vga_text_buffer::clear()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:83:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal6output10initializeEv" targetname: "_ZN8terminal15vga_text_buffer5clearEv" label: "utilities/io/output/terminal_output.cpp:175:21" }
+node: { title: "_ZN8terminal19vga_hardware_cursor6enableEhh" label: "static void terminal::vga_hardware_cursor::enable(uint8_t, uint8_t)\nutilities/vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h:20:25" shape : ellipse }
+edge: { sourcename: "_ZN8terminal6output10initializeEv" targetname: "_ZN8terminal19vga_hardware_cursor6enableEhh" label: "utilities/io/output/terminal_output.cpp:176:36" }
+node: { title: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "static void terminal::vga_hardware_cursor::set_position(uint16_t)\nutilities/vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h:23:25" shape : ellipse }
+edge: { sourcename: "_ZN8terminal6output10initializeEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.cpp:182:13\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEc" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEc" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEc" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.cpp:189:13\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKc" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKc" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKc" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\nutilities/io/output/terminal_output.cpp:197:13\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEh" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEh" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEh" targetname: "_ZN8terminal6output19write_hex_8_no_syncEh" label: "utilities/io/output/terminal_output.cpp:205:36" }
+edge: { sourcename: "_ZN8terminal6outputlsEh" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEa" label: "terminal::output& terminal::output::operator<<(int8_t)\nutilities/io/output/terminal_output.cpp:213:13\n64 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal6output19write_hex_8_no_syncEh" label: "utilities/io/output/terminal_output.cpp:227:36" }
+edge: { sourcename: "_ZN8terminal6outputlsEa" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEt" label: "terminal::output& terminal::output::operator<<(uint16_t)\nutilities/io/output/terminal_output.cpp:235:13\n64 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEt" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEt" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEt" targetname: "_ZN8terminal6output20write_hex_16_no_syncEt" label: "utilities/io/output/terminal_output.cpp:243:37" }
+edge: { sourcename: "_ZN8terminal6outputlsEt" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEs" label: "terminal::output& terminal::output::operator<<(int16_t)\nutilities/io/output/terminal_output.cpp:251:13\n64 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal6output20write_hex_16_no_syncEt" label: "utilities/io/output/terminal_output.cpp:265:37" }
+edge: { sourcename: "_ZN8terminal6outputlsEs" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\nutilities/io/output/terminal_output.cpp:273:13\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEm" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEm" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEm" targetname: "_ZN8terminal6output20write_hex_32_no_syncEm" label: "utilities/io/output/terminal_output.cpp:281:37" }
+edge: { sourcename: "_ZN8terminal6outputlsEm" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEl" label: "terminal::output& terminal::output::operator<<(int32_t)\nutilities/io/output/terminal_output.cpp:289:13\n64 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal6output20write_hex_32_no_syncEm" label: "utilities/io/output/terminal_output.cpp:303:37" }
+edge: { sourcename: "_ZN8terminal6outputlsEl" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEy" label: "terminal::output& terminal::output::operator<<(uint64_t)\nutilities/io/output/terminal_output.cpp:311:13\n96 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEy" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEy" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEy" targetname: "_ZN8terminal6output20write_hex_64_no_syncEy" label: "utilities/io/output/terminal_output.cpp:319:37" }
+edge: { sourcename: "_ZN8terminal6outputlsEy" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEx" label: "terminal::output& terminal::output::operator<<(int64_t)\nutilities/io/output/terminal_output.cpp:327:13\n96 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal6output20write_hex_64_no_syncEy" label: "utilities/io/output/terminal_output.cpp:341:37" }
+edge: { sourcename: "_ZN8terminal6outputlsEx" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEb" label: "terminal::output& terminal::output::operator<<(bool)\nutilities/io/output/terminal_output.cpp:349:13\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEb" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEb" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEb" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEb" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEPKv" label: "terminal::output& terminal::output::operator<<(const void*)\nutilities/io/output/terminal_output.cpp:358:13\n32 bytes (static)" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKv" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKv" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKv" targetname: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "utilities/io/output/terminal_output.cpp:17:33" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKv" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+edge: { sourcename: "_ZN8terminal6outputlsEPKv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\nutilities/io/output/terminal_output.cpp:366:13\n4 bytes (static)" }
+node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
+edge: { sourcename: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" targetname: "__indirect_call" label: "utilities/io/output/terminal_output.cpp:368:27" }
+node: { title: "_ZN8terminal3decERNS_6outputE" label: "terminal::output& terminal::dec(output&)\nutilities/io/output/terminal_output.cpp:373:13\n4 bytes (static)" }
+node: { title: "_ZN8terminal3hexERNS_6outputE" label: "terminal::output& terminal::hex(output&)\nutilities/io/output/terminal_output.cpp:380:13\n4 bytes (static)" }
+node: { title: "_ZN8terminal10bool_alphaERNS_6outputE" label: "terminal::output& terminal::bool_alpha(output&)\nutilities/io/output/terminal_output.cpp:387:13\n4 bytes (static)" }
+node: { title: "_ZN8terminal13bool_no_alphaERNS_6outputE" label: "terminal::output& terminal::bool_no_alpha(output&)\nutilities/io/output/terminal_output.cpp:394:13\n4 bytes (static)" }
+}

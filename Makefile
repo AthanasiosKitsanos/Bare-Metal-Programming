@@ -10,13 +10,14 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections -fno-stack-protector -fcallgraph-info=su
 LINKING_FLAGS = --gc-sections
 
 SECTOR_SIZE = 512
 
 INCLUDE_MAP_FILE = -Map=output.map
 
+CI_FILES = ci_files
 #-----------------------Include Mk Files---------------------------------------
 include mk_files/apps/decl.mk
 include mk_files/assembly/decl.mk
@@ -24,6 +25,7 @@ include mk_files/drivers/decl.mk
 include mk_files/kernel/decl.mk
 include mk_files/links/decl.mk
 include mk_files/utilities/decl.mk
+include mk_files/stack_calculator/decl.mk
 
 #------------------------------ Include MK Libraries ---------------------------------
 include mk_files/lib/decl.mk
@@ -33,9 +35,11 @@ MAIN_H = main.h
 MAIN_CPP = main.cpp
 MAIN_OBJ = obj/main.o
 
+#-------------------------Stack Calculator--------------------------------
+
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE) $(CODE_32_DISASM)
+all: $(OS_IMAGE) $(CODE_32_DISASM) $(CI_FILES)
 
 #------------------------ Source MK Files ---------------------------------
 include mk_files/apps/rules.mk
@@ -43,6 +47,7 @@ include mk_files/assembly/rules.mk
 include mk_files/drivers/rules.mk
 include mk_files/kernel/rules.mk
 include mk_files/utilities/rules.mk
+include mk_files/stack_calculator/rules.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
 include mk_files/lib/rules.mk
@@ -65,6 +70,8 @@ clean:
 	rm -f obj/hardware_exceptions/*
 	rm -f obj/kernel/*
 	rm -f obj/utilities/*
+	rm -f obj/*.o
 	rm -f bin/*
 	rm -f elf/*
 	rm -f lib/*.a
+	rm -f ci_files/*

@@ -1,0 +1,85 @@
+graph: { title: "utilities/io/input/terminal_input.cpp"
+node: { title: "_ZN8terminal5inputC2Ev" label: "terminal::input::input()\nutilities/io/input/terminal_input.cpp:32:5\n16 bytes (static)" }
+node: { title: "_ZN8terminal5inputC1Ev" label: "terminal::input::input()\nutilities/io/input/terminal_input.cpp:32:5" shape : triangle }
+edge: { sourcename: "_ZN8terminal5inputC1Ev" targetname: "_ZN8terminal5inputC2Ev" label: "utilities/io/input/terminal_input.cpp:32:5" }
+node: { title: "_ZN8terminal5input13add_characterEc" label: "bool terminal::input::add_character(char)\nutilities/io/input/terminal_input.cpp:36:10\n16 bytes (static)" }
+node: { title: "_ZN8terminal5input10add_stringEPKc" label: "bool terminal::input::add_string(const char*)\nutilities/io/input/terminal_input.cpp:50:10\n20 bytes (static)" }
+node: { title: "_ZN8terminal5input16delete_characterEv" label: "bool terminal::input::delete_character()\nutilities/io/input/terminal_input.cpp:69:10\n28 bytes (static)" }
+node: { title: "_ZN8terminal5input12reset_bufferEv" label: "void terminal::input::reset_buffer()\nutilities/io/input/terminal_input.cpp:79:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal5input8trim_endEv" label: "void terminal::input::trim_end()\nutilities/io/input/terminal_input.cpp:88:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal5input13handle_escapeEv" label: "void terminal::input::handle_escape()\nutilities/io/input/terminal_input.cpp:134:10\n32 bytes (static)" }
+node: { title: "_ZN8terminal15vga_text_buffer19move_cursor_right_nEh" label: "void terminal::vga_text_buffer::move_cursor_right_n(uint8_t)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:101:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input13handle_escapeEv" targetname: "_ZN8terminal15vga_text_buffer19move_cursor_right_nEh" label: "utilities/io/output/terminal_output.h:128:103" }
+node: { title: "_ZN8terminal15vga_text_buffer16remove_last_charEv" label: "void terminal::vga_text_buffer::remove_last_char()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:92:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input13handle_escapeEv" targetname: "_ZN8terminal15vga_text_buffer16remove_last_charEv" label: "utilities/io/output/terminal_output.h:144:86" }
+node: { title: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "static void terminal::vga_hardware_cursor::set_position(uint16_t)\nutilities/vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h:23:25" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input13handle_escapeEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input16handle_backspaceEv" label: "void terminal::input::handle_backspace()\nutilities/io/input/terminal_input.cpp:146:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN8terminal15vga_text_buffer16remove_last_charEv" label: "utilities/io/output/terminal_output.h:144:86" }
+node: { title: "_ZN8terminal6output20write_string_no_syncEPKc" label: "void terminal::output::write_string_no_sync(const char*)\nutilities/io/output/terminal_output.h:29:14" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN8terminal6output20write_string_no_syncEPKc" label: "utilities/io/output/terminal_output.h:150:97" }
+node: { title: "_ZN8terminal15vga_text_buffer3putEc" label: "void terminal::vga_text_buffer::put(char)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:86:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN8terminal15vga_text_buffer3putEc" label: "utilities/io/output/terminal_output.h:80:31" }
+node: { title: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "void terminal::vga_text_buffer::move_cursor_left_n(uint8_t)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:98:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "utilities/io/output/terminal_output.h:125:101" }
+edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input10handle_tabEv" label: "void terminal::input::handle_tab()\nutilities/io/input/terminal_input.cpp:162:10\n16 bytes (static)" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input10handle_tabEv" targetname: "_ZN8terminal6outputlsEPKc" label: "utilities/io/input/terminal_input.cpp:167:25" }
+edge: { sourcename: "_ZN8terminal5input10handle_tabEv" targetname: "_ZN8terminal6output20write_string_no_syncEPKc" label: "utilities/io/output/terminal_output.h:150:97" }
+edge: { sourcename: "_ZN8terminal5input10handle_tabEv" targetname: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "utilities/io/output/terminal_output.h:125:101" }
+edge: { sourcename: "_ZN8terminal5input10handle_tabEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input12handle_enterEv" label: "void terminal::input::handle_enter()\nutilities/io/input/terminal_input.cpp:178:10\n16 bytes (static)" }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input12handle_enterEv" targetname: "_ZN8terminal6outputlsEc" label: "utilities/io/input/terminal_input.cpp:184:21" }
+node: { title: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" label: "void terminal::input::control_key_dispatch(driver::keyboard::keyboard_key)\nutilities/io/input/terminal_input.cpp:189:10\n32 bytes (static)" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer19move_cursor_right_nEh" label: "utilities/io/output/terminal_output.h:128:103" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer16remove_last_charEv" label: "utilities/io/output/terminal_output.h:144:86" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal5input16handle_backspaceEv" label: "utilities/io/input/terminal_input.cpp:197:13" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal6outputlsEPKc" label: "utilities/io/input/terminal_input.cpp:167:25" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal6output20write_string_no_syncEPKc" label: "utilities/io/output/terminal_output.h:150:97" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "utilities/io/output/terminal_output.h:125:101" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+edge: { sourcename: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal6outputlsEc" label: "utilities/io/input/terminal_input.cpp:184:21" }
+node: { title: "_ZN8terminal5input11handle_homeEv" label: "void terminal::input::handle_home()\nutilities/io/input/terminal_input.cpp:206:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal5input11handle_homeEv" targetname: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "utilities/io/output/terminal_output.h:125:101" }
+edge: { sourcename: "_ZN8terminal5input11handle_homeEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input15handle_arrow_upEv" label: "void terminal::input::handle_arrow_up()\nutilities/io/input/terminal_input.cpp:214:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal5input14handle_page_upEv" label: "void terminal::input::handle_page_up()\nutilities/io/input/terminal_input.cpp:220:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal5input17handle_arrow_leftEv" label: "void terminal::input::handle_arrow_left()\nutilities/io/input/terminal_input.cpp:226:10\n16 bytes (static)" }
+node: { title: "_ZN8terminal15vga_text_buffer14move_backwardsEv" label: "void terminal::vga_text_buffer::move_backwards()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:95:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input17handle_arrow_leftEv" targetname: "_ZN8terminal15vga_text_buffer14move_backwardsEv" label: "utilities/io/output/terminal_output.h:156:72" }
+edge: { sourcename: "_ZN8terminal5input17handle_arrow_leftEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input18handle_arrow_rightEv" label: "void terminal::input::handle_arrow_right()\nutilities/io/input/terminal_input.cpp:233:10\n16 bytes (static)" }
+node: { title: "_ZN8terminal15vga_text_buffer12move_forwardEv" label: "void terminal::vga_text_buffer::move_forward()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:89:18" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input18handle_arrow_rightEv" targetname: "_ZN8terminal15vga_text_buffer12move_forwardEv" label: "utilities/io/output/terminal_output.h:159:68" }
+edge: { sourcename: "_ZN8terminal5input18handle_arrow_rightEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input10handle_endEv" label: "void terminal::input::handle_end()\nutilities/io/input/terminal_input.cpp:240:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal5input10handle_endEv" targetname: "_ZN8terminal15vga_text_buffer19move_cursor_right_nEh" label: "utilities/io/output/terminal_output.h:128:103" }
+edge: { sourcename: "_ZN8terminal5input10handle_endEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input17handle_arrow_downEv" label: "void terminal::input::handle_arrow_down()\nutilities/io/input/terminal_input.cpp:248:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal5input16handle_page_downEv" label: "void terminal::input::handle_page_down()\nutilities/io/input/terminal_input.cpp:254:10\n4 bytes (static)" }
+node: { title: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" label: "void terminal::input::navigation_key_dispatch(driver::keyboard::keyboard_key)\nutilities/io/input/terminal_input.cpp:260:10\n32 bytes (static)" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "utilities/io/output/terminal_output.h:125:101" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer14move_backwardsEv" label: "utilities/io/output/terminal_output.h:156:72" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer12move_forwardEv" label: "utilities/io/output/terminal_output.h:159:68" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal15vga_text_buffer19move_cursor_right_nEh" label: "utilities/io/output/terminal_output.h:128:103" }
+edge: { sourcename: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+node: { title: "_ZN8terminal5input20start_data_receivingEv" label: "void terminal::input::start_data_receiving()\nutilities/io/input/terminal_input.cpp:96:10\n64 bytes (static)" }
+node: { title: "_ZN6driver8keyboard26has_pending_keyboard_eventEv" label: "uint8_t driver::keyboard::has_pending_keyboard_event()\ndrivers/keyboard/keyboard.h:140:13" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN6driver8keyboard26has_pending_keyboard_eventEv" label: "utilities/io/input/terminal_input.cpp:102:64" }
+node: { title: "_ZN6driver8keyboard19poll_keyboard_eventEPNS0_14keyboard_eventE" label: "bool driver::keyboard::poll_keyboard_event(keyboard_event*)\ndrivers/keyboard/keyboard.h:135:10" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN6driver8keyboard19poll_keyboard_eventEPNS0_14keyboard_eventE" label: "utilities/io/input/terminal_input.cpp:107:50" }
+node: { title: "_ZN6driver8keyboard24try_translate_text_eventEPKNS0_14keyboard_eventEPc" label: "bool driver::keyboard::try_translate_text_event(const keyboard_event*, char*)\ndrivers/keyboard/keyboard.h:138:10" shape : ellipse }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN6driver8keyboard24try_translate_text_eventEPKNS0_14keyboard_eventEPc" label: "utilities/io/input/terminal_input.cpp:109:58" }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN8terminal6outputlsEc" label: "utilities/io/input/terminal_input.cpp:113:33" }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN8terminal6output20write_string_no_syncEPKc" label: "utilities/io/output/terminal_output.h:150:97" }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "utilities/io/output/terminal_output.h:125:101" }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN8terminal19vga_hardware_cursor12set_positionEt" label: "utilities/io/output/terminal_output.h:86:86" }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN8terminal5input20control_key_dispatchEN6driver8keyboard12keyboard_keyE" label: "utilities/io/input/terminal_input.cpp:124:37" }
+edge: { sourcename: "_ZN8terminal5input20start_data_receivingEv" targetname: "_ZN8terminal5input23navigation_key_dispatchEN6driver8keyboard12keyboard_keyE" label: "utilities/io/input/terminal_input.cpp:128:40" }
+}

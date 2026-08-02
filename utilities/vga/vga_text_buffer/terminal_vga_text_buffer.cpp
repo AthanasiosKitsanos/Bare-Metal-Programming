@@ -219,7 +219,7 @@ namespace terminal
         if(overflowed)
         {
             if(base_row > base_row_max) reset();
-            else clear_row();
+             else clear_row();
             vga_hardware_cursor::set_display_start(base_row * vga_width);
         }
     }

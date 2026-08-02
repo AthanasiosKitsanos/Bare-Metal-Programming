@@ -1,0 +1,3 @@
+graph: { title: "kernel/memory/e820/kernel_e820.cpp"
+node: { title: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "kernel::memory::e820_memory_map kernel::memory::get_e820_memory_map()\nkernel/memory/e820/kernel_e820.cpp:11:21\n8 bytes (static)" }
+}

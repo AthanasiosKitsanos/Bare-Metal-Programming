@@ -11,7 +11,7 @@ exception_counter:
 .section .text
 .extern _interrupt_stack_top
 .extern _interrupt_stack_bottom
-.extern _stack_top
+
 
 .set exception_count_max, 0x03
 .set pic_count_max, 0x0F

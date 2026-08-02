@@ -87,7 +87,6 @@ namespace
 
             default:
             {
-                kernel::logger log{};
                 log.warning() << "No handler registered in vector " << frame->vector;
                 halt_forever();
             }
