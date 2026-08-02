@@ -11,14 +11,31 @@
 
 constexpr const char* path{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/ci_files"};
 constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/inderect_calls.txt"};
+constexpr const char* stack_result{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/calc_results.txt"};
+constexpr const char* relationships{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/relationships.txt"};
 
-constexpr uint32_t indirect_call_list_size{4};
-constexpr const char* exception_list[indirect_call_list_size] =
+constexpr uint32_t undepended_interrupt_methods_size{12};
+constexpr const char* undepended_interrupt_methods[undepended_interrupt_methods_size] =
 {
     "_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE",
+    "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE",
+    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_sse_2EPVmtm",
+    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_avx_2EPVmtm",
+    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_fillEPVmtm",
+    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_sse_2_copyEPVKmPVmt",
+    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_avx_2_copyEPVKmPVmt",
+    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_copyEPVKmPVmt",
+    "_ZN8terminal3decERNS_6outputE",
+    "_ZN8terminal3hexERNS_6outputE",
+    "_ZN8terminal10bool_alphaERNS_6outputE",
+    "_ZN8terminal13bool_no_alphaERNS_6outputE",
+};
+
+constexpr uint32_t depended_interrupt_methods_size{2};
+constexpr const char* depended_interrupt_methods[depended_interrupt_methods_size] =
+{
     "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE",
-    "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE",
-    "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE"
+    "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE"
 };
 
 [[gnu::always_inline]]
@@ -92,121 +109,150 @@ bool fdp_unorderd_map(graph_ci* graph, std::vector<graph_ci*>* vec) noexcept
     return false;
 }
 
-// TODO need to complete it
-uint32_t fdp_unordered_set(const graph_ci* child) noexcept
+// Find the worst case scenario of memory consuption of a method
+uint64_t get_subtree_depth(const graph_ci* node) noexcept
 {
-    const std::string* children{child->children.data()};
-    const std::string* const childern_end{children + child->children.size()};
-    uint32_t total_dist{0};
+    uint64_t kernel_dist{0};
+    const std::string* children{node->children.data()};
+    const std::string* const childern_end{children + node->children.size()};
     for(; children < childern_end; ++children)
     {
-        if(children->empty()) return static_cast<uint32_t>(std::max(total_dist, child->dist));
+        kernel_dist = std::max(kernel_dist , get_subtree_depth(&u_map.at(*children)));
     }
+    return node->frame_size + kernel_dist;
+}
+
+
+
+// Find the worst case scenario of memory consumption while interrupt_happen
+uint64_t get_interrupt_stack_size() noexcept
+{
+    uint64_t stack_size{0};
+    graph_ci* indirect_call{&u_map.at("__indirect_call")};
+    const char* const* current_interrupt{undepended_interrupt_methods};
+    const char* const* current_interrupt_end{current_interrupt + undepended_interrupt_methods_size};
+    for(; current_interrupt < current_interrupt_end; ++current_interrupt)
+    {
+        stack_size = std::max(stack_size, get_subtree_depth(&u_map.at(*current_interrupt)));
+    }
+    
+    indirect_call->frame_size = static_cast<uint32_t>(stack_size);
+
+    current_interrupt = depended_interrupt_methods;
+    current_interrupt_end = current_interrupt + depended_interrupt_methods_size;
+    for(; current_interrupt < current_interrupt_end; ++current_interrupt)
+    {
+        stack_size = std::max(stack_size, get_subtree_depth(&u_map.at(*current_interrupt)));
+    }
+    indirect_call->frame_size = static_cast<uint32_t>(stack_size);
+    return stack_size;
 }
 
 int main()
 {
-    std::ifstream input_file{};
+    std::ios::sync_with_stdio(false);
+    std::cin.tie(nullptr);
+
     std::vector<graph_ci*> topological_order{};
+    
+    {   // We read and divide nodes from edges and fill our unorder_map
+        // when a method is marked as an edge, it means that it is a node that is called by another node
+        std::filesystem::directory_iterator iterator{std::filesystem::path{path}};
+        std::ifstream input_file{};
         
-    std::filesystem::directory_iterator iterator{std::filesystem::path{path}};
-    for(const std::filesystem::directory_entry& entry: iterator)
-    {
-        input_file.open(entry.path().string());
-        for(std::string line{}; std::getline(input_file, line);)
+        for(const std::filesystem::directory_entry& entry: iterator)
         {
-            if(line.starts_with("node"))
+            input_file.open(entry.path().string());
+            for(std::string line{}; std::getline(input_file, line);)
             {
-                graph_ci graph{};
-                const char* current_char{(line.data() + 4)};
-                const char* const end{(line.data() + line.size())};
-                while(current_char < end && *current_char != '\"') ++current_char;
-                current_char += (current_char < end);
-                
-                while(*current_char != '\"')
+                if(line.starts_with("node"))
                 {
-                    graph.title.push_back(*current_char);
-                    ++current_char;
-                }
-
-                size_t new_line_index{line.rfind("\\n")};
-                current_char = (line.data() + new_line_index + 2);
-                std::from_chars_result result{std::from_chars(current_char, end, graph.frame_size)};
-
-                if(u_map.contains(graph.title))
-                {
-                    graph_ci* temp{&u_map[graph.title]};
-                    temp->frame_size += graph.frame_size;
-                    temp->dist = temp->frame_size;
-                }
-                else
-                {
-                    graph.dist = graph.frame_size;
-                    u_map.emplace(graph.title, std::move(graph));
-                }
-            }
-            else if(line.starts_with("edge"))
-            {
-                node_ci node{};
-                const char* current_char{(line.data() + 4)};
-                const char* const end{(line.data() + line.size())};
-
-                while(current_char < end && *current_char != '\"') ++current_char;
-                current_char += (current_char < end);
-
-                while(*current_char != '\"')
-                {
-                    node.source_name.push_back(*current_char);
-                    ++current_char;
-                }
-                current_char += (current_char < end);
-
-                if(u_map.contains(node.source_name))
-                {
+                    graph_ci graph{};
+                    const char* current_char{(line.data() + 4)};
+                    const char* const end{(line.data() + line.size())};
                     while(current_char < end && *current_char != '\"') ++current_char;
                     current_char += (current_char < end);
+                    
                     while(*current_char != '\"')
                     {
-                        node.target_name.push_back(*current_char);
+                        graph.title.push_back(*current_char);
                         ++current_char;
                     }
-
-                    u_map[node.source_name].children.emplace_back(std::move(node.target_name));
+    
+                    size_t new_line_index{line.rfind("\\n")};
+                    current_char = (line.data() + new_line_index + 2);
+                    std::from_chars_result result{std::from_chars(current_char, end, graph.frame_size)};
+    
+                    if(u_map.contains(graph.title))
+                    {
+                        graph_ci* temp{&u_map[graph.title]};
+                        temp->frame_size += graph.frame_size;
+                        temp->dist = temp->frame_size;
+                    }
+                    else
+                    {
+                        graph.dist = graph.frame_size;
+                        u_map.emplace(graph.title, std::move(graph));
+                    }
                 }
-
+                else if(line.starts_with("edge"))
+                {
+                    node_ci node{};
+                    const char* current_char{(line.data() + 4)};
+                    const char* const end{(line.data() + line.size())};
+    
+                    while(current_char < end && *current_char != '\"') ++current_char;
+                    current_char += (current_char < end);
+    
+                    while(*current_char != '\"')
+                    {
+                        node.source_name.push_back(*current_char);
+                        ++current_char;
+                    }
+                    current_char += (current_char < end);
+    
+                    if(u_map.contains(node.source_name))
+                    {
+                        while(current_char < end && *current_char != '\"') ++current_char;
+                        current_char += (current_char < end);
+                        while(*current_char != '\"')
+                        {
+                            node.target_name.push_back(*current_char);
+                            ++current_char;
+                        }
+    
+                        u_map[node.source_name].children.emplace_back(std::move(node.target_name));
+                    }
+                }
             }
-        }
-        reset_input_file(&input_file);
-    }
-
-
-    topological_order.reserve(u_map.size());
-    bool loop_found{false};
-    for(std::pair<const std::string, graph_ci>& pair: u_map)
-    {
-        if(pair.second.col == color::white)
-        {
-            loop_found |= fdp_unorderd_map(&pair.second, &topological_order);
+            reset_input_file(&input_file);
         }
     }
     
+    // We reserve space equal to our unordered_map size
+    // That avoids asking the OS for more memory when an addition happens at the current capacity does not cover for it
+    topological_order.reserve(u_map.size());
+    {
+        // We check if we passed all the methods once
+        // and find if the calls are acyclic, meaning the is no A calls B, which calls C, which calls A again. This makes a cycle
+        bool loop_found{false};
+        const std::pair<const std::string, graph_ci>* temp{nullptr};
+        for(std::pair<const std::string, graph_ci>& pair: u_map)
+        {
+            if(pair.second.col == color::white)
+            {
+                loop_found |= fdp_unorderd_map(&pair.second, &topological_order);
+            }
+        }
+        if(loop_found) std::cout << "The methods are cyclic\n";
+    }
+    
+    // we reverse the vector, so there order is the same as the unordered map's
     std::reverse(topological_order.begin(), topological_order.end());
 
-    graph_ci* const indirect_call_node{&u_map.at("__indirect_call")};
-    {
-        uint32_t indirect_worse_case{0};
-        const char* const* currrent_call{exception_list};
-        const char* const* list_end{currrent_call + indirect_call_list_size};
-        for(; currrent_call < list_end; ++currrent_call)
-        {   
-            indirect_worse_case = std::max(indirect_worse_case, u_map.at(*currrent_call).frame_size);
-        }
-
-        indirect_call_node->frame_size = indirect_worse_case;
-    }
-
-
-    {
+    {   // Here we find how much memory a method will occupy while running
+        // meaning by the variables it creates and other methods that it may call
+        // i.e. method A creates some variables, then calls another method, in which it creates its own varibales
         graph_ci* const* topological_current{topological_order.data()};
         const graph_ci* const* topological_end{topological_current + topological_order.size()};
         const std::string* child{nullptr};
@@ -231,20 +277,9 @@ int main()
         }
     }
 
-    // interrupt_stack D + (52 + d) * 17
-    
-    //kernel_stack
-    // const graph_ci* kernel_main{&u_map.at("kernel_main")};
-    // const std::string* kernel_current_child{kernel_main->children.data()};
-    // const std::string* const kernel_children_end{kernel_current_child + kernel_main->children.size()};
-    // std::cout << "Kernel Color: " << static_cast<unsigned>(kernel_main->col) << '\n';
-
-    // for(; kernel_current_child < kernel_children_end; ++kernel_current_child)
-    // {
-    //     std::cout << *kernel_current_child << ": " << static_cast<unsigned>(u_map.at(*kernel_current_child).col) << "\n\n";
-    // }
-
-    graph_ci* kernel_main{&u_map.at("kernel_main")};
-    uint32_t kernel_greater_dist{fdp_unordered_set(kernel_main)};
-    kernel_main->dist = kernel_greater_dist;
+    const uint64_t interrupt_stack{get_interrupt_stack_size()};
+    const uint64_t kernel_stack{get_subtree_depth(&u_map.at("kernel_main"))};
+    std::ofstream out{stack_result, std::ios::binary};
+    out << "#Kernel Stack\n" << kernel_stack
+    << "\n#Interrupt Stack\n" << interrupt_stack << '\n';
 }
