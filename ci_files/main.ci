@@ -14,16 +14,18 @@ node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initia
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:29:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "main.cpp:31:32" }
+node: { title: "_ZN8terminal5inputC1Ev" label: "terminal::input::input()\nutilities/io/input/terminal_input.h:109:13" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal5inputC1Ev" label: "main.cpp:35:28" }
 node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:35:16" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:36:16" }
 node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\nutilities/io/output/terminal_output.h:187:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:35:60" }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:36:12" }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:36:64" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:36:60" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:37:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:37:64" }
 node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:36:90" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:37:90" }
 node: { title: "_ZN3app5shellC1Ev" label: "app::shell::shell()\napps/shell/shell.h:19:13" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3app5shellC1Ev" label: "main.cpp:39:22" }
+edge: { sourcename: "kernel_main" targetname: "_ZN3app5shellC1Ev" label: "main.cpp:40:22" }
 node: { title: "_ZN3app5shell3runEv" label: "void app::shell::run()\napps/shell/shell.h:23:18" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3app5shell3runEv" label: "main.cpp:43:14" }
+edge: { sourcename: "kernel_main" targetname: "_ZN3app5shell3runEv" label: "main.cpp:44:14" }
 }

@@ -17,6 +17,7 @@ namespace kernel::memory
         hb_deny = 0x03
     };
 
+    [[gnu::regparm(3)]]
     void pmm_initialize(const e820_memory_map*, const uintptr_t, const uintptr_t) noexcept;
 
     [[gnu::regparm(1)]]

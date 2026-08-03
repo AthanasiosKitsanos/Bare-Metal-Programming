@@ -145,6 +145,7 @@ namespace kernel::memory
     size_t pmm_used_frames() noexcept { return g_used_frames; }
     size_t pmm_free_frames() noexcept { return g_total_frames - g_used_frames; }
 
+    [[gnu::regparm(3)]]
     void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
     {
         const e820_entry* const entry_end{map->entries + map->count};
@@ -164,7 +165,25 @@ namespace kernel::memory
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);
         g_bitmap.end = g_bitmap.start + ((g_total_frames + 7) >> bit_size_byte_mask);
 
-        for(uint8_t* current{g_bitmap.start}; current < g_bitmap.end; ++current)
+        uint8_t* current{g_bitmap.start};
+        constexpr uintptr_t alignment_mask{0x3};
+        for(; current < g_bitmap.end && ((reinterpret_cast<uintptr_t>(current) & alignment_mask) != 0); ++current)
+        {
+            *current = 0xFF;
+        }
+
+        {
+            uint32_t* current_32{reinterpret_cast<uint32_t*>(current)};
+            constexpr uintptr_t alignment_mask_not{~alignment_mask};
+            uint32_t* const current_32_end{reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(g_bitmap.end) & alignment_mask_not)};
+            for(; current_32 < current_32_end; ++current_32)
+            {
+                *current_32 = 0xFFFFFFFF;
+            }
+            current = reinterpret_cast<uint8_t*>(current_32);
+        }
+
+        for(; current < g_bitmap.end; ++current)
         {
             *current = 0xFF;
         }
