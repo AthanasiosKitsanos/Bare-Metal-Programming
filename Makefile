@@ -10,7 +10,7 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections -fno-stack-protector -fcallgraph-info=su
+COMPILE_FLAGS = -std=gnu++17 -ffreestanding -O2 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections -fno-stack-protector -fcallgraph-info=su -mgeneral-regs-only
 LINKING_FLAGS = --gc-sections
 
 SECTOR_SIZE = 512
