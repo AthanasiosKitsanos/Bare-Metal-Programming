@@ -1,59 +1,67 @@
 graph: { title: "apps/shell/shell.cpp"
-node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_exitEPN3app5shellE" label: "void {anonymous}::execute_exit(app::shell*)\napps/shell/shell.cpp:41:17\n8 bytes (static)" }
+node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_exitEPN3app5shellE" label: "void {anonymous}::execute_exit(app::shell*)\napps/shell/shell.cpp:46:17\n8 bytes (static)" }
 node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_exitEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:121:21" }
-node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_peekEPN3app5shellE" label: "void {anonymous}::execute_peek(app::shell*)\napps/shell/shell.cpp:44:17\n8 bytes (static)" }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_peekEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:126:47" }
-node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" label: "void {anonymous}::execute_clear(app::shell*)\napps/shell/shell.cpp:38:17\n16 bytes (static)" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_exitEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:129:21" }
+node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" label: "void {anonymous}::execute_clear(app::shell*)\napps/shell/shell.cpp:43:17\n16 bytes (static)" }
 node: { title: "_ZN8terminal5input12reset_bufferEv" label: "void terminal::input::reset_buffer()\nutilities/io/input/terminal_input.h:58:14" shape : ellipse }
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" targetname: "_ZN8terminal5input12reset_bufferEv" label: "utilities/io/input/terminal_input.h:117:56" }
 node: { title: "_ZN8terminal15vga_text_buffer5clearEv" label: "void terminal::vga_text_buffer::clear()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.h:83:18" shape : ellipse }
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" targetname: "_ZN8terminal15vga_text_buffer5clearEv" label: "utilities/io/output/terminal_output.h:165:56" }
-node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" label: "void {anonymous}::execute_flag(app::shell*)\napps/shell/shell.cpp:47:17\n16 bytes (static)" }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:124:47" }
-node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\nutilities/io/output/terminal_output.h:175:21" shape : ellipse }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEh" label: "apps/shell/shell.cpp:124:81" }
-node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:124:86" }
-node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" label: "void {anonymous}::execute_ticks(app::shell*)\napps/shell/shell.cpp:50:17\n16 bytes (static)" }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:130:21" }
-node: { title: "_ZN6kernel11timer_ticksEv" label: "uint32_t kernel::timer_ticks()\nkernel/timer/kernel_timer.h:15:14" shape : ellipse }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN6kernel11timer_ticksEv" label: "apps/shell/shell.cpp:130:54" }
+node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L23execute_interrupt_stackEPN3app5shellE" label: "void {anonymous}::execute_interrupt_stack(app::shell*)\napps/shell/shell.cpp:55:17\n16 bytes (static)" }
 node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\nutilities/io/output/terminal_output.h:187:21" shape : ellipse }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:130:54" }
-edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:130:59" }
-node: { title: "_ZN3app5shellC2Ev" label: "app::shell::shell()\napps/shell/shell.cpp:70:5\n32 bytes (dynamic,bounded)" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L23execute_interrupt_stackEPN3app5shellE" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:142:21" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L23execute_interrupt_stackEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:142:40" }
+node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L20execute_kernel_stackEPN3app5shellE" label: "void {anonymous}::execute_kernel_stack(app::shell*)\napps/shell/shell.cpp:58:17\n16 bytes (static)" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L20execute_kernel_stackEPN3app5shellE" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:148:21" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L20execute_kernel_stackEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:148:37" }
+node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" label: "void {anonymous}::execute_flag(app::shell*)\napps/shell/shell.cpp:49:17\n16 bytes (static)" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:132:47" }
+node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\nutilities/io/output/terminal_output.h:175:21" shape : ellipse }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEh" label: "apps/shell/shell.cpp:132:81" }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:132:86" }
+node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" label: "void {anonymous}::execute_ticks(app::shell*)\napps/shell/shell.cpp:52:17\n16 bytes (static)" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:136:21" }
+node: { title: "_ZN6kernel11timer_ticksEv" label: "uint32_t kernel::timer_ticks()\nkernel/timer/kernel_timer.h:15:14" shape : ellipse }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN6kernel11timer_ticksEv" label: "apps/shell/shell.cpp:136:54" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:136:54" }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_ticksEPN3app5shellE" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:136:59" }
+node: { title: "_ZN3app5shellC2Ev" label: "app::shell::shell()\napps/shell/shell.cpp:78:5\n32 bytes (dynamic,bounded)" }
 node: { title: "_ZN8terminal5inputC1Ev" label: "terminal::input::input()\nutilities/io/input/terminal_input.h:109:13" shape : ellipse }
-edge: { sourcename: "_ZN3app5shellC2Ev" targetname: "_ZN8terminal5inputC1Ev" label: "apps/shell/shell.cpp:70:30" }
-node: { title: "_ZN3app5shellC1Ev" label: "app::shell::shell()\napps/shell/shell.cpp:70:5" shape : triangle }
-edge: { sourcename: "_ZN3app5shellC1Ev" targetname: "_ZN3app5shellC2Ev" label: "apps/shell/shell.cpp:70:5" }
-node: { title: "_ZNK3app5shell14command_existsEv" label: "int8_t app::shell::command_exists() const\napps/shell/shell.cpp:73:12\n28 bytes (static)" }
-node: { title: "_ZN3app5shell15execute_commandEv" label: "void app::shell::execute_command()\napps/shell/shell.cpp:90:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN3app5shellC2Ev" targetname: "_ZN8terminal5inputC1Ev" label: "apps/shell/shell.cpp:78:30" }
+node: { title: "_ZN3app5shellC1Ev" label: "app::shell::shell()\napps/shell/shell.cpp:78:5" shape : triangle }
+edge: { sourcename: "_ZN3app5shellC1Ev" targetname: "_ZN3app5shellC2Ev" label: "apps/shell/shell.cpp:78:5" }
+node: { title: "_ZNK3app5shell14command_existsEv" label: "int8_t app::shell::command_exists() const\napps/shell/shell.cpp:81:12\n28 bytes (static)" }
+node: { title: "_ZN3app5shell15execute_commandEv" label: "void app::shell::execute_command()\napps/shell/shell.cpp:98:10\n48 bytes (static)" }
 node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
-edge: { sourcename: "_ZN3app5shell15execute_commandEv" targetname: "__indirect_call" label: "apps/shell/shell.cpp:95:47" }
-edge: { sourcename: "_ZN3app5shell15execute_commandEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:98:21" }
-node: { title: "_ZN3app5shell3runEv" label: "void app::shell::run()\napps/shell/shell.cpp:101:10\n64 bytes (dynamic,bounded)" }
-edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:105:25" }
+edge: { sourcename: "_ZN3app5shell15execute_commandEv" targetname: "__indirect_call" label: "apps/shell/shell.cpp:103:47" }
+edge: { sourcename: "_ZN3app5shell15execute_commandEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:106:21" }
+node: { title: "_ZN3app5shell3runEv" label: "void app::shell::run()\napps/shell/shell.cpp:109:10\n64 bytes (dynamic,bounded)" }
+edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:113:25" }
 node: { title: "_ZN8terminal5input20start_data_receivingEv" label: "void terminal::input::start_data_receiving()\nutilities/io/input/terminal_input.h:64:14" shape : ellipse }
 edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal5input20start_data_receivingEv" label: "utilities/io/input/terminal_input.h:114:64" }
-edge: { sourcename: "_ZN3app5shell3runEv" targetname: "__indirect_call" label: "apps/shell/shell.cpp:95:47" }
+edge: { sourcename: "_ZN3app5shell3runEv" targetname: "__indirect_call" label: "apps/shell/shell.cpp:103:47" }
 edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal5input12reset_bufferEv" label: "utilities/io/input/terminal_input.h:117:56" }
-edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:98:21" }
+edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:106:21" }
 edge: { sourcename: "_ZN3app5shell3runEv" targetname: "_ZN8terminal5input12reset_bufferEv" label: "utilities/io/input/terminal_input.h:117:56" }
-node: { title: "_ZN3app5shell5clearEv" label: "void app::shell::clear()\napps/shell/shell.cpp:112:10\n16 bytes (static)" }
+node: { title: "_ZN3app5shell5clearEv" label: "void app::shell::clear()\napps/shell/shell.cpp:120:10\n16 bytes (static)" }
 edge: { sourcename: "_ZN3app5shell5clearEv" targetname: "_ZN8terminal5input12reset_bufferEv" label: "utilities/io/input/terminal_input.h:117:56" }
 edge: { sourcename: "_ZN3app5shell5clearEv" targetname: "_ZN8terminal15vga_text_buffer5clearEv" label: "utilities/io/output/terminal_output.h:165:56" }
-node: { title: "_ZN3app5shell4exitEv" label: "void app::shell::exit()\napps/shell/shell.cpp:118:10\n8 bytes (static)" }
-edge: { sourcename: "_ZN3app5shell4exitEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:121:21" }
-node: { title: "_ZN3app5shell4flagEv" label: "void app::shell::flag()\napps/shell/shell.cpp:124:10\n16 bytes (static)" }
-edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:124:47" }
-edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEh" label: "apps/shell/shell.cpp:124:81" }
-edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:124:86" }
-node: { title: "_ZN3app5shell4peekEv" label: "void app::shell::peek()\napps/shell/shell.cpp:126:10\n8 bytes (static)" }
-edge: { sourcename: "_ZN3app5shell4peekEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:126:47" }
-node: { title: "_ZN3app5shell5ticksEv" label: "void app::shell::ticks()\napps/shell/shell.cpp:128:10\n16 bytes (static)" }
-edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:130:21" }
-edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN6kernel11timer_ticksEv" label: "apps/shell/shell.cpp:130:54" }
-edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:130:54" }
-edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:130:59" }
+node: { title: "_ZN3app5shell4exitEv" label: "void app::shell::exit()\napps/shell/shell.cpp:126:10\n8 bytes (static)" }
+edge: { sourcename: "_ZN3app5shell4exitEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:129:21" }
+node: { title: "_ZN3app5shell4flagEv" label: "void app::shell::flag()\napps/shell/shell.cpp:132:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:132:47" }
+edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEh" label: "apps/shell/shell.cpp:132:81" }
+edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:132:86" }
+node: { title: "_ZN3app5shell5ticksEv" label: "void app::shell::ticks()\napps/shell/shell.cpp:134:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:136:21" }
+edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN6kernel11timer_ticksEv" label: "apps/shell/shell.cpp:136:54" }
+edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:136:54" }
+edge: { sourcename: "_ZN3app5shell5ticksEv" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:136:59" }
+node: { title: "_ZN3app5shell15interrupt_stackEv" label: "void app::shell::interrupt_stack()\napps/shell/shell.cpp:139:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN3app5shell15interrupt_stackEv" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:142:21" }
+edge: { sourcename: "_ZN3app5shell15interrupt_stackEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:142:40" }
+node: { title: "_ZN3app5shell12kernel_stackEv" label: "void app::shell::kernel_stack()\napps/shell/shell.cpp:145:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN3app5shell12kernel_stackEv" targetname: "_ZN8terminal6outputlsEm" label: "apps/shell/shell.cpp:148:21" }
+edge: { sourcename: "_ZN3app5shell12kernel_stackEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:148:37" }
 }

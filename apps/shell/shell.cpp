@@ -5,6 +5,11 @@
 #include "cpu/features.h"
 #include "timer/kernel_timer.h"
 
+extern "C" uint32_t _kernel_stack_top;
+extern "C" uint32_t _kernel_stack_bottom;
+extern "C" uint32_t _interrupt_stack_top;
+extern "C" uint32_t _interrupt_stack_bottom;
+
 namespace
 {
     int8_t str_compare(const char* comparer, const char* other) noexcept
@@ -19,7 +24,7 @@ namespace
         return static_cast<int8_t>(c) - static_cast<int8_t>(o); 
     }
 
-    constexpr uint8_t command_list_size{5};
+    constexpr uint8_t command_list_size{6};
     struct command_list
     {
         const char* entries[command_list_size];
@@ -39,15 +44,18 @@ namespace
 
     [[gnu::always_inline]]
     inline void execute_exit(app::shell* shell) noexcept { shell->exit(); }
-    
-    [[gnu::always_inline]]
-    inline void execute_peek(app::shell* shell) noexcept { shell->peek(); }
 
     [[gnu::always_inline]]
     inline void execute_flag(app::shell* shell) noexcept { shell->flag(); }
 
     [[gnu::always_inline]]
     inline void execute_ticks(app::shell* shell) noexcept { shell->ticks(); }
+
+    [[gnu::always_inline]]
+    inline void execute_interrupt_stack(app::shell* shell) noexcept { shell->interrupt_stack(); }
+
+    [[gnu::always_inline]]
+    inline void execute_kernel_stack(app::shell* shell) noexcept { shell->kernel_stack(); }
 
     using command_list_functions = void(*)(app::shell*) noexcept;
     struct command_functions
@@ -123,10 +131,20 @@ namespace app
 
     void shell::flag() noexcept { m_output << "mm_flag: " << cpu::features::get() << '\n'; }
 
-    void shell::peek() noexcept { m_output << "There is nothing to peek!\n"; }
-
     void shell::ticks() noexcept
     {
         m_output << "Ticks: " << kernel::timer_ticks() << '\n';
+    }
+
+    void shell::interrupt_stack() noexcept
+    {
+        const uintptr_t interrupt_stack{reinterpret_cast<uintptr_t>(&_interrupt_stack_top) - reinterpret_cast<uintptr_t>(&_interrupt_stack_bottom)};
+        m_output << interrupt_stack << " bytes\n";
+    }
+
+    void shell::kernel_stack() noexcept
+    {
+        const uintptr_t kernel_stack{reinterpret_cast<uintptr_t>(&_kernel_stack_top) - reinterpret_cast<uintptr_t>(&_kernel_stack_bottom)};
+        m_output << kernel_stack << " bytes\n";
     }
 }
