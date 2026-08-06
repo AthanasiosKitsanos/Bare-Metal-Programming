@@ -23,8 +23,9 @@ namespace app
             void run() noexcept;
             void clear() noexcept;
             void exit() noexcept;
-            void peek() noexcept;
             void flag() noexcept;
             void ticks() noexcept;
+            void kernel_stack() noexcept;
+            void interrupt_stack() noexcept;
     };
 }

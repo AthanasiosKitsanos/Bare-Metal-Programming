@@ -17,13 +17,13 @@ namespace kernel::memory
         hb_deny = 0x03
     };
 
+    [[gnu::regparm(3)]]
     void pmm_initialize(const e820_memory_map*, const uintptr_t, const uintptr_t) noexcept;
 
-    [[gnu::regparm(1)]]
-    pmm_result pmm_allocate_frame(uintptr_t* const address) noexcept;
+    void* pmm_allocate_frame() noexcept;
 
-    [[gnu::regparm(2)]]
-    pmm_result pmm_find_contiguous_free_frames(const size_t frames, uintptr_t* const address) noexcept;
+    [[gnu::regparm(1)]]
+    void* pmm_find_contiguous_free_frames(const size_t frames) noexcept;
 
     [[gnu::regparm(1)]]
     pmm_result pmm_free_frame(const uintptr_t) noexcept;
