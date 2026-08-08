@@ -14,7 +14,8 @@ namespace kernel::memory
         success = 0x00,
         failed = 0x01,
         lb_deny = 0x02,
-        hb_deny = 0x03
+        hb_deny = 0x03,
+        zero_frames = 0x04
     };
 
     [[gnu::regparm(3)]]
@@ -23,7 +24,10 @@ namespace kernel::memory
     void* pmm_allocate_frame() noexcept;
 
     [[gnu::regparm(1)]]
-    void* pmm_find_contiguous_free_frames(const size_t frames) noexcept;
+    void* pmm_allocate_contiguous_frames(const size_t frames) noexcept;
+
+    [[gnu::regparm(2)]]
+    pmm_result pmm_free_contiguous_frames(const uintptr_t address, const size_t frames) noexcept;
 
     [[gnu::regparm(1)]]
     pmm_result pmm_free_frame(const uintptr_t) noexcept;

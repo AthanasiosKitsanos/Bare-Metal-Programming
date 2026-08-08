@@ -74,26 +74,12 @@ namespace
     }
 
     [[gnu::always_inline]]
-    inline void set_frames_in_byte_used(const size_t index, const uint8_t mask, const size_t frames) noexcept
-    {
-        *(g_bitmap.start + index) |= mask;
-        g_used_frames += frames;
-    }
-
-    [[gnu::always_inline]]
-    inline void set_frames_in_byte_free(const size_t index, const uint8_t mask, const size_t frames) noexcept
-    {
-        *(g_bitmap.start + index) &= ~mask;
-        g_used_frames -= frames;
-    }
-
-    [[gnu::always_inline]]
     inline void set_frame_free(const bit_n_byte* const pair) noexcept
     {
         *(g_bitmap.start + pair->byte_index) &= ~(1 << pair->bit_index);
         --g_used_frames;
     }
-
+    
     [[gnu::always_inline]]
     inline uint8_t leading_zeros(const uint8_t value) noexcept
     {
@@ -105,13 +91,13 @@ namespace
     {
         return static_cast<uint8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
     }
-
+    
     struct run
     {
         uint8_t position{0};
         uint8_t length{0};
     };
-
+    
     // There is no need for branchless calculations. Those are done for practicing
     constexpr uint8_t find_buried_run_packed(const uint8_t value) noexcept
     {
@@ -120,14 +106,14 @@ namespace
         bool is_first_run{false};
         bool is_zero_bit{false};
         bool is_current_better{false};
-
+        
         for(uint8_t i{1}; i < 7; ++i)
         {
             is_first_run = (current_run.length == 0);
             is_zero_bit = ((value & (1 << i)) == 0);
             current_run.position = (current_run.position * !is_first_run) + (i * is_first_run);
             current_run.length += is_zero_bit;
-
+            
             is_current_better = (current_run.length > best_run.length);
             best_run.position = (best_run.position * !is_current_better) + (current_run.position * is_current_better);
             best_run.length = (best_run.length * !is_current_better) + (current_run.length * is_current_better);
@@ -135,7 +121,7 @@ namespace
         }
         return static_cast<uint8_t>((best_run.length > 1) * ((best_run.position << 4) | best_run.length));
     }
-
+    
     constexpr size_t byte_array_size{256};
     struct byte_lut
     {
@@ -149,36 +135,62 @@ namespace
             }
         }
     };
-
+    
     constexpr byte_lut buried_zeros_lut{};
-
+    
     constexpr uint8_t fill_mask{0xFF};
     constexpr uint8_t bit_max_pos{0x07};
-
+    
     [[gnu::always_inline]]
-    inline uint8_t mark_front_byte(const uint8_t bit_pos) noexcept
+    inline uint8_t front_byte_mask_used(const uint8_t bit_pos) noexcept
     {
         return fill_mask << bit_pos;
     }
-
+    
     [[gnu::always_inline]]
-    inline uint8_t mark_back_byte(const uint8_t bit_end_pos) noexcept
+    inline uint8_t back_byte_mask_used(const uint8_t bit_end_pos) noexcept
     {
         return fill_mask >> (bit_max_pos - bit_end_pos);
+    }
+    
+    [[gnu::always_inline]]
+    inline void set_frames_in_byte_used(const size_t index, const uint8_t mask, const size_t frames) noexcept
+    {
+        *(g_bitmap.start + index) |= mask;
+        g_used_frames += frames;
     }
 
     [[gnu::always_inline]]
     inline void mark_whole_byte_used(const size_t index) noexcept
     {
         *(g_bitmap.start + index) = 0xFF;
-        g_used_frames += 8;
+        g_used_frames += bit_size_byte;
+    }
+    
+    [[gnu::always_inline]]
+    inline uint8_t front_byte_free_mask(const size_t index) noexcept
+    {
+        return fill_mask >> (bit_size_byte - index);
     }
 
+    [[gnu::always_inline]]
+    inline uint8_t back_byte_free_mask(const size_t index) noexcept
+    {
+        return fill_mask << (index + 1);
+    }
+    
     [[gnu::always_inline]]
     inline void mark_whole_byte_free(const size_t index) noexcept
     {
         *(g_bitmap.start + index) = 0x00;
-        g_used_frames -= 8;
+        g_used_frames -= bit_size_byte;
+    }
+
+    [[gnu::always_inline]]
+    inline void set_frames_in_byte_free(const size_t index, const uint8_t mask, const size_t frames) noexcept
+    {
+        *(g_bitmap.start + index) &= mask;
+        g_used_frames -= frames;
     }
 }
 
@@ -187,7 +199,7 @@ namespace kernel::memory
     size_t pmm_total_frames() noexcept { return g_total_frames; }
     size_t pmm_used_frames() noexcept { return g_used_frames; }
     size_t pmm_free_frames() noexcept { return g_total_frames - g_used_frames; }
-
+    
     [[gnu::regparm(3)]]
     void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
     {
@@ -285,7 +297,27 @@ namespace kernel::memory
     }
 
     [[gnu::regparm(1)]]
-    void* pmm_find_contiguous_free_frames(const size_t frames) noexcept
+    pmm_result pmm_free_frame(const uintptr_t address) noexcept
+    {
+        size_t index{frame_index(address)};
+        
+        if(index >= g_total_frames) return pmm_result::hb_deny;
+
+        const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
+
+        if(bitmap_frame_pos < g_bitmap.lower_limit) return pmm_result::lb_deny;
+
+        if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
+        set_frame_free(&bitmap_frame_pos);
+
+        const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
+        g_bitmap.search_begin -= ((g_bitmap.search_begin - addr) * (addr < g_bitmap.search_begin));
+        
+        return pmm_result::success;
+    }
+
+    [[gnu::regparm(1)]]
+    void* pmm_allocate_contiguous_frames(const size_t frames) noexcept
     {
         if(frames == 0) return nullptr;
 
@@ -327,40 +359,55 @@ namespace kernel::memory
         const bit_n_byte end_byte{get_bit_n_byte(start_address + frames - 1)};
         if(run_start_index.byte_index == end_byte.byte_index)
         {
-            const uint8_t mask{static_cast<uint8_t>(mark_front_byte(run_start_index.bit_index) & mark_back_byte(end_byte.bit_index))};
+            const uint8_t mask{static_cast<uint8_t>(front_byte_mask_used(run_start_index.bit_index) & back_byte_mask_used(end_byte.bit_index))};
             set_frames_in_byte_used(run_start_index.byte_index, mask, frames);
         }
         else
         {
-            set_frames_in_byte_used(run_start_index.byte_index, mark_front_byte(run_start_index.bit_index), bit_max_pos - run_start_index.bit_index + 1);
+            set_frames_in_byte_used(run_start_index.byte_index, front_byte_mask_used(run_start_index.bit_index), bit_max_pos - run_start_index.bit_index + 1);
             for(size_t start{run_start_index.byte_index + 1}; start < end_byte.byte_index; ++start)
             {
                 mark_whole_byte_used(start);
             }
-            set_frames_in_byte_used(end_byte.byte_index, mark_back_byte(end_byte.bit_index), end_byte.bit_index + 1);
+            set_frames_in_byte_used(end_byte.byte_index, back_byte_mask_used(end_byte.bit_index), end_byte.bit_index + 1);
         }
         const uint8_t* temp_end{g_bitmap.start + end_byte.byte_index};
-        g_bitmap.search_begin = temp_end + (*temp_end == 0xFF) * (temp_end < g_bitmap.end);
+        g_bitmap.search_begin = temp_end + (*temp_end == 0xFF);
         return reinterpret_cast<void*>(frame_address(start_address));
     }
 
-    [[gnu::regparm(1)]]
-    pmm_result pmm_free_frame(const uintptr_t address) noexcept
+    [[gnu::regparm(2)]]
+    pmm_result pmm_free_contiguous_frames(const uintptr_t address, const size_t frames) noexcept
     {
-        size_t index{frame_index(address)};
-        
+        if(frames == 0) return pmm_result::zero_frames;
+
+        const size_t index{frame_index(address)};
         if(index >= g_total_frames) return pmm_result::hb_deny;
 
-        const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
+        const bit_n_byte start_byte{get_bit_n_byte(index)};
 
-        if(bitmap_frame_pos < g_bitmap.lower_limit) return pmm_result::lb_deny;
+        if(start_byte < g_bitmap.lower_limit) return pmm_result::lb_deny;
 
-        if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
-        set_frame_free(&bitmap_frame_pos);
+        const bit_n_byte end_byte{get_bit_n_byte(index + frames - 1)};
 
-        const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
+        if(start_byte.byte_index == end_byte.byte_index)
+        {
+            const uint8_t mask{static_cast<uint8_t>(front_byte_free_mask(start_byte.bit_index) | static_cast<uint8_t>(back_byte_free_mask(end_byte.bit_index)))};
+            set_frames_in_byte_free(start_byte.byte_index, mask, frames);
+        }
+        else
+        {
+            set_frames_in_byte_free(start_byte.byte_index, front_byte_free_mask(start_byte.bit_index), bit_max_pos - start_byte.bit_index + 1);
+            for(size_t start{start_byte.byte_index + 1}; start < end_byte.byte_index; ++start)
+            {
+                mark_whole_byte_free(start);
+            }
+            set_frames_in_byte_free(end_byte.byte_index, back_byte_free_mask(end_byte.bit_index), end_byte.bit_index + 1);
+        }
+
+        const uint8_t* const addr{g_bitmap.start + start_byte.byte_index};
         g_bitmap.search_begin -= ((g_bitmap.search_begin - addr) * (addr < g_bitmap.search_begin));
-        
+
         return pmm_result::success;
     }
 }
