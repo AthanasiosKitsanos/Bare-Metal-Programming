@@ -10,7 +10,8 @@ mode, and runs directly under QEMU with no underlying OS support.
 
 Every line of code in this project is written to be understood, not just to work.
 The focus is on correctness, clarity, and hardware-level understanding.
-Performance and low memory usage are considered at every step.
+Performance and low memory usage are considered at every step — including cache
+locality, hot/cold field separation, and branchless design on runtime hot paths.
 
 Long mode (64-bit) is intentionally deferred to a later stage.
 
@@ -22,7 +23,7 @@ Long mode (64-bit) is intentionally deferred to a later stage.
 |-------------------|----------------------------------|
 | `i686-elf-g++`    | Cross-compiler (C++17 freestanding) |
 | `i686-elf-as`     | AT&T syntax assembler            |
-| `i686-elf-ld`     | Linker                           |
+| `i686-elf-ld`     | Linker (raw, no libgcc dependency) |
 | `i686-elf-objcopy`| Raw binary conversion            |
 | `i686-elf-ar`     | Static library archiver          |
 | `make`            | Build system                     |
@@ -45,7 +46,6 @@ Output image: `bin/os_image.bin`
 
 ---
 
-## Repository Layout
 ## Repository Layout
 
 - **assembly/**
@@ -70,7 +70,8 @@ Output image: `bin/os_image.bin`
   - **logger/** — info / warning / error / debug / panic
   - **memory/**
     - **e820/** — E820 physical memory map reader
-    - **pmm/** — Physical Memory Manager, bitmap allocator *(In Progress)*
+    - **heap/** — `kernel_heap.cpp` / `.h` — kernel heap allocator (next-fit, coalescing)
+    - **pmm/** — `kernel_pmm.cpp` / `.h` — Physical Memory Manager, bitmap allocator
   - **pic/** — 8259 PIC remap, send_eoi, IRQ masking
   - **pit/** — PIT channel 0, configurable frequency (20–100 Hz)
   - **timer/** — tick counter, uptime, sleep_ticks, sleep_ms
@@ -82,8 +83,8 @@ Output image: `bin/os_image.bin`
 - **utilities/**
   - **internals/** — `inb` / `outb` port I/O inline helpers
   - **vga/**
-    - **vga_text_buffer/** — 80×25 VGA text buffer (put, scroll, color)
-    - **vga_hardware_cursor/** — CRT hardware cursor (port 0x3D4 / 0x3D5)
+    - **vga_text_buffer/** — 80×25 VGA text buffer (double-buffer ring scheme, SIMD fill/copy dispatch via SSE2/AVX2, branchless cursor movement)
+    - **vga_hardware_cursor/** — CRT hardware cursor (port 0x3D4 / 0x3D5, CRTC start address register)
   - **io/**
     - **output/** — `terminal::output` (`<<`, hex, dec, bool_alpha)
     - **input/** — `terminal::input` *(Skeleton — not yet implemented)*
@@ -91,6 +92,9 @@ Output image: `bin/os_image.bin`
 - **apps/**
   - **shell/** — kernel shell application *(Skeleton — not yet implemented)*
     - **internal/** — X-macro command table (currently only `clear`)
+
+- **diagnostic_tools/** *(host-side, not part of the kernel image)*
+  - `stack_calculator.cpp` — worst-case stack usage computation from GCC `.ci` call-graph files, with two-pass `__indirect_call` resolution
 
 - **links/**
   - `code_16.ld` — linker script for 16-bit stages (0x7C00)
@@ -109,7 +113,7 @@ Output image: `bin/os_image.bin`
 | Stage 2 Bootloader (E820 + GDT)   | ✅ Complete         |
 | 32-bit Protected Mode Entry       | ✅ Complete         |
 | BSS zeroing                       | ✅ Complete         |
-| VGA Text Buffer (80×25)           | ✅ Complete         |
+| VGA Text Buffer (double-buffer, SIMD dispatch) | ✅ Complete |
 | VGA Hardware Cursor               | ✅ Complete         |
 | Terminal Output (`terminal::output`) | ✅ Complete      |
 | Kernel Logger                     | ✅ Complete         |
@@ -130,7 +134,10 @@ Output image: `bin/os_image.bin`
 | Keyboard Modifier State Tracking  | ✅ Complete         |
 | Keyboard Event Queue (ring buffer, 64 slots) | ✅ Complete |
 | E820 Memory Map Reader            | ✅ Complete         |
-| Physical Memory Manager (PMM)     | ✅ Complete       |
+| Kernel Heap Allocator (next-fit, coalescing) | ✅ Complete |
+| Physical Memory Manager — single frame (alloc/free) | ✅ Complete |
+| Physical Memory Manager — contiguous frames (alloc/free) | ✅ Complete |
+| Stack Usage Diagnostic Tool (host-side) | ✅ Complete   |
 | Terminal Input                    | 🔧 Skeleton Only   |
 | Kernel Shell                      | 🔧 Skeleton Only   |
 
@@ -196,51 +203,79 @@ All other vectors fall through to `default_interrupt_handler`.
 
 ---
 
-## Memory Management (In Progress)
+## Memory Management
 
 ### E820
 The bootloader calls INT 0x15 / EAX=0xE820 in real mode and stores entries at address `0x502` (count at `0x500`). The kernel reads this via `get_e820_memory_map()`.
 
+### Kernel Heap Allocator
+A next-fit allocator with forward/backward coalescing, using a `physical_prev` pointer
+stored in each `block_header` to walk the physically-adjacent block without a separate
+free-list traversal.
+
 ### Physical Memory Manager (PMM)
-A bitmap-based frame allocator is being implemented.
+A bitmap-based frame allocator (1 bit per frame, bit = 0 free / bit = 1 occupied) over
+the E820 usable regions. Single-frame and contiguous-frame allocation/deallocation are
+both complete, sharing a front/middle/back byte-masking strategy for partial-byte
+boundaries.
 
 - Enum class `pmm_result: uint8_t`  
 {  
     - success = 0x00,  
     - failed = 0x01,  
     - lb_deny = 0x02,  
-    - hb_deny = 0x03  
+    - hb_deny = 0x03,  
+    - zero_frames = 0x04  
 }
 - Frame size: **4096 bytes**
 - Bitmap: 1 bit per frame (set = used, clear = free)
-- Public API (defined, implementation pending):
+- Public API (fully implemented):
   - `pmm_initialize(map, kernel_start, kernel_end)`
-  - `pmm_allocate_frame(uintptr_t*)` → `pmm_result`
+  - `pmm_allocate_frame()` → `void*`
   - `pmm_free_frame(uintptr_t)` → `pmm_result`
+  - `pmm_allocate_contiguous_frames(size_t frames)` → `void*`
+  - `pmm_free_contiguous_frames(uintptr_t address, size_t frames)` → `pmm_result`
   - `pmm_total_frames()`, `pmm_used_frames()`, `pmm_free_frames()`
 
 ---
 
+## Diagnostic Tools
+
+### Stack Usage Calculator (`diagnostic_tools/stack_calculator.cpp`)
+A host-side tool that computes worst-case stack usage per function from GCC-generated
+`.ci` call-graph files. Handles indirect calls (`__indirect_call`) via a two-pass
+resolution: independent nodes are resolved first, then dependent nodes that route
+through `__indirect_call` (e.g. via `operator<<`). Integrated into the Makefile and
+linker script build flow.
+
+---
+
 ## Current Chapter
-Chapter 3 — Physical Memory Manager (PMM)
-Bitmap-based frame allocator over E820 usable regions.
+Chapter 4 — Physical Memory Manager (PMM), contiguous frame allocation/deallocation.
+
+`pmm_allocate_contiguous_frames` and `pmm_free_contiguous_frames` are both complete
+and verified. One deferred optimization remains open for this subsystem: SIMD
+chunk-boundary carry-over for bitmap scanning.
 
 ---
 
 ## Roadmap
 
 ### Near-Term
-- [✅] Complete PMM (`pmm_initialize`, `pmm_allocate_frame`, `pmm_free_frame`)
-- [✅] Integrate PMM into `kernel_main`
-- [✅] Log memory map and PMM statistics at boot
+- [✅] Complete PMM single-frame allocation/deallocation
+- [✅] Complete PMM contiguous-frame allocation/deallocation
+- [✅] Complete kernel heap allocator (`kmalloc` / `kfree`-equivalent)
+- [ ] SIMD chunk-boundary carry-over for PMM bitmap scanning (deferred optimization)
+- [ ] Makefile header dependency tracking (`-MMD -MP`)
 
 ### Medium-Term
 - [ ] Virtual memory / paging (identity map kernel, page directory/tables)
-- [ ] Kernel heap allocator (`kmalloc` / `kfree`)
+- [ ] BOOT_STAGE_1 enhancement — BIOS-based 80×50 text mode setup before protected mode jump
 - [ ] Improve terminal input and begin shell implementation
 - [ ] Expand CPU exception coverage
 
 ### Long-Term
+- [ ] Graphics framebuffer mode (requires VMM/paging)
 - [ ] Scheduler
 - [ ] User mode
 - [ ] System calls
@@ -251,10 +286,15 @@ Bitmap-based frame allocator over E820 usable regions.
 
 ## Design Principles
 
-1. **Freestanding** — no libc, no C++ runtime, no exceptions, no RTTI, no dynamic allocation (yet).
+1. **Freestanding** — no libc, no C++ runtime, no exceptions, no RTTI, no dynamic allocation beyond the kernel heap.
 2. **Explicit hardware** — every port access, every IDT entry, every PIC command is visible in code.
 3. **Lean interrupt paths** — IRQ handlers do the minimum; all heavy work is deferred to polling.
 4. **Compile-time correctness** — `static_assert` on every packed struct, every table size.
 5. **Clean subsystem boundaries** — internal helpers stay in `.cpp` or `internal/` headers.
 6. **X-macro driven tables** — CPU exceptions and hardware interrupts are registered from
    a single source of truth, eliminating duplication.
+7. **Branchless runtime hot paths** — kernel functions on the hot path (e.g. bitmap
+   scanning, cursor movement) favor branchless arithmetic; `constexpr` compile-time
+   code and host-side tooling favor plain, readable `if` statements instead.
+8. **Cache-conscious layout** — structs are ordered hot-field-first for cache locality
+   where access frequency differs meaningfully between fields.
