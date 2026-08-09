@@ -27,10 +27,10 @@ namespace kernel::memory
     void* pmm_allocate_contiguous_frames(const size_t frames) noexcept;
 
     [[gnu::regparm(2)]]
-    pmm_result pmm_free_contiguous_frames(const uintptr_t address, const size_t frames) noexcept;
+    pmm_result pmm_free_contiguous_frames(const void* address, const size_t frames) noexcept;
 
     [[gnu::regparm(1)]]
-    pmm_result pmm_free_frame(const uintptr_t) noexcept;
+    pmm_result pmm_free_frame(const void*) noexcept;
 
     size_t pmm_total_frames() noexcept;
     size_t pmm_used_frames() noexcept;

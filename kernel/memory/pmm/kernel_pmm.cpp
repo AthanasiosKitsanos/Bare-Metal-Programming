@@ -297,9 +297,9 @@ namespace kernel::memory
     }
 
     [[gnu::regparm(1)]]
-    pmm_result pmm_free_frame(const uintptr_t address) noexcept
+    pmm_result pmm_free_frame(const void* address) noexcept
     {
-        size_t index{frame_index(address)};
+        size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
         
         if(index >= g_total_frames) return pmm_result::hb_deny;
 
@@ -377,11 +377,11 @@ namespace kernel::memory
     }
 
     [[gnu::regparm(2)]]
-    pmm_result pmm_free_contiguous_frames(const uintptr_t address, const size_t frames) noexcept
+    pmm_result pmm_free_contiguous_frames(const void* address, const size_t frames) noexcept
     {
         if(frames == 0) return pmm_result::zero_frames;
 
-        const size_t index{frame_index(address)};
+        const size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
         if(index >= g_total_frames) return pmm_result::hb_deny;
 
         const bit_n_byte start_byte{get_bit_n_byte(index)};
