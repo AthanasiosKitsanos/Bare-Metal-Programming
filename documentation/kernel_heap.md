@@ -1,14 +1,14 @@
-# `kernel_heap.cpp` — Τεκμηρίωση
+# `kernel_heap.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί έναν **kernel heap allocator** τύπου **next-fit**, με **συνένωση (coalescing) προς τα εμπρός και προς τα πίσω** κατά την αποδέσμευση, μέσω μιας διπλά συνδεδεμένης λίστας ελεύθερων/χρησιμοποιημένων μπλοκ (blocks). Προσφέρει τη γνωστή τριάδα `kmalloc` / `kfree` / `krealloc`, το αντίστοιχο του `malloc`/`free`/`realloc` της C βιβλιοθήκης, αλλά χτισμένο από την αρχή (freestanding, χωρίς εξάρτηση από libc).
+Implements a **next-fit kernel heap allocator**, with **forward and backward coalescing** on free, via a doubly-linked list of free/used blocks. Provides the familiar `kmalloc` / `kfree` / `krealloc` trio — the equivalent of C's `malloc`/`free`/`realloc`, built from scratch (freestanding, no dependency on libc).
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `memory/heap/kernel_heap.h`: δηλώνει τη δομή `block_header` και το δημόσιο API.
+- `memory/heap/kernel_heap.h`: declares the `block_header` structure and the public API.
 
-## Δομή `block_header` (από το header, χρησιμοποιείται εδώ)
+## `block_header` structure (from the header, used here)
 
 ```cpp
 struct alignas(8) block_header
@@ -21,11 +21,11 @@ struct alignas(8) block_header
 };
 ```
 
-Κάθε μπλοκ μνήμης (ελεύθερο ή δεσμευμένο) έχει μπροστά από τα δεδομένα του μία τέτοια κεφαλίδα (header). Σημειώστε τους δύο **διαφορετικούς** τύπους "γειτονίας":
-- `next` / `prev`: θέση μέσα στη **συνδεδεμένη λίστα ελεύθερων μπλοκ** (free list) — δεν είναι απαραίτητα γειτονικά στη μνήμη.
-- `physical_prev`: το μπλοκ που βρίσκεται **φυσικά ακριβώς πριν** από αυτό στη μνήμη (memory layout), ανεξάρτητα από το αν είναι στη free list. Αυτό είναι απαραίτητο για τη συνένωση προς τα πίσω (backward coalescing), αφού η free list μόνη της δεν αρκεί για να βρεθεί ο "φυσικός" γείτονας.
+Every block of memory (free or allocated) has such a header placed right before its data. Note the two **different** notions of "neighbor":
+- `next` / `prev`: position within the **linked free-block list** — not necessarily adjacent in memory.
+- `physical_prev`: the block that sits **physically right before** this one in memory (memory layout), regardless of whether it's in the free list. This is required for backward coalescing, since the free list alone isn't enough to find the "physical" neighbor.
 
-## Global state (ανώνυμος χώρος ονομάτων)
+## Global state (anonymous namespace)
 
 ```cpp
 kernel::memory::block_header* free_list_head{nullptr};
@@ -33,17 +33,17 @@ kernel::memory::block_header* heap_end{nullptr};
 kernel::memory::block_header* searching_block{nullptr};
 ```
 
-- `free_list_head`: κεφαλή της λίστας ελεύθερων μπλοκ.
-- `heap_end`: η διεύθυνση αμέσως μετά το τέλος όλου του heap — χρησιμοποιείται για να ελεγχθεί αν ένα "επόμενο φυσικά" μπλοκ υπάρχει πράγματι μέσα στα όρια του heap.
-- `searching_block`: δρομέας next-fit — η θέση από όπου ξεκινά η **επόμενη** αναζήτηση σε `kmalloc`, ανάλογη λογική με το `search_begin` του PMM.
+- `free_list_head`: head of the free-block list.
+- `heap_end`: the address right after the end of the entire heap — used to check whether a "physically next" block actually exists within the heap's bounds.
+- `searching_block`: next-fit cursor — the position from which the **next** `kmalloc` search begins, similar logic to the PMM's `search_begin`.
 
 ## `heap_initialize(heap_start, heap_size)`
 
-Αρχικοποιεί ολόκληρο τον heap ως **ένα** ενιαίο ελεύθερο μπλοκ που καλύπτει όλο τον διαθέσιμο χώρο (`heap_size - sizeof(block_header)` bytes χρησιμοποιήσιμα δεδομένα, αφού ο header "τρώει" χώρο). Θέτει `physical_prev = nullptr` (δεν υπάρχει τίποτα πριν) και υπολογίζει το `heap_end` προσθέτοντας το `heap_size` στην αρχική διεύθυνση.
+Initializes the entire heap as **one** single free block covering all available space (`heap_size - sizeof(block_header)` usable data bytes, since the header "eats" some space). Sets `physical_prev = nullptr` (nothing exists before it) and computes `heap_end` by adding `heap_size` to the starting address.
 
 ## `kmalloc(requested_size)` — `[[gnu::regparm(1)]]`
 
-### Βήμα 1: Αναζήτηση next-fit
+### Step 1: Next-fit search
 
 ```cpp
 while(searching_block != nullptr)
@@ -54,9 +54,9 @@ while(searching_block != nullptr)
 }
 ```
 
-Αυτό είναι ένα **branchless trick**: αντί για `if(!is_used && size >= requested_size)`, ο κώδικας πολλαπλασιάζει το μέγεθος με `(~flags) & 1`. Αν το μπλοκ είναι δεσμευμένο (`flags = 1`), το `(~1) & 1 = 0`, άρα το γινόμενο γίνεται `0` και η συνθήκη αποτυγχάνει αυτόματα χωρίς ξεχωριστό έλεγχο `if(used)`. Αν είναι ελεύθερο (`flags = 0`), το `(~0) & 1 = 1` και συγκρίνεται το πραγματικό μέγεθος. Αν δεν βρεθεί κατάλληλο μπλοκ, επιστρέφει `nullptr` (ενοποιημένη σύμβαση αποτυχίας, ίδια φιλοσοφία με το PMM).
+This is a **branchless trick**: instead of `if(!is_used && size >= requested_size)`, the code multiplies the size by `(~flags) & 1`. If the block is used (`flags = 1`), `(~1) & 1 = 0`, so the product becomes `0` and the condition automatically fails without a separate `if(used)` check. If it's free (`flags = 0`), `(~0) & 1 = 1` and the real size gets compared. If no suitable block is found, it returns `nullptr` (the unified failure convention, same philosophy as the PMM).
 
-### Βήμα 2: Πιθανό "σπάσιμο" (split) του μπλοκ
+### Step 2: Possible block split
 
 ```cpp
 constexpr uint32_t split_limit{sizeof(block_header) + 8};
@@ -64,11 +64,11 @@ const uint32_t remaining{cached_size - requested_size};
 if(remaining >= split_limit) { ... }
 ```
 
-Αν το βρεθέν μπλοκ είναι σημαντικά μεγαλύτερο απ' όσο ζητήθηκε (αρκετό περιθώριο για να χωρέσει ένα νέο `block_header` **και** τουλάχιστον 8 bytes χρήσιμου χώρου — το `split_limit`), δημιουργείται ένα δεύτερο μπλοκ (`remainder_block`) αμέσως μετά τα δεσμευμένα δεδομένα. Αυτό το νέο μπλοκ μπαίνει στη free list στη θέση του αρχικού και το `physical_prev` του γείτονά του (`remainder_block->next`) ενημερώνεται ώστε η φυσική αλυσίδα να παραμείνει συνεπής.
+If the found block is significantly larger than what was requested (enough margin to fit a new `block_header` **and** at least 8 bytes of usable space — the `split_limit`), a second block (`remainder_block`) is created right after the allocated data. This new block is inserted into the free list in place of the original, and the `physical_prev` of its neighbor (`remainder_block->next`) is updated so the physical chain stays consistent.
 
-Αν το περιθώριο *δεν* είναι αρκετό, το μπλοκ δίνεται ολόκληρο (δεν αξίζει να δημιουργηθεί ένα μικροσκοπικό ελεύθερο θραύσμα — αυτό θα οδηγούσε σε εξωτερικό κατακερματισμό, external fragmentation, χωρίς πρακτικό όφελος).
+If the margin *isn't* sufficient, the entire block is handed out (it's not worth creating a tiny free fragment — that would lead to external fragmentation with no practical benefit).
 
-### Βήμα 3: Σήμανση ως δεσμευμένο και ενημέρωση δρομέα αναζήτησης
+### Step 3: Mark as used and update the search cursor
 
 ```cpp
 allocated->flags = 1;
@@ -77,32 +77,32 @@ const bool is_null{next_addr == 0};
 searching_block = reinterpret_cast<block_header*>(next_addr * !is_null + (reinterpret_cast<uintptr_t>(free_list_head) * is_null));
 ```
 
-Ακόμη ένα **branchless** μοτίβο: αντί για `if(allocated->next) searching_block = allocated->next; else searching_block = free_list_head;`, ο κώδικας υπολογίζει και τις δύο πιθανές τιμές και επιλέγει τη σωστή πολλαπλασιάζοντας με boolean μάσκες (`is_null`/`!is_null`), αποφεύγοντας branch misprediction στο hot path.
+Another **branchless** pattern: instead of `if(allocated->next) searching_block = allocated->next; else searching_block = free_list_head;`, the code computes both possible values and picks the right one by multiplying with boolean masks (`is_null`/`!is_null`), avoiding branch mispredictions on the hot path.
 
-Επιστρέφει `allocated + 1` — δηλαδή τον δείκτη **αμέσως μετά** τον header, που είναι η πραγματική διεύθυνση δεδομένων που βλέπει ο καλών (η κλασική τεχνική "header πριν τα δεδομένα").
+Returns `allocated + 1` — i.e. the pointer right after the header, which is the actual data address seen by the caller (the classic "header before data" technique).
 
 ## `kfree(ptr)` — `[[gnu::regparm(1)]]`
 
-1. Αν `ptr == nullptr`, επιστρέφει αμέσως (ασφαλές no-op, όπως το standard `free`).
-2. Ανακτά τον header με `reinterpret_cast<block_header*>(ptr) - 1` (αντίστροφο του `allocated + 1` στο `kmalloc`).
-3. Καθαρίζει το flag (`flags = 0`).
-4. **Forward coalescing**: υπολογίζει το φυσικά επόμενο μπλοκ (`ptr + size`). Αν αυτό βρίσκεται εντός των ορίων του heap (`next < heap_end`) και είναι ελεύθερο, το αφαιρεί από τη free list (επιδιορθώνοντας τους δεσμούς `prev`/`next`, συμπεριλαμβανομένων ειδικών περιπτώσεων όπου ήταν η κεφαλή της λίστας ή ο τρέχων `searching_block`) και **επεκτείνει** το μέγεθος του τρέχοντος μπλοκ ώστε να το απορροφήσει, μαζί με το μέγεθος του δικού του header (`sizeof(block_header) + next->size`).
-5. Εισάγει το (πλέον ενδεχομένως μεγαλύτερο) μπλοκ στην **κεφαλή** της free list.
-6. Θέτει `searching_block = allocated_memory`, ώστε το επόμενο `kmalloc` να ξεκινήσει την αναζήτηση από το μόλις ελευθερωμένο σημείο (next-fit heuristic — συχνά ένα μπλοκ που μόλις ελευθερώθηκε είναι καλός υποψήφιος για την επόμενη δέσμευση).
+1. If `ptr == nullptr`, returns immediately (safe no-op, just like standard `free`).
+2. Recovers the header with `reinterpret_cast<block_header*>(ptr) - 1` (inverse of `allocated + 1` in `kmalloc`).
+3. Clears the flag (`flags = 0`).
+4. **Forward coalescing**: computes the physically next block (`ptr + size`). If it lies within the heap's bounds (`next < heap_end`) and is free, it's removed from the free list (fixing up the `prev`/`next` links, including special cases where it was the head of the list or the current `searching_block`) and the current block's size is **expanded** to absorb it, along with its own header's size (`sizeof(block_header) + next->size`).
+5. Inserts the (possibly now larger) block at the **head** of the free list.
+6. Sets `searching_block = allocated_memory`, so the next `kmalloc` starts its search right at the just-freed spot (next-fit heuristic — a block that was just freed is often a good candidate for the next allocation).
 
-> Σημείωση: το backward coalescing (χρήση του `physical_prev`) αναφέρεται ρητά στην περιγραφή του αλγορίθμου next-fit με forward/backward coalescing στη μνήμη του project· σε αυτήν την έκδοση του `kfree` υλοποιείται ρητά μόνο η **forward** συνένωση μέσα στο σώμα της συνάρτησης. Το πεδίο `physical_prev` παραμένει διαθέσιμο στη δομή και ενημερώνεται σωστά σε κάθε `kmalloc`/split, έτοιμο να χρησιμοποιηθεί.
+> Note: backward coalescing (using `physical_prev`) is referenced in the project's description of the next-fit algorithm with forward/backward coalescing; in this version of `kfree`, only the **forward** coalescing is explicitly implemented in the function body. The `physical_prev` field remains available in the structure and is correctly maintained on every `kmalloc`/split, ready to be used.
 
 ## `krealloc(ptr, new_size)` — `[[gnu::regparm(2)]]`
 
-Ακολουθεί τη σημασιολογία (semantics) του standard `realloc`:
-- Αν `ptr == nullptr`, ισοδυναμεί με `kmalloc(new_size)`.
-- Αν `new_size == 0`, ισοδυναμεί με `kfree(ptr)` και επιστρέφει `nullptr`.
-- Αν το υπάρχον μπλοκ έχει ήδη αρκετό χώρο (`size >= new_size`), επιστρέφει το **ίδιο** `ptr` χωρίς καμία αντιγραφή (fast path — αποφεύγει περιττή δουλειά).
-- Αλλιώς, δεσμεύει νέο χώρο με `kmalloc`, αντιγράφει byte προς byte το μικρότερο από τα δύο μεγέθη (`new_size` ή το παλιό `size`, όποιο είναι μικρότερο — υπολογισμένο branchless μέσω πολλαπλασιασμού με `is_lower`/`!is_lower`), απελευθερώνει το παλιό μπλοκ με `kfree` και επιστρέφει τον νέο δείκτη.
+Follows the semantics of standard `realloc`:
+- If `ptr == nullptr`, it's equivalent to `kmalloc(new_size)`.
+- If `new_size == 0`, it's equivalent to `kfree(ptr)` and returns `nullptr`.
+- If the existing block already has enough room (`size >= new_size`), it returns the **same** `ptr` with no copying at all (fast path — avoids unnecessary work).
+- Otherwise, it allocates new space via `kmalloc`, copies byte by byte the smaller of the two sizes (`new_size` or the old `size`, whichever is smaller — computed branchlessly via multiplication with `is_lower`/`!is_lower`), frees the old block via `kfree`, and returns the new pointer.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Το next-fit σχήμα (σε αντίθεση με first-fit) διατηρεί έναν κινητό δρομέα αναζήτησης, μειώνοντας τον μέσο αριθμό συγκρίσεων όταν γίνονται πολλές διαδοχικές δεσμεύσεις.
-- Η χρήση branchless αριθμητικής στα hot paths (`kmalloc`, μέρος του `krealloc`) είναι συνεπής με την αρχή του project ότι ο κώδικας πυρήνα σε κρίσιμα μονοπάτια πρέπει να αποφεύγει branches για να μειώνεται το κόστος branch misprediction.
-- Το μέγεθος `sizeof(block_header) + 8` ως `split_limit` αποτρέπει τη δημιουργία εκφυλισμένων (πρακτικά άχρηστων) μικροσκοπικών ελεύθερων μπλοκ.
-- Δεν υπάρχει `alignas`/padding ελέγχου εκτός του `alignas(8)` στη δομή `block_header` — αυτό εξασφαλίζει ότι κάθε επιστρεφόμενος δείκτης δεδομένων είναι τουλάχιστον 8-byte ευθυγραμμισμένος, αρκετό για τους περισσότερους τύπους δεδομένων σε 32-bit περιβάλλον.
+- The next-fit scheme (as opposed to first-fit) keeps a moving search cursor, reducing the average number of comparisons when many consecutive allocations happen.
+- The use of branchless arithmetic in the hot paths (`kmalloc`, part of `krealloc`) is consistent with the project's principle that hot-path kernel code should avoid branches to reduce branch-misprediction cost.
+- The `sizeof(block_header) + 8` split limit prevents the creation of degenerate (practically useless) tiny free blocks.
+- There is no alignment padding check beyond the `alignas(8)` on the `block_header` structure — this guarantees that every returned data pointer is at least 8-byte aligned, sufficient for most data types in a 32-bit environment.

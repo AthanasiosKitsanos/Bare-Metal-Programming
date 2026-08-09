@@ -1,21 +1,21 @@
-# `kernel_assert.cpp` — Τεκμηρίωση
+# `kernel_assert.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί έναν μηχανισμό διεκδίκησης (assertion) για τον πυρήνα — το αντίστοιχο του `assert()` της C βιβλιοθήκης, αλλά προσαρμοσμένο ώστε να γράφει το μήνυμα σφάλματος στην οθόνη μέσω του `kernel::logger`, αντί να καλεί `abort()`.
+Implements an assertion mechanism for the kernel — the equivalent of the C library's `assert()`, but adapted to write the error message to the screen via `kernel::logger`, instead of calling `abort()`.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `kernel_assert.h`: δημόσιο API (`assert_failed`, `assert_failed_msg`, `set_assert_logger`), πιθανότατα και μια macro `KERNEL_ASSERT` που καλεί αυτές τις συναρτήσεις.
-- `logger/kernel_logger.h`: κλάση `logger`, με τη μέθοδο `error()`/`panic()`.
+- `kernel_assert.h`: public API (`assert_failed`, `assert_failed_msg`, `set_assert_logger`), likely also a `KERNEL_ASSERT` macro that calls these functions.
+- `logger/kernel_logger.h`: the `logger` class, with its `error()`/`panic()` methods.
 
-## Global state (ανώνυμος χώρος ονομάτων)
+## Global state (anonymous namespace)
 
 ```cpp
 kernel::logger* g_assert_logger{nullptr};
 ```
 
-Ένας **δείκτης** (όχι στιγμιότυπο) σε logger, εγχεόμενος (injected) από έξω μέσω του `set_assert_logger`. Αυτή η επιλογή (dependency injection μέσω δείκτη) επιτρέπει στο σύστημα assertions να λειτουργεί ακόμη και πριν υπάρχει κάποιος συγκεκριμένος, μόνιμος logger έτοιμος — απλά ο δείκτης παραμένει `nullptr` μέχρι να ρυθμιστεί.
+A **pointer** (not an instance) to a logger, injected from outside via `set_assert_logger`. This choice (dependency injection via pointer) allows the assertion system to work even before any specific, permanent logger is ready — the pointer simply remains `nullptr` until it's configured.
 
 ## `halt_forever()` — `[[noreturn]]`
 
@@ -23,7 +23,7 @@ kernel::logger* g_assert_logger{nullptr};
 while(true) asm volatile("cli; hlt");
 ```
 
-Απενεργοποιεί τις διακοπές και σταματά τον επεξεργαστή, οριστικά. Χρησιμοποιείται ως **έσχατη γραμμή άμυνας**: αν συμβεί μια αποτυχημένη διεκδίκηση **πριν** έχει ρυθμιστεί κανένας logger (`g_assert_logger == nullptr`), δεν υπάρχει τρόπος να τυπωθεί μήνυμα σφάλματος με ασφάλεια — προτιμότερο να σταματήσει ο επεξεργαστής αμέσως παρά να συνεχίσει σε ασταθή κατάσταση ή να προσπαθήσει να χρησιμοποιήσει έναν null δείκτη.
+Disables interrupts and halts the CPU, permanently. Used as a **last line of defense**: if a failed assertion occurs **before** any logger has been configured (`g_assert_logger == nullptr`), there's no safe way to print an error message — better to halt the CPU immediately than to continue in an unstable state or attempt to use a null pointer.
 
 ## `build_assert_message(expression, file, line)`
 
@@ -32,23 +32,23 @@ if(!g_assert_logger) halt_forever();
 return g_assert_logger->error() << "Assertion failed: " << expression << "\nFile: " << file << "\nLine: " << line << '\n';
 ```
 
-Κοινή βοηθητική συνάρτηση, καλείται και από τα δύο δημόσια σημεία εισόδου, ώστε το format του βασικού μηνύματος (έκφραση, αρχείο, γραμμή) να ορίζεται σε **ένα** σημείο. Επιστρέφει αναφορά στο ίδιο το output stream του logger, επιτρέποντας στον καλούντα να προσθέσει επιπλέον πληροφορία (π.χ. προσαρμοσμένο μήνυμα) πριν κληθεί το τελικό `panic`.
+A shared helper function, called from both public entry points, so the format of the base message (expression, file, line) is defined in **one** place. Returns a reference to the logger's own output stream, letting the caller append additional information (e.g. a custom message) before the final `panic` is called.
 
-## Δημόσιο API (namespace `kernel`)
+## Public API (namespace `kernel`)
 
 ### `set_assert_logger(log)`
 
-Απλός setter — καταχωρεί τον δείκτη logger που θα χρησιμοποιείται από όλες τις μελλοντικές αποτυχημένες διεκδικήσεις.
+A simple setter — registers the logger pointer that will be used by all future failed assertions.
 
 ### `assert_failed(expression, file, line)` — `[[noreturn]]`
 
-Καλείται όταν μια απλή διεκδίκηση αποτύχει (π.χ. `KERNEL_ASSERT(x > 0)`). Χτίζει το βασικό μήνυμα μέσω `build_assert_message` και μετά καλεί `g_assert_logger->panic(panic_message)`, το οποίο τυπώνει σε κόκκινο φόντο και σταματά τον επεξεργαστή οριστικά.
+Called when a plain assertion fails (e.g. `KERNEL_ASSERT(x > 0)`). Builds the base message via `build_assert_message` and then calls `g_assert_logger->panic(panic_message)`, which prints on a red background and halts the CPU permanently.
 
 ### `assert_failed_msg(expression, message, file, line)` — `[[noreturn]]`
 
-Παραλλαγή που δέχεται επιπλέον ένα προσαρμοσμένο μήνυμα εξήγησης, το οποίο προστίθεται **μετά** το βασικό μήνυμα, πριν το τελικό `panic`. Χρήσιμο όταν μια διεκδίκηση χρειάζεται περισσότερο πλαίσιο (context) από ό,τι μπορεί να δώσει μόνη της η κειμενική αναπαράσταση της έκφρασης.
+A variant that also accepts a custom explanatory message, appended **after** the base message, before the final `panic`. Useful when an assertion needs more context than the textual representation of the expression alone can provide.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Η ύπαρξη **δύο επιπέδων προστασίας από κατάρρευση χωρίς πληροφορία** (πρώτα ο έλεγχος `!g_assert_logger` στο `build_assert_message`, μετά το τελικό `panic` του ίδιου του logger) εξασφαλίζει ότι ο πυρήνας ποτέ δεν "πέφτει σιωπηλά" — είτε θα δώσει πλήρες διαγνωστικό μήνυμα, είτε (στη χειρότερη περίπτωση, πριν υπάρχει logger) θα σταματήσει με προβλέψιμο, ελεγχόμενο τρόπο.
-- Το ξεχωριστό αρχείο/υποσύστημα `assert` (αντί να ενσωματωθεί απευθείας στο `kernel_logger.cpp`) επιτρέπει σε **οποιοδήποτε** άλλο υποσύστημα του πυρήνα να χρησιμοποιεί διεκδικήσεις χωρίς να χρειάζεται να γνωρίζει τις λεπτομέρειες του logger — μόνο τη μακροεντολή/συνάρτηση assert.
+- Having **two layers of protection against crashing with no information** (first the `!g_assert_logger` check in `build_assert_message`, then the final `panic` of the logger itself) ensures the kernel never "silently falls over" — it either provides a full diagnostic message, or (in the worst case, before a logger exists) halts in a predictable, controlled way.
+- Keeping `assert` as a separate file/subsystem (instead of embedding it directly into `kernel_logger.cpp`) lets **any** other kernel subsystem use assertions without needing to know the logger's internal details — just the assertion macro/function.

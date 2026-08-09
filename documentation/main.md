@@ -1,21 +1,21 @@
-# `main.cpp` — Τεκμηρίωση
+# `main.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Αυτό είναι το σημείο εισόδου (entry point) του πυρήνα (kernel). Η συνάρτηση `kernel_main` καλείται από τον κώδικα εκκίνησης (boot code, σε assembly) αφού ο επεξεργαστής έχει ήδη περάσει σε protected mode και έχει ρυθμιστεί ένα προσωρινό stack. Ο ρόλος του αρχείου είναι να αρχικοποιήσει, με τη σωστή σειρά, όλα τα υποσυστήματα του πυρήνα και στη συνέχεια να παραδώσει τον έλεγχο στο shell.
+This is the kernel's entry point. `kernel_main` is called from the boot code (assembly) once the CPU has already switched to protected mode and a temporary stack has been set up. The file's job is to initialize every kernel subsystem in the correct order and then hand control over to the shell.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `main.h`: περιέχει τις δηλώσεις που χρειάζονται για να μεταγλωττιστεί το `kernel_main` (έμμεσα φέρνει PIT, e820, PMM, exceptions, keyboard, shell κ.λπ.).
+- `main.h`: contains the declarations needed to compile `kernel_main` (transitively pulls in PIT, e820, PMM, exceptions, keyboard, shell, etc.).
 
-## Εξωτερικά σύμβολα (extern "C")
+## External symbols (extern "C")
 
 ```cpp
 extern "C" uint32_t _kernel_start;
 extern "C" uint32_t _kernel_end;
 ```
 
-Αυτά **δεν** είναι μεταβλητές· είναι σύμβολα (symbols) που ορίζονται από το linker script. Η **διεύθυνσή** τους (όχι η τιμή τους) δίνει τα φυσικά όρια (physical bounds) του πυρήνα στη μνήμη — δηλαδή πού ξεκινάει και πού τελειώνει η εικόνα (image) του πυρήνα μετά τη φόρτωσή του. Αυτό το εύρος διευθύνσεων χρησιμοποιείται από τον `pmm_initialize` ώστε ο Physical Memory Manager να ξέρει ποια πλαίσια (frames) είναι ήδη κατειλημμένα από τον ίδιο τον πυρήνα και να μην τα δανείσει σε κανέναν.
+These are **not** variables; they are symbols defined by the linker script. Their **address** (not their value) gives the physical bounds of the kernel image in memory — i.e. where the loaded kernel starts and ends. This address range is used by `pmm_initialize` so the Physical Memory Manager knows which frames are already occupied by the kernel itself and must not be handed out to anyone.
 
 ## `kernel_main()`
 
@@ -23,24 +23,24 @@ extern "C" uint32_t _kernel_end;
 extern "C" [[noreturn]] void kernel_main()
 ```
 
-- Είναι `extern "C"` ώστε το όνομά του να μην αλλοιωθεί (name mangling) από τον C++ compiler — έτσι το assembly boot code μπορεί να κάνει `call kernel_main` χωρίς να ξέρει τίποτα για C++ mangling.
-- Είναι σημειωμένη ως `[[noreturn]]`: ο compiler γνωρίζει ότι η συνάρτηση ποτέ δεν επιστρέφει κανονικά, πράγμα που επιτρέπει καλύτερες βελτιστοποιήσεις (π.χ. δεν χρειάζεται να διατηρήσει έναν μηχανισμό επιστροφής).
+- It is `extern "C"` so its name is not mangled by the C++ compiler — this lets the assembly boot code do `call kernel_main` without knowing anything about C++ name mangling.
+- It is marked `[[noreturn]]`: the compiler knows the function never returns normally, which allows better optimizations (e.g. it doesn't need to keep a return mechanism around).
 
-### Σειρά αρχικοποίησης και γιατί έχει σημασία
+### Initialization order and why it matters
 
-1. **`kernel::initialize_pit(timer_frequency_hz)`** — Ρυθμίζει το Programmable Interval Timer (PIT) στα 100 Hz, πριν ενεργοποιηθούν οι διακοπές (interrupts). Έτσι, όταν αργότερα μπει `sti`, το PIT είναι ήδη σε γνωστή κατάσταση και δεν θα παράγει "μπερδεμένα" ticks.
-2. **`kernel::set_timer_frequency(timer_frequency_hz)`** — Καταγράφει τη συχνότητα στον εσωτερικό μετρητή του `kernel_timer`, ώστε συναρτήσεις όπως `uptime_seconds()` και `sleep_ms()` να μπορούν να μετατρέπουν ticks σε πραγματικό χρόνο.
-3. **`terminal::output::initialize()`** — Καθαρίζει τον VGA text buffer και ενεργοποιεί/συγχρονίζει τον hardware cursor. Πρέπει να τρέξει πριν από οποιοδήποτε μήνυμα καταγραφής (logging), διαφορετικά η έξοδος θα ήταν σε απροσδιόριστη κατάσταση.
-4. **`kernel::memory::get_e820_memory_map()`** — Διαβάζει τον χάρτη μνήμης (memory map) που άφησε το BIOS/bootloader στη γνωστή διεύθυνση `0x500`. Αυτός ο χάρτης λέει ποιες περιοχές φυσικής μνήμης είναι χρησιμοποιήσιμες (`usable`) και ποιες είναι δεσμευμένες (`reserved`, ACPI κ.λπ.).
-5. **`kernel::memory::pmm_initialize(&map, kernel_start, kernel_end)`** — Χτίζει το bitmap του Physical Memory Manager πάνω από τον e820 χάρτη, αποκλείοντας επιπλέον και το εύρος `[kernel_start, kernel_end]` ώστε ο πυρήνας να μην "καταπιεί" τη δική του μνήμη.
-6. **`kernel::initialize_exceptions()`** — Γεμίζει το IDT (Interrupt Descriptor Table) με τους handlers των CPU exceptions και των hardware IRQs, ρυθμίζει το PIC (remap) και φορτώνει το IDT με `lidt`. Πρέπει να τρέξει **πριν** ενεργοποιηθούν οι διακοπές (`sti`), αλλιώς μια πρόωρη διακοπή θα οδηγούσε σε undefined behavior (κλήση σε μη αρχικοποιημένο IDT entry).
-7. **`driver::initialize_keyboard()`** — Στέλνει εντολές στον PS/2 keyboard controller (καθαρισμό LEDs) πριν αρχίσουν να φτάνουν interrupts από αυτόν.
-8. **Δημιουργία του `app::shell shell{}`** — Κατασκευάζεται *πριν* το `sti`, ώστε το αντικείμενο να είναι πλήρως έτοιμο τη στιγμή που θα φτάσει το πρώτο πλήκτρο.
-9. **`asm volatile("sti")`** — Ενεργοποιεί τις maskable interrupts. Από εδώ και πέρα, timer και πληκτρολόγιο αρχίζουν να παράγουν IRQs.
-10. **`shell.run()`** — Μπαίνει στον κύριο βρόχο (main loop) του κελύφους (shell), ο οποίος διαβάζει εντολές και τις εκτελεί επ' αόριστον.
-11. **Τελικός βρόχος `for(;;) asm volatile("hlt");`** — Δικλείδα ασφαλείας (safety net): αν το `shell.run()` κάποτε επέστρεφε (κανονικά δεν πρέπει), ο πυρήνας απλά σταματά τον επεξεργαστή σε βρόχο `hlt` αντί να "πέσει" σε άγνωστο κώδικα μετά το τέλος της συνάρτησης.
+1. **`kernel::initialize_pit(timer_frequency_hz)`** — Configures the Programmable Interval Timer (PIT) at 100 Hz, before interrupts are enabled. This way, when `sti` is executed later, the PIT is already in a known state and won't produce "confused" ticks.
+2. **`kernel::set_timer_frequency(timer_frequency_hz)`** — Records the frequency in `kernel_timer`'s internal state, so functions like `uptime_seconds()` and `sleep_ms()` can convert ticks into real time.
+3. **`terminal::output::initialize()`** — Clears the VGA text buffer and enables/syncs the hardware cursor. Must run before any log message, otherwise output would be in an undefined state.
+4. **`kernel::memory::get_e820_memory_map()`** — Reads the memory map left by the BIOS/bootloader at the well-known address `0x500`. This map says which physical memory regions are usable and which are reserved (ACPI, etc.).
+5. **`kernel::memory::pmm_initialize(&map, kernel_start, kernel_end)`** — Builds the Physical Memory Manager's bitmap on top of the e820 map, additionally excluding the `[kernel_start, kernel_end]` range so the kernel can't accidentally "swallow" its own memory.
+6. **`kernel::initialize_exceptions()`** — Fills the IDT (Interrupt Descriptor Table) with handlers for CPU exceptions and hardware IRQs, remaps the PIC, and loads the IDT with `lidt`. Must run **before** interrupts are enabled (`sti`), otherwise a premature interrupt would lead to undefined behavior (calling into an uninitialized IDT entry).
+7. **`driver::initialize_keyboard()`** — Sends commands to the PS/2 keyboard controller (clearing LEDs) before interrupts from it start arriving.
+8. **Construction of `app::shell shell{}`** — Constructed *before* `sti`, so the object is fully ready by the time the first keystroke arrives.
+9. **`asm volatile("sti")`** — Enables maskable interrupts. From here on, the timer and keyboard start producing IRQs.
+10. **`shell.run()`** — Enters the shell's main loop, which reads commands and executes them indefinitely.
+11. **Final `for(;;) asm volatile("hlt");` loop** — Safety net: if `shell.run()` were ever to return (it normally shouldn't), the kernel simply halts the CPU in an `hlt` loop instead of falling through into unknown code past the end of the function.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Η σειρά κλήσεων εδώ **είναι** η τεκμηρίωση των εξαρτήσεων (dependency graph) του συστήματος εκκίνησης (boot sequence): κάθε βήμα προϋποθέτει το προηγούμενο. Οποιαδήποτε αναδιάταξη (π.χ. ενεργοποίηση διακοπών πριν από το IDT) θα οδηγούσε άμεσα σε κατάρρευση (crash) ή σε triple fault.
-- Το `kernel_main` παραμένει σκόπιμα "αδύναμο" σε λογική (thin orchestrator): δεν κάνει καμία δουλειά μόνο του, απλώς καλεί την αρχικοποίηση κάθε υποσυστήματος με τη σωστή σειρά. Αυτό διευκολύνει τη διαβασιμότητα και το debugging, αφού το σημείο εισόδου λειτουργεί σαν "πίνακας περιεχομένων" της εκκίνησης.
+- The order of calls here **is** the documentation of the boot sequence's dependency graph: each step assumes the previous one. Any reordering (e.g. enabling interrupts before the IDT is ready) would immediately lead to a crash or a triple fault.
+- `kernel_main` is deliberately kept "thin" (a thin orchestrator): it does no work by itself, it simply calls each subsystem's initializer in the right order. This aids readability and debugging, since the entry point acts as a "table of contents" for boot.

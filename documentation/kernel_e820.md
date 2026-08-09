@@ -1,21 +1,21 @@
-# `kernel_e820.cpp` — Τεκμηρίωση
+# `kernel_e820.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Παρέχει πρόσβαση στον **χάρτη μνήμης BIOS e820** (memory map), που έχει ήδη συλλεχθεί από τον bootloader/boot code (σε πραγματική λειτουργία, real mode, πριν τη μετάβαση σε protected mode) και αποθηκευτεί σε γνωστές, σταθερές διευθύνσεις χαμηλής μνήμης. Αυτή η πληροφορία είναι απαραίτητη για τον PMM ώστε να ξέρει ποιες περιοχές φυσικής μνήμης είναι ασφαλείς προς χρήση.
+Provides access to the **BIOS e820 memory map**, which has already been collected by the boot loader/boot code (in real mode, before the switch to protected mode) and stored at well-known, fixed addresses in low memory. This information is essential for the PMM to know which regions of physical memory are safe to use.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `kernel_e820.h`: δηλώνει τους τύπους `e820_entry`, `e820_memory_map`, `e820_memory_type`.
+- `kernel_e820.h`: declares the `e820_entry`, `e820_memory_map`, `e820_memory_type` types.
 
-## Σταθερές διευθύνσεων (ανώνυμος χώρος ονομάτων)
+## Address constants (anonymous namespace)
 
 ```cpp
 constexpr uintptr_t e820_count_address{0x500};
 constexpr uintptr_t e820_entries_address{0x502};
 ```
 
-Αυτές οι διευθύνσεις είναι μια **σύμβαση** μεταξύ του boot loader/boot stage (σε assembly, τρέχει σε real mode και καλεί το BIOS interrupt `INT 0x15, EAX=0xE820` για να συλλέξει τον χάρτη) και του πυρήνα: το boot code γράφει τον αριθμό εγγραφών στη διεύθυνση `0x500` (ως `uint16_t`), και ξεκινά να γράφει τις ίδιες τις εγγραφές (`e820_entry`) αμέσως μετά, στο `0x502`. Η περιοχή γύρω από `0x500` επιλέγεται συνήθως επειδή βρίσκεται σε "ασφαλές" τμήμα χαμηλής μνήμης, εκτός της περιοχής BIOS Data Area/IVT που θα μπορούσε να χρησιμοποιείται ενεργά.
+These addresses are a **convention** between the boot loader/boot stage (in assembly, running in real mode and calling BIOS interrupt `INT 0x15, EAX=0xE820` to collect the map) and the kernel: the boot code writes the entry count at address `0x500` (as a `uint16_t`), and starts writing the actual entries (`e820_entry`) right after, at `0x502`. The area around `0x500` is typically chosen because it sits in a "safe" region of low memory, outside the BIOS Data Area/IVT that might otherwise still be actively in use.
 
 ## `get_e820_memory_map()`
 
@@ -25,10 +25,10 @@ const e820_entry* entries{reinterpret_cast<const e820_entry*>(e820_entries_addre
 return {entries, count};
 ```
 
-Διαβάζει τον αριθμό εγγραφών από τη σταθερή διεύθυνση (με `volatile`, αφού πρόκειται ουσιαστικά για δεδομένα γραμμένα από **διαφορετικό** στάδιο εκτέλεσης — το boot code — και όχι από κανονική C++ ροή προγράμματος στην οποία ο compiler θα μπορούσε να «βασιστεί» για βελτιστοποίηση), και κατασκευάζει έναν δείκτη στην αρχή του πίνακα εγγραφών. Επιστρέφει τα δύο αυτά μαζί, πακεταρισμένα σε ένα `e820_memory_map` (`{entries, count}`), χωρίς καμία αντιγραφή δεδομένων — απλή «προβολή» (view) πάνω στα ήδη υπάρχοντα δεδομένα στη χαμηλή μνήμη.
+Reads the entry count from the fixed address (with `volatile`, since this data was essentially written by a **different** stage of execution — the boot code — rather than by normal C++ program flow that the compiler could otherwise "rely on" for optimization purposes), and constructs a pointer to the start of the entries array. Returns both of these packaged into an `e820_memory_map` (`{entries, count}`), with no data copying at all — a simple "view" over data that already exists in low memory.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Το αρχείο δεν κάνει **καμία επαλήθευση** (validation) του περιεχομένου — εμπιστεύεται πλήρως ό,τι έγραψε το boot code. Αυτό είναι αποδεκτό εδώ επειδή το ίδιο άτομο/project ελέγχει και τα δύο άκρα της σύμβασης (boot stage και πυρήνα)· σε ένα πιο αμυντικό σχεδιασμό θα μπορούσε να προστεθεί ένας έλεγχος λογικότητας (sanity check) στο `count` πριν χρησιμοποιηθεί.
-- Η δομή `e820_entry` είναι σημειωμένη `[[gnu::packed]]` στο header (μέγεθος ακριβώς 20 bytes, χωρίς padding) — αυτό είναι **υποχρεωτικό** εδώ, αφού το layout πρέπει να ταιριάζει byte-προς-byte με το format που παράγει το BIOS interrupt `0xE820`, το οποίο δεν γνωρίζει τίποτα για C++ alignment κανόνες.
-- Η επιστροφή με τιμή (`return {entries, count};`, δηλαδή αντιγραφή μιας μικρής δομής δείκτη+αριθμού) αντί για δείκτη σε global δομή είναι μια καθαρή, απλή διεπαφή (interface) — ο καλών παίρνει μια ανεξάρτητη «στιγμιαία εικόνα» (snapshot) των δύο τιμών.
+- The file performs **no validation** whatsoever of the contents — it fully trusts whatever the boot code wrote. This is acceptable here because the same person/project controls both ends of the convention (boot stage and kernel); a more defensive design could add a sanity check on `count` before it's used.
+- The `e820_entry` structure is marked `[[gnu::packed]]` in the header (exactly 20 bytes in size, with no padding) — this is **mandatory** here, since the layout must match, byte for byte, the format produced by the BIOS `0xE820` interrupt, which knows nothing about C++ alignment rules.
+- Returning by value (`return {entries, count};`, i.e. copying a small pointer+count structure) instead of a pointer to a global structure is a clean, simple interface — the caller gets an independent "snapshot" of the two values.

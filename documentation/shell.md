@@ -1,24 +1,24 @@
-# `shell.cpp` — Τεκμηρίωση
+# `shell.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί το `app::shell`: ένα στοιχειώδες διαδραστικό κέλυφος (interactive shell) γραμμής εντολών που τρέχει πάνω από τον `terminal::input`/`terminal::output`. Δέχεται μια εντολή, την αναγνωρίζει μέσω δυαδικής αναζήτησης (binary search) σε μια αλφαβητικά ταξινομημένη λίστα, και καλεί τη σχετική συνάρτηση εκτέλεσης μέσω πίνακα δεικτών συναρτήσεων.
+Implements `app::shell`: a minimal interactive command-line shell running on top of `terminal::input`/`terminal::output`. It receives a command, recognizes it via binary search over an alphabetically sorted list, and calls the matching execution function through a function-pointer table.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `shell.h`: δηλώνει την κλάση `shell` και τα μέλη της (`m_input`, `m_output`, `m_is_running`) καθώς και τις δημόσιες μεθόδους εντολών.
-- `io/output/terminal_output.h`: για έξοδο κειμένου.
-- `internal/shell_commands_list.h`: X-macros `COMMAND_LIST` και `COMMAND_FUNCTIONS` — η **μοναδική πηγή αλήθειας** (single source of truth) για ποιες εντολές υπάρχουν.
-- `cpu/features.h`: για την εντολή `flag`.
-- `timer/kernel_timer.h`: για την εντολή `ticks`.
+- `shell.h`: declares the `shell` class and its members (`m_input`, `m_output`, `m_is_running`) as well as the public command methods.
+- `io/output/terminal_output.h`: for text output.
+- `internal/shell_commands_list.h`: the `COMMAND_LIST` and `COMMAND_FUNCTIONS` X-macros — the **single source of truth** for which commands exist.
+- `cpu/features.h`: for the `flag` command.
+- `timer/kernel_timer.h`: for the `ticks` command.
 
-## Βοηθητική συνάρτηση σύγκρισης
+## Comparison helper
 
-### `str_compare(comparer, other)` — ανώνυμος χώρος ονομάτων
+### `str_compare(comparer, other)` — anonymous namespace
 
-Υλοποιεί σύγκριση strings παρόμοια με το `strcmp` της C: επιστρέφει τη διαφορά (`int8_t`) των πρώτων χαρακτήρων που διαφέρουν, ή `0` αν είναι ίσα. Χρησιμοποιείται από τη δυαδική αναζήτηση εντολών, αφού χρειάζεται πρόσημο (θετικό/αρνητικό/μηδέν), όχι απλώς boolean ισότητα.
+Implements a `strcmp`-style string comparison: returns the difference (`int8_t`) of the first differing characters, or `0` if equal. Used by the command binary search, which needs a sign (positive/negative/zero), not just boolean equality.
 
-## Πίνακες εντολών, χτισμένοι σε compile time
+## Command tables built at compile time
 
 ### `command_list` → `g_command_list`
 
@@ -28,15 +28,15 @@ struct command_list { const char* entries[command_list_size]; constexpr command_
 constexpr command_list g_command_list{};
 ```
 
-Ένας πίνακας με τα **ονόματα** (strings) των 6 εντολών, γεμισμένος από το X-macro `COMMAND_LIST` — η σειρά τους **πρέπει** να είναι αλφαβητική, αφού πάνω σε αυτόν τον πίνακα εκτελείται δυαδική αναζήτηση.
+An array of the **names** (strings) of the 6 commands, populated from the `COMMAND_LIST` X-macro — their order **must** be alphabetical, since a binary search runs over this array.
 
-### Wrapper συναρτήσεις εκτέλεσης
+### Execution wrapper functions
 
 ```cpp
 inline void execute_clear(app::shell* shell) noexcept { shell->clear(); }
 ```
 
-Κάθε δημόσια μέθοδος εντολής της κλάσης `shell` (π.χ. `clear()`, `exit()`) "τυλίγεται" σε μία ελεύθερη συνάρτηση `execute_<όνομα>` με ενιαία υπογραφή `void(app::shell*) noexcept`, ώστε να μπορεί να μπει σε πίνακα δεικτών συναρτήσεων — οι μέθοδοι μελών (member function pointers) της C++ δεν έχουν την ίδια, απλή υπογραφή δείκτη με τις ελεύθερες συναρτήσεις, οπότε αυτό το "άπλωμα" (flattening) απλοποιεί τον πίνακα αποστολής. Όλες σημειωμένες `[[gnu::always_inline]]` — δεν υπάρχει πραγματικό κόστος κλήσης, ενσωματώνονται πλήρως.
+Every public command method of the `shell` class (e.g. `clear()`, `exit()`) is "wrapped" in a free function `execute_<name>` with a uniform signature `void(app::shell*) noexcept`, so it can be placed into a function-pointer array — C++ member function pointers don't share the same simple pointer signature as free functions, so this "flattening" simplifies the dispatch table. All marked `[[gnu::always_inline]]` — there's no real call overhead, they're fully inlined.
 
 ### `command_functions` → `g_command_functions`
 
@@ -45,51 +45,51 @@ struct command_functions { command_list_functions entries[command_list_size]; co
 constexpr command_functions g_command_functions{};
 ```
 
-Πίνακας δεικτών συναρτήσεων (`execute_*`), γεμισμένος σε **αντιστοιχία θέσης (index)** με τον `g_command_list` — η θέση `i` στο `g_command_functions` πρέπει να αντιστοιχεί στην ίδια εντολή με τη θέση `i` στο `g_command_list`. Αυτή η αντιστοιχία διατηρείται από τα δύο X-macros (`COMMAND_LIST`, `COMMAND_FUNCTIONS`) που μοιράζονται τους ίδιους δείκτες (`index`).
+An array of function pointers (`execute_*`), populated in **positional correspondence** with `g_command_list` — position `i` in `g_command_functions` must correspond to the same command as position `i` in `g_command_list`. This correspondence is maintained by the two X-macros (`COMMAND_LIST`, `COMMAND_FUNCTIONS`), which share the same `index` values.
 
-## Δημόσιες μέθοδοι της κλάσης `shell` (namespace `app`)
+## Public methods of the `shell` class (namespace `app`)
 
-### Κατασκευαστής
+### Constructor
 
 ```cpp
 shell::shell() noexcept: m_input{}, m_output{}, m_is_running{true}
 ```
 
-Αρχικοποιεί τα εσωτερικά αντικείμενα εισόδου/εξόδου και θέτει τη σημαία εκτέλεσης σε ενεργή.
+Initializes the internal input/output objects and sets the running flag to active.
 
 ### `command_exists()` const
 
-Υλοποιεί **δυαδική αναζήτηση (binary search)** πάνω στο `g_command_list.entries`, χρησιμοποιώντας τη συμβολοσειρά εισόδου του χρήστη (`m_input.read_buffer()`) ως κλειδί, μέσω `str_compare`. Επιστρέφει τον **δείκτη (index)** της εντολής αν βρεθεί ταίριασμα, ή `-1` αν όχι. Πολυπλοκότητα O(log n) αντί για γραμμική σύγκριση O(n) — σημαντικό ακόμη και για μικρό αριθμό εντολών, ως πρακτική καλής σχεδίασης που κλιμακώνεται (scales) όταν προστεθούν περισσότερες εντολές.
+Implements **binary search** over `g_command_list.entries`, using the user's input string (`m_input.read_buffer()`) as the search key, via `str_compare`. Returns the **index** of the command if a match is found, or `-1` otherwise. O(log n) complexity instead of a linear O(n) comparison — significant even for a small number of commands, as good practice that scales as more commands get added.
 
 ### `execute_command()`
 
-Καλεί `command_exists()`· αν βρεθεί έγκυρος δείκτης, καλεί απευθείας `g_command_functions.entries[index](this)` — **καμία** αλυσίδα `if`/`else if` ή `switch` δεν χρειάζεται, η "αποστολή" (dispatch) γίνεται με μία μόνο προσπέλαση πίνακα και έμμεση κλήση συνάρτησης. Αν δεν βρεθεί εντολή, τυπώνει `"Command not found\n"`.
+Calls `command_exists()`; if a valid index is found, it directly calls `g_command_functions.entries[index](this)` — **no** chain of `if`/`else if` or `switch` is needed, dispatch happens via a single array lookup and an indirect function call. If no command is found, it prints `"Command not found\n"`.
 
 ### `run()`
 
-Ο κύριος βρόχος του κελύφους: όσο `m_is_running`, τυπώνει το prompt (`"my_OS:> "`), ξεκινά τη λήψη εισόδου (`m_input.start()`, μπλοκάρει μέχρι να πατηθεί Enter), εκτελεί την εντολή, και επαναφέρει το buffer εισόδου (`m_input.reset()`).
+The shell's main loop: while `m_is_running`, it prints the prompt (`"my_OS:> "`), starts receiving input (`m_input.start()`, blocks until Enter is pressed), executes the command, and resets the input buffer (`m_input.reset()`).
 
 ### `clear()`
 
-Επαναφέρει το input buffer και καθαρίζει την οθόνη (`m_output.clear()`) — υλοποιεί την εντολή `clear`.
+Resets the input buffer and clears the screen (`m_output.clear()`) — implements the `clear` command.
 
 ### `exit()`
 
-Θέτει `m_is_running = 0`, τερματίζοντας τον βρόχο `run()` στην επόμενη επανάληψη, και τυπώνει μήνυμα τερματισμού.
+Sets `m_is_running = 0`, ending the `run()` loop on the next iteration, and prints a termination message.
 
 ### `flag()`
 
-Τυπώνει το τρέχον επίπεδο SIMD υποστήριξης της CPU (`cpu::features::get()`) — χρήσιμο διαγνωστικό εργαλείο (diagnostic) για να επιβεβαιωθεί ποια υλοποίηση (fallback/SSE2/AVX2) χρησιμοποιεί ο VGA text buffer.
+Prints the CPU's current SIMD support level (`cpu::features::get()`) — a useful diagnostic to confirm which implementation (fallback/SSE2/AVX2) the VGA text buffer is using.
 
 ### `ticks()`
 
-Τυπώνει τον τρέχοντα αριθμό timer ticks (`kernel::timer_ticks()`).
+Prints the current timer tick count (`kernel::timer_ticks()`).
 
 ### `interrupt_stack()` / `kernel_stack()`
 
-Υπολογίζουν και τυπώνουν το μέγεθος (σε bytes) του interrupt stack και του kernel stack αντίστοιχα, αφαιρώντας τις διευθύνσεις των linker-defined συμβόλων `_interrupt_stack_top`/`_bottom` και `_kernel_stack_top`/`_bottom` — διαγνωστικά εργαλεία για επαλήθευση ότι τα stacks έχουν το αναμενόμενο μέγεθος (σχετικό με το `diagnostic_tools/stack_calculator.cpp`, που υπολογίζει το θεωρητικό απαιτούμενο μέγεθος στατικά, πριν την εκτέλεση).
+Compute and print the size (in bytes) of the interrupt stack and the kernel stack respectively, by subtracting the addresses of the linker-defined symbols `_interrupt_stack_top`/`_bottom` and `_kernel_stack_top`/`_bottom` — diagnostic tools for verifying that the stacks have the expected size (related to `diagnostic_tools/stack_calculator.cpp`, which statically computes the theoretical required size ahead of time, before execution).
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Η αρχιτεκτονική "πίνακας ονομάτων + παράλληλος πίνακας συναρτήσεων + binary search" είναι ένα πλήρως **data-driven** σχήμα διανομής εντολών: η προσθήκη μιας νέας εντολής απαιτεί μόνο μία γραμμή στο X-macro `COMMAND_LIST`/`COMMAND_FUNCTIONS` (διατηρώντας αλφαβητική σειρά) και μία νέα μέθοδο/wrapper — καμία αλλαγή στη λογική διανομής.
-- Όλα τα δεδομένα διανομής (`g_command_list`, `g_command_functions`) είναι `constexpr`, άρα ζουν στο read-only τμήμα του binary (`.rodata`), χωρίς κόστος αρχικοποίησης κατά την εκκίνηση και χωρίς κίνδυνο ακούσιας τροποποίησης κατά το runtime.
+- The "name array + parallel function array + binary search" architecture is a fully **data-driven** command dispatch scheme: adding a new command only requires one line in the `COMMAND_LIST`/`COMMAND_FUNCTIONS` X-macro (keeping alphabetical order) and a new method/wrapper — no change to the dispatch logic itself.
+- All dispatch data (`g_command_list`, `g_command_functions`) is `constexpr`, so it lives in the binary's read-only section (`.rodata`), with no initialization cost at boot and no risk of accidental runtime modification.

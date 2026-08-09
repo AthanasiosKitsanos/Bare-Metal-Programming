@@ -1,37 +1,37 @@
-# `terminal_vga_text_buffer.cpp` — Τεκμηρίωση
+# `terminal_vga_text_buffer.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί τη λογική του **VGA text-mode buffer**: γέμισμα (fill), αντιγραφή (copy/scroll), τοποθέτηση χαρακτήρων και μετακίνηση δρομέα (cursor) μέσα στο κείμενο 80×25 του VGA. Το κεντρικό χαρακτηριστικό του αρχείου είναι ο **πίνακας αποστολής (dispatch table) SIMD συναρτήσεων**: την ίδια λειτουργία (fill ή copy) μπορεί να την εκτελέσει είτε ένα scalar fallback, είτε SSE2 (128-bit), είτε AVX2 (256-bit) — και η επιλογή γίνεται δυναμικά κατά το runtime, ανάλογα με τις δυνατότητες της CPU.
+Implements the logic of the **VGA text-mode buffer**: filling, copying (for scrolling), placing characters, and moving the cursor within the 80×25 VGA text grid. The centerpiece of this file is the **SIMD dispatch table**: the same operation (fill or copy) can be performed by either a scalar fallback, SSE2 (128-bit), or AVX2 (256-bit) implementation — and the choice is made dynamically at runtime, depending on what the CPU actually supports.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `terminal_vga_text_buffer.h`: δηλώνει την κλάση `vga_text_buffer`, τις ιδιωτικές (private) βοηθητικές μεθόδους της (`begin_32`, `cell_32`, `make_entry` κ.λπ.) και τις σταθερές διαστάσεων (`vga_width = 80`, `vga_height = 25`).
-- `vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h`: για ενημέρωση του hardware scroll register (`set_display_start`).
-- `cpu/features.h`: για το `cpu::features::get()`, τον δείκτη (index) που λέει ποιο SIMD επίπεδο υποστηρίζει η τρέχουσα CPU.
-- `<immintrin.h>`: τα SSE2/AVX2 intrinsics (`_mm_set1_epi32`, `_mm256_store_si256` κ.λπ.).
+- `terminal_vga_text_buffer.h`: declares the `vga_text_buffer` class, its private helper methods (`begin_32`, `cell_32`, `make_entry`, etc.), and the dimension constants (`vga_width = 80`, `vga_height = 25`).
+- `vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h`: for updating the hardware scroll register (`set_display_start`).
+- `cpu/features.h`: for `cpu::features::get()`, the index telling which SIMD level the current CPU supports.
+- `<immintrin.h>`: the SSE2/AVX2 intrinsics (`_mm_set1_epi32`, `_mm256_store_si256`, etc.).
 
-## Οι τρεις υλοποιήσεις "γεμίσματος" (fill)
+## The three "fill" implementations
 
-Όλες μοιράζονται την ίδια υπογραφή: `void(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) [[gnu::regparm(3)]]`. Το `entry` είναι μια 32-bit τιμή που περιέχει **δύο** VGA text cells (χαρακτήρας + χρώμα) πακεταρισμένα μαζί, ώστε κάθε εγγραφή 32-bit να γεμίζει δύο διαδοχικές θέσεις οθόνης ταυτόχρονα.
+All share the same signature: `void(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) [[gnu::regparm(3)]]`. `entry` is a 32-bit value containing **two** VGA text cells (character + color) packed together, so that each 32-bit write fills two consecutive screen positions at once.
 
 ### `use_sse_2` — `[[gnu::target("sse2")]]`
 
-Μετατρέπει το `entry` σε ένα SSE register 128 bits (`__m128i`) με τέσσερις επαναλήψεις της ίδιας 32-bit τιμής (`_mm_set1_epi32`), δηλαδή 8 VGA cells ανά εγγραφή. Το `bytes >>= 4` μετατρέπει το μήκος σε bytes σε πλήθος 16-byte (128-bit) εγγραφών. Γράφει με `_mm_store_si128` — **ευθυγραμμισμένη (aligned)** εγγραφή, που απαιτεί ο δείκτης προορισμού να είναι πολλαπλάσιο των 16 bytes.
+Converts `entry` into a 128-bit SSE register (`__m128i`) with four repetitions of the same 32-bit value (`_mm_set1_epi32`), i.e. 8 VGA cells per write. `bytes >>= 4` converts the byte length into a count of 16-byte (128-bit) writes. Writes with `_mm_store_si128` — an **aligned** write, requiring the destination pointer to be a multiple of 16 bytes.
 
 ### `use_avx_2` — `[[gnu::target("avx2")]]`
 
-Ίδια λογική αλλά με 256-bit registers (`__m256i`, `_mm256_set1_epi32`, `_mm256_store_si256`), δηλαδή 16 VGA cells ανά εγγραφή. Το `bytes >>= 5` αντιστοιχεί σε 32-byte (256-bit) εγγραφές.
+Same logic but with 256-bit registers (`__m256i`, `_mm256_set1_epi32`, `_mm256_store_si256`), i.e. 16 VGA cells per write. `bytes >>= 5` corresponds to 32-byte (256-bit) writes.
 
 ### `fallback_fill`
 
-Απλός scalar βρόχος (`bytes >>= 2`, δηλαδή 4-byte εγγραφές, γράφοντας ένα `uint32_t` τη φορά) — χρησιμοποιείται όταν η CPU δεν υποστηρίζει ούτε SSE2 ούτε AVX2 (σπάνιο σε σύγχρονο υλικό, αλλά απαραίτητο για ορθότητα/φορητότητα).
+A simple scalar loop (`bytes >>= 2`, i.e. 4-byte writes, writing one `uint32_t` at a time) — used when the CPU supports neither SSE2 nor AVX2 (rare on modern hardware, but necessary for correctness/portability).
 
-### `[[gnu::target("...")]]` γιατί υπάρχει
+### Why `[[gnu::target("...")]]` exists
 
-Επειδή τα project-wide compile flags **δεν** περιλαμβάνουν `-mavx2` γενικά (θα προκαλούσε VEX-encoded εντολές να παραχθούν πριν αρχικοποιηθεί το AVX hardware στην εκκίνηση, οδηγώντας σε `#UD` fault), το `[[gnu::target("avx2")]]` επιτρέπει σε **αυτές τις συγκεκριμένες συναρτήσεις** να μεταγλωττιστούν με AVX2 εντολές, χωρίς να επηρεάζεται ο υπόλοιπος κώδικας του πυρήνα. Το ίδιο ισχύει και για το `sse2` target, αν και το SSE2 είναι baseline σε κάθε x86-64/i686 CPU με FPU· εδώ διατηρείται ρητό για σαφήνεια και συνέπεια.
+Because the project-wide compile flags **don't** include `-mavx2` globally (that would cause VEX-encoded instructions to be emitted before the AVX hardware is initialized at boot, leading to a `#UD` fault), `[[gnu::target("avx2")]]` allows **these specific functions** to be compiled with AVX2 instructions, without affecting the rest of the kernel's code. The same applies to the `sse2` target, even though SSE2 is baseline on every x86-64/i686 CPU with an FPU; it's kept explicit here for clarity and consistency.
 
-## `g_dispatch` — Ο πίνακας αποστολής γεμίσματος
+## `g_dispatch` — The fill dispatch table
 
 ```cpp
 using fill_fn = void(*)(volatile uint32_t*, uint16_t, const uint32_t) [[gnu::regparm(3)]];
@@ -39,42 +39,42 @@ struct fill_functions { fill_fn entries[3]; constexpr fill_functions(): entries{
 constexpr fill_functions g_dispatch{};
 ```
 
-Ένας πίνακας δεικτών συναρτήσεων, γεμισμένος σε **compile time** (`constexpr`), στη σειρά `{fallback, sse2, avx2}`. Ο δείκτης `cpu::features::get()` επιστρέφει έναν αριθμό 0/1/2 που αντιστοιχεί ακριβώς σε αυτή τη σειρά, οπότε η επιλογή SIMD υλοποίησης γίνεται με **μία μόνο προσπέλαση πίνακα (O(1))** αντί για αλυσίδα από `if`/`switch` — αποφεύγοντας branch misprediction σε κάθε κλήση.
+An array of function pointers, populated at **compile time** (`constexpr`), in the order `{fallback, sse2, avx2}`. `cpu::features::get()` returns a 0/1/2 index matching exactly this order, so choosing the SIMD implementation reduces to a **single array lookup (O(1))** instead of a chain of `if`/`switch` statements — avoiding branch misprediction on every call.
 
-## Οι τρεις υλοποιήσεις "αντιγραφής" (copy)
+## The three "copy" implementations
 
-Ίδια φιλοσοφία με το fill, αλλά για αντιγραφή δεδομένων από πηγή σε προορισμό (χρησιμοποιείται στο scroll):
+Same philosophy as fill, but for copying data from a source to a destination (used during scrolling):
 
-- **`use_sse_2_copy`** / **`use_avx_2_copy`**: `_mm_load_si128`/`_mm256_load_si256` από την πηγή, ακολουθούμενο από `_mm_store_si128`/`_mm256_store_si256` στον προορισμό. Και οι δύο επιστρέφουν τον **ενημερωμένο δείκτη προορισμού** (`destination`) στο τέλος, ώστε ο καλών να ξέρει πού σταμάτησε η εγγραφή.
-- **`fallback_copy`**: scalar βρόχος `uint32_t` τη φορά.
+- **`use_sse_2_copy`** / **`use_avx_2_copy`**: `_mm_load_si128`/`_mm256_load_si256` from the source, followed by `_mm_store_si128`/`_mm256_store_si256` to the destination. Both return the **updated destination pointer** (`destination`) at the end, so the caller knows where the write ended.
+- **`fallback_copy`**: a scalar loop, one `uint32_t` at a time.
 
-Ο αντίστοιχος πίνακας αποστολής είναι το `g_dispatch_cpy` (`fill_copy_function`), με ίδια δομή `{fallback, sse2, avx2}`.
+The corresponding dispatch table is `g_dispatch_cpy` (`fill_copy_function`), with the same `{fallback, sse2, avx2}` structure.
 
-## Δημόσιες μέθοδοι της `vga_text_buffer` (namespace `terminal`)
+## Public methods of `vga_text_buffer` (namespace `terminal`)
 
 ### `reset()`
 
-Καλείται όταν ο "παράθυρο προβολής" (viewport) του κυκλικού buffer φτάνει στο μέγιστο επιτρεπτό `base_row` (`base_row_max = 179`). Αντιγράφει τις τελευταίες `vga_height - 1` γραμμές πίσω στην **αρχή** της φυσικής μνήμης VGA (μέσω `g_dispatch_cpy`) και μηδενίζει το `base_row` σε `1`. Αυτό υλοποιεί το **double-buffer ring scheme**: αντί να μετακινεί δεδομένα σε κάθε γραμμή (scroll), ο buffer προωθεί απλώς έναν δείκτη βάσης (`base_row`) μέσα σε μια μεγαλύτερη εικονική περιοχή, και μόνο όταν φτάσει στο άκρο αυτής της περιοχής αντιγράφει το ορατό τμήμα πίσω στην αρχή — μια σπάνια, "ακριβή" λειτουργία αντί για μια λειτουργία ανά κάθε νέα γραμμή. Μετά την αντιγραφή, καθαρίζει τη νέα τελευταία γραμμή (`g_dispatch.entries[idx]`).
+Called when the "viewport" of the circular buffer reaches the maximum allowed `base_row` (`base_row_max = 179`). It copies the last `vga_height - 1` lines back to the **start** of the physical VGA memory (via `g_dispatch_cpy`) and resets `base_row` to `1`. This implements the **double-buffer ring scheme**: instead of moving data on every line (scrolling), the buffer simply advances a base pointer (`base_row`) within a larger virtual region, and only when that region's edge is reached does it copy the visible portion back to the start — a rare, "expensive" operation instead of one happening on every new line. After copying, it clears the new last line (`g_dispatch.entries[idx]`).
 
 ### `clear()`
 
-Γεμίζει **ολόκληρο** τον buffer (`length` bytes) με το προεπιλεγμένο κενό cell (space character, `default_color`), μηδενίζει `base_row`, `row`, `column`, και μηδενίζει το hardware scroll register (`vga_hardware_cursor::set_display_start(0)`). Χρησιμοποιείται στην εντολή shell `clear` και στην αρχικοποίηση.
+Fills the **entire** buffer (`length` bytes) with the default blank cell (space character, `default_color`), resets `base_row`, `row`, `column`, and resets the hardware scroll register (`vga_hardware_cursor::set_display_start(0)`). Used by the shell's `clear` command and during initialization.
 
 ### `clear_row()` — `[[gnu::regparm(1)]]`
 
-Γεμίζει μόνο μία γραμμή (`vga_width << 1` bytes) στη θέση `cell_32()` — χρησιμοποιείται όταν προστίθεται μια νέα γραμμή στο κάτω μέρος του ορατού παραθύρου, χωρίς να χρειάζεται πλήρες `reset()`.
+Fills only a single row (`vga_width << 1` bytes) at position `cell_32()` — used when a new line is added at the bottom of the visible window, without needing a full `reset()`.
 
 ### `put(c)` — `[[gnu::regparm(2)]]`
 
-Γράφει έναν χαρακτήρα στη τρέχουσα θέση του δρομέα (`make_entry(c, active_color)`) και προωθεί τη θέση με `move_forward()`.
+Writes a character at the current cursor position (`make_entry(c, active_color)`) and advances the position with `move_forward()`.
 
 ### `remove_last_char()` — `[[gnu::regparm(1)]]`
 
-Οπισθοχωρεί με `move_backwards()` και γράφει ένα κενό στη νέα θέση — υλοποιεί backspace.
+Steps back with `move_backwards()` and writes a blank at the new position — implements backspace.
 
 ### `move_forward()` — `[[gnu::regparm(1)]]`
 
-Προωθεί `column`, με **branchless "carry" λογική**:
+Advances `column`, with **branchless "carry" logic**:
 
 ```cpp
 ++column;
@@ -87,22 +87,22 @@ base_row += overflowed;
 row -= overflowed;
 ```
 
-Αντί για ένθετα `if`, το overflow από στήλη σε γραμμή, και από γραμμή σε "νέα γραμμή στο τέλος της οθόνης", υπολογίζεται με boolean → αριθμητική μετατροπή (`true`/`false` → `1`/`0`) πολλαπλασιαζόμενη με το βήμα υπερχείλισης. Αν προκύψει υπερχείλιση γραμμής, ελέγχει αν χρειάζεται πλήρες `reset()` (έφτασε στο άκρο του κυκλικού buffer) ή απλό `clear_row()`, και ενημερώνει το hardware scroll register ώστε η οθόνη να "κυλήσει" οπτικά.
+Instead of nested `if` statements, the overflow from column into row, and from row into "new line at the bottom of the screen", is computed via boolean → arithmetic conversion (`true`/`false` → `1`/`0`) multiplied by the overflow step. If a row overflow occurs, it checks whether a full `reset()` is needed (reached the edge of the circular buffer) or a simple `clear_row()` suffices, and updates the hardware scroll register so the screen visually "scrolls".
 
 ### `move_backwards()` — `[[gnu::regparm(1)]]`
 
-Συμμετρικό του `move_forward`, με ίδια branchless φιλοσοφία, για μετακίνηση προς τα πίσω (backspace σε αρχή γραμμής, ξετύλιγμα σε προηγούμενη γραμμή).
+The symmetric counterpart of `move_forward`, with the same branchless philosophy, for moving backward (backspace at start of line, unwinding into a previous line).
 
 ### `move_to_next_line()` — `[[gnu::regparm(1)]]`
 
-Χρησιμοποιείται για το `'\n'`: μηδενίζει τη στήλη και προωθεί τη γραμμή, με ίδια λογική overflow/reset/clear_row με το `move_forward`.
+Used for `'\n'`: resets the column and advances the row, with the same overflow/reset/clear_row logic as `move_forward`.
 
 ### `move_cursor_left_n(count)` / `move_cursor_right_n(count)` — `[[gnu::regparm(2)]]`
 
-Μετατρέπουν την τρέχουσα θέση σε "απόλυτη" θέση μέσα στην ορατή οθόνη (`row * vga_width + column`), αφαιρούν/προσθέτουν `count`, και ξαναϋπολογίζουν `row`/`column` με διαίρεση/υπόλοιπο ακέραιας αριθμητικής (`/` και υπολειπόμενη αφαίρεση), ενημερώνοντας κατάλληλα και το `base_row` αν η γραμμή άλλαξε. Χρησιμοποιούνται από το `terminal::input` για τα βέλη αριστερά/δεξιά και τα Home/End.
+Convert the current position into an "absolute" position within the visible screen (`row * vga_width + column`), subtract/add `count`, and recompute `row`/`column` via integer division/remainder arithmetic (`/` and remainder subtraction), updating `base_row` appropriately if the row changed. Used by `terminal::input` for left/right arrow keys and Home/End.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Ο **δείκτης SIMD dispatch** (`cpu::features::get()`) υπολογίζεται μία φορά κατά την εκκίνηση (CPU feature detection) και επαναχρησιμοποιείται σε κάθε κλήση fill/copy — δεν γίνεται επανέλεγχος CPUID σε κάθε χαρακτήρα.
-- Η επιλογή `volatile uint32_t*` για τους δείκτες αντανακλά ότι η μνήμη VGA (`0xB8000`) είναι memory-mapped I/O· το `volatile` αποτρέπει τον compiler από το να εξαλείψει (optimize away) ή να αναδιατάξει εγγραφές που θεωρητικά "δεν έχουν επίδραση" στο πρόγραμμα, ενώ στην πραγματικότητα έχουν ορατό αποτέλεσμα στην οθόνη.
-- Όλες οι γεωμετρικές μεταβάσεις (overflow γραμμής/στήλης) είναι σκόπιμα branchless, σύμφωνα με την αρχή του project ότι ο κώδικας πυρήνα σε hot path δεν πρέπει να χρησιμοποιεί έλεγχο ροής με `if` όπου αποφεύγεται.
+- The **SIMD dispatch index** (`cpu::features::get()`) is computed once during boot (CPU feature detection) and reused on every fill/copy call — CPUID is never re-checked on every character.
+- The choice of `volatile uint32_t*` for the pointers reflects the fact that VGA memory (`0xB8000`) is memory-mapped I/O; `volatile` prevents the compiler from eliminating (optimizing away) or reordering writes that theoretically "have no effect" on the program, when in reality they have a visible effect on the screen.
+- All geometric transitions (row/column overflow) are deliberately branchless, in line with the project's principle that hot-path kernel code should avoid `if`-based control flow wherever it can be avoided.

@@ -1,24 +1,24 @@
-# `stopwatch.cpp` — Τεκμηρίωση
+# `stopwatch.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί ένα διαγνωστικό εργαλείο τύπου **RAII stopwatch**: ένα αντικείμενο που, απλά με το να υπάρχει (scope-based lifetime), μετρά αυτόματα πόσος χρόνος πέρασε από τη δημιουργία του μέχρι την καταστροφή του, και τυπώνει το αποτέλεσμα στην οθόνη όταν βγαίνει εκτός εμβέλειας (scope).
+Implements a **RAII stopwatch** diagnostic tool: an object that, simply by existing (scope-based lifetime), automatically measures how much time has passed between its construction and its destruction, and prints the result to the screen when it goes out of scope.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `stopwatch.h`: δηλώνει την κλάση `stopwatch` (μέλος `start`).
+- `stopwatch.h`: declares the `stopwatch` class (member `start`).
 - `kernel/timer/kernel_timer.h`: `timer_ticks()`, `timer_frequency()`.
-- `io/output/terminal_output.h`: για την τελική εκτύπωση.
+- `io/output/terminal_output.h`: for the final print.
 
-## Κατασκευαστής
+## Constructor
 
 ```cpp
 stopwatch::stopwatch() noexcept: start{kernel::timer_ticks()} {}
 ```
 
-Απλά καταγράφει τον τρέχοντα αριθμό ticks τη στιγμή της δημιουργίας — δεν κάνει τίποτα άλλο.
+Simply records the current tick count at the moment of construction — does nothing else.
 
-## Καταστροφέας (Destructor)
+## Destructor
 
 ```cpp
 stopwatch::~stopwatch() noexcept
@@ -29,20 +29,20 @@ stopwatch::~stopwatch() noexcept
 }
 ```
 
-Εδώ γίνεται όλη η πραγματική δουλειά, ακολουθώντας το πρότυπο σχεδίασης **RAII (Resource Acquisition Is Initialization)**: επειδή ο καταστροφέας καλείται **αυτόματα** από τον compiler όταν το αντικείμενο `stopwatch` βγαίνει εκτός εμβέλειας (είτε κανονικά, είτε λόγω πρόωρης εξόδου/return/exception σε ένα scope), ο χρήστης του εργαλείου δεν χρειάζεται να θυμάται να καλέσει κάποιο `stop()` ή `report()` χειροκίνητα — αρκεί να δηλώσει ένα τοπικό `stopwatch` στην αρχή της περιοχής κώδικα που θέλει να χρονομετρήσει.
+All the real work happens here, following the **RAII (Resource Acquisition Is Initialization)** design pattern: because the destructor is called **automatically** by the compiler whenever the `stopwatch` object goes out of scope (whether normally or due to an early return/exception in that scope), the tool's user doesn't need to remember to call some `stop()` or `report()` manually — simply declaring a local `stopwatch` at the start of a code region is enough to time it.
 
-Η μετατροπή από ticks σε χιλιοστά του δευτερολέπτου γίνεται με προσεκτική διαχείριση **υπερχείλισης (overflow)** σε `uint32_t` αριθμητική, με την ίδια φιλοσοφία που ακολουθείται και στο `kernel_timer.cpp::sleep_ms`:
+The conversion from ticks to milliseconds is done with careful **overflow** handling for `uint32_t` arithmetic, following the same philosophy used in `kernel_timer.cpp::sleep_ms`:
 
 ```cpp
 if(whole_seconds > UINT32_MAX / ms_per_sec) elapsed_ms = UINT32_MAX;
-else { ... έλεγχος υπερχείλισης και στην τελική πρόσθεση ... }
+else { ... overflow check on the final addition too ... }
 ```
 
-Η τιμή "κόβεται" (clamped) στο `UINT32_MAX` αντί να επιτραπεί σιωπηλή υπερχείλιση, που θα παρήγαγε ένα παραπλανητικά μικρό αποτέλεσμα σε ένα διαγνωστικό εργαλείο — κρίσιμο, αφού ο σκοπός του εργαλείου είναι ακριβώς η αξιοπιστία της μέτρησης.
+The value is "clamped" to `UINT32_MAX` instead of allowing silent overflow, which would produce a misleadingly small result in a diagnostic tool — critical, since the whole point of the tool is measurement reliability.
 
-Τέλος, δημιουργεί ένα τοπικό `terminal::output console{}` και τυπώνει `"Time elapsed: <N>ms\n"`.
+Finally, it constructs a local `terminal::output console{}` and prints `"Time elapsed: <N>ms\n"`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Το μοτίβο "δημιούργησε ένα stopwatch στην αρχή ενός block κώδικα `{ ... }`, χρησιμοποίησέ το ως αόρατο (unnamed ή named) τοπικό αντικείμενο, και άφησέ το να τυπώσει μόνο του τον χρόνο όταν κλείσει το block" είναι ιδιαίτερα χρήσιμο σε κώδικα πυρήνα, όπου δεν υπάρχουν εξωτερικά profiling εργαλεία διαθέσιμα — το ίδιο το πρόγραμμα αναφέρει τις επιδόσεις του.
-- Αν η συχνότητα του timer δεν έχει ρυθμιστεί ακόμη (`frequency == 0`), ο καταστροφέας απλά δεν τυπώνει τίποτα — αποφεύγει διαίρεση με το μηδέν χωρίς να ρίξει το σύστημα σε κατάσταση σφάλματος για κάτι τόσο δευτερεύον όσο μια αποτυχημένη μέτρηση χρόνου.
+- The pattern "create a stopwatch at the start of a code block `{ ... }`, use it as an invisible (named or unnamed) local object, and let it print the elapsed time on its own when the block closes" is especially useful in kernel code, where no external profiling tools are available — the program itself reports its own performance.
+- If the timer's frequency hasn't been configured yet (`frequency == 0`), the destructor simply prints nothing — avoiding a division by zero without dropping the system into an error state over something as minor as a failed time measurement.

@@ -1,79 +1,79 @@
-# `terminal_output.cpp` — Τεκμηρίωση
+# `terminal_output.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί την κλάση `terminal::output`: μια στοιχειώδη έκδοση stream-style εξόδου (κατά το πρότυπο του `std::cout`, με υπερφορτωμένους — overloaded — τελεστές `operator<<`) πάνω από τον `vga_text_buffer`. Μετατρέπει αριθμητικές τιμές, χαρακτήρες, δείκτες και booleans σε κείμενο και τα γράφει στην οθόνη, με υποστήριξη για δεκαδική (`dec`) ή δεκαεξαδική (`hex`) αναπαράσταση μέσω "χειριστών ροής" (stream manipulators).
+Implements the `terminal::output` class: a minimal stream-style output type (modeled after `std::cout`, with overloaded `operator<<`) built on top of `vga_text_buffer`. Converts numeric values, characters, pointers, and booleans to text and writes them to the screen, with support for decimal (`dec`) or hexadecimal (`hex`) representation via stream manipulators.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `terminal_output.h`: δηλώνει την κλάση `output`, τη στατική instance `buffer` (`vga_text_buffer`), και όλες τις μεθόδους/templates.
+- `terminal_output.h`: declares the `output` class, the static `buffer` instance (`vga_text_buffer`), and all the methods/templates.
 
-## Πίνακας μετατροπής σε δεκαεξαδικό
+## Hex conversion table
 
 ```cpp
 constexpr char table[] = {'0', ..., '9', 'A', ..., 'F'};
 inline char hex_digit(uint8_t nibble) noexcept { return *(table + nibble); }
 ```
 
-Απλή προσπέλαση πίνακα (LUT) για τη μετατροπή μιας τιμής 4-bit (nibble, 0–15) στον αντίστοιχο δεκαεξαδικό χαρακτήρα — αποφεύγει έλεγχο `if(n < 10)` σε κάθε ψηφίο.
+Simple table lookup (LUT) for converting a 4-bit value (a nibble, 0–15) into the corresponding hex character — avoids an `if(n < 10)` check on every digit.
 
-## Ιδιωτικές μέθοδοι (private, "no_sync")
+## Private methods ("no_sync")
 
-Η επιθυμία "\_no\_sync" στο όνομα σημαίνει: γράφει στον buffer **χωρίς** να συγχρονίζει τον hardware cursor μετά από κάθε χαρακτήρα. Αυτό επιτρέπει σε μεθόδους που γράφουν πολλούς χαρακτήρες (π.χ. έναν ολόκληρο αριθμό) να κάνουν το συγχρονισμό **μία φορά στο τέλος**, αντί σε κάθε ψηφίο — σημαντική βελτιστοποίηση αφού η ενημέρωση του hardware cursor απαιτεί προσπέλαση σε I/O θύρες (`outb`/`inb`), που είναι ακριβές λειτουργίες σε σχέση με μια απλή εγγραφή στη μνήμη VGA.
+The "\_no\_sync" suffix means: write to the buffer **without** syncing the hardware cursor after every character. This lets methods that write many characters (e.g. an entire number) do the sync **once at the end**, instead of after every digit — an important optimization since updating the hardware cursor requires I/O port access (`outb`/`inb`), which is expensive relative to a plain memory write to the VGA buffer.
 
 ### `new_line()` — `[[gnu::regparm(1)]]`
 
-Καλεί `buffer.move_to_next_line()`.
+Calls `buffer.move_to_next_line()`.
 
 ### `write_string_no_sync(text)` — `[[gnu::regparm(2)]]`
 
-Βρόχος που γράφει κάθε χαρακτήρα μέχρι το `'\0'`, μέσω `put_char_no_sync`.
+A loop that writes each character up to `'\0'`, via `put_char_no_sync`.
 
 ### `write_pointer_no_sync(value)` — `[[gnu::regparm(2)]]`
 
-Γράφει το πρόθεμα `"0x"` και μετά τα δεκαεξαδικά ψηφία μιας διεύθυνσης (`uintptr_t`). Χρησιμοποιεί `__builtin_clz(value)` για να υπολογίσει πόσα leading zero nibbles πρέπει να παραλειφθούν, ώστε η έξοδος να μην έχει άσκοπα μηδενικά μπροστά (π.χ. `0x1A` αντί για `0x0000001A`).
+Writes the `"0x"` prefix and then the hex digits of an address (`uintptr_t`). Uses `__builtin_clz(value)` to compute how many leading zero nibbles should be skipped, so the output doesn't have pointless leading zeros (e.g. `0x1A` instead of `0x0000001A`).
 
 ### `write_signed_N_no_sync(value)` (N = 8, 16, 32, 64 bits)
 
-Ελέγχουν το πρόσημο: αν αρνητικό, γράφουν `'-'` και μετά τη **θετική** τιμή του απόλυτου (υπολογισμένη με `0 - value` σε unsigned αριθμητική, ώστε να λειτουργεί σωστά ακόμη και στο ελάχιστο όριο, π.χ. `INT32_MIN`, όπου το κλασικό `-value` θα προκαλούσε undefined behavior λόγω overflow). Στη συνέχεια καλούν το κοινό template `write_unsigned_no_sync`.
+Check the sign: if negative, write `'-'` and then the **positive** value of the magnitude (computed as `0 - value` in unsigned arithmetic, so it works correctly even at the type's minimum bound, e.g. `INT32_MIN`, where the classic `-value` would cause undefined behavior due to overflow). Then call the common `write_unsigned_no_sync` template.
 
-### `write_unsigned_no_sync<T>(value)` (template, ορισμένο στο header)
+### `write_unsigned_no_sync<T>(value)` (template, defined in the header)
 
-Γράφει τα ψηφία **από το τέλος προς την αρχή** μέσα σε έναν τοπικό πίνακα (`digits[max_digits]`), εξάγοντας κάθε ψηφίο με `value % 10` (υπολογισμένο ως `value - (value/10)*10`, αποφεύγοντας δεύτερη διαίρεση) και μειώνοντας το `value` με `/= 10`. Στο τέλος, γράφει τον πίνακα με τη σωστή σειρά. Το `max_digits` υπολογίζεται σε compile time ανάλογα με το μέγεθος του τύπου `T` (3 για `uint8_t`, 5 για `uint16_t`, 10 για `uint32_t`, 20 για `uint64_t`) — το ελάχιστο μέγεθος πίνακα που χωράει σίγουρα τη μέγιστη δυνατή τιμή του τύπου.
+Writes the digits **from last to first** into a local array (`digits[max_digits]`), extracting each digit with `value % 10` (computed as `value - (value/10)*10`, avoiding a second division) and reducing `value` with `/= 10`. At the end it writes the array in the correct order. `max_digits` is computed at compile time based on the size of type `T` (3 for `uint8_t`, 5 for `uint16_t`, 10 for `uint32_t`, 20 for `uint64_t`) — the minimum array size guaranteed to fit the type's maximum possible value.
 
 ### `write_hex_N_no_sync(value)` (N = 8, 16, 32, 64 bits)
 
-Ίδια λογική με το `write_pointer_no_sync`, αλλά ειδικευμένα ανά μέγεθος τύπου, με ειδική περίπτωση για `value == 0` (γράφει απλώς `'0'`).
+Same logic as `write_pointer_no_sync`, but specialized per type size, with a special case for `value == 0` (simply writes `'0'`).
 
-### `put_char_no_sync(c)` — inline (ορισμένο στο header)
+### `put_char_no_sync(c)` — inline (defined in the header)
 
-Κεντρικό σημείο διανομής χαρακτήρων: ερμηνεύει `'\r'` ως επιστροφή στην αρχή γραμμής (`line_start()`) και `'\n'` ως νέα γραμμή (`new_line()`)· κάθε άλλος χαρακτήρας πάει απευθείας στο `buffer.put(c)`.
+Central dispatch point for characters: interprets `'\r'` as return-to-line-start (`line_start()`) and `'\n'` as a new line (`new_line()`); every other character goes straight to `buffer.put(c)`.
 
-## Δημόσιο API
+## Public API
 
 ### `initialize()` (static)
 
-Καθαρίζει τον buffer, ενεργοποιεί τον hardware cursor (`vga_hardware_cursor::enable()`) και συγχρονίζει τη θέση του.
+Clears the buffer, enables the hardware cursor (`vga_hardware_cursor::enable()`), and syncs its position.
 
-### Υπερφορτωμένοι τελεστές `operator<<`
+### Overloaded `operator<<`
 
-Για κάθε αριθμητικό τύπο (`uint8_t`…`int64_t`), ο τελεστής ελέγχει την τρέχουσα κατάσταση βάσης (`state`, `integer_base::dec` ή `integer_base::hex`) και καλεί την κατάλληλη ιδιωτική `write_*_no_sync` μέθοδο, και στο τέλος καλεί πάντα `sync_cursor()` — έτσι κάθε **δημόσια** κλήση `<<` αφήνει τον hardware cursor σωστά συγχρονισμένο, ενώ οι εσωτερικές `_no_sync` κλήσεις μέσα στη μέθοδο δεν κάνουν επαναλαμβανόμενο συγχρονισμό.
+For every numeric type (`uint8_t`…`int64_t`), the operator checks the current base state (`state`, `integer_base::dec` or `integer_base::hex`) and calls the appropriate private `write_*_no_sync` method, then always calls `sync_cursor()` at the end — so every **public** `<<` call leaves the hardware cursor properly synced, while the internal `_no_sync` calls inside the method don't perform repeated syncs.
 
-- `operator<<(char)`, `operator<<(const char*)`: απευθείας εγγραφή κειμένου.
-- `operator<<(bool)`: αν είναι ενεργό το `bool_alpha_enabled`, γράφει `"true"`/`"false"`· αλλιώς γράφει `'0'`/`'1'` (μέσω `'0' + value`).
-- `operator<<(const void*)`: καλεί `write_pointer_no_sync`.
-- `operator<<(output_manipulator)`: εφαρμόζει έναν "χειριστή" (π.χ. `terminal::hex`) καλώντας τον ως συνάρτηση πάνω στο ίδιο το stream — το κλασικό μοτίβο `std::cout << std::hex`.
+- `operator<<(char)`, `operator<<(const char*)`: direct text writes.
+- `operator<<(bool)`: if `bool_alpha_enabled` is set, writes `"true"`/`"false"`; otherwise writes `'0'`/`'1'` (via `'0' + value`).
+- `operator<<(const void*)`: calls `write_pointer_no_sync`.
+- `operator<<(output_manipulator)`: applies a "manipulator" (e.g. `terminal::hex`) by calling it as a function on the stream itself — the classic `std::cout << std::hex` pattern.
 
-### Ελεύθερες συναρτήσεις-χειριστές (manipulators)
+### Free manipulator functions
 
-- **`dec(out)`** — `[[gnu::regparm(1)]]`: θέτει `state = integer_base::dec`.
-- **`hex(out)`** — `[[gnu::regparm(1)]]`: θέτει `state = integer_base::hex`.
-- **`bool_alpha(out)`** / **`bool_no_alpha(out)`** — `[[gnu::regparm(1)]]`: ενεργοποιούν/απενεργοποιούν την αναπαράσταση `bool` ως `"true"/"false"` αντί για `'0'/'1'`.
+- **`dec(out)`** — `[[gnu::regparm(1)]]`: sets `state = integer_base::dec`.
+- **`hex(out)`** — `[[gnu::regparm(1)]]`: sets `state = integer_base::hex`.
+- **`bool_alpha(out)`** / **`bool_no_alpha(out)`** — `[[gnu::regparm(1)]]`: enable/disable rendering `bool` as `"true"/"false"` instead of `'0'/'1'`.
 
-Κάθε μία επιστρέφει αναφορά (`output&`) στο ίδιο αντικείμενο, επιτρέποντας αλυσίδωση (chaining), π.χ. `out << terminal::hex << value << terminal::dec`.
+Each returns a reference (`output&`) to the same object, enabling chaining, e.g. `out << terminal::hex << value << terminal::dec`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Ο διαχωρισμός σε μεθόδους `_no_sync` + μία τελική κλήση `sync_cursor()` είναι ένα καθαρό παράδειγμα **batching** μιας ακριβής λειτουργίας (I/O port write) ώστε να μη γίνεται σε κάθε χαρακτήρα αλλά μία φορά ανά "λογική" εγγραφή δεδομένων.
-- Η κλάση `output` δεν κρατά δικό της buffer· η στατική μεταβλητή `buffer` (`inline static vga_text_buffer`) είναι **κοινή** σε όλα τα instances της `output` — κάθε στιγμιότυπο (π.χ. αυτό μέσα στο `terminal::input`, ή αυτό μέσα στο `kernel::logger`) γράφει στην ίδια, μοναδική οθόνη VGA.
-- Η αριθμητική εξαγωγή ψηφίων (`value % 10` υπολογισμένο ως αφαίρεση αντί για διαίρεση/υπόλοιπο modulo) αποφεύγει μια δεύτερη ακριβή εντολή διαίρεσης στον επεξεργαστή.
+- Splitting into `_no_sync` methods plus a single final `sync_cursor()` call is a clean example of **batching** an expensive operation (I/O port write) so it doesn't happen on every character but once per "logical" write of data.
+- The `output` class doesn't hold its own buffer; the static member `buffer` (`inline static vga_text_buffer`) is **shared** across all instances of `output` — every instance (e.g. the one inside `terminal::input`, or the one inside `kernel::logger`) writes to the same, single VGA screen.
+- Extracting digits via `value % 10` (computed as subtraction instead of a division/modulo operation) avoids a second expensive division instruction on the processor.

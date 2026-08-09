@@ -1,19 +1,19 @@
-# `keyboard.cpp` — Τεκμηρίωση
+# `keyboard.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί τον οδηγό (driver) του PS/2 πληκτρολογίου: αρχικοποίηση της συσκευής, μετάφραση raw scancodes (Scancode Set 1) σε λογικά πλήκτρα (`keyboard_key`), παρακολούθηση της κατάστασης modifiers (Shift/Ctrl/Alt/CapsLock), και μια ουρά κυκλικού buffer (ring buffer) γεγονότων πληκτρολογίου που γεμίζει το interrupt handler και αδειάζει ο υπόλοιπος πυρήνας.
+Implements the PS/2 keyboard driver: device initialization, translation of raw scancodes (Scancode Set 1) into logical keys (`keyboard_key`), tracking of modifier state (Shift/Ctrl/Alt/CapsLock), and a ring-buffer queue of keyboard events that the interrupt handler fills and the rest of the kernel drains.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `pic/kernel_pic.h`: PIC (Programmable Interrupt Controller) λειτουργίες.
-- `keyboard.h`: δημόσιο API και τύποι.
-- `internals/terminal_io_registers.h`: `inb`/`outb` για I/O θύρες.
-- `internal/keyboard_key_list_n_map.h`: X-macros με τους πλήρεις πίνακες αντιστοίχισης scancode→πλήκτρο και πλήκτρο→χαρακτήρα.
-- `internal/kernel_interrupt_frame.h`, `internal/kernel_interrupt_guard.h`: τύπος `interrupt_frame` και RAII φύλακας διακοπών (interrupt guard).
-- `logger/kernel_logger.h`: αναφορά σφαλμάτων αρχικοποίησης.
+- `pic/kernel_pic.h`: PIC (Programmable Interrupt Controller) functions.
+- `keyboard.h`: public API and types.
+- `internals/terminal_io_registers.h`: `inb`/`outb` for I/O ports.
+- `internal/keyboard_key_list_n_map.h`: X-macros with the full scancode→key and key→character mapping tables.
+- `internal/kernel_interrupt_frame.h`, `internal/kernel_interrupt_guard.h`: the `interrupt_frame` type and an RAII interrupt guard.
+- `logger/kernel_logger.h`: reporting initialization errors.
 
-## Σταθερές θυρών και πρωτοκόλλου
+## Port and protocol constants
 
 ```cpp
 constexpr uint16_t data_port{0x60};
@@ -22,48 +22,48 @@ constexpr uint8_t output_buffer_full{0x01};
 constexpr uint8_t input_buffer_full{0x02};
 ```
 
-Αυτές είναι οι κλασικές θύρες του PS/2 controller (i8042): `0x60` για δεδομένα, `0x64` για κατάσταση/εντολές. Τα bits `output_buffer_full`/`input_buffer_full` δείχνουν αν υπάρχουν δεδομένα προς ανάγνωση από το πληκτρολόγιο ή αν ο controller είναι έτοιμος να δεχτεί νέα εντολή.
+These are the classic PS/2 controller (i8042) ports: `0x60` for data, `0x64` for status/commands. The `output_buffer_full`/`input_buffer_full` bits indicate whether there's data available to read from the keyboard, or whether the controller is ready to accept a new command.
 
-## Πίνακες αντιστοίχισης χτισμένοι σε compile time
+## Mapping tables built at compile time
 
-Τέσσερις δομές, όλες χτισμένες μέσω `constexpr` κατασκευαστή που εκτελεί ένα X-macro:
+Four structures, all built via a `constexpr` constructor that runs an X-macro:
 
-- **`key_list` → `normal_key_map`**: scancode (0–127) → `keyboard_key` (χωρίς extended prefix).
-- **`normal_character_map_table` → `normal_characters_table`**: `keyboard_key` → χαρακτήρας χωρίς Shift.
-- **`shifted_character_map_table` → `shifted_characters_table`**: `keyboard_key` → χαρακτήρας με Shift.
-- **`extended_key_map_table` → `extended_key_table`**: scancode (με extended prefix `0xE0`) → `keyboard_key`.
+- **`key_list` → `normal_key_map`**: scancode (0–127) → `keyboard_key` (without the extended prefix).
+- **`normal_character_map_table` → `normal_characters_table`**: `keyboard_key` → character without Shift.
+- **`shifted_character_map_table` → `shifted_characters_table`**: `keyboard_key` → character with Shift.
+- **`extended_key_map_table` → `extended_key_table`**: scancode (with the extended prefix `0xE0`) → `keyboard_key`.
 
-Επειδή είναι όλες `constexpr`, οι πίνακες αυτοί γεμίζουν **κατά τη μεταγλώττιση** και ενσωματώνονται στο binary ως έτοιμα δεδομένα (data section) — καμία αρχικοποίηση δεν χρειάζεται κατά την εκκίνηση (runtime), και η αναζήτηση γίνεται πάντα με O(1) προσπέλαση πίνακα.
+Because they're all `constexpr`, these tables are populated **at compile time** and end up embedded in the binary as ready-made data (in the data section) — no initialization is needed at boot (runtime), and lookups are always O(1) array accesses.
 
-## Βοηθητικές συναρτήσεις μετάφρασης
+## Translation helper functions
 
 ### `map_scancode_set_1_key(key_code, extended)` — `[[gnu::regparm(2)]]`
 
-Επιλέγει τον σωστό πίνακα (`extended_key_table` ή `normal_key_map`) ανάλογα με το αν προηγήθηκε το byte `0xE0`.
+Selects the correct table (`extended_key_table` or `normal_key_map`) depending on whether the `0xE0` byte preceded it.
 
 ### `get_normal_character(key)` — `[[gnu::regparm(1)]]` / `get_shifted_character(key)`
 
-Απλή προσπέλαση στους αντίστοιχους πίνακες χαρακτήρων.
+Simple lookups into the corresponding character tables.
 
-## Πρωτόκολλο επικοινωνίας με τον controller
+## Controller communication protocol
 
 ### `wait_input_buffer_clear()` / `wait_output_buffer_full()`
 
-Πολικές αναμονές (polling loops) με άνω όριο `keyboard_timeout = 100000` προσπάθειες, καλώντας `kernel::io_wait()` σε κάθε επανάληψη (μικρή καθυστέρηση μεταξύ διαδοχικών προσπελάσεων I/O, απαραίτητη σε παλιό υλικό PS/2). Επιστρέφουν `false` αν λήξει το timeout — προστασία από μόνιμο "κρέμασμα" (hang) αν ο controller δεν απαντήσει ποτέ.
+Polling loops with an upper bound of `keyboard_timeout = 100000` attempts, calling `kernel::io_wait()` on every iteration (a small delay between consecutive I/O accesses, needed on old PS/2 hardware). Return `false` if the timeout expires — protection against a permanent hang if the controller never responds.
 
 ### `read_keyboard_ack()`
 
-Περιμένει δεδομένα και ελέγχει αν η απάντηση είναι `keyboard_ack (0xFA)`.
+Waits for data and checks whether the response equals `keyboard_ack (0xFA)`.
 
 ### `send_keyboard_byte_and_wait_ack(byte)`
 
-Στέλνει ένα byte εντολής στον controller και επιβεβαιώνει ότι έγινε αποδεκτό (ACK).
+Sends a command byte to the controller and confirms it was accepted (ACK).
 
 ### `flush_keyboard_output_buffer()`
 
-Αδειάζει τυχόν "μπαγιάτικα" (stale) bytes από προηγούμενες καταστάσεις πριν ξεκινήσει η κανονική λειτουργία — αποτρέπει το πρώτο interrupt να επεξεργαστεί ένα ξεχασμένο byte από το BIOS.
+Drains any stale bytes left over from previous states before normal operation begins — prevents the first interrupt from processing a leftover byte from the BIOS.
 
-## Ουρά γεγονότων (Event Queue)
+## Event Queue
 
 ```cpp
 struct alignas(64) keyboard_event_queue
@@ -73,50 +73,50 @@ struct alignas(64) keyboard_event_queue
 };
 ```
 
-Κυκλικό buffer (ring buffer) χωρητικότητας 64 στοιχείων (δύναμη του 2, ώστε το wraparound να γίνεται με bitwise AND αντί για modulo — βλέπε `next_keyboard_event`). Η ευθυγράμμιση `alignas(64)` τοποθετεί τη δομή σε όριο cache line, αποτρέποντας το "false sharing" και βελτιώνοντας τη χωρική τοπικότητα (locality) κατά τις προσπελάσεις.
+A ring buffer of 64 entries (a power of 2, so wraparound can be done via bitwise AND instead of modulo — see `next_keyboard_event`). The `alignas(64)` places the structure on a cache-line boundary, preventing false sharing and improving locality during accesses.
 
-- **`next_keyboard_event(index)`** — `[[gnu::always_inline]]`: `(index + 1) & keyboard_event_queue_mask` — γρήγορο wraparound modulo χωρίς πραγματική διαίρεση, εφικτό επειδή το μέγεθος είναι δύναμη του 2 (ελεγμένο με `static_assert`).
-- **`commit_keyboard_event()`**: προωθεί το `tail` και αυξάνει το `count` — καλείται αφού γραφτεί ένα νέο γεγονός στην ουρά.
+- **`next_keyboard_event(index)`** — `[[gnu::always_inline]]`: `(index + 1) & keyboard_event_queue_mask` — fast modulo wraparound with no real division, possible because the size is a power of 2 (checked via `static_assert`).
+- **`commit_keyboard_event()`**: advances `tail` and increments `count` — called after a new event has been written into the queue.
 
-## Παρακολούθηση κατάστασης modifiers
+## Modifier state tracking
 
 ### `update_modifier_state(key, state)` — `[[gnu::regparm(2)]]`
 
-Ένα `switch` που ενημερώνει το bitmask `g_modifier_state` (τύπος `modifier_state = uint8_t`) για κάθε πλήκτρο modifier. Ιδιαίτερη προσοχή στο `caps_lock`: επειδή το πλήκτρο Caps Lock είναι "toggle" (εναλλαγή κατάστασης) και όχι "κράτα πατημένο", ο χειρισμός του διακρίνει ρητά μεταξύ **κατάστασης πατήματος** (`caps_lock_down`, sticky bit που αποτρέπει επανειλημμένη εναλλαγή όσο το πλήκτρο παραμένει κάτω) και **κατάστασης ενεργοποίησης** (`caps_lock_on`, το πραγματικό on/off): μόνο στην **πρώτη** στιγμή που ανιχνεύεται πάτημα (`!is_caps_down`) αναστρέφεται το `caps_lock_on`.
+A `switch` that updates the `g_modifier_state` bitmask (type `modifier_state = uint8_t`) for every modifier key. Special attention goes to `caps_lock`: because the Caps Lock key is "toggle" (flip state) rather than "hold down", its handling explicitly distinguishes between **press state** (`caps_lock_down`, a sticky bit that prevents repeated toggling while the key remains held) and **active state** (`caps_lock_on`, the actual on/off): only at the **first** detected press moment (`!is_caps_down`) is `caps_lock_on` flipped.
 
-## Δημόσιο API
+## Public API
 
 ### `driver::initialize_keyboard()`
 
-Καθαρίζει την κατάσταση modifiers, αδειάζει το output buffer, και στέλνει εντολή απενεργοποίησης όλων των LEDs (`set_leds_command` + `all_leds_off`). Αν αποτύχει, καταγράφει προειδοποίηση (`kernel::logger::warning`) αλλά **δεν** σταματά την εκκίνηση — η αποτυχία ρύθμισης LEDs δεν είναι κρίσιμη.
+Clears the modifier state, flushes the output buffer, and sends the command to turn off all LEDs (`set_leds_command` + `all_leds_off`). If it fails, it logs a warning (`kernel::logger::warning`) but **does not** halt boot — failing to configure LEDs isn't critical.
 
 ### `try_translate_text_event(event, out_character)` — `[[gnu::regparm(2)]]`
 
-Ελέγχει πρώτα αν το event είναι υποψήφιο για εισαγωγή κειμένου (`is_text_input_candidate_event`). Για γράμματα, εφαρμόζει **XOR λογική** μεταξύ Shift και Caps Lock: `shift_pressed != caps_on` επιλέγει το shifted γράμμα — αυτό υλοποιεί σωστά τον κανόνα ότι το Caps Lock αντιστρέφει το Shift **μόνο** για γράμματα (π.χ. Shift+γράμμα με Caps ενεργό δίνει πεζό), ενώ για μη-γράμματα (ψηφία, σύμβολα) εξαρτάται μόνο από το Shift.
+First checks whether the event is a candidate for text input (`is_text_input_candidate_event`). For letters, it applies **XOR logic** between Shift and Caps Lock: `shift_pressed != caps_on` selects the shifted letter — this correctly implements the rule that Caps Lock inverts Shift **only** for letters (e.g. Shift+letter with Caps active yields a lowercase letter), while for non-letters (digits, symbols) it depends only on Shift.
 
 ### `handle_keyboard_interrupt(frame)` — `[[gnu::regparm(1)]]`
 
-Ο πραγματικός IRQ1 handler, καλείται από τον interrupt dispatcher:
-1. Ελέγχει ότι όντως υπάρχουν δεδομένα (`output_buffer_full`) — αλλιώς επιστρέφει αμέσως.
-2. Διαβάζει το scancode byte.
-3. Αν είναι το extended prefix (`0xE0`), θέτει σημαία `g_extended_pending` και επιστρέφει (το πραγματικό scancode έρχεται στο **επόμενο** interrupt).
-4. Αν η ουρά είναι γεμάτη, αγνοεί το γεγονός (drop) — αποτρέπει buffer overflow· προτιμάται η απώλεια ενός γεγονότος από καταστροφή μνήμης.
-5. Αποκωδικοποιεί: `key_code = scancode & 0x7F`, κατάσταση (`pressed`/`released` από το bit `0x80`), αναζητά το λογικό πλήκτρο, ενημερώνει τους modifiers, και γράφει όλα τα πεδία του `keyboard_event` απευθείας στη θέση `tail` της ουράς πριν καλέσει `commit_keyboard_event()`.
+The actual IRQ1 handler, called by the interrupt dispatcher:
+1. Checks that data is actually available (`output_buffer_full`) — otherwise returns immediately.
+2. Reads the scancode byte.
+3. If it's the extended prefix (`0xE0`), sets the `g_extended_pending` flag and returns (the real scancode arrives on the **next** interrupt).
+4. If the queue is full, drops the event — prevents buffer overflow; losing one event is preferable to memory corruption.
+5. Decodes: `key_code = scancode & 0x7F`, state (`pressed`/`released` from bit `0x80`), looks up the logical key, updates modifiers, and writes all fields of the `keyboard_event` directly at the queue's `tail` position before calling `commit_keyboard_event()`.
 
 ### `current_keyboard_modifier_state()`
 
-Επιστρέφει το `g_modifier_state`, προστατευμένο από `kernel::interrupt_guard` (RAII, απενεργοποιεί τις διακοπές όσο διαρκεί η ανάγνωση) — αποτρέπει μια ενδιάμεση κατάσταση αν συμβεί interrupt ενώ διαβάζεται η μεταβλητή.
+Returns `g_modifier_state`, protected by `kernel::interrupt_guard` (RAII, disables interrupts for the duration of the read) — prevents an intermediate state if an interrupt fires while the variable is being read.
 
 ### `poll_keyboard_event(out_event)` — `[[gnu::regparm(1)]]`
 
-Αν η ουρά είναι άδεια, επιστρέφει `false`. Αλλιώς αντιγράφει το event στη θέση `head`, προωθεί το `head` και μειώνει το `count`. Επίσης προστατευμένο με `interrupt_guard`, αφού η ουρά είναι κοινόχρηστη μεταξύ interrupt context (writer) και κανονικού κώδικα (reader) — κλασικό producer/consumer πρόβλημα ταυτοχρονισμού (concurrency) σε περιβάλλον χωρίς threads αλλά με interrupts.
+If the queue is empty, returns `false`. Otherwise copies the event from the `head` position, advances `head`, and decrements `count`. Also protected by `interrupt_guard`, since the queue is shared between the interrupt context (writer) and normal code (reader) — a classic producer/consumer concurrency problem in an environment without threads but with interrupts.
 
 ### `has_pending_keyboard_event()`
 
-Επιστρέφει το `count`, επίσης προστατευμένο.
+Returns `count`, also protected.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Όλη η στατική κατάσταση (πίνακες, ουρά) είναι περιορισμένη στον ανώνυμο χώρο ονομάτων — καμία εξωτερική μεταγλωττιστική μονάδα δεν μπορεί να τη διαβάσει ή να την αλλοιώσει απευθείας.
-- Το `interrupt_guard` γύρω από κάθε προσπέλαση της κοινής ουράς είναι το βασικό μοτίβο συγχρονισμού (synchronization) του πυρήνα, αντικαθιστώντας locks/mutexes (άσκοπα σε μονοπύρηνο, μη-preemptive πλαίσιο) με απλή απενεργοποίηση διακοπών.
-- Η επιλογή "απόρριψη γεγονότος όταν η ουρά είναι γεμάτη" αντί για αναμονή είναι σωστή επιλογή μέσα σε interrupt handler: ο handler πρέπει να επιστρέψει γρήγορα και ποτέ να μην μπλοκάρει.
+- All static state (tables, queue) is confined to the anonymous namespace — no external translation unit can directly read or corrupt it.
+- The `interrupt_guard` wrapped around every access to the shared queue is the kernel's core synchronization pattern, replacing locks/mutexes (pointless on a single-core, non-preemptive setup) with simple interrupt disabling.
+- The choice of "drop the event when the queue is full" instead of waiting is the right choice inside an interrupt handler: the handler must return quickly and must never block.

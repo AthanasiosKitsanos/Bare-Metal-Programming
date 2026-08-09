@@ -1,14 +1,14 @@
-# `features.cpp` — Τεκμηρίωση
+# `features.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Ορίζει τη μοναδική, καθολική (global) μεταβλητή αποθήκευσης του αποτελέσματος ανίχνευσης δυνατοτήτων CPU (CPU feature detection) — συγκεκριμένα, ποιο επίπεδο SIMD υποστηρίζει η τρέχουσα CPU (καμία / SSE2 / AVX2), όπως προσδιορίστηκε κατά την εκκίνηση μέσω CPUID.
+Defines the single, global variable holding the result of CPU feature detection — specifically, which SIMD level the current CPU supports (none / SSE2 / AVX2), as determined at boot via CPUID.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `features.h`: δηλώνει τον τύπο `simd_flags` και πιθανότατα τη συνάρτηση ανίχνευσης (`detect()`/`initialize()`) που γεμίζει αυτή τη μεταβλητή, καθώς και το `get()` που τη διαβάζει.
+- `features.h`: declares the `simd_flags` type and likely the detection function (`detect()`/`initialize()`) that populates this variable, as well as `get()`, which reads it.
 
-## Περιεχόμενο αρχείου
+## File contents
 
 ```cpp
 namespace cpu::features
@@ -17,12 +17,12 @@ namespace cpu::features
 }
 ```
 
-Ολόκληρο το `.cpp` αρχείο περιορίζεται σε **έναν** ορισμό: τη μεταβλητή `mm_flag`, αρχικοποιημένη σε `0` (καμία ειδική δυνατότητα ανιχνευμένη ακόμη — ασφαλής προεπιλογή/fallback πριν τρέξει η πραγματική ανίχνευση).
+The entire `.cpp` file consists of **one** definition: the `mm_flag` variable, initialized to `0` (no special capability detected yet — a safe fallback default before the actual detection runs).
 
-- **`extern "C"`**: αποφεύγει το C++ name mangling για αυτό το σύμβολο. Αυτό έχει πρακτική σημασία αν η ανίχνευση δυνατοτήτων (η οποία συνήθως περιλαμβάνει inline assembly ή εξειδικευμένο κώδικα εκκίνησης) γράφεται εν μέρει σε assembly ή χρειάζεται να αναφερθεί σε αυτό το σύμβολο με προβλέψιμο, μη-αλλοιωμένο όνομα.
-- Ο τύπος `simd_flags` λειτουργεί ως ο **δείκτης (index)** που χρησιμοποιείται απευθείας στους πίνακες αποστολής (`g_dispatch`, `g_dispatch_cpy`) του `terminal_vga_text_buffer.cpp`, με τη σύμβαση `0 = fallback, 1 = SSE2, 2 = AVX2`.
+- **`extern "C"`**: avoids C++ name mangling for this symbol. This matters in practice if feature detection (which usually involves inline assembly or specialized boot-time code) is partly written in assembly, or needs to refer to this symbol under a predictable, unmangled name.
+- The `simd_flags` type serves as the **index** used directly in the dispatch tables (`g_dispatch`, `g_dispatch_cpy`) of `terminal_vga_text_buffer.cpp`, with the convention `0 = fallback, 1 = SSE2, 2 = AVX2`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Η απομόνωση αυτής της μεταβλητής σε δικό της, ελάχιστο αρχείο (αντί να είναι, π.χ., static μέσα σε κάποια άλλη μονάδα) τη μετατρέπει σε ένα **σαφές, καθολικά προσβάσιμο σημείο αλήθειας** για τις δυνατότητες SIMD της CPU — οποιοδήποτε άλλο υποσύστημα του πυρήνα (όχι μόνο ο VGA buffer) μπορεί να το συμβουλευτεί χωρίς να χρειάζεται να ξαναεκτελέσει CPUID.
-- Η αρχική τιμή `0` εξασφαλίζει ότι, ακόμη κι αν κάποιος κώδικας διαβάσει αυτή τη μεταβλητή **πριν** τρέξει η πραγματική ανίχνευση (θεωρητικό σενάριο σφάλματος σειράς αρχικοποίησης), το αποτέλεσμα θα είναι η ασφαλέστερη δυνατή επιλογή (scalar fallback), ποτέ SIMD εντολές σε υλικό που ενδεχομένως δεν τις υποστηρίζει.
+- Isolating this variable in its own, minimal file (instead of, say, being static within some other module) turns it into a **clear, globally accessible single source of truth** for the CPU's SIMD capabilities — any other kernel subsystem (not just the VGA buffer) can consult it without needing to re-run CPUID.
+- The initial value of `0` ensures that even if some code reads this variable **before** actual detection has run (a theoretical initialization-order bug scenario), the result will be the safest possible choice (scalar fallback), never SIMD instructions on hardware that might not support them.

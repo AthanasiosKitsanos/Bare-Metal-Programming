@@ -1,110 +1,110 @@
-# `terminal_input.cpp` — Τεκμηρίωση
+# `terminal_input.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί την κλάση `terminal::input`: έναν επεξεργαστή γραμμής εντολών (line editor) με buffer σταθερού μεγέθους, δρομέα εισαγωγής (insertion cursor) στη μέση της γραμμής, και υποστήριξη για navigation keys (βέλη, Home, End) και control keys (Backspace, Enter, Tab, Escape). Καταναλώνει events από τον οδηγό πληκτρολογίου (`driver::keyboard`) και ενημερώνει ταυτόχρονα την οθόνη μέσω ενός εσωτερικού `terminal::output`.
+Implements the `terminal::input` class: a command-line editor with a fixed-size buffer, an insertion cursor that can sit anywhere within the line, and support for navigation keys (arrows, Home, End) and control keys (Backspace, Enter, Tab, Escape). It consumes events from the keyboard driver (`driver::keyboard`) and simultaneously updates the screen via an internal `terminal::output`.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `terminal_input.h`: δηλώνει την κλάση, το `input_buffer` (128 + 1 bytes), τους δείκτες `cursor`/`data_end`.
-- `io/output/terminal_output.h`: για την ενσωματωμένη έξοδο (`m_output`).
-- `internals/navigation_handlers.h`, `internals/control_input_handlers.h`: X-macros που παράγουν τον κώδικα διανομής (dispatch) για τα navigation/control keys.
-- `keyboard/keyboard.h`: τύποι `keyboard_event`, `keyboard_key` και ταξινομητές γεγονότων (event classifiers).
+- `terminal_input.h`: declares the class, the `input_buffer` (128 + 1 bytes), the `cursor`/`data_end` pointers.
+- `io/output/terminal_output.h`: for the embedded output object (`m_output`).
+- `internals/navigation_handlers.h`, `internals/control_input_handlers.h`: X-macros that generate the dispatch code for navigation/control keys.
+- `keyboard/keyboard.h`: `keyboard_event`, `keyboard_key` types and event classifiers.
 
-## Βοηθητικές συναρτήσεις (ανώνυμος χώρος ονομάτων)
+## Helper functions (anonymous namespace)
 
 ### `move_data_right(end, begin, step)` / `move_data_left(begin, end, step)`
 
-Μετακινούν ένα εύρος χαρακτήρων μέσα στο buffer κατά `step` θέσεις, δεξιά ή αριστερά, byte προς byte. Χρησιμοποιούνται όταν εισάγεται ή διαγράφεται χαρακτήρας **στη μέση** της γραμμής (όχι μόνο στο τέλος): πρέπει να "ανοίξει" ή να "κλείσει" χώρος μετακινώντας ό,τι βρίσκεται μετά τον δρομέα.
+Shift a range of characters within the buffer by `step` positions, right or left, byte by byte. Used when a character is inserted or deleted **in the middle** of the line (not just at the end): the buffer must "open up" or "close" space by shifting whatever comes after the cursor.
 
 ### `string_length(string)` — `[[gnu::regparm(1)]]`
 
-Απλή μέτρηση μήκους string μέχρι το `'\0'`, επιστρέφοντας `uint8_t` (αρκετό αφού η χωρητικότητα του buffer είναι μόλις 128 χαρακτήρες).
+Simple string length measurement up to `'\0'`, returning `uint8_t` (enough since the buffer's capacity is only 128 characters).
 
-## Κατασκευαστής
+## Constructor
 
 ```cpp
 input::input() noexcept: cursor{input_buffer}, data_end{input_buffer}, input_buffer{}, m_output{}, input_ready{false}
 ```
 
-Αρχικοποιεί `cursor` και `data_end` να δείχνουν στην αρχή ενός άδειου buffer.
+Initializes `cursor` and `data_end` to point at the start of an empty buffer.
 
-## Λειτουργίες επεξεργασίας buffer
+## Buffer editing operations
 
 ### `add_character(c)` — `[[gnu::regparm(2)]]`
 
-Αν το buffer είναι γεμάτο (`buffer_full()`), επιστρέφει `false`. Αν ο δρομέας **δεν** βρίσκεται ήδη στο τέλος δεδομένων (`*cursor != '\0'`), μετακινεί τα υπόλοιπα δεδομένα προς τα δεξιά κατά μία θέση (`move_data_right`) ώστε να ανοίξει χώρος. Γράφει τον χαρακτήρα, προωθεί τον δρομέα, και θέτει τον νέο τερματικό `'\0'`.
+If the buffer is full (`buffer_full()`), returns `false`. If the cursor is **not** already at the end of the data (`*cursor != '\0'`), shifts the remaining data right by one position (`move_data_right`) to open up space. Writes the character, advances the cursor, and sets the new terminating `'\0'`.
 
 ### `add_string(string)` — `[[gnu::regparm(2)]]`
 
-Ίδια λογική με το `add_character` αλλά για ολόκληρο string ταυτόχρονα (χρησιμοποιείται από το Tab, που εισάγει 4 κενά μαζί) — υπολογίζει το μήκος, ελέγχει χωρητικότητα, μετακινεί τα δεδομένα μία φορά για όλο το string (πιο αποδοτικό από το να καλείται `add_character` σε βρόχο, που θα μετακινούσε επαναληπτικά τα ίδια δεδομένα).
+Same logic as `add_character` but for an entire string at once (used by Tab, which inserts 4 spaces together) — computes the length, checks capacity, shifts data once for the whole string (more efficient than calling `add_character` in a loop, which would repeatedly shift the same data).
 
 ### `delete_character()` — `[[gnu::regparm(1)]]`
 
-Αν ο δρομέας είναι ήδη στην αρχή (`buffer_begin()`), επιστρέφει `false`. Αλλιώς οπισθοχωρεί τον δρομέα και μετακινεί τα επόμενα δεδομένα προς τα αριστερά (`move_data_left`) για να "κλείσει" το κενό — υλοποιεί backspace στη μέση της γραμμής.
+If the cursor is already at the start (`buffer_begin()`), returns `false`. Otherwise steps the cursor back and shifts the following data left (`move_data_left`) to "close" the gap — implements backspace in the middle of the line.
 
 ### `reset_buffer()` — `[[gnu::regparm(1)]]`
 
-Επαναφέρει `cursor`/`data_end` στην αρχή και `input_ready = false` — καλείται μεταξύ διαδοχικών εντολών του shell.
+Resets `cursor`/`data_end` to the start and `input_ready = false` — called between consecutive shell commands.
 
 ### `trim_end()` — `[[gnu::regparm(1)]]`
 
-Αφαιρεί τα κενά (`' '`) από το τέλος της γραμμής πριν την εκτέλεση της εντολής, μετακινώντας το `data_end` προς τα πίσω.
+Strips trailing spaces (`' '`) from the end of the line before command execution, moving `data_end` back.
 
-## Κύριος βρόχος εισαγωγής
+## Main input loop
 
 ### `start_data_receiving()` — `[[gnu::regparm(1)]]`
 
-Αναμονή/επεξεργασία σε βρόχο μέχρι `input_ready == true`:
+Waits/processes in a loop until `input_ready == true`:
 
-1. Όσο δεν υπάρχει εκκρεμές event πληκτρολογίου, ο επεξεργαστής "κοιμάται" με `hlt` (εξοικονόμηση ενέργειας — δεν κάνει busy-wait πολικής δειγματοληψίας/polling).
-2. Παίρνει ένα event (`poll_keyboard_event`).
-3. Αν το event αντιστοιχεί σε εκτυπώσιμο χαρακτήρα (`try_translate_text_event`), τον εισάγει (`add_character`) και ενημερώνει την οθόνη: γράφει τον χαρακτήρα, και αν ο δρομέας **δεν** βρίσκεται στο τέλος του κειμένου (δηλαδή εισήχθη στη μέση), ξανατυπώνει το υπόλοιπο κείμενο μετά τον δρομέα και μετακινεί τον hardware cursor πίσω στη σωστή θέση (`print_string_no_sync` + `move_cursor_left_n` + `call_cursor_sync`) — έτσι η οθόνη δείχνει σωστά το αποτέλεσμα ακόμη και όταν πληκτρολογείς στη μέση μιας γραμμής.
-4. Αλλιώς, αν είναι "control" event (Backspace, Tab, Enter, Escape), καλεί `control_key_dispatch`.
-5. Αλλιώς, αν είναι "navigation" event (βέλη, Home, End, PageUp/Down), καλεί `navigation_key_dispatch`.
+1. As long as there's no pending keyboard event, the CPU "sleeps" with `hlt` (power saving — no busy-wait polling).
+2. Takes an event (`poll_keyboard_event`).
+3. If the event corresponds to a printable character (`try_translate_text_event`), it's inserted (`add_character`) and the screen is updated: the character is written, and if the cursor is **not** at the end of the text (i.e. it was inserted mid-line), the rest of the text after the cursor is reprinted and the hardware cursor is moved back to the correct position (`print_string_no_sync` + `move_cursor_left_n` + `call_cursor_sync`) — so the screen correctly shows the result even when typing in the middle of a line.
+4. Otherwise, if it's a "control" event (Backspace, Tab, Enter, Escape), it calls `control_key_dispatch`.
+5. Otherwise, if it's a "navigation" event (arrows, Home, End, Page Up/Down), it calls `navigation_key_dispatch`.
 
-## Χειριστές πλήκτρων ελέγχου (control handlers)
+## Control key handlers
 
 ### `handle_escape()`
 
-Μετακινεί τον hardware cursor στο τέλος της γραμμής, διαγράφει όλους τους χαρακτήρες οπτικά (`delete_last_char_no_sync` σε βρόχο μήκους `count()`), συγχρονίζει τον cursor, και επαναφέρει το buffer — υλοποιεί "καθάρισε ό,τι έγραψα".
+Moves the hardware cursor to the end of the line, visually deletes every character (`delete_last_char_no_sync` in a loop of length `count()`), syncs the cursor, and resets the buffer — implements "clear what I typed".
 
 ### `handle_backspace()`
 
-Καλεί `delete_character()`· αν πέτυχε, διαγράφει οπτικά τον τελευταίο χαρακτήρα και, αν ο δρομέας δεν ήταν στο τέλος, ξανατυπώνει το υπόλοιπο κείμενο με ένα επιπλέον κενό στο τέλος (για να "σβήσει" τον χαρακτήρα που πλέον περισσεύει οπτικά), μετά επαναφέρει τη θέση του δρομέα.
+Calls `delete_character()`; if successful, visually deletes the last character, and if the cursor wasn't at the end, reprints the remaining text with one extra trailing space (to visually "erase" the now-leftover character), then restores the cursor position.
 
 ### `handle_tab()`
 
-Εισάγει 4 κενά (`add_string("    ")`) με την ίδια λογική "ξανατύπωσε το υπόλοιπο αν χρειάζεται" όπως το `add_character`.
+Inserts 4 spaces (`add_string("    ")`) with the same "reprint the remainder if needed" logic as `add_character`.
 
 ### `handle_enter()`
 
-Αν υπάρχει περιεχόμενο (`count() > 0`), κόβει τα κενά στο τέλος (`trim_end()`). Γράφει νέα γραμμή και σηματοδοτεί `input_ready = true`, τερματίζοντας τον βρόχο του `start_data_receiving`.
+If there's content (`count() > 0`), trims trailing spaces (`trim_end()`). Writes a newline and signals `input_ready = true`, ending the `start_data_receiving` loop.
 
 ### `control_key_dispatch(key)` — `[[gnu::regparm(2)]]`
 
-Ένα `switch` που παράγεται από το X-macro `CONTROL_INPUT_HANDLERS` — για κάθε καταχωρημένο πλήκτρο ελέγχου καλεί την αντίστοιχη `handle_<key>()`.
+A `switch` generated from the `CONTROL_INPUT_HANDLERS` X-macro — for every registered control key, it calls the corresponding `handle_<key>()`.
 
-## Χειριστές πλοήγησης (navigation handlers)
+## Navigation handlers
 
 ### `handle_home()` / `handle_end()`
 
-Μετακινούν τον hardware cursor στην αρχή/τέλος της γραμμής (`move_cursor_left_n`/`move_cursor_right_n` στον buffer) και ενημερώνουν τον εσωτερικό δείκτη `cursor` αντίστοιχα.
+Move the hardware cursor to the start/end of the line (`move_cursor_left_n`/`move_cursor_right_n` on the buffer) and update the internal `cursor` pointer accordingly.
 
 ### `handle_arrow_left()` / `handle_arrow_right()`
 
-Καλούν `move_cursor_left()`/`move_cursor_right()` (inline μέθοδοι που απλά μετακινούν τον δείκτη `cursor` κατά μία θέση μέσα στο buffer, αν είναι δυνατόν) και, αν επιτύχει η μετακίνηση, ενημερώνουν οπτικά τον hardware cursor (`go_backwards()`/`go_forward()`).
+Call `move_cursor_left()`/`move_cursor_right()` (inline methods that simply shift the `cursor` pointer by one position within the buffer, if possible) and, if the move succeeds, visually update the hardware cursor (`go_backwards()`/`go_forward()`).
 
 ### `handle_arrow_up()` / `handle_arrow_down()` / `handle_page_up()` / `handle_page_down()`
 
-Επί του παρόντος **κενές υλοποιήσεις** (`return;`) — δεσμευμένες θέσεις (placeholders) για μελλοντική λειτουργικότητα (π.χ. ιστορικό εντολών/command history), χωρίς σήμερα καμία επίδραση.
+Currently **empty implementations** (`return;`) — placeholders for future functionality (e.g. command history), with no effect today.
 
 ### `navigation_key_dispatch(key)` — `[[gnu::regparm(2)]]`
 
-Αντίστοιχο `switch`, παραγόμενο από το X-macro `NAVIGATION_HANDLERS`.
+The corresponding `switch`, generated from the `NAVIGATION_HANDLERS` X-macro.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Το buffer έχει **σταθερό, στατικό μέγεθος** (`input_capacity = 128`) — καμία δυναμική δέσμευση μνήμης δεν εμπλέκεται στην επεξεργασία εισόδου, κατάλληλο για κώδικα πυρήνα πριν ακόμη υπάρχει πλήρως λειτουργικός heap.
-- Η χρήση X-macros (`CONTROL_INPUT_HANDLERS`, `NAVIGATION_HANDLERS`) για την παραγωγή των `switch` blocks αποφεύγει την επανάληψη κώδικα (κάθε νέο πλήκτρο προστίθεται σε **ένα** σημείο, στη λίστα X-macro, και ο handler switch παράγεται αυτόματα).
-- Ο διαχωρισμός "ενημέρωσε το buffer" / "ενημέρωσε την οθόνη" σε κάθε handler ακολουθεί το μοτίβο "πρώτα η λογική κατάσταση, μετά η οπτική αναπαράσταση", διατηρώντας τα δύο συστήματα συγχρονισμένα χωρίς να αναμειγνύεται η λογική τους.
+- The buffer has a **fixed, static size** (`input_capacity = 128`) — no dynamic memory allocation is involved in processing input, appropriate for kernel code before a fully functional heap even exists.
+- The use of X-macros (`CONTROL_INPUT_HANDLERS`, `NAVIGATION_HANDLERS`) to generate the `switch` blocks avoids code duplication (every new key is added in **one** place, the X-macro list, and the dispatch switch is generated automatically).
+- The "first update the buffer, then update the screen" separation in every handler follows the pattern of "logical state first, visual representation second", keeping the two systems in sync without mixing their logic.

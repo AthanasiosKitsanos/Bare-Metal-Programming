@@ -1,26 +1,26 @@
-# `kernel_idt.cpp` — Τεκμηρίωση
+# `kernel_idt.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί τις δύο θεμελιώδεις λειτουργίες διαχείρισης του **Interrupt Descriptor Table (IDT)** σε επίπεδο υλικού x86: τη συγγραφή μιας εγγραφής (gate) στον πίνακα, και τη φόρτωση του πίνακα στον επεξεργαστή μέσω της εντολής `lidt`.
+Implements the two fundamental hardware-level operations for managing the x86 **Interrupt Descriptor Table (IDT)**: writing a single entry (gate) into the table, and loading the table into the CPU via the `lidt` instruction.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `kernel_idt.h`: δηλώνει τις δομές `idt_entry`/`idtr_descriptor` και το δημόσιο API.
-- `<stddef.h>`: για `size_t`.
+- `kernel_idt.h`: declares the `idt_entry`/`idtr_descriptor` structures and the public API.
+- `<stddef.h>`: for `size_t`.
 
-## Ο πίνακας IDT (ανώνυμος χώρος ονομάτων)
+## The IDT array (anonymous namespace)
 
 ```cpp
 constexpr size_t total_entries{256};
 kernel::idt_entry idt_entry_table[total_entries];
 ```
 
-Ο πραγματικός πίνακας IDT ζει ως στατικός πίνακας (static array) περιορισμένος σε αυτό το translation unit — κανένα άλλο αρχείο δεν έχει άμεση πρόσβαση σε αυτόν, μόνο μέσω των δύο δημόσιων συναρτήσεων. Το x86 protected mode υποστηρίζει ακριβώς 256 πιθανά vectors διακοπών, εξ ου και το σταθερό μέγεθος.
+The actual IDT array lives as a static array confined to this translation unit — no other file has direct access to it, only through the two public functions. x86 protected mode supports exactly 256 possible interrupt vectors, hence the fixed size.
 
 ## `set_interrupt_gate(vector, handler_address, selector, type_attributes)`
 
-Γεμίζει **μία** εγγραφή του IDT στη θέση `vector`. Η δομή `idt_entry` (x86 interrupt gate descriptor) χωρίζει τη διεύθυνση του handler σε δύο μισά 16-bit (`offset_low`, `offset_high`) εξαιτίας του ιστορικού σχεδιασμού segmentation του x86:
+Fills **one** IDT entry at position `vector`. The `idt_entry` structure (x86 interrupt gate descriptor) splits the handler's address into two 16-bit halves (`offset_low`, `offset_high`) due to the historical segmented design of x86:
 
 ```cpp
 entry->offset_low = static_cast<uint16_t>(handler_address & 0xFFFFu);
@@ -30,12 +30,12 @@ entry->type_attributes = type_attributes;
 entry->offset_high = static_cast<uint16_t>((handler_address >> 16) & 0xFFFFu);
 ```
 
-- **`offset_low`/`offset_high`**: τα κάτω και άνω 16 bits της 32-bit διεύθυνσης του handler.
-- **`selector`**: ο επιλογέας segment στο GDT που πρέπει να χρησιμοποιηθεί κατά την είσοδο στον handler (συνήθως το kernel code segment, `0x08`).
-- **`zero`**: δεσμευμένο byte, πρέπει να είναι μηδέν σύμφωνα με την αρχιτεκτονική.
-- **`type_attributes`**: κωδικοποιεί τον τύπο gate (interrupt/trap), το DPL (privilege level) και το present bit.
+- **`offset_low`/`offset_high`**: the low and high 16 bits of the handler's 32-bit address.
+- **`selector`**: the GDT segment selector to be used when entering the handler (typically the kernel code segment, `0x08`).
+- **`zero`**: a reserved byte, must be zero per the architecture.
+- **`type_attributes`**: encodes the gate type (interrupt/trap), the DPL (privilege level), and the present bit.
 
-Αυτή η συνάρτηση καλείται μία φορά ανά exception/IRQ κατά την αρχικοποίηση (από το `kernel_exceptions.cpp`), όχι σε hot path, οπότε δεν φέρει ειδικές σημειώσεις βελτιστοποίησης όπως `regparm`.
+This function is called once per exception/IRQ during initialization (from `kernel_exceptions.cpp`), not on a hot path, so it carries no special optimization annotations like `regparm`.
 
 ## `load_idt()`
 
@@ -48,9 +48,9 @@ const idtr_descriptor descriptor
 asm volatile("lidt %0" : : "m"(descriptor) : "memory");
 ```
 
-Χτίζει έναν **περιγραφέα IDTR** (limit + base address) και τον φορτώνει στον επεξεργαστή με την ειδική εντολή assembly `lidt`. Το `limit` είναι το μέγεθος του πίνακα **μείον ένα** (σύμβαση της αρχιτεκτονικής x86: το `limit` είναι η τελευταία έγκυρη byte offset, όχι το συνολικό μέγεθος). Το `"memory"` clobber στο inline assembly ενημερώνει τον compiler ότι αυτή η εντολή μπορεί να επηρεάσει τη μνήμη με τρόπο που δεν μπορεί να προβλεφθεί στατικά, αποτρέποντας επικίνδυνες αναδιατάξεις εντολών (instruction reordering) γύρω από αυτήν.
+Builds an **IDTR descriptor** (limit + base address) and loads it into the CPU via the special `lidt` assembly instruction. The `limit` is the table's size **minus one** (x86 architecture convention: `limit` is the last valid byte offset, not the total size). The `"memory"` clobber in the inline assembly tells the compiler this instruction may affect memory in ways that can't be statically predicted, preventing dangerous instruction reordering around it.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Ο διαχωρισμός σε δύο μικρές, ξεκάθαρες συναρτήσεις (μία για "γράψε μια εγγραφή", μία για "ενεργοποίησε τον πίνακα") ακολουθεί την αρχή του ενιαίου σκοπού (single responsibility): η `kernel_exceptions.cpp` καλεί το `set_interrupt_gate` πολλές φορές σε βρόχο, και το `load_idt` **μία μόνο φορά** στο τέλος, αφού όλες οι εγγραφές έχουν ήδη οριστεί.
-- Ο πίνακας `idt_entry_table` **δεν** αρχικοποιείται ρητά πριν την κλήση των `set_interrupt_gate` — κάθε στοιχείο του παραμένει σε απροσδιόριστη κατάσταση μέχρι να γραφτεί ρητά. Αυτό είναι ασφαλές επειδή το `kernel_exceptions.cpp` καλύπτει **όλα** τα 256 vectors πριν καλέσει `load_idt()` (κάθε γνωστό exception/IRQ, και το `default_interrupt_handler` για όλα τα υπόλοιπα, μέσω του δικού του `g_interrupt_handlers_table` — προσοχή όμως: αυτός ο πίνακας-εγγραφών IDT στο υλικό χρειάζεται να έχει *κάποιο* stub σε κάθε θέση πριν φορτωθεί, ώστε ένα απρόσμενο interrupt να μην οδηγήσει σε ανάγνωση άκυρης εγγραφής IDT).
+- Splitting this into two small, clear functions (one for "write an entry", one for "activate the table") follows the single-responsibility principle: `kernel_exceptions.cpp` calls `set_interrupt_gate` many times in a loop, and `load_idt` only **once**, at the end, after every entry has already been defined.
+- The `idt_entry_table` array is **not** explicitly initialized before the `set_interrupt_gate` calls — every element remains in an undefined state until explicitly written. This is safe because `kernel_exceptions.cpp` covers **all** 256 vectors before calling `load_idt()` (every known exception/IRQ, plus `default_interrupt_handler` for everything else, via its own `g_interrupt_handlers_table` — though note this is a separate, higher-level dispatch table; the raw hardware IDT array itself needs *some* stub at every position before it's loaded, so an unexpected interrupt doesn't end up reading an invalid IDT entry).

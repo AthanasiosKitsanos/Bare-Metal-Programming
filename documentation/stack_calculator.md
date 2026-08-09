@@ -1,17 +1,17 @@
-# `stack_calculator.cpp` — Τεκμηρίωση
+# `stack_calculator.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Αυτό είναι ένα **host-side** εργαλείο (τρέχει στα Windows, μεταγλωττισμένο με κανονικό desktop compiler — **όχι** μέρος της εικόνας του πυρήνα), που υπολογίζει τη **χειρότερη δυνατή περίπτωση (worst-case)** μεγέθους stack που μπορεί να χρειαστεί ο πυρήνας, τόσο για το κανονικό stack (`kernel_main` και ό,τι καλεί) όσο και για το interrupt stack (κατά τη διάρκεια χειρισμού διακοπών). Το εργαλείο διαβάζει αρχεία `.ci` (call-graph αρχεία που παράγει το GCC με `-fdump-ipa-cgraph` ή αντίστοιχο flag) και εκτελεί τοπολογική ταξινόμηση (topological sort) πάνω στο γράφημα κλήσεων (call graph) για να υπολογίσει, για κάθε συνάρτηση, το άθροισμα του δικού της stack frame plus το βαθύτερο μονοπάτι κλήσεων που ξεκινά από αυτήν.
+This is a **host-side** tool (runs on Windows, compiled with a regular desktop compiler — **not** part of the kernel image) that computes the **worst-case** stack size that the kernel might require, both for the regular stack (`kernel_main` and everything it calls) and for the interrupt stack (during interrupt handling). The tool reads `.ci` files (call-graph files produced by GCC via `-fdump-ipa-cgraph` or an equivalent flag) and performs a topological sort over the call graph to compute, for every function, the sum of its own stack frame plus the deepest call-chain path starting from it.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `<iostream>`, `<fstream>`, `<filesystem>`: I/O αρχείων και καταλόγων — επιτρεπτό εδώ επειδή πρόκειται για host tool, **όχι** freestanding kernel κώδικα (εξ ου και η οδηγία του project ότι ο branchless κανόνας/περιορισμοί πυρήνα **δεν** ισχύουν σε αυτό το εργαλείο· εδώ προτιμάται σαφήνεια με απλά `if`).
-- `<vector>`, `<unordered_map>`, `<unordered_set>`: δομές δεδομένων του γράφου κλήσεων.
-- `<charconv>`: `std::from_chars` για γρήγορη, χωρίς εξαιρέσεις (exception-free) ανάλυση αριθμών από κείμενο.
+- `<iostream>`, `<fstream>`, `<filesystem>`: file and directory I/O — acceptable here since this is a host tool, **not** freestanding kernel code (hence the project's guidance that the kernel's branchless rules/constraints do **not** apply to this tool; clarity via plain `if` statements is preferred here).
+- `<vector>`, `<unordered_map>`, `<unordered_set>`: call-graph data structures.
+- `<charconv>`: `std::from_chars` for fast, exception-free number parsing from text.
 - `<algorithm>`: `std::reverse`, `std::max`.
 
-## Σταθερές διαδρομών και ειδικών περιπτώσεων
+## Path constants and special cases
 
 ```cpp
 constexpr const char* path{".../ci_files"};
@@ -20,7 +20,7 @@ constexpr const char* stack_result{".../calc_results.txt"};
 constexpr const char* relationships{".../relationships.txt"};
 ```
 
-Απόλυτες διαδρομές (hardcoded absolute paths) προς τον φάκελο εισόδου (`ci_files`, όπου βρίσκονται τα αρχεία `.ci` που παράγει το GCC για κάθε μεταγλωττισμένη μονάδα) και τα αρχεία εξόδου/βοηθητικά. Αποδεκτό εδώ επειδή είναι εσωτερικό εργαλείο ανάπτυξης (development tool) που τρέχει πάντα στο ίδιο μηχάνημα ανάπτυξης.
+Hardcoded absolute paths to the input folder (`ci_files`, where the `.ci` files produced by GCC for each compiled unit live) and the output/helper files. Acceptable here since this is an internal development tool that always runs on the same development machine.
 
 ```cpp
 constexpr uint32_t undepended_interrupt_methods_size{12};
@@ -29,11 +29,11 @@ constexpr uint32_t depended_interrupt_methods_size{2};
 constexpr const char* depended_interrupt_methods[...] = { ... };
 ```
 
-Αυτοί οι πίνακες περιέχουν τα (mangled) ονόματα των **ριζών** (roots) του γράφου κλήσεων που αντιστοιχούν σε πραγματικούς interrupt handlers (π.χ. `handle_timer_interrupt`, `handle_keyboard_interrupt`, τα SIMD dispatch functions του VGA buffer, κ.λπ.) — το σημείο εκκίνησης για τον υπολογισμό του "χειρότερου δυνατού interrupt stack". Ο διαχωρισμός σε **"undepended"** και **"depended"** αντικατοπτρίζει το γνωστό πρόβλημα κυκλικής εξάρτησης (circular dependency) που περιγράφεται παρακάτω, στο `__indirect_call`.
+These arrays contain the (mangled) names of the **roots** of the call graph that correspond to actual interrupt handlers (e.g. `handle_timer_interrupt`, `handle_keyboard_interrupt`, the VGA buffer's SIMD dispatch functions, etc.) — the starting point for computing the "worst-case interrupt stack". The split into **"undepended"** and **"depended"** reflects the known circular-dependency issue described below, around `__indirect_call`.
 
 ## `reset_input_file(input_file)` — `[[gnu::always_inline]]`
 
-Απλή βοηθητική για `close()` + `clear()` ενός `ifstream`, ώστε το ίδιο stream object να μπορεί να ξαναχρησιμοποιηθεί για το επόμενο αρχείο μέσα στον βρόχο ανάγνωσης, χωρίς να αφήνει bits σφάλματος (error state) από το προηγούμενο άνοιγμα.
+A simple helper that calls `close()` + `clear()` on an `ifstream`, so the same stream object can be reused for the next file in the reading loop, without leftover error-state bits from the previous open.
 
 ## `enum class color`
 
@@ -41,9 +41,9 @@ constexpr const char* depended_interrupt_methods[...] = { ... };
 enum class color: uint8_t { white = 0x00, gray = 0x01, black = 0x02 };
 ```
 
-Τα κλασικά **τρία χρώματα του αλγορίθμου DFS ανίχνευσης κύκλων (cycle detection)** σε γράφους: `white` = δεν έχει επισκεφθεί ακόμη, `gray` = βρίσκεται αυτή τη στιγμή στο ενεργό μονοπάτι αναδρομής (αν ξανασυναντηθεί ένας γκρίζος κόμβος, υπάρχει κύκλος), `black` = έχει ολοκληρωθεί πλήρως η επεξεργασία του.
+The classic **three colors of the DFS cycle-detection algorithm** for graphs: `white` = not yet visited, `gray` = currently on the active recursion path (if a gray node is encountered again, a cycle exists), `black` = fully processed.
 
-## `struct graph_ci` — Κόμβος του γράφου κλήσεων
+## `struct graph_ci` — A call-graph node
 
 ```cpp
 struct alignas(8) graph_ci
@@ -58,37 +58,37 @@ struct alignas(8) graph_ci
 static_assert(sizeof(graph_ci) == 72);
 ```
 
-Κάθε κόμβος αντιπροσωπεύει μία συνάρτηση: `children` είναι η λίστα ονομάτων των συναρτήσεων που καλεί, `frame_size` το μέγεθος του δικού της stack frame (όπως αναφέρεται από το GCC στο αρχείο `.ci`), `dist` η **υπολογισμένη** χειρότερη απόσταση (βαθύτερο δυνατό συνολικό stack) μέχρι αυτόν τον κόμβο κατά την τοπολογική διάσχιση, και `col` η κατάσταση DFS. Ο κατασκευαστής κίνησης (move constructor) είναι ρητά ορισμένος και μηδενίζει τα πεδία του πηγαίου αντικειμένου (`other.frame_size = 0` κ.λπ.) — καλή πρακτική καθαρής κίνησης (clean move semantics), ώστε το "άδειο" αντικείμενο μετά τη μεταφορά να είναι σε προβλέψιμη κατάσταση. Το `static_assert(sizeof(graph_ci) == 72)` είναι μια **εμπειρική επαλήθευση** του μεγέθους της δομής — ακριβώς η αρχή "επαλήθευση, όχι υπόθεση" που διέπει όλο το project: αν κάποια μελλοντική αλλαγή προσθέσει/αφαιρέσει ένα πεδίο, ο compiler θα αποτύχει αμέσως αντί να αφήσει το μέγεθος να αλλάξει σιωπηλά.
+Each node represents a function: `children` is the list of names of functions it calls, `frame_size` is the size of its own stack frame (as reported by GCC in the `.ci` file), `dist` is the **computed** worst-case distance (deepest possible total stack) up to this node during topological traversal, and `col` is the DFS state. The move constructor is explicitly defined and zeroes out the source object's fields (`other.frame_size = 0`, etc.) — good clean move-semantics practice, so the "empty" object after the move is left in a predictable state. The `static_assert(sizeof(graph_ci) == 72)` is an **empirical verification** of the structure's size — exactly the "verify, don't assume" principle that runs through the whole project: if some future change adds/removes a field, the compiler will fail immediately instead of letting the size silently change.
 
 ## `struct node_ci`
 
-Απλή βοηθητική δομή δύο strings (`source_name`, `target_name`) — προσωρινή αναπαράσταση μιας ακμής (edge) κατά την ανάλυση (parsing), πριν προστεθεί στη λίστα `children` του σωστού κόμβου.
+A simple helper structure of two strings (`source_name`, `target_name`) — a temporary representation of an edge during parsing, before it's added to the `children` list of the correct node.
 
-## `std::unordered_map<std::string, graph_ci> u_map` — Ο κύριος γράφος
+## `std::unordered_map<std::string, graph_ci> u_map` — The main graph
 
-Όλοι οι κόμβοι αποθηκεύονται εδώ, με κλειδί το mangled όνομα της συνάρτησης. Η επιλογή `unordered_map` (αντί για `vector`) είναι σκόπιμη: **η σταθερότητα διευθύνσεων (pointer stability)** των στοιχείων ενός `unordered_map` κατά τη διάρκεια rehashing/εισαγωγών είναι εγγυημένη από το πρότυπο C++, κάτι που **δεν** ισχύει για `std::vector` (η επέκταση χωρητικότητας μετακινεί όλα τα στοιχεία). Αυτό επιτρέπει την ασφαλή χρήση ακατέργαστων δεικτών (`graph_ci*`) μέσα στο `topological_order` vector καθ' όλη τη διάρκεια της εκτέλεσης, ακόμη κι αν συνεχίζουν να προστίθενται νέοι κόμβοι στο `u_map`.
+All nodes are stored here, keyed by the function's mangled name. The choice of `unordered_map` (over `vector`) is deliberate: the **pointer stability** of `unordered_map` elements during rehashing/insertion is guaranteed by the C++ standard, which **does not** hold for `std::vector` (growing its capacity moves all elements). This allows safely using raw pointers (`graph_ci*`) inside the `topological_order` vector throughout execution, even as new nodes continue to be added to `u_map`.
 
-## `fdp_unorderd_map(graph, vec)` — Depth-First Search με ανίχνευση κύκλων
+## `fdp_unorderd_map(graph, vec)` — Depth-First Search with cycle detection
 
 ```cpp
 bool fdp_unorderd_map(graph_ci* graph, std::vector<graph_ci*>* vec) noexcept
 ```
 
-Κλασικός αναδρομικός DFS με τρία χρώματα:
-1. Σημειώνει τον τρέχοντα κόμβο ως `gray` (στο ενεργό μονοπάτι).
-2. Για κάθε παιδί: αν είναι `white`, κάνει αναδρομή σε αυτό· αν κατά την αναδρομή βρεθεί κύκλος, διαδίδει `true` προς τα πάνω. Αν το παιδί είναι ήδη `gray`, **βρέθηκε κύκλος** — επιστρέφει `true` αμέσως.
-3. Αν όλα τα παιδιά ολοκληρώθηκαν χωρίς κύκλο, σημειώνει τον κόμβο ως `black` και τον προσθέτει στο διάνυσμα αποτελεσμάτων `vec` — αυτή η σειρά εισαγωγής (κόμβοι εισάγονται **μετά** την ολοκλήρωση όλων των παιδιών τους) είναι η βάση της τοπολογικής ταξινόμησης: όταν αντιστραφεί (`std::reverse`) στο τέλος του `main`, δίνει μια σειρά όπου κάθε κόμβος εμφανίζεται **πριν** από όποιον τον καλεί.
-4. Χρησιμοποιεί δείκτες μέσα στο `children` vector (`start`, `vector_end`) αντί για iterators βασισμένους σε εύρος — απλή, ρητή αριθμητική δεικτών, συνεπής με το στιλ όλου του project.
+A classic three-color recursive DFS:
+1. Marks the current node as `gray` (on the active path).
+2. For each child: if it's `white`, recurse into it; if the recursion finds a cycle, propagate `true` upward. If the child is already `gray`, **a cycle has been found** — return `true` immediately.
+3. If all children complete without a cycle, marks the node `black` and adds it to the result vector `vec` — this insertion order (nodes are inserted **after** all their children finish) is the basis of the topological sort: once reversed (`std::reverse`) at the end of `main`, it yields an ordering where every node appears **before** anyone who calls it.
+4. Uses raw pointers into the `children` vector (`start`, `vector_end`) instead of range-based iterators — plain, explicit pointer arithmetic, consistent with the style of the rest of the project.
 
-## `get_subtree_depth(node)` — Χειρότερη περίπτωση stack ενός υποδέντρου
+## `get_subtree_depth(node)` — Worst-case stack of a subtree
 
 ```cpp
 uint64_t get_subtree_depth(const graph_ci* node) noexcept
 ```
 
-Αναδρομικά υπολογίζει το **μέγιστο** άθροισμα stack frame μεγεθών κατά μήκος οποιουδήποτε μονοπατιού κλήσεων που ξεκινά από τον δοσμένο κόμβο, μέσω `std::max` πάνω σε όλα τα παιδιά. Χρησιμοποιείται ρητά (και όχι το προϋπολογισμένο `dist` από την τοπολογική διάσχιση) για τα σημεία εκκίνησης interrupt handlers και για το `kernel_main` — αφού αυτά είναι οι **ρίζες** του ενδιαφέροντος (δεν χρειάζεται το "άθροισμα από την αρχή του προγράμματος", αλλά το "βάθος από αυτό το σημείο και πέρα").
+Recursively computes the **maximum** sum of stack frame sizes along any call path starting from the given node, via `std::max` over all children. It's used explicitly (rather than the precomputed `dist` from the topological traversal) for interrupt handler roots and for `kernel_main` — since these are the points of interest (there's no need for "the sum from the start of the program", but rather "the depth from this point onward").
 
-## `get_interrupt_stack_size()` — Το πρόβλημα του `__indirect_call`
+## `get_interrupt_stack_size()` — The `__indirect_call` problem
 
 ```cpp
 graph_ci* indirect_call{&u_map.at("__indirect_call")};
@@ -96,43 +96,43 @@ graph_ci* indirect_call{&u_map.at("__indirect_call")};
 indirect_call->frame_size = static_cast<uint32_t>(stack_size);
 ```
 
-Εδώ αντιμετωπίζεται η γνωστή **κυκλική εξάρτηση**: κάποιοι interrupt handlers καλούν έμμεσα (μέσω δεικτών συναρτήσεων, π.χ. `operator<<` στο logging) πίσω στον ίδιο τον μηχανισμό `__indirect_call` του compiler, ο οποίος με τη σειρά του θα μπορούσε θεωρητικά να καλέσει ξανά έναν από τους handlers — ένας πραγματικός κύκλος στο γράφημα κλήσεων που θα έκανε αδύνατη μια απλή τοπολογική ταξινόμηση.
+Here the known **circular dependency** is dealt with: some interrupt handlers indirectly call (via function pointers, e.g. `operator<<` in logging) back into the compiler's own `__indirect_call` mechanism, which in turn could theoretically call back into one of the handlers — a genuine cycle in the call graph that would make a plain topological sort impossible.
 
-Η λύση εδώ είναι μια **διαδικασία δύο περασμάτων (two-pass)**:
-1. **Πρώτο πέρασμα**: υπολογίζεται το `stack_size` πάνω στους ανεξάρτητους κόμβους (`undepended_interrupt_methods`) — αυτοί που δεν εξαρτώνται από το `__indirect_call`. Το αποτέλεσμα ανατίθεται ως το `frame_size` του ίδιου του `__indirect_call` κόμβου.
-2. **Δεύτερο πέρασμα**: τώρα που το `__indirect_call` έχει μια συγκεκριμένη (upper-bound) τιμή `frame_size`, υπολογίζονται και οι κόμβοι που **εξαρτώνται** από αυτό (`depended_interrupt_methods`, π.χ. οι default exception handlers που καλούν μέσω `operator<<`), δίνοντας μια ασφαλή, συντηρητική εκτίμηση χωρίς να χρειάζεται να λυθεί ο πραγματικός κύκλος.
+The solution here is a **two-pass procedure**:
+1. **First pass**: computes `stack_size` over the independent nodes (`undepended_interrupt_methods`) — those that don't depend on `__indirect_call`. The result is assigned as the `frame_size` of the `__indirect_call` node itself.
+2. **Second pass**: now that `__indirect_call` has a concrete (upper-bound) `frame_size` value, the nodes that **do** depend on it are computed (`depended_interrupt_methods`, e.g. the default exception handlers that call through `operator<<`), giving a safe, conservative estimate without needing to actually resolve the real cycle.
 
 ## `main()`
 
-### Φάση 1 — Ανάλυση (Parsing) των αρχείων `.ci`
+### Phase 1 — Parsing the `.ci` files
 
-Διατρέχει κάθε αρχείο μέσα στον φάκελο `ci_files` και διαβάζει γραμμή προς γραμμή:
-- Γραμμές που ξεκινούν με `"node"`: αναλύει το όνομα της συνάρτησης (μέσα σε εισαγωγικά) και το μέγεθος του stack frame (μετά το `"\\n"` literal μέσα στη γραμμή, χαρακτηριστικό format του GCC dump), χρησιμοποιώντας χειροκίνητη ανάλυση δεικτών χαρακτήρων (`current_char`) και `std::from_chars` για τη μετατροπή αριθμού — γρηγορότερο και χωρίς εξαιρέσεις σε σχέση με `std::stoi`. Αν το όνομα υπάρχει ήδη (η ίδια συνάρτηση εμφανίζεται σε πολλαπλά αρχεία `.ci`, π.χ. λόγω inlining ή πολλαπλών dump αρχείων), **αθροίζει** τα μεγέθη frame αντί να τα αντικαταστήσει.
-- Γραμμές που ξεκινούν με `"edge"`: αναλύει πηγή και προορισμό μιας ακμής κλήσης, και — **μόνο αν η πηγή είναι ήδη γνωστός κόμβος** — προσθέτει τον προορισμό στη λίστα `children` της πηγής.
+Walks every file inside the `ci_files` folder and reads line by line:
+- Lines starting with `"node"`: parses the function's name (inside quotes) and the stack frame size (after the `"\\n"` literal embedded in the line, characteristic of GCC's dump format), using manual character-pointer parsing (`current_char`) and `std::from_chars` for the number conversion — faster and exception-free compared to `std::stoi`. If the name already exists (the same function appears in multiple `.ci` files, e.g. due to inlining or multiple dump files), it **sums** the frame sizes rather than replacing them.
+- Lines starting with `"edge"`: parses the source and target of a call edge, and — **only if the source is already a known node** — appends the target to the source's `children` list.
 
-### Φάση 2 — Τοπολογική ταξινόμηση
+### Phase 2 — Topological sort
 
-Καλεί `fdp_unorderd_map` για κάθε μη-επισκεφθέντα κόμβο (`color::white`), συλλέγοντας το αποτέλεσμα στο `topological_order`, και αναφέρει αν βρέθηκε κύκλος. Στη συνέχεια αντιστρέφει τη σειρά (`std::reverse`) ώστε κάθε κόμβος να προηγείται των κόμβων που τον καλούν.
+Calls `fdp_unorderd_map` for every unvisited node (`color::white`), collecting the result into `topological_order`, and reports whether a cycle was found. It then reverses the order (`std::reverse`) so every node precedes the nodes that call it.
 
-### Φάση 3 — Υπολογισμός `dist` μέσω "χαλάρωσης ακμών" (edge relaxation)
+### Phase 3 — Computing `dist` via edge relaxation
 
 ```cpp
 for(; topological_current < topological_end; ++topological_current)
 {
     topological_dist = (*topological_current)->dist;
     ...
-    for(κάθε παιδί) temp_child->dist = std::max(temp_child->dist, topological_dist + temp_child->frame_size);
+    for(each child) temp_child->dist = std::max(temp_child->dist, topological_dist + temp_child->frame_size);
 }
 ```
 
-Κλασικός αλγόριθμος **longest path σε DAG (Directed Acyclic Graph) μέσω τοπολογικής ταξινόμησης**: επειδή η σειρά επεξεργασίας εγγυάται ότι κάθε κόμβος επεξεργάζεται **πριν** από όσους καλεί, το `dist` κάθε παιδιού μπορεί να ενημερωθεί με σιγουριά με βάση το ήδη-οριστικοποιημένο `dist` του γονέα — ίδια λογική με τον αλγόριθμο συντομότερου μονοπατιού Bellman-Ford σε DAG, αλλά για **μέγιστο** αντί για ελάχιστο μονοπάτι.
+A classic **longest path in a DAG (Directed Acyclic Graph) via topological sort** algorithm: because the processing order guarantees every node is processed **before** anyone it calls, each child's `dist` can be safely updated based on its parent's already-finalized `dist` — the same logic as the Bellman-Ford shortest-path algorithm on a DAG, but for the **maximum** instead of the minimum path.
 
-### Φάση 4 — Τελικός υπολογισμός και εγγραφή αποτελεσμάτων
+### Phase 4 — Final computation and writing the results
 
-Υπολογίζει το `interrupt_stack` (μέσω `get_interrupt_stack_size()`) και το `kernel_stack` (μέσω `get_subtree_depth` ξεκινώντας από το `"kernel_main"`), και τα γράφει σε ένα αρχείο κειμένου (`calc_results.txt`), ανοιγμένο ρητά σε **binary mode** (`std::ios::binary`) — αυτή είναι η γνωστή προστασία από αλλοίωση CRLF στα Windows: χωρίς binary mode, το `std::ofstream` θα μετέτρεπε αυτόματα κάθε `'\n'` σε `"\r\n"`, κάτι που θα μπέρδευε το εργαλείο ανάγνωσης αριθμών (shell tools/Makefile) που περιμένει καθαρά `'\n'`.
+Computes `interrupt_stack` (via `get_interrupt_stack_size()`) and `kernel_stack` (via `get_subtree_depth` starting from `"kernel_main"`), and writes them to a text file (`calc_results.txt`), explicitly opened in **binary mode** (`std::ios::binary`) — this is the known protection against CRLF corruption on Windows: without binary mode, `std::ofstream` would automatically convert every `'\n'` into `"\r\n"`, which would confuse the number-reading tool (shell tools/Makefile) that expects plain `'\n'`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Αν και είναι μέρος του ίδιου project, αυτό το αρχείο **δεν** ακολουθεί τους περιορισμούς branchless/freestanding του πυρήνα — χρησιμοποιεί ελεύθερα STL containers, εξαιρέσεις (μέσω `std::filesystem`), και απλά `if` statements, όπως αρμόζει σε ένα host-side εργαλείο ανάπτυξης όπου η σαφήνεια προτιμάται ρητά από την ακραία απόδοση.
-- `std::ios::sync_with_stdio(false)` και `std::cin.tie(nullptr)` στην αρχή του `main` είναι τυπικές βελτιστοποιήσεις I/O για C++ προγράμματα με έντονη χρήση stream (εδώ, ωστόσο, χρησιμοποιείται κυρίως αρχεία, όχι stdin/stdout, οπότε το όφελος είναι περιορισμένο αλλά αβλαβές).
-- Η χρήση `.at()` αντί για `operator[]` σε όλα τα σημεία ανάγνωσης (`u_map.at(...)`) — αντίθετα με τα σημεία εγγραφής, όπου `operator[]` είναι σκόπιμο — αντανακλά τη γνωστή αρχή του project: `operator[]` σε `unordered_map` εισάγει σιωπηλά ένα "φάντασμα" κόμβο αν το κλειδί δεν υπάρχει, κάτι ανεπιθύμητο κατά την ανάγνωση.
+- Although part of the same project, this file deliberately **does not** follow the kernel's branchless/freestanding constraints — it freely uses STL containers, exceptions (via `std::filesystem`), and plain `if` statements, as appropriate for a host-side development tool where clarity is explicitly preferred over extreme performance.
+- `std::ios::sync_with_stdio(false)` and `std::cin.tie(nullptr)` at the start of `main` are standard I/O optimizations for stream-heavy C++ programs (here, though, mostly file I/O rather than stdin/stdout is used, so the benefit is limited but harmless).
+- The use of `.at()` instead of `operator[]` at every read site (`u_map.at(...)`) — as opposed to the write sites, where `operator[]` is used deliberately — reflects the project's well-known principle: `operator[]` on an `unordered_map` silently inserts a "phantom" node if the key doesn't exist, which is undesirable during reads.

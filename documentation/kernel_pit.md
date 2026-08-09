@@ -1,16 +1,16 @@
-# `kernel_pit.cpp` — Τεκμηρίωση
+# `kernel_pit.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Αρχικοποιεί το **PIT (Programmable Interval Timer, chip 8253/8254)** στο κανάλι 0, ρυθμίζοντάς το να παράγει IRQ0 με μια επιθυμητή συχνότητα (Hz), μέσα σε ένα υποστηριζόμενο εύρος.
+Initializes the **PIT (Programmable Interval Timer, 8253/8254 chip)** on channel 0, configuring it to produce IRQ0 at a desired frequency (Hz), within a supported range.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `kernel_pit.h`: δημόσιο API.
+- `kernel_pit.h`: public API.
 - `internals/terminal_io_registers.h`: `inb`/`outb`.
-- `kernel/logger/kernel_logger.h`: αναφορά κρίσιμου σφάλματος αν η αρχικοποίηση αποτύχει.
+- `kernel/logger/kernel_logger.h`: reporting a critical error if initialization fails.
 
-## Σταθερές
+## Constants
 
 ```cpp
 constexpr uint32_t input_frequency{1193182};
@@ -20,25 +20,25 @@ constexpr uint16_t channel_0_data_port{0x40}; constexpr uint16_t command_port{0x
 constexpr uint8_t channel_0_lobyte_hibyte_mode_3_binary{0x36};
 ```
 
-- `input_frequency = 1193182`: η **σταθερή** εσωτερική συχνότητα ρολογιού του PIT chip (περίπου 1.193182 MHz), καθορισμένη από το ίδιο το υλικό — δεν αλλάζει ποτέ.
-- `min_divisor`/`max_divisor`: το PIT δέχεται διαιρέτη (divisor) 16-bit (1–65535). Διαιρέτης 0 ερμηνεύεται από το υλικό ως 65536, γι' αυτό αποκλείεται ρητά εδώ για απλότητα/σαφήνεια.
-- `min_supported_frequency`/`max_supported_frequency`: τεχνητό όριο **αυτού** του πυρήνα (20–100 Hz) — όχι όριο του υλικού, αλλά μια λογική επιλογή σχεδίασης ώστε ο timer να μην τρέχει υπερβολικά γρήγορα (σπαταλώντας κύκλους CPU σε interrupts) ούτε πολύ αργά (χάνοντας ακρίβεια χρονισμού).
-- `0x36`: εντολή κατάστασης PIT — κανάλι 0, πρόσβαση lobyte/hibyte και οι δύο, mode 3 (square wave generator), δυαδική (όχι BCD) μέτρηση.
+- `input_frequency = 1193182`: the **fixed** internal clock frequency of the PIT chip (approximately 1.193182 MHz), determined by the hardware itself — it never changes.
+- `min_divisor`/`max_divisor`: the PIT accepts a 16-bit divisor (1–65535). A divisor of 0 is interpreted by the hardware as 65536, which is why it's explicitly excluded here for simplicity/clarity.
+- `min_supported_frequency`/`max_supported_frequency`: an artificial limit of **this** kernel (20–100 Hz) — not a hardware limit, but a deliberate design choice so the timer neither runs too fast (wasting CPU cycles on interrupts) nor too slow (losing timing accuracy).
+- `0x36`: the PIT command byte — channel 0, access mode lobyte/hibyte (both), mode 3 (square wave generator), binary (not BCD) counting.
 
 ## `initialize_pit(frequency)`
 
-1. **Έλεγχος ορίων**: αν η ζητούμενη συχνότητα είναι εκτός `[20, 100]`, καλεί `log.panic(...)` — δεν έχει νόημα να συνεχιστεί η εκκίνηση με λανθασμένη ρύθμιση χρονισμού, αφού όλα τα υπόλοιπα υποσυστήματα (sleep, uptime) εξαρτώνται από αυτόν.
-2. **Υπολογισμός διαιρέτη με στρογγυλοποίηση (rounding)**:
+1. **Bounds check**: if the requested frequency is outside `[20, 100]`, calls `log.panic(...)` — there's no point continuing boot with an incorrect timing setup, since every other subsystem (sleep, uptime) depends on it.
+2. **Divisor computation with rounding**:
 
    ```cpp
    const uint32_t divisor_32{(input_frequency + frequency / 2) / frequency};
    ```
 
-   Αντί για απλή ακέραια διαίρεση `input_frequency / frequency` (που θα έστρωνε πάντα προς τα κάτω, truncation), προστίθεται `frequency / 2` πριν τη διαίρεση — το κλασικό τέχνασμα **στρογγυλοποίησης ακέραιας διαίρεσης στο πλησιέστερο ακέραιο** αντί για περικοπή προς τα κάτω, ελαχιστοποιώντας το σφάλμα ανάμεσα στη ζητούμενη και την πραγματική συχνότητα που θα παραχθεί.
-3. **Δεύτερος έλεγχος ορίων** στον υπολογισμένο διαιρέτη (`[1, 0xFFFF]`) — προστασία ακόμη κι αν κάποια μελλοντική αλλαγή στα όρια συχνότητας άφηνε ένα ασυνεπές (inconsistent) συνδυασμό τιμών.
-4. **Αποστολή εντολής και διαιρέτη**: εντολή κατάστασης (`0x36`), μετά το χαμηλό byte και το υψηλό byte του διαιρέτη, με τη σειρά που απαιτεί το πρωτόκολλο lobyte/hibyte του PIT.
+   Instead of a plain integer division `input_frequency / frequency` (which would always round down, truncation), `frequency / 2` is added before dividing — the classic trick for **rounding an integer division to the nearest integer** rather than truncating downward, minimizing the error between the requested and actually-produced frequency.
+3. **Second bounds check** on the computed divisor (`[1, 0xFFFF]`) — a safeguard in case some future change to the frequency bounds left an inconsistent combination of values.
+4. **Sends the command and divisor**: the command byte (`0x36`), then the low byte and high byte of the divisor, in the order required by the PIT's lobyte/hibyte protocol.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Ο κώδικας εδώ τρέχει **μία φορά** κατά την εκκίνηση, πριν ενεργοποιηθούν οι διακοπές — δεν υπάρχει ανάγκη για `regparm` ή άλλες μικρο-βελτιστοποιήσεις hot-path.
-- Ο έλεγχος ορίων συχνότητας πριν από κάθε υπολογισμό ακολουθεί την αρχή "αποτυχία γρήγορα και με σαφήνεια" (fail-fast): καλύτερα ένα ελεγχόμενο `panic` με σαφές μήνυμα, παρά ένας PIT που τρέχει με απροσδιόριστη ή παράλογη συχνότητα.
+- The code here runs **once**, at boot, before interrupts are enabled — there's no need for `regparm` or other hot-path micro-optimizations.
+- Checking frequency bounds before every computation follows the "fail fast and clearly" principle: a controlled `panic` with a clear message is far better than a PIT running at an undefined or nonsensical frequency.

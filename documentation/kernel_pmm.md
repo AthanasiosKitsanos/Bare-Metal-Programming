@@ -1,21 +1,21 @@
-# `kernel_pmm.cpp` — Τεκμηρίωση
+# `kernel_pmm.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί τον **Physical Memory Manager (PMM)**: έναν διαχειριστή φυσικής μνήμης βασισμένο σε bitmap (bitmap allocator). Κάθε bit του bitmap αντιστοιχεί σε ένα πλαίσιο μνήμης (frame) των 4096 bytes. Σύμβαση bit encoding: **bit = 0 σημαίνει ελεύθερο πλαίσιο, bit = 1 σημαίνει κατειλημμένο**.
+Implements the **Physical Memory Manager (PMM)**: a bitmap-based physical memory allocator. Each bit of the bitmap corresponds to one memory frame of 4096 bytes. Bit encoding convention: **bit = 0 means free frame, bit = 1 means occupied**.
 
-Το αρχείο προσφέρει:
-- Αρχικοποίηση του bitmap πάνω από τον e820 memory map (`pmm_initialize`).
-- Δέσμευση/αποδέσμευση ενός μεμονωμένου πλαισίου (`pmm_allocate_frame` / `pmm_free_frame`).
-- Δέσμευση/αποδέσμευση **συνεχόμενων** πλαισίων (`pmm_allocate_contiguous_frames` / `pmm_free_contiguous_frames`), απαραίτητων για DMA buffers ή δομές που χρειάζονται φυσική συνέχεια.
-- Στατιστικά (`pmm_total_frames`, `pmm_used_frames`, `pmm_free_frames`).
+The file provides:
+- Bitmap initialization on top of the e820 memory map (`pmm_initialize`).
+- Allocation/deallocation of a single frame (`pmm_allocate_frame` / `pmm_free_frame`).
+- Allocation/deallocation of **contiguous** frames (`pmm_allocate_contiguous_frames` / `pmm_free_contiguous_frames`), needed for DMA buffers or structures that require physical contiguity.
+- Statistics (`pmm_total_frames`, `pmm_used_frames`, `pmm_free_frames`).
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `memory/pmm/kernel_pmm.h`: δηλώσεις δημόσιου API, `frame_size = 4096`, `pmm_result`.
+- `memory/pmm/kernel_pmm.h`: public API declarations, `frame_size = 4096`, `pmm_result`.
 - `memory/e820/kernel_e820.h`: `e820_entry`, `e820_memory_map`, `e820_memory_type`.
 
-## Εσωτερικές δομές (ανώνυμος χώρος ονομάτων)
+## Internal structures (anonymous namespace)
 
 ### `bit_n_byte`
 
@@ -23,7 +23,7 @@
 struct bit_n_byte { size_t byte_index; uint8_t bit_index; };
 ```
 
-Αναπαριστά μια θέση bit μέσα στο bitmap, χωρισμένη σε δείκτη byte (`byte_index`) και θέση bit μέσα σε αυτό το byte (`bit_index`, 0–7). Ορίζει επίσης `operator<` για λεξικογραφική σύγκριση δύο θέσεων — χρησιμοποιείται για να ελεγχθεί αν μια ζητούμενη διεύθυνση βρίσκεται *κάτω* από το κατώτερο επιτρεπτό όριο (`lower_limit`) του bitmap.
+Represents a bit position inside the bitmap, split into a byte index (`byte_index`) and a bit position within that byte (`bit_index`, 0–7). It also defines `operator<` for lexicographic comparison of two positions — used to check whether a requested address lies *below* the bitmap's lower allowed bound (`lower_limit`).
 
 ### `bitmap`
 
@@ -37,10 +37,10 @@ struct bitmap
 };
 ```
 
-- `start`: αρχή του πίνακα bitmap στη μνήμη (τοποθετείται αμέσως μετά το τέλος του πυρήνα, `kernel_end`).
-- `search_begin`: **δρομέας βελτιστοποίησης (optimization cursor)** — το σημείο από όπου ξεκινά η επόμενη αναζήτηση ελεύθερου πλαισίου. Μετακινείται προς τα εμπρός καθώς δεσμεύονται πλαίσια, ώστε να μην ξαναδιατρέχεται (rescan) η αρχή του bitmap κάθε φορά. Μετακινείται προς τα πίσω όταν ένα πλαίσιο ελευθερώνεται σε μικρότερη διεύθυνση απ' ό,τι δείχνει.
-- `end`: το τέλος του πίνακα bitmap.
-- `lower_limit`: το χαμηλότερο έγκυρο bit index — προστατεύει από αποδέσμευση (free) πλαισίων που ανήκουν στο ίδιο το bitmap ή σε μη-χρησιμοποιήσιμη μνήμη κάτω από αυτό.
+- `start`: start of the bitmap array in memory (placed right after the end of the kernel, `kernel_end`).
+- `search_begin`: **optimization cursor** — the point from which the next free-frame search begins. It advances as frames get allocated, so the beginning of the bitmap is never rescanned every time. It moves backward when a frame is freed at a lower address than it currently points to.
+- `end`: end of the bitmap array.
+- `lower_limit`: the lowest valid bit index — protects against freeing frames that belong to the bitmap itself or to non-usable memory below it.
 
 ### Global state
 
@@ -50,26 +50,26 @@ size_t g_total_frames{0};
 bitmap g_bitmap{};
 ```
 
-Global μεταβλητές μεταγλωττιστικής μονάδας (translation-unit–local globals), προσβάσιμες μόνο εντός αυτού του αρχείου· αποκρύπτουν την εσωτερική κατάσταση του PMM από τον έξω κόσμο (encapsulation μέσω ανώνυμου namespace αντί για class).
+Translation-unit-local globals, accessible only within this file — they hide the PMM's internal state from the outside world (encapsulation via anonymous namespace instead of a class).
 
-## Βοηθητικές `constexpr`/`inline` συναρτήσεις
+## Helper `constexpr`/`inline` functions
 
-- **`get_power_of_two(size)`** *(constexpr)*: υπολογίζει, σε compile time, το \\(\log_2\\) ενός μεγέθους (π.χ. 4096 → 12). Χρησιμοποιείται για να παραχθεί το `frame_size_bit_mask`, ώστε οι μετατροπές διεύθυνσης→δείκτη πλαισίου να γίνονται με ολίσθηση bit (`>>`) αντί για διαίρεση.
-- **`frame_index(address)`**: `address >> frame_size_bit_mask` — δίνει τον αριθμό πλαισίου (frame number) από μια φυσική διεύθυνση.
-- **`frame_address(index)`**: το αντίστροφο· `index << frame_size_bit_mask`.
-- **`get_bit_n_byte(index)`**: μετατρέπει έναν αριθμό πλαισίου σε ζεύγος `{byte_index, bit_index}` μέσα στο bitmap, μέσω `index >> 3` (byte) και `index & 7` (bit).
-- **`is_frame_used(pair)`**: ελέγχει αν το αντίστοιχο bit είναι 1.
-- **`set_frame_used(pair)` / `set_frame_free(pair)`**: θέτουν/καθαρίζουν το bit ενός **μεμονωμένου** πλαισίου και ενημερώνουν το `g_used_frames`.
-- **`max(entry)`**: επιστρέφει `base + length` μιας εγγραφής e820 — δηλαδή τη διεύθυνση-τέλος (exclusive end) της περιοχής.
-- **`leading_zeros` / `trailing_zeros`**: wrappers γύρω από τα built-ins `__builtin_clz`/`__builtin_ctz` του GCC, εξειδικευμένα για τιμές `uint8_t` (ένα byte του bitmap).
+- **`get_power_of_two(size)`** *(constexpr)*: computes, at compile time, the \\(\log_2\\) of a size (e.g. 4096 → 12). Used to produce `frame_size_bit_mask`, so address↔frame-index conversions are done via bit shifts (`>>`) instead of division.
+- **`frame_index(address)`**: `address >> frame_size_bit_mask` — gives the frame number from a physical address.
+- **`frame_address(index)`**: the inverse; `index << frame_size_bit_mask`.
+- **`get_bit_n_byte(index)`**: converts a frame number into a `{byte_index, bit_index}` pair inside the bitmap, via `index >> 3` (byte) and `index & 7` (bit).
+- **`is_frame_used(pair)`**: checks whether the corresponding bit is 1.
+- **`set_frame_used(pair)` / `set_frame_free(pair)`**: set/clear the bit for a **single** frame and update `g_used_frames`.
+- **`max(entry)`**: returns `base + length` of an e820 entry — i.e. the (exclusive) end address of the region.
+- **`leading_zeros` / `trailing_zeros`**: wrappers around GCC's `__builtin_clz`/`__builtin_ctz` built-ins, specialized for `uint8_t` values (one bitmap byte).
 
-## Εύρεση "θαμμένων" ελεύθερων ακολουθιών μέσα σε ένα byte
+## Finding "buried" free runs inside a byte
 
 ### `find_buried_run_packed(value)` *(constexpr)*
 
-Δέχεται μια τιμή byte (8 bits, όπου 1 = κατειλημμένο) και ψάχνει, **αποκλειστικά στα bits 1 έως 6** (τα ενδιάμεσα, χωρίς τα άκρα 0 και 7), το μεγαλύτερο συνεχόμενο run από μηδενικά bits (δηλαδή ελεύθερα πλαίσια) που είναι πλήρως "θαμμένο" μέσα στο byte — όχι στα άκρα, γιατί τα άκρα καλύπτονται ήδη από τους ξεχωριστούς ελέγχους `trailing_zeros`/`leading_zeros`. Επιστρέφει ένα πακεταρισμένο (packed) byte: τα πάνω 4 bits είναι η θέση (`position`) και τα κάτω 4 bits το μήκος (`length`) του καλύτερου run, ή `0` αν δεν υπάρχει run μήκους > 1.
+Takes a byte value (8 bits, where 1 = occupied) and searches, **exclusively over bits 1 through 6** (the middle bits, excluding the edges 0 and 7), for the longest contiguous run of zero bits (i.e. free frames) that is fully "buried" inside the byte — not at the edges, since the edges are already covered by the separate `trailing_zeros`/`leading_zeros` checks. It returns a packed byte: the top 4 bits are the `position`, the bottom 4 bits are the `length` of the best run, or `0` if no run of length > 1 exists.
 
-Ο υπολογισμός γίνεται **σκόπιμα χωρίς branches (branchless)** μέσα στον βρόχο, μέσω πολλαπλασιασμού με boolean συνθήκες αντί για `if`, παρότι πρόκειται για `constexpr` συνάρτηση compile time (δεν τρέχει ποτέ ως runtime κώδικας). Το σχόλιο στον κώδικα το εξηγεί ρητά: γίνεται έτσι **μόνο για εξάσκηση** (practicing), όχι επειδή απαιτείται απόδοση σε compile time.
+The computation is **deliberately branchless** inside the loop, via multiplication by boolean conditions instead of `if`, even though this is a `constexpr` compile-time function (it never runs as runtime code). The code comment says so explicitly: it's done this way **purely for practice**, not because compile-time performance requires it.
 
 ### `buried_zeros_lut` (Look-Up Table)
 
@@ -77,67 +77,67 @@ Global μεταβλητές μεταγλωττιστικής μονάδας (tra
 constexpr byte_lut buried_zeros_lut{};
 ```
 
-Πίνακας 256 στοιχείων, γεμισμένος πλήρως σε compile time καλώντας `find_buried_run_packed` για κάθε δυνατή τιμή byte (0–255). Στο runtime, η αναζήτηση buried run μέσα σε ένα byte γίνεται με **μία απλή προσπέλαση πίνακα (table lookup)**, O(1), αντί για βρόχο. Είναι ένα κλασικό παράδειγμα ανταλλαγής χώρου για ταχύτητα (space-for-time trade-off), κατάλληλο για hot-path kernel κώδικα.
+A 256-entry table, fully populated at compile time by calling `find_buried_run_packed` for every possible byte value (0–255). At runtime, searching for a buried run inside a byte becomes a **single table lookup**, O(1), instead of a loop. A classic example of trading space for speed, appropriate for hot-path kernel code.
 
-## Μάσκες για μαζική (bulk) ενημέρωση bits
+## Masks for bulk bit updates
 
-- **`front_byte_mask_used(bit_pos)`** = `0xFF << bit_pos`: μάσκα που καλύπτει από τη θέση `bit_pos` μέχρι το τέλος του byte (χρήσιμη όταν ένα εύρος αρχίζει μέσα σε ένα byte).
-- **`back_byte_mask_used(bit_end_pos)`** = `0xFF >> (7 - bit_end_pos)`: μάσκα που καλύπτει από την αρχή του byte μέχρι τη θέση `bit_end_pos` (χρήσιμη όταν ένα εύρος τελειώνει μέσα σε ένα byte).
-- **`set_frames_in_byte_used` / `set_frames_in_byte_free`**: εφαρμόζουν μια μάσκα σε ένα byte του bitmap (`|=` για δέσμευση, `&=` για αποδέσμευση) και ενημερώνουν το `g_used_frames` κατά το πλήθος πλαισίων (`frames`) που άλλαξαν.
-- **`mark_whole_byte_used` / `mark_whole_byte_free`**: γρήγορη διαδρομή (fast path) όταν ένα ολόκληρο byte (8 πλαίσια) βρίσκεται εξ ολοκλήρου εντός του ζητούμενου εύρους — γράφουν απευθείας `0xFF`/`0x00` χωρίς μάσκα.
-- **`front_byte_free_mask` / `back_byte_free_mask`**: αντίστοιχες μάσκες αλλά για τη λογική AND της αποδέσμευσης (θέλουμε τα bits εκτός εύρους να **παραμείνουν ως έχουν**, άρα η μάσκα έχει άσσους έξω από το εύρος και μηδενικά μέσα σε αυτό — αντίστροφη λογική από τις μάσκες δέσμευσης).
+- **`front_byte_mask_used(bit_pos)`** = `0xFF << bit_pos`: a mask covering from position `bit_pos` to the end of the byte (useful when a range starts inside a byte).
+- **`back_byte_mask_used(bit_end_pos)`** = `0xFF >> (7 - bit_end_pos)`: a mask covering from the start of the byte to position `bit_end_pos` (useful when a range ends inside a byte).
+- **`set_frames_in_byte_used` / `set_frames_in_byte_free`**: apply a mask to a bitmap byte (`|=` for allocation, `&=` for deallocation) and update `g_used_frames` by the number of frames (`frames`) that changed.
+- **`mark_whole_byte_used` / `mark_whole_byte_free`**: fast path for when an entire byte (8 frames) falls fully within the requested range — write `0xFF`/`0x00` directly with no mask.
+- **`front_byte_free_mask` / `back_byte_free_mask`**: the corresponding masks but for the AND logic used when freeing (bits outside the range must stay untouched, so the mask has ones outside the range and zeros inside it — the inverse logic of the allocation masks).
 
-## Δημόσιο API (namespace `kernel::memory`)
+## Public API (namespace `kernel::memory`)
 
 ### `pmm_total_frames()`, `pmm_used_frames()`, `pmm_free_frames()`
 
-Απλές getter συναρτήσεις πάνω στα globals. `pmm_free_frames()` υπολογίζεται ως `total - used` αντί να διατηρείται ξεχωριστός μετρητής — αποφεύγει data duplication (θα μπορούσε να αποσυγχρονιστεί).
+Simple getters over the globals. `pmm_free_frames()` is computed as `total - used` rather than keeping a separate counter — avoids data duplication (which could get out of sync).
 
 ### `pmm_initialize(map, kernel_start, kernel_end)`
 
-Σημειωμένη με `[[gnu::regparm(3)]]` (και τα τρία ορίσματα περνάνε μέσω registers αντί για stack, μειώνοντας το overhead κλήσης).
+Marked `[[gnu::regparm(3)]]` (all three arguments pass through registers instead of the stack, reducing call overhead).
 
-Βήματα:
-1. **Εύρεση της μέγιστης διεύθυνσης** που αναφέρεται σε ολόκληρο τον e820 χάρτη (ακόμη και σε μη-χρησιμοποιήσιμες περιοχές), ώστε να προσδιοριστεί πόσα bits συνολικά χρειάζεται το bitmap (`g_total_frames`).
-2. **Τοποθέτηση του bitmap** αμέσως μετά το `kernel_end` — έτσι το bitmap "κάθεται" φυσικά πάνω στη μνήμη ακριβώς μετά την εικόνα του πυρήνα, χωρίς να χρειάζεται ξεχωριστός allocator (chicken-and-egg πρόβλημα: ο PMM δεν μπορεί να δεσμεύσει μνήμη για τον εαυτό του πριν αρχικοποιηθεί).
-3. **Αρχικό γέμισμα του bitmap με όλα τα bits σε 1** (όλα κατειλημμένα), σε τρία περάσματα για ταχύτητα:
-   - Byte-by-byte μέχρι να επιτευχθεί ευθυγράμμιση 4 bytes (alignment).
-   - Μαζικό γράψιμο `0xFFFFFFFF` σε 32-bit λέξεις (4 bytes τη φορά) για το ευθυγραμμισμένο τμήμα.
-   - Byte-by-byte για το τυχόν υπόλοιπο στο τέλος.
+Steps:
+1. **Find the highest address** referenced anywhere in the e820 map (even in non-usable regions), to determine how many bits the bitmap needs in total (`g_total_frames`).
+2. **Place the bitmap** right after `kernel_end` — so the bitmap naturally "sits" in physical memory right after the kernel image, with no need for a separate allocator (chicken-and-egg problem: the PMM can't allocate memory for itself before it's initialized).
+3. **Initially fill the bitmap with all bits set to 1** (everything occupied), in three passes for speed:
+   - Byte-by-byte until 4-byte alignment is reached.
+   - Bulk-write `0xFFFFFFFF` in 32-bit words (4 bytes at a time) for the aligned portion.
+   - Byte-by-byte for any remainder at the end.
 
-   Αυτό είναι ένα κλασικό μοτίβο "head/body/tail" για γρήγορο γέμισμα μνήμης με ευθυγράμμιση, ανάλογο στη φιλοσοφία με τα SIMD dispatch functions του VGA buffer, αλλά εδώ σε επίπεδο 32-bit λέξεων αντί για SIMD registers.
-4. **Καταγραφή του `search_begin`/`lower_limit`** στο τέλος του ίδιου του bitmap, ώστε καμία μελλοντική αναζήτηση ή αποδέσμευση να μην μπορεί να "χτυπήσει" πλαίσια πριν από αυτό το σημείο (εκεί βρίσκεται ο πυρήνας + το ίδιο το bitmap).
-5. **Διάσχιση του e820 χάρτη**: για κάθε εγγραφή τύπου `usable`, σημειώνει τα αντίστοιχα πλαίσια ως **ελεύθερα** (`set_frame_free`), ανά 4096 bytes.
-6. **Επανακάλυψη της περιοχής του πυρήνα**: επειδή το βήμα 5 μπορεί να έχει ελευθερώσει (λανθασμένα) πλαίσια που στην πραγματικότητα καταλαμβάνει ο πυρήνας (αφού ο e820 δεν ξέρει πού φορτώθηκε ο πυρήνας μέσα σε μια `usable` περιοχή), το τελευταίο βήμα ξαναπερνά από `kernel_start` έως το τέλος του bitmap και ξαναδεσμεύει (`set_frame_used`) όποιο πλαίσιο δεν είναι ήδη κατειλημμένο.
+   This is a classic "head/body/tail" pattern for fast, alignment-aware memory filling, similar in spirit to the VGA buffer's SIMD dispatch functions, but here operating at the level of 32-bit words instead of SIMD registers.
+4. **Record `search_begin`/`lower_limit`** at the end of the bitmap itself, so no future search or free operation can ever "hit" frames before this point (that's where the kernel + the bitmap itself live).
+5. **Walk the e820 map**: for every entry of type `usable`, mark the corresponding frames as **free** (`set_frame_free`), in 4096-byte steps.
+6. **Re-cover the kernel's own region**: because step 5 may have (incorrectly) freed frames that the kernel actually occupies (since e820 has no idea where the kernel was loaded inside a `usable` region), the final step walks from `kernel_start` to the end of the bitmap and re-marks (`set_frame_used`) any frame not already occupied.
 
 ### `pmm_allocate_frame()`
 
-Αναζητά, ξεκινώντας από `search_begin`, το πρώτο byte που δεν είναι `0xFF` (δηλαδή έχει τουλάχιστον ένα ελεύθερο bit). Μέσα σε αυτό το byte, ελέγχει bit προς bit με `is_frame_used` μέχρι να βρει το πρώτο ελεύθερο. Το δεσμεύει, ενημερώνει το `search_begin` (προχωρώντας το κατά ένα byte αν το τρέχον byte μόλις γέμισε πλήρως) και επιστρέφει τη φυσική διεύθυνση του πλαισίου. Επιστρέφει `nullptr` αν δεν βρεθεί ελεύθερο πλαίσιο — αυτή είναι η ενοποιημένη σύμβαση αποτυχίας (unified failure convention) που χρησιμοποιείται σε όλο το PMM/heap, αντί για ένα ξεχωριστό enum σφάλματος.
+Searches, starting at `search_begin`, for the first byte that isn't `0xFF` (i.e. has at least one free bit). Within that byte, checks bit by bit with `is_frame_used` until it finds the first free one. Marks it used, updates `search_begin` (advancing it by one byte if the current byte just became fully occupied), and returns the frame's physical address. Returns `nullptr` if no free frame is found — the same unified failure convention used throughout the PMM/heap, instead of a separate error enum.
 
 ### `pmm_free_frame(address)`
 
-Σημειωμένη `[[gnu::regparm(1)]]`. Επιστρέφει `pmm_result` (`success`, `failed`, `lb_deny`, `hb_deny`):
-- `hb_deny`: η διεύθυνση είναι πέρα από το συνολικό πλήθος πλαισίων.
-- `lb_deny`: η διεύθυνση βρίσκεται κάτω από το `lower_limit` (θα κατέστρεφε τον πυρήνα ή το ίδιο το bitmap).
-- `failed`: το πλαίσιο ήταν ήδη ελεύθερο (double-free προστασία).
-- `success`: το πλαίσιο ελευθερώθηκε κανονικά· επιπλέον, αν η νέα ελεύθερη θέση είναι *πριν* το τρέχον `search_begin`, το `search_begin` οπισθοχωρεί (branchless, μέσω πολλαπλασιασμού με boolean συνθήκη) ώστε η επόμενη δέσμευση να το βρει αμέσως.
+Marked `[[gnu::regparm(1)]]`. Returns a `pmm_result` (`success`, `failed`, `lb_deny`, `hb_deny`):
+- `hb_deny`: the address is beyond the total frame count.
+- `lb_deny`: the address is below `lower_limit` (would corrupt the kernel or the bitmap itself).
+- `failed`: the frame was already free (double-free protection).
+- `success`: the frame was freed normally; additionally, if the newly-freed position is *before* the current `search_begin`, `search_begin` is stepped back (branchless, via multiplication by a boolean condition) so the next allocation finds it immediately.
 
 ### `pmm_allocate_contiguous_frames(frames)`
 
-Σημειωμένη `[[gnu::regparm(1)]]`. Ψάχνει ένα **συνεχόμενο** run από `frames` ελεύθερα bits, διατρέχοντας το bitmap byte προς byte από το `search_begin`:
-- Αν ένα byte είναι `0x00` (όλα ελεύθερα), το run επεκτείνεται κατά 8.
-- Αν είναι `0xFF` (όλα κατειλημμένα), το run μηδενίζεται (σπάει η συνέχεια).
-- Σε μικτό byte, ελέγχει πρώτα τα trailing zeros (συνέχεια από το προηγούμενο run), μετά ψάχνει "θαμμένο" run μέσα στο byte μέσω του LUT `buried_zeros_lut`, και τέλος τα leading zeros (πιθανή αρχή νέου run που θα συνεχιστεί στο επόμενο byte).
+Marked `[[gnu::regparm(1)]]`. Searches for a **contiguous** run of `frames` free bits, walking the bitmap byte by byte from `search_begin`:
+- If a byte is `0x00` (all free), the run extends by 8.
+- If it's `0xFF` (all occupied), the run resets to zero (the streak breaks).
+- On a mixed byte, it first checks the trailing zeros (continuation of the previous run), then looks for a "buried" run inside the byte via the `buried_zeros_lut` LUT, and finally the leading zeros (potential start of a new run continuing into the next byte).
 
-Μόλις βρεθεί αρκετό μήκος, εφαρμόζει τις μάσκες (front/middle/back, όπως περιγράφηκε παραπάνω) για να σημειώσει όλο το εύρος ως κατειλημμένο σε O(bytes) αντί για O(frames) μεμονωμένες ενημερώσεις bit. Ενημερώνει τέλος το `search_begin`.
+Once enough length is found, it applies the masks (front/middle/back, as described above) to mark the whole range as occupied in O(bytes) instead of O(frames) individual bit updates. Finally, `search_begin` is updated.
 
 ### `pmm_free_contiguous_frames(address, frames)`
 
-Σημειωμένη `[[gnu::regparm(2)]]`. Ο "αντίστροφος" του `pmm_allocate_contiguous_frames`: μετατρέπει τη διεύθυνση αρχής σε `bit_n_byte`, ελέγχει όρια (`hb_deny` αν εκτός συνόλου, `lb_deny` αν κάτω από `lower_limit`), υπολογίζει το τελευταίο bit (`end_byte`) και εφαρμόζει τη συμμετρική λογική front/middle/back — αλλά αντί για `|=` (set) χρησιμοποιεί `&=` με τις "αντίστροφες" μάσκες free (set αδιάφορα bits, clear τα bits εντός εύρους) ώστε να καθαρίσει (0) όλα τα bits του εύρους χωρίς να αγγίξει bits έξω από αυτό. Επιστρέφει `pmm_result::zero_frames` αν ζητηθεί αποδέσμευση μηδενικού πλήθους πλαισίων. Ενημερώνει επίσης, όπως και το `pmm_free_frame`, το `search_begin` αν χρειάζεται να οπισθοχωρήσει.
+Marked `[[gnu::regparm(2)]]`. The "reverse" of `pmm_allocate_contiguous_frames`: converts the start address to a `bit_n_byte`, checks bounds (`hb_deny` if beyond the total, `lb_deny` if below `lower_limit`), computes the last bit (`end_byte`), and applies the same symmetric front/middle/back logic — but instead of `|=` (set) it uses `&=` with the "inverted" free masks (set on don't-care bits, clear on the bits inside the range) to zero out all bits in the range without touching bits outside it. Returns `pmm_result::zero_frames` if asked to free zero frames. Also updates `search_begin` if it needs to step back, same as `pmm_free_frame`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- **Καμία δυναμική δέσμευση (dynamic allocation)** δεν χρησιμοποιείται πουθενά· το bitmap "κάθεται" σε στατικά υπολογισμένη διεύθυνση πάνω στη φυσική μνήμη.
-- Όλες οι κρίσιμες συναρτήσεις είναι `[[gnu::always_inline]]` στον ανώνυμο χώρο ονομάτων — καμία πραγματική συνάρτηση δεν υπάρχει στο τελικό binary γι' αυτές, μόνο inline κώδικας στο σημείο κλήσης.
-- Η στρατηγική "μία μάσκα ανά byte" αντί για "ένα bit τη φορά" σε όλες τις μαζικές λειτουργίες (contiguous allocate/free) μειώνει δραστικά τον αριθμό εντολών όταν ζητούνται πολλά συνεχόμενα πλαίσια.
-- Η `search_begin` βελτιστοποίηση μετατρέπει τη μέση περίπτωση αναζήτησης από O(n) σε σχεδόν O(1) όταν η μνήμη δεν είναι κατακερματισμένη (fragmented), αφού δεν χρειάζεται ποτέ να ξαναδιατρέξει ήδη-γεμάτα bytes.
+- **No dynamic allocation** is used anywhere; the bitmap "sits" at a statically computed address in physical memory.
+- All critical functions are `[[gnu::always_inline]]` within the anonymous namespace — no real function exists in the final binary for them, just inline code at the call site.
+- The "one mask per byte" strategy instead of "one bit at a time" in all bulk operations (contiguous allocate/free) drastically reduces the instruction count when many contiguous frames are requested.
+- The `search_begin` optimization turns the average-case search from O(n) into near-O(1) when memory isn't fragmented, since it never needs to rescan already-full bytes.

@@ -1,20 +1,20 @@
-# `kernel_exceptions.cpp` — Τεκμηρίωση
+# `kernel_exceptions.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Το κεντρικό "νευρικό σύστημα" διακοπών (interrupts) του πυρήνα: εγκαθιστά όλους τους handlers CPU exceptions (π.χ. Divide Error, Page Fault) και hardware IRQs (Timer, Keyboard) στο IDT, και υλοποιεί τον ενιαίο **interrupt dispatcher** που καλείται από το assembly stub (`common_interrupt_entry.S`) για **κάθε** διακοπή, ανεξαρτήτως vector.
+The kernel's central interrupt "nervous system": installs every handler for CPU exceptions (e.g. Divide Error, Page Fault) and hardware IRQs (Timer, Keyboard) into the IDT, and implements the single **interrupt dispatcher** called by the assembly stub (`common_interrupt_entry.S`) for **every** interrupt, regardless of vector.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
 - `idt/kernel_idt.h`: `set_interrupt_gate`, `load_idt`.
-- `logger/kernel_logger.h`: αναφορά exceptions στην οθόνη.
-- `kernel_exceptions.h`: δημόσιο API.
-- `internal/kernel_interrupt_frame.h`: δομή `interrupt_frame` (καταχωρητές CPU κατά τη στιγμή της διακοπής).
+- `logger/kernel_logger.h`: reporting exceptions to the screen.
+- `kernel_exceptions.h`: public API.
+- `internal/kernel_interrupt_frame.h`: the `interrupt_frame` structure (CPU register state at the time of the interrupt).
 - `pic/kernel_pic.h`: `pic_remap`, `send_eoi`, `mask_all_except_timer_and_keyboard`.
-- `timer/kernel_timer.h`, `keyboard/keyboard.h`: οι πραγματικοί handlers IRQ0/IRQ1.
-- `internal/kernel_cpu_interrupts_list.h`, `internal/kernel_hardware_interrupts_list.h`: X-macros `CPU_INTERRUPT_LIST`/`HARDWARE_INTERRUPT_LIST` — η πλήρης λίστα όλων των γνωστών exceptions/IRQs με vector, όνομα, τίτλο, mnemonic.
+- `timer/kernel_timer.h`, `keyboard/keyboard.h`: the actual IRQ0/IRQ1 handlers.
+- `internal/kernel_cpu_interrupts_list.h`, `internal/kernel_hardware_interrupts_list.h`: the `CPU_INTERRUPT_LIST`/`HARDWARE_INTERRUPT_LIST` X-macros — the full list of known exceptions/IRQs with vector, name, title, mnemonic.
 
-## Σταθερές
+## Constants
 
 ```cpp
 constexpr uint16_t interrupt_vector_count{256};
@@ -24,9 +24,9 @@ constexpr uint8_t irq_base{32};
 constexpr uint8_t irq_max{47};
 ```
 
-Το x86 IDT έχει πάντα 256 πιθανά vectors. Το `0x08` είναι ο επιλογέας (selector) του kernel code segment στο GDT. Το `0x8E` κωδικοποιεί: παρόν (present), προνόμιο (privilege) ring 0, 32-bit interrupt gate. Τα IRQs υλικού, μετά το PIC remap, καταλαμβάνουν τα vectors 32–47.
+x86 protected mode always has 256 possible interrupt vectors. `0x08` is the selector for the kernel code segment in the GDT. `0x8E` encodes: present, privilege (DPL) ring 0, 32-bit interrupt gate. After the PIC remap, hardware IRQs occupy vectors 32–47.
 
-## Δομές περιγραφής exceptions
+## Exception descriptor structures
 
 ### `exception_descriptor`
 
@@ -34,9 +34,9 @@ constexpr uint8_t irq_max{47};
 struct exception_descriptor { uint8_t vector; exception_handler_ptr stub; const char* name; const char* mnemonic; };
 ```
 
-Ενοποιεί όλες τις πληροφορίες που χρειάζονται για να εγκατασταθεί ένα IDT entry: το vector, τον δείκτη στο assembly stub, το ανθρώπινα-αναγνώσιμο όνομα και το τυπικό mnemonic (π.χ. `"#DE"`, `"#PF"`).
+Bundles all the information needed to install an IDT entry: the vector, the pointer to the assembly stub, the human-readable name, and the standard mnemonic (e.g. `"#DE"`, `"#PF"`).
 
-### Παραγωγή δηλώσεων και descriptors μέσω X-macros
+### Generating declarations and descriptors via X-macros
 
 ```cpp
 #define X(vector, name, title, mnemonic) extern "C" void isr_##vector() noexcept;
@@ -44,9 +44,9 @@ CPU_INTERRUPT_LIST
 #undef X
 ```
 
-Αυτό το μοτίβο επαναλαμβάνεται τέσσερις φορές (δύο για CPU exceptions, δύο για hardware IRQs): μία φορά για να δηλωθούν τα εξωτερικά assembly σύμβολα (`isr_N`/`irq_N`, ορισμένα στο `common_interrupt_entry.S`), και μία φορά για να χτιστούν οι αντίστοιχοι `constexpr exception_descriptor`. Έτσι, η **μία και μοναδική** λίστα ορισμών στο `.h` αρχείο παράγει αυτόματα τόσο τις δηλώσεις όσο και τα δεδομένα περιγραφής — καμία επανάληψη, μηδενική πιθανότητα το vector ενός exception να μην ταιριάζει με το stub του.
+This pattern repeats four times (twice for CPU exceptions, twice for hardware IRQs): once to declare the external assembly symbols (`isr_N`/`irq_N`, defined in `common_interrupt_entry.S`), and once to build the corresponding `constexpr exception_descriptor` values. This way, the **single** list of definitions in the `.h` file automatically generates both the declarations and the description data — no duplication, zero chance that an exception's vector doesn't match its stub.
 
-## Ο πίνακας εγγραφών χειρισμού (dispatch table)
+## The dispatch table
 
 ```cpp
 using interrupt_handler = void (*)(kernel::interrupt_frame*) noexcept [[gnu::regparm(1)]];
@@ -54,26 +54,26 @@ struct g_interrupt_handlers_table { interrupt_handler entries[interrupt_vector_c
 constexpr g_interrupt_handlers_table g_interrupt_handlers{};
 ```
 
-Ένας πίνακας 256 δεικτών συναρτήσεων, γεμισμένος σε compile time:
-1. Αρχικά, **όλα** τα 256 στοιχεία γεμίζουν με `default_interrupt_handler` (fallback για κάθε άγνωστο/απρόσμενο vector).
-2. Στη συνέχεια, τα vectors των γνωστών CPU exceptions αντικαθίστανται με `handle_cpu_exception`.
-3. Τέλος, τα vectors των γνωστών hardware IRQs αντικαθίστανται με τον **πραγματικό** handler τους (`kernel::handle_timer_interrupt`, `driver::keyboard::handle_keyboard_interrupt`), μέσω `name_space::handle_##name` δυναμικά παραγόμενου από το X-macro.
+An array of 256 function pointers, populated at compile time:
+1. First, **all** 256 entries are filled with `default_interrupt_handler` (the fallback for any unknown/unexpected vector).
+2. Next, the vectors of known CPU exceptions are replaced with `handle_cpu_exception`.
+3. Finally, the vectors of known hardware IRQs are replaced with their **actual** handler (`kernel::handle_timer_interrupt`, `driver::keyboard::handle_keyboard_interrupt`), via `name_space::handle_##name` dynamically generated from the X-macro.
 
-Αυτό σημαίνει ότι κάθε νέο IRQ που προστίθεται στη λίστα `HARDWARE_INTERRUPT_LIST` "συνδέεται" αυτόματα με τον σωστό handler του, χωρίς να χρειάζεται αλλαγή στη λογική διανομής.
+This means every new IRQ added to the `HARDWARE_INTERRUPT_LIST` gets automatically "wired" to its correct handler, with no change needed to the dispatch logic.
 
-## Χειρισμός CPU exceptions
+## Handling CPU exceptions
 
 ### `handle_exception(name, mnemonic, frame)` — `[[gnu::regparm(1)]] [[noreturn]]`
 
-Καταγράφει πλήρη κατάσταση καταχωρητών CPU (EIP, EFLAGS, error code, EAX/ECX/EDX/EBX/ESP/EBP/ESI/EDI, vector) στο log επιπέδου σφάλματος (`log.error()`), σε δεκαεξαδική μορφή, και μετά καλεί `log.panic(...)`, το οποίο σταματά τον επεξεργαστή οριστικά. Χρησιμοποιείται όταν συμβεί ένα **αναγνωρισμένο** CPU exception — δεν υπάρχει ασφαλής τρόπος συνέχισης, οπότε ο πυρήνας "πανικοβάλλεται" ελεγχόμενα, δίνοντας στον προγραμματιστή όλα τα διαγνωστικά δεδομένα.
+Logs the full CPU register state (EIP, EFLAGS, error code, EAX/ECX/EDX/EBX/ESP/EBP/ESI/EDI, vector) at error level (`log.error()`), in hexadecimal, then calls `log.panic(...)`, which halts the CPU permanently. Used when a **recognized** CPU exception occurs — there's no safe way to continue, so the kernel panics in a controlled manner, giving the developer all the diagnostic data available.
 
 ### `handle_cpu_exception(frame)` — `[[gnu::regparm(1)]] [[noreturn]]`
 
-`switch` πάνω στο `frame->vector`, παραγόμενο από το X-macro `CPU_INTERRUPT_LIST` — κάθε γνωστό vector καλεί το `handle_exception` με το σωστό όνομα/mnemonic. Ένα `default` case καλύπτει την (θεωρητικά αδύνατη, αλλά ασφαλή) περίπτωση ενός vector που δεν αναγνωρίζεται, καταγράφοντας προειδοποίηση και σταματώντας τον επεξεργαστή.
+A `switch` on `frame->vector`, generated from the `CPU_INTERRUPT_LIST` X-macro — every known vector calls `handle_exception` with the correct name/mnemonic. A `default` case covers the (theoretically impossible, but safely handled) case of an unrecognized vector, logging a warning and halting the CPU.
 
 ### `default_interrupt_handler(frame)` — `[[gnu::regparm(1)]]`
 
-Χειρίζεται **κάθε** vector που δεν έχει ρητά καταχωρημένο handler (ούτε CPU exception, ούτε γνωστό IRQ): καταγράφει προειδοποίηση με το vector και το EIP. Αν το vector ανήκει στο εύρος IRQ (`irq_base`–`irq_max`), επιστρέφει κανονικά (ώστε το EOI να σταλεί ούτως ή άλλως και το hardware να μη "φρακάρει"). Αλλιώς, σταματά τον επεξεργαστή — ένα άγνωστο, μη-IRQ interrupt είναι σοβαρό σφάλμα.
+Handles **every** vector without an explicitly registered handler (neither a CPU exception nor a known IRQ): logs a warning with the vector and EIP. If the vector falls in the IRQ range (`irq_base`–`irq_max`), it returns normally (so the EOI still gets sent and the hardware doesn't "jam"). Otherwise, it halts the CPU — an unknown, non-IRQ interrupt is a serious error.
 
 ## `interrupt_dispatcher(frame)` — `extern "C"`
 
@@ -86,16 +86,16 @@ extern "C" void interrupt_dispatcher(kernel::interrupt_frame* frame) noexcept
 }
 ```
 
-Το **μοναδικό, καθολικό σημείο εισόδου** που καλείται από το assembly (`common_interrupt_entry.S`) για κάθε είδος διακοπής, ανεξάρτητα από τον τύπο της. Η αποστολή γίνεται με μία απλή προσπέλαση πίνακα (O(1), καμία αλυσίδα `if`), και αν το vector είναι hardware IRQ, στέλνεται End-Of-Interrupt (EOI) στο PIC μετά την επεξεργασία — απαραίτητο ώστε το PIC να ξέρει ότι μπορεί να στείλει το επόμενο IRQ ίδιας ή χαμηλότερης προτεραιότητας.
+The **single, universal entry point** called by the assembly (`common_interrupt_entry.S`) for every kind of interrupt, regardless of its type. Dispatch happens through a simple array lookup (O(1), no `if` chain), and if the vector is a hardware IRQ, an End-Of-Interrupt (EOI) is sent to the PIC after processing — required so the PIC knows it can send the next IRQ of the same or lower priority.
 
 ## `kernel::initialize_exceptions()`
 
-1. Αναδιάταξη (remap) του PIC ώστε τα IRQs να μεταφερθούν από τα συγκρουόμενα vectors 0–15 (που επικαλύπτονται με CPU exceptions) στα 32–47.
-2. Εγκατάσταση **όλων** των CPU exception και IRQ gates στο IDT, μέσω `install_exception` σε βρόχο X-macro.
-3. `kernel::mask_all_except_timer_and_keyboard()` — απενεργοποιεί όλα τα άλλα IRQs στο PIC, αφού ο πυρήνας δεν έχει ακόμη handlers γι' αυτά.
-4. `load_idt()` — φορτώνει το IDTR με τη διεύθυνση του πίνακα IDT μέσω `lidt`.
+1. Remaps the PIC so IRQs move from the conflicting vectors 0–15 (which overlap with CPU exceptions) to 32–47.
+2. Installs **all** CPU exception and IRQ gates into the IDT, via `install_exception` in an X-macro loop.
+3. `kernel::mask_all_except_timer_and_keyboard()` — disables all other IRQs on the PIC, since the kernel doesn't yet have handlers for them.
+4. `load_idt()` — loads the IDTR with the address of the IDT array via `lidt`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Η φιλοσοφία "μία λίστα X-macro, πολλαπλές παραγόμενες όψεις (δηλώσεις, descriptors, dispatch table, switch cases)" εξαλείφει ολόκληρες κατηγορίες σφαλμάτων συγχρονισμού μεταξύ IDT εγγραφών, handler tables και human-readable ονομάτων.
-- Η επιλογή vector-indexed πίνακα 256 στοιχείων αντί για hash map ή αλυσίδα ελέγχων είναι η φυσική επιλογή εδώ, αφού το εύρος του vector είναι ήδη γνωστό, μικρό και πυκνό (0–255) — τέλειο σενάριο για άμεση ευρετηρίαση (direct indexing).
+- The philosophy of "one X-macro list, multiple generated views (declarations, descriptors, dispatch table, switch cases)" eliminates entire classes of synchronization bugs between IDT entries, handler tables, and human-readable names.
+- Choosing a vector-indexed 256-entry array instead of a hash map or chain of checks is the natural choice here, since the vector's range is already known, small, and dense (0–255) — a perfect scenario for direct indexing.

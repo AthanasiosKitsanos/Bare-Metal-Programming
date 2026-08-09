@@ -1,15 +1,15 @@
-# `kernel_pic.cpp` — Τεκμηρίωση
+# `kernel_pic.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Οδηγός για το ζεύγος **8259 PIC (Programmable Interrupt Controller)** — master και slave. Υλοποιεί την κλασική διαδικασία "remap" (μετατόπιση των IRQ vectors ώστε να μη συγκρούονται με τα CPU exceptions), αποστολή End-Of-Interrupt (EOI), και επιλεκτική απόκρυψη (masking) IRQs.
+Driver for the **8259 PIC (Programmable Interrupt Controller)** pair — master and slave. Implements the classic "remap" procedure (shifting IRQ vectors so they don't collide with CPU exceptions), sending End-Of-Interrupt (EOI), and selectively masking IRQs.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `kernel_pic.h`: δηλώσεις `inb`/`outb` (μέσω `terminal::` namespace) και το δημόσιο API.
+- `kernel_pic.h`: declarations of `inb`/`outb` (via the `terminal::` namespace) and the public API.
 - `<stdint.h>`.
 
-## Θύρες και σταθερές πρωτοκόλλου (ανώνυμος χώρος ονομάτων)
+## Ports and protocol constants (anonymous namespace)
 
 ```cpp
 constexpr uint16_t master_command{0x20}; constexpr uint16_t master_data{0x21};
@@ -20,18 +20,18 @@ constexpr uint8_t x86_mode{0x01};
 constexpr uint8_t eoi_command{0x20};
 ```
 
-Αυτές είναι οι κλασικές θύρες και τιμές πρωτοκόλλου του i8259: `0x20`/`0x21` για τον master PIC, `0xA0`/`0xA1` για τον slave. Το `0x11` είναι η εντολή αρχικοποίησης ICW1 (Initialization Control Word 1) που ζητά ICW4. Τα `0x04`/`0x02` (ICW3) δηλώνουν στον master ότι ο slave είναι συνδεδεμένος στη γραμμή IRQ2, και στον slave τη δική του "cascade identity". Το `0x01` (ICW4) ενεργοποιεί τη λειτουργία 8086/88 mode.
+These are the classic i8259 ports and protocol values: `0x20`/`0x21` for the master PIC, `0xA0`/`0xA1` for the slave. `0x11` is the ICW1 (Initialization Control Word 1) command requesting ICW4. `0x04`/`0x02` (ICW3) tell the master that the slave is connected on IRQ line 2, and tell the slave its own "cascade identity". `0x01` (ICW4) enables 8086/88 mode.
 
 ## `pic_remap(offset_1, offset_2)`
 
-Η κλασική ακολουθία τεσσάρων ζευγών ICW (Initialization Control Words), με `io_wait()` μετά από κάθε εγγραφή (απαραίτητο επειδή ο παλιός PIC ενδέχεται να μην προλαβαίνει να επεξεργαστεί διαδοχικές εγγραφές αρκετά γρήγορα σε σύγχρονο υλικό):
+The classic four-pair ICW (Initialization Control Words) sequence, with `io_wait()` after every write (necessary because the old PIC might not process consecutive writes fast enough on modern hardware):
 
-1. **Διάβασμα και προσωρινή αποθήκευση των τρεχουσών μασκών (masks)** και για τους δύο ελεγκτές, ώστε να μπορούν να επαναφερθούν στο τέλος χωρίς να χαθεί καμία προϋπάρχουσα ρύθμιση.
-2. **ICW1** (`enable = 0x11`) σε master και slave: ξεκινά τη διαδικασία αρχικοποίησης.
-3. **ICW2** (`offset_1`/`offset_2`): ορίζει τη **νέα βάση vector** — δηλαδή σε ποιο IDT vector θα αντιστοιχεί το IRQ0 του master και το IRQ0 του slave αντίστοιχα. Αυτό είναι το ίδιο το "remap": προεπιλεγμένα τα IRQs ξεκινούν στο vector 8, συγκρουόμενα με τα CPU exceptions (0–31)· το remap τα μετατοπίζει, συνήθως σε 32 (master) και 40 (slave).
-4. **ICW3**: δηλώνει τη σχέση cascade (master↔slave) μέσω των `master_bit`/`slave_bit`.
-5. **ICW4** (`x86_mode`): θέτει λειτουργία 8086.
-6. **Επαναφορά των αρχικών μασκών** που είχαν αποθηκευτεί στο βήμα 1.
+1. **Reads and temporarily saves the current masks** for both controllers, so they can be restored at the end without losing any pre-existing configuration.
+2. **ICW1** (`enable = 0x11`) on both master and slave: begins the initialization sequence.
+3. **ICW2** (`offset_1`/`offset_2`): sets the **new base vector** — i.e. which IDT vector IRQ0 of the master and IRQ0 of the slave will map to, respectively. This is the actual "remap": by default the IRQs start at vector 8, colliding with CPU exceptions (0–31); the remap shifts them, typically to 32 (master) and 40 (slave).
+4. **ICW3**: declares the cascade relationship (master↔slave) via `master_bit`/`slave_bit`.
+5. **ICW4** (`x86_mode`): sets 8086 mode.
+6. **Restores the original masks** saved in step 1.
 
 ## `send_eoi(vector)` — `[[gnu::regparm(1)]]`
 
@@ -40,7 +40,7 @@ if(vector > 7) terminal::outb(slave_command, eoi_command);
 terminal::outb(master_command, eoi_command);
 ```
 
-Στέλνει την εντολή End-Of-Interrupt. Το `vector` εδώ είναι ο **τοπικός** αριθμός IRQ (0–15, όχι το IDT vector — η μετατροπή `vector - irq_base` γίνεται πριν την κλήση, στο `kernel_exceptions.cpp`). Αν το IRQ προήλθε από τον slave (>7), πρέπει να σταλεί EOI **και στους δύο** ελεγκτές — πρώτα στον slave, μετά στον master — αφού ο master δεν γνωρίζει τίποτα για την εσωτερική κατάσταση του slave παρά μόνο ότι έλαβε ένα cascade interrupt.
+Sends the End-Of-Interrupt command. Here `vector` is the **local** IRQ number (0–15, not the IDT vector — the `vector - irq_base` conversion happens before the call, in `kernel_exceptions.cpp`). If the IRQ came from the slave (>7), EOI must be sent to **both** controllers — first to the slave, then to the master — since the master knows nothing about the slave's internal state, only that it received a cascade interrupt.
 
 ## `mask_all_except_timer_and_keyboard()`
 
@@ -49,9 +49,9 @@ terminal::outb(master_data, 0xFC);
 terminal::outb(slave_data, 0xFF);
 ```
 
-Γράφει απευθείας τις μάσκες διακοπών: `0xFC` = `0b11111100` αφήνει ενεργά μόνο τα bits 0 και 1 (IRQ0 = timer, IRQ1 = keyboard), αποκρύπτοντας όλα τα υπόλοιπα IRQs του master. Ο slave αποκρύπτεται πλήρως (`0xFF`), αφού ο πυρήνας δεν έχει ακόμη κανέναν handler για συσκευές πίσω από αυτόν.
+Writes the interrupt masks directly: `0xFC` = `0b11111100` leaves only bits 0 and 1 active (IRQ0 = timer, IRQ1 = keyboard), masking off every other IRQ on the master. The slave is masked entirely (`0xFF`), since the kernel doesn't yet have any handler for devices behind it.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Αυτό το αρχείο είναι καθαρά κώδικας ρύθμισης hardware (configuration-time code), όχι hot path — δεν υπάρχουν βελτιστοποιήσεις όπως `regparm` πέρα από το `send_eoi`, το οποίο **καλείται σε κάθε interrupt** (άρα βρίσκεται στο hot path και δικαιολογημένα φέρει `[[gnu::regparm(1)]]`).
-- Η αποθήκευση/επαναφορά των αρχικών μασκών στο `pic_remap` είναι μια άμυνα καλής πρακτικής: ακόμη κι αν το BIOS είχε ήδη αποκρύψει κάποια IRQs για δικούς του λόγους, το remap δεν τα "ξεκρύβει" ακούσια.
+- This file is purely hardware configuration-time code, not hot path — there are no `regparm`-style optimizations aside from `send_eoi`, which **is called on every interrupt** (so it lives on the hot path and rightfully carries `[[gnu::regparm(1)]]`).
+- Saving/restoring the original masks in `pic_remap` is a defensive best practice: even if the BIOS had already masked some IRQs for its own reasons, the remap doesn't accidentally unmask them.

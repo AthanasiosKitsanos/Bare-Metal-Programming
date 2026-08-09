@@ -1,14 +1,14 @@
-# `kernel_logger.cpp` — Τεκμηρίωση
+# `kernel_logger.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Υλοποιεί την κλάση `kernel::logger`: ένα λεπτό (thin) περιτύλιγμα (wrapper) πάνω από το `terminal::output` που προσθέτει σημασιολογία επιπέδων καταγραφής (error/warning/panic), με χρωματισμένα προθέματα ώστε το είδος του μηνύματος να ξεχωρίζει οπτικά στην οθόνη.
+Implements the `kernel::logger` class: a thin wrapper around `terminal::output` that adds logging-level semantics (error/warning/panic), with colored prefixes so the message type visually stands out on screen.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `kernel_logger.h`: δηλώνει την κλάση `logger`, τη μέθοδο `m_terminal` (πιθανότατα ένα ενσωματωμένο `terminal::output`), και τους τύπους `vga_color`, `color_code`.
+- `kernel_logger.h`: declares the `logger` class, the `m_terminal` member (presumably an embedded `terminal::output`), and the `vga_color`, `color_code` types.
 
-## Ιδιωτικές μέθοδοι
+## Private methods
 
 ### `set_prefix_text_and_color(error_type, foreground, background)`
 
@@ -19,7 +19,7 @@ m_terminal << error_type;
 m_terminal.set_color_code(temp);
 ```
 
-Το μοτίβο εδώ είναι **"αποθήκευσε, άλλαξε, γράψε, επανάφερε"**: αποθηκεύει το τρέχον χρώμα, αλλάζει προσωρινά σε ένα χρώμα προειδοποίησης/σφάλματος για να τυπώσει το πρόθεμα (π.χ. `"[ERROR]: "`), και αμέσως μετά επαναφέρει το **προηγούμενο** χρώμα (όχι απαραίτητα το προεπιλεγμένο) — έτσι το υπόλοιπο μήνυμα που θα ακολουθήσει από τον καλούντα διατηρεί όποιο χρώμα είχε πριν, χωρίς να "μολύνεται" (leak) από το χρώμα του προθέματος.
+The pattern here is **"save, change, write, restore"**: it saves the current color, temporarily switches to a warning/error color to print the prefix (e.g. `"[ERROR]: "`), and immediately restores the **previous** color afterward (not necessarily the default color) — so the rest of the message that follows from the caller keeps whatever color it had before, without being "leaked" the prefix's color.
 
 ### `halt_forever()` const — `[[noreturn]]`
 
@@ -27,9 +27,9 @@ m_terminal.set_color_code(temp);
 while(true) asm volatile("cli; hlt");
 ```
 
-Ίδιο μοτίβο με το αντίστοιχο του `kernel_assert.cpp` — σταματά οριστικά τον επεξεργαστή. Καλείται μόνο εσωτερικά, από το `panic`.
+Same pattern as the equivalent function in `kernel_assert.cpp` — halts the CPU permanently. Called only internally, from `panic`.
 
-## Δημόσιες μέθοδοι
+## Public methods
 
 ### `panic(panic_message)` — `[[noreturn]]`
 
@@ -39,11 +39,11 @@ m_terminal << "[PANIC]: " << panic_message << '\n';
 halt_forever();
 ```
 
-Το πιο σοβαρό επίπεδο καταγραφής: γράφει άσπρο κείμενο σε **κόκκινο φόντο** (μέγιστη οπτική έμφαση, αφού πρόκειται για κατάσταση από την οποία ο πυρήνας δεν μπορεί να ανακάμψει), και μετά σταματά τον επεξεργαστή μόνιμα — καμία επιστροφή δεν είναι δυνατή, εξ ου και το `[[noreturn]]`.
+The most severe logging level: writes white text on a **red background** (maximum visual emphasis, since this represents a condition the kernel cannot recover from), then halts the CPU permanently — no return is possible, hence `[[noreturn]]`.
 
-> Σημείωση: το header (`kernel_logger.h`) δηλώνει πιθανότατα επιπλέον δημόσιες μεθόδους όπως `error()` και `warning()` (χρησιμοποιούνται εκτενώς από άλλα αρχεία, π.χ. `kernel_exceptions.cpp`, `keyboard.cpp`), οι οποίες όμως ορίζονται ως `inline` απευθείας στο header (γι' αυτό δεν εμφανίζονται στο `.cpp`) — ακολουθούν την ίδια λογική με το `panic`: αλλάζουν χρώμα μέσω `set_prefix_text_and_color`, τυπώνουν το κατάλληλο πρόθεμα (`"[ERROR]: "`, `"[WARNING]: "`) και επιστρέφουν αναφορά στο terminal stream ώστε ο καλών να συνεχίσει να γράφει με `operator<<`.
+> Note: the header (`kernel_logger.h`) likely declares additional public methods such as `error()` and `warning()` (used extensively by other files, e.g. `kernel_exceptions.cpp`, `keyboard.cpp`), which are probably defined `inline` directly in the header (which is why they don't appear in the `.cpp`) — following the same logic as `panic`: they change color via `set_prefix_text_and_color`, print the appropriate prefix (`"[ERROR]: "`, `"[WARNING]: "`), and return a reference to the terminal stream so the caller can keep writing with `operator<<`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Η κλάση `logger` **δεν** αποθηκεύει δικό της buffer κειμένου — γράφει απευθείας στο κοινόχρηστο, static `vga_text_buffer` μέσω του εσωτερικού `terminal::output`, όπως κάθε άλλο σημείο εξόδου του πυρήνα.
-- Ο διαχωρισμός μεταξύ `logger` (σημασιολογία/επίπεδα καταγραφής + χρώμα) και `terminal::output` (πρωτόγονη έξοδος χαρακτήρων/αριθμών) είναι ένα καθαρό παράδειγμα διαχωρισμού ευθυνών (separation of concerns): το `output` δεν γνωρίζει τίποτα για "σφάλματα" ή "προειδοποιήσεις", ενώ το `logger` δεν γνωρίζει τίποτα για το πώς γράφεται πραγματικά ένας χαρακτήρας στην οθόνη VGA.
+- The `logger` class doesn't store its own text buffer — it writes directly to the shared, static `vga_text_buffer` via its internal `terminal::output`, just like every other output point in the kernel.
+- The separation between `logger` (semantics/logging levels + color) and `terminal::output` (primitive character/number output) is a clean example of separation of concerns: `output` knows nothing about "errors" or "warnings", while `logger` knows nothing about how a character is actually written to the VGA screen.

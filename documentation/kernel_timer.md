@@ -1,17 +1,17 @@
-# `kernel_timer.cpp` — Τεκμηρίωση
+# `kernel_timer.cpp` — Documentation
 
-## Σκοπός αρχείου
+## File Purpose
 
-Διατηρεί τον **μετρητή ticks** του συστήματος (ενημερωμένο από τον interrupt handler του PIT/IRQ0), και προσφέρει βοηθητικές συναρτήσεις μετατροπής ticks↔χρόνο και αναμονής (sleep), τόσο σε ticks όσο και σε χιλιοστά του δευτερολέπτου.
+Maintains the system's **tick counter** (updated by the PIT/IRQ0 interrupt handler), and provides helper functions for tick↔time conversions and waiting (sleep), both in ticks and in milliseconds.
 
-## Ενσωματώσεις (Includes)
+## Includes
 
-- `<stdint.h>`, `kernel_timer.h`: δημόσιο API.
-- `logger/kernel_logger.h`: (διαθέσιμο, αν και δεν χρησιμοποιείται άμεσα σε αυτό το αρχείο εκτός εξάρτησης transitively).
-- `internal/kernel_interrupt_frame.h`: τύπος `interrupt_frame`.
-- `internal/kernel_interrupt_guard.h`: RAII φύλακας διακοπών.
+- `<stdint.h>`, `kernel_timer.h`: public API.
+- `logger/kernel_logger.h`: (available, though not used directly in this file outside of transitive dependency).
+- `internal/kernel_interrupt_frame.h`: the `interrupt_frame` type.
+- `internal/kernel_interrupt_guard.h`: an RAII interrupt guard.
 
-## Global state (ανώνυμος χώρος ονομάτων)
+## Global state (anonymous namespace)
 
 ```cpp
 constexpr uint32_t milliseconds_per_second{1000};
@@ -19,24 +19,24 @@ volatile uint32_t g_timer_ticks{0};
 uint32_t g_timer_frequency{0};
 ```
 
-Το `g_timer_ticks` είναι σημειωμένο **`volatile`**: ενημερώνεται μέσα σε interrupt context (`handle_timer_interrupt`) και διαβάζεται από κανονικό κώδικα (π.χ. `sleep_ticks`) — το `volatile` αποτρέπει τον compiler από το να "καθηλώσει" (cache) την τιμή σε καταχωρητή μέσα σε έναν βρόχο αναμονής, κάτι που θα δημιουργούσε άπειρο βρόχο αφού ο compiler δεν θα "έβλεπε" ότι η τιμή αλλάζει ασύγχρονα από interrupt.
+`g_timer_ticks` is marked **`volatile`**: it's updated inside interrupt context (`handle_timer_interrupt`) and read from normal code (e.g. `sleep_ticks`) — `volatile` prevents the compiler from "pinning" the value in a register inside a wait loop, which would otherwise create an infinite loop since the compiler wouldn't "see" that the value changes asynchronously from an interrupt.
 
 ## `handle_timer_interrupt(frame)` — `[[gnu::regparm(1)]]`
 
-Ο πραγματικός handler του IRQ0. Αγνοεί εντελώς το περιεχόμενο του `frame` (`static_cast<void>(frame)`) — ο timer δεν χρειάζεται καμία πληροφορία από την κατάσταση της CPU τη στιγμή της διακοπής, μόνο αυξάνει τον μετρητή:
+The actual IRQ0 handler. Completely ignores the contents of `frame` (`static_cast<void>(frame)`) — the timer needs no information from the CPU's state at the moment of the interrupt, it just increments the counter:
 
 ```cpp
 ++g_timer_ticks;
 ```
 
-Ελάχιστη δυνατή δουλειά μέσα σε interrupt handler — ακριβώς όπως αρμόζει σε handler υψηλής συχνότητας κλήσης (100 φορές το δευτερόλεπτο σε αυτό το σύστημα).
+The minimum possible amount of work inside an interrupt handler — exactly appropriate for a handler called with high frequency (100 times per second in this system).
 
 ## Getters/Setters
 
-- **`set_timer_frequency(frequency)`**: αποθηκεύει τη συχνότητα που έχει ρυθμιστεί στο PIT (καλείται από το `main.cpp` αμέσως μετά το `initialize_pit`), ώστε άλλες συναρτήσεις να μπορούν να μετατρέπουν ticks σε πραγματικό χρόνο.
-- **`timer_ticks()`**: επιστρέφει τον τρέχοντα μετρητή.
-- **`timer_frequency()`**: επιστρέφει την αποθηκευμένη συχνότητα.
-- **`uptime_seconds()`**: `ticks / frequency`, με προστασία διαίρεσης με το μηδέν (`if(frequency == 0) return 0;`) — σημαντικό αν κληθεί πριν ρυθμιστεί η συχνότητα.
+- **`set_timer_frequency(frequency)`**: stores the frequency configured on the PIT (called from `main.cpp` right after `initialize_pit`), so other functions can convert ticks into real time.
+- **`timer_ticks()`**: returns the current counter.
+- **`timer_frequency()`**: returns the stored frequency.
+- **`uptime_seconds()`**: `ticks / frequency`, protected against division by zero (`if(frequency == 0) return 0;`) — important if called before the frequency has been configured.
 
 ## `sleep_ticks(ticks)`
 
@@ -48,20 +48,20 @@ while((g_timer_ticks - start) < ticks) asm volatile("sti; hlt");
 if(!was_enabled) asm volatile("cli");
 ```
 
-Υλοποιεί **παθητική αναμονή (passive/busy-free wait)**: αντί για πολική δειγματοληψία (busy-polling) που θα κατανάλωνε κύκλους CPU χωρίς λόγο, ο βρόχος εκτελεί `sti; hlt` — ενεργοποιεί διακοπές και **σταματά** τον επεξεργαστή μέχρι την επόμενη διακοπή (οποιαδήποτε, όχι μόνο timer). Κάθε φορά που ο επεξεργαστής "ξυπνά", ελέγχεται ξανά η συνθήκη. Η αφαίρεση `g_timer_ticks - start` λειτουργεί σωστά ακόμη και σε **overflow** του `uint32_t` μετρητή (unsigned αριθμητική wraparound), αφού η αφαίρεση δύο unsigned τιμών δίνει πάντα τη σωστή "απόσταση" ανεξάρτητα από το αν ο μετρητής έχει κάνει κύκλο.
+Implements **passive (busy-free) waiting**: instead of busy-polling, which would burn CPU cycles for no reason, the loop executes `sti; hlt` — enabling interrupts and **halting** the CPU until the next interrupt (any interrupt, not just the timer). Every time the CPU "wakes up", the condition is checked again. The subtraction `g_timer_ticks - start` works correctly even across a `uint32_t` counter **overflow** (unsigned arithmetic wraparound), since subtracting two unsigned values always gives the correct "distance" regardless of whether the counter has wrapped around.
 
-Πριν τον βρόχο, ελέγχεται (μέσω `read_eflags()` και του bit `IF`, bit 9) αν οι διακοπές ήταν ήδη ενεργές· αν **δεν** ήταν, μετά την αναμονή επαναφέρονται σε ανενεργές (`cli`) — η συνάρτηση αφήνει την κατάσταση διακοπών **όπως τη βρήκε**, μια σημαντική αρχή "μη-παρεμβατικής" (non-intrusive) σχεδίασης βοηθητικών συναρτήσεων.
+Before the loop, it checks (via `read_eflags()` and the `IF` bit, bit 9) whether interrupts were already enabled; if they **weren't**, they are restored to disabled (`cli`) after the wait — the function leaves the interrupt state **exactly as it found it**, an important principle of "non-intrusive" helper function design.
 
 ## `sleep_ms(ms)`
 
-Μετατρέπει χιλιοστά του δευτερολέπτου σε ticks και καλεί `sleep_ticks`, με προσεκτική διαχείριση **overflow**:
+Converts milliseconds into ticks and calls `sleep_ticks`, with careful **overflow** handling:
 
-1. Αν `frequency == 0` ή `ms == 0`, επιστρέφει αμέσως (τίποτα να περιμένει).
-2. Χωρίζει το `ms` σε ολόκληρα δευτερόλεπτα (`whole_seconds`) και το υπόλοιπο (`remaining_milliseconds`).
-3. Ελέγχει **πριν** τον πολλαπλασιασμό αν `whole_seconds * frequency` θα υπερχείλιζε (`whole_seconds > UINT32_MAX / frequency`) — αν ναι, "καλύπτει" (clamp) την αναμονή στη μέγιστη δυνατή τιμή (`sleep_ticks(UINT32_MAX)`) αντί να αφήσει την πράξη να υπερχειλίσει σιωπηλά και να παράξει λανθασμένα μικρότερη αναμονή.
-4. Υπολογίζει τα ticks και για τα δύο μέρη (ολόκληρα δευτερόλεπτα + υπόλοιπο, με στρογγυλοποίηση προς τα πάνω στο υπόλοιπο: `(ms * freq + 999) / 1000`), και ελέγχει ξανά για υπερχείλιση στο άθροισμά τους πριν καλέσει το τελικό `sleep_ticks`.
+1. If `frequency == 0` or `ms == 0`, returns immediately (nothing to wait for).
+2. Splits `ms` into whole seconds (`whole_seconds`) and the remainder (`remaining_milliseconds`).
+3. Checks **before** multiplying whether `whole_seconds * frequency` would overflow (`whole_seconds > UINT32_MAX / frequency`) — if so, it clamps the wait to the maximum possible value (`sleep_ticks(UINT32_MAX)`) instead of letting the operation silently overflow and produce an incorrectly shorter wait.
+4. Computes ticks for both parts (whole seconds + remainder, rounding the remainder up: `(ms * freq + 999) / 1000`), and again checks for overflow in their sum before calling the final `sleep_ticks`.
 
-## Σχεδιαστικές παρατηρήσεις
+## Design notes
 
-- Το `sti; hlt` μοτίβο είναι θεμελιώδες σε πυρήνες: επιτρέπει σε έναν πυρήνα χωρίς πολλαπλά νήματα (multi-threading) να "κοιμάται" αποδοτικά, αφήνοντας τον επεξεργαστή σε κατάσταση χαμηλής κατανάλωσης ενέργειας μέχρι να υπάρξει πραγματική δουλειά.
-- Η ρητή διαχείριση πιθανής υπερχείλισης `uint32_t` σε κάθε αριθμητική πράξη (`sleep_ms`) αντανακλά τη γενική αρχή "εμπειρική επαλήθευση, όχι υποθέσεις": αντί να υποτεθεί ότι οι τιμές πάντα θα χωρούν, κάθε ενδεχόμενο υπερχείλισης ελέγχεται ρητά πριν συμβεί.
+- The `sti; hlt` pattern is fundamental in kernels: it lets a kernel with no multi-threading "sleep" efficiently, leaving the CPU in a low-power state until there's actual work to do.
+- The explicit handling of potential `uint32_t` overflow in every arithmetic operation (`sleep_ms`) reflects the general principle of "empirical verification, not assumption": rather than assuming values will always fit, every possible overflow scenario is checked explicitly before it can happen.
