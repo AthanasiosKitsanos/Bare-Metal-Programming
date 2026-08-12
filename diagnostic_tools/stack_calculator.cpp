@@ -9,10 +9,10 @@
 #include <stddef.h>
 #include <algorithm>
 
-constexpr const char* path{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/ci_files"};
-constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/inderect_calls.txt"};
-constexpr const char* stack_result{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/calc_results.txt"};
-constexpr const char* relationships{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/relationships.txt"};
+constexpr const char* path{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/ci_files"};
+constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/inderect_calls.txt"};
+constexpr const char* stack_result{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/calc_results.txt"};
+constexpr const char* relationships{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/relationships.txt"};
 
 constexpr uint32_t undepended_interrupt_methods_size{12};
 constexpr const char* undepended_interrupt_methods[undepended_interrupt_methods_size] =

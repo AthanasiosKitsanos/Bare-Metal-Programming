@@ -192,6 +192,9 @@ namespace
         *(g_bitmap.start + index) &= mask;
         g_used_frames -= frames;
     }
+
+    // SIMD Methods
+    
 }
 
 namespace kernel::memory
