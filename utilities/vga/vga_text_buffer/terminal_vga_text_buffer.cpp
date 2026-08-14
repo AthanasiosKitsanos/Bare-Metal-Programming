@@ -46,7 +46,7 @@ namespace
     }
 
     
-    using fill_fn = void(*)(volatile uint32_t* dst, uint16_t count, const uint32_t entry) [[gnu::regparm(3)]];
+    using fill_fn = void(*)(volatile uint32_t* dst, uint16_t count, const uint32_t entry) noexcept [[gnu::regparm(3)]];
     struct fill_functions
     {
         fill_fn entries[3];
@@ -102,7 +102,7 @@ namespace
         return dst;
     }
 
-    using fill_copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst, uint16_t count) [[gnu::regparm(3)]];
+    using fill_copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst, uint16_t count) noexcept [[gnu::regparm(3)]];
     struct fill_copy_function
     {
         fill_copy_fn entries[3];

@@ -1,5 +1,6 @@
 #include "memory/pmm/kernel_pmm.h"
 #include "memory/e820/kernel_e820.h"
+#include "cpu/features.h"
 
 namespace
 {
@@ -15,7 +16,7 @@ namespace
         }
     };
 
-    struct bitmap
+    struct alignas(32) bitmap
     {
         uint8_t* start{nullptr};
         const uint8_t* search_begin{nullptr};
@@ -194,7 +195,79 @@ namespace
     }
 
     // SIMD Methods
-    
+    struct allocation_run
+    {
+        bit_n_byte start_index{};
+        size_t length{};
+    };
+
+    [[gnu::regparm(3)]]
+    void allocate_contiguous_frames_32(const uint8_t** current, const size_t frames, allocation_run* run) noexcept
+    {
+        
+    }
+
+    [[gnu::target("sse2")]] [[gnu::regparm(3)]]
+    void allocate_contiguous_frames_sse2(const uint8_t** current, const size_t frames, allocation_run* run) noexcept
+    {
+
+    }
+
+    [[gnu::target("avx2")]] [[gnu::regparm(3)]]
+    void allocate_contiguous_frames_avx2(const uint8_t** current, const size_t frames, allocation_run* run) noexcept
+    {
+        
+    }
+
+    using simd_alloc_methods = void(*)(const uint8_t**, const size_t, allocation_run*) noexcept [[gnu::regparm(3)]];
+
+    constexpr uint8_t simd_methods_size{3};
+    struct simd_alloc_lut
+    {
+        simd_alloc_methods entries[simd_methods_size];
+        
+        constexpr simd_alloc_lut() noexcept: entries{}
+        {
+            entries[0] = allocate_contiguous_frames_32;
+            entries[1] = allocate_contiguous_frames_sse2;
+            entries[2] = allocate_contiguous_frames_avx2;
+        }
+    };
+
+    constexpr simd_alloc_lut simd_lut{};
+
+    [[gnu::always_inline]]
+    inline void allocate_contiguous_frames_tail(const uint8_t** current, const size_t frames, allocation_run* run) noexcept
+    {
+        uint8_t current_value{0};
+        bool is_first_run{false};
+        for(*current = g_bitmap.search_begin; *current < g_bitmap.end && run->length < frames; ++current)
+        {
+            current_value = **current;
+            is_first_run = (run->length == 0);
+            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((*current - g_bitmap.start) * is_first_run));
+            run->start_index.bit_index *= !is_first_run;
+
+            if(current_value == 0x00) run->length += 8;
+            else if(current_value == 0xFF) run->length = 0;
+            else
+            {
+                run->length += trailing_zeros(current_value);
+                if(run->length >= frames) return;
+
+                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
+
+                run->start_index.byte_index = static_cast<size_t>(*current - g_bitmap.start);
+                run->start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
+                run->length = (pos_n_length & 0x0F);
+
+                if(run->length >= frames) return;
+
+                run->length = leading_zeros(current_value);
+                run->start_index.bit_index = (bit_size_byte - run->length);
+            }
+        }
+    }
 }
 
 namespace kernel::memory
@@ -324,51 +397,26 @@ namespace kernel::memory
     {
         if(frames == 0) return nullptr;
 
-        bool is_first_run{false};
 
-        size_t run_length{};
-        bit_n_byte run_start_index{};
-        uint8_t current_value{0};
+        allocation_run run{};
+        const uint8_t* current{nullptr};
+        simd_lut.entries[cpu::features::get()](&current, frames, &run);
 
-        for(const uint8_t* current{g_bitmap.search_begin}; current < g_bitmap.end && run_length < frames; ++current)
-        {
-            current_value = *current;
-            is_first_run = (run_length == 0);
-            run_start_index.byte_index = (run_start_index.byte_index * !is_first_run) + (static_cast<size_t>((current - g_bitmap.start) * is_first_run));
-            run_start_index.bit_index *= !is_first_run;
+        allocate_contiguous_frames_tail(&current, frames, &run);
 
-            if(current_value == 0x00) run_length += 8;
-            else if(current_value == 0xFF) run_length = 0;
-            else
-            {
-                run_length += trailing_zeros(current_value);
-                if(run_length >= frames) break;
+        if(run.length < frames) return nullptr;
 
-                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
-                run_start_index.byte_index = static_cast<size_t>(current - g_bitmap.start);
-                run_start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                run_length = (pos_n_length & 0x0F);
-
-                if(run_length >= frames) break;
-
-                run_length = leading_zeros(current_value);
-                run_start_index.bit_index = (bit_size_byte - run_length);
-            }
-        }
-
-        if(run_length < frames) return nullptr;
-
-        uintptr_t start_address{(run_start_index.byte_index << bit_size_byte_mask) + run_start_index.bit_index};
+        uintptr_t start_address{(run.start_index.byte_index << bit_size_byte_mask) + run.start_index.bit_index};
         const bit_n_byte end_byte{get_bit_n_byte(start_address + frames - 1)};
-        if(run_start_index.byte_index == end_byte.byte_index)
+        if(run.start_index.byte_index == end_byte.byte_index)
         {
-            const uint8_t mask{static_cast<uint8_t>(front_byte_mask_used(run_start_index.bit_index) & back_byte_mask_used(end_byte.bit_index))};
-            set_frames_in_byte_used(run_start_index.byte_index, mask, frames);
+            const uint8_t mask{static_cast<uint8_t>(front_byte_mask_used(run.start_index.bit_index) & back_byte_mask_used(end_byte.bit_index))};
+            set_frames_in_byte_used(run.start_index.byte_index, mask, frames);
         }
         else
         {
-            set_frames_in_byte_used(run_start_index.byte_index, front_byte_mask_used(run_start_index.bit_index), bit_max_pos - run_start_index.bit_index + 1);
-            for(size_t start{run_start_index.byte_index + 1}; start < end_byte.byte_index; ++start)
+            set_frames_in_byte_used(run.start_index.byte_index, front_byte_mask_used(run.start_index.bit_index), bit_max_pos - run.start_index.bit_index + 1);
+            for(size_t start{run.start_index.byte_index + 1}; start < end_byte.byte_index; ++start)
             {
                 mark_whole_byte_used(start);
             }
