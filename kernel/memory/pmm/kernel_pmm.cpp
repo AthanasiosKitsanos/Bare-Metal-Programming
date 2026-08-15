@@ -241,7 +241,7 @@ namespace
     {
         uint8_t current_value{0};
         bool is_first_run{false};
-        for(*current = g_bitmap.search_begin; *current < g_bitmap.end && run->length < frames; ++current)
+        for(; *current < g_bitmap.end && run->length < frames; ++current)
         {
             current_value = **current;
             is_first_run = (run->length == 0);
@@ -397,9 +397,8 @@ namespace kernel::memory
     {
         if(frames == 0) return nullptr;
 
-
         allocation_run run{};
-        const uint8_t* current{nullptr};
+        const uint8_t* current{g_bitmap.search_begin};
         simd_lut.entries[cpu::features::get()](&current, frames, &run);
 
         allocate_contiguous_frames_tail(&current, frames, &run);
