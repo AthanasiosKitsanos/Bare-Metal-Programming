@@ -503,8 +503,8 @@ Disassembly of section .text:
 
 000083ca <common_interrupt_entry>:
     83ca:	89 e2                	mov    %esp,%edx
-    83cc:	bb d5 c2 00 00       	mov    $0xc2d5,%ebx
-    83d1:	b9 79 d5 00 00       	mov    $0xd579,%ecx
+    83cc:	bb b1 c2 00 00       	mov    $0xc2b1,%ebx
+    83d1:	b9 55 d5 00 00       	mov    $0xd555,%ecx
     83d6:	39 da                	cmp    %ebx,%edx
     83d8:	0f 46 e1             	cmovbe %ecx,%esp
     83db:	39 ca                	cmp    %ecx,%edx
@@ -542,9 +542,9 @@ Disassembly of section .text:
     841b:	8e e0                	mov    %eax,%fs
     841d:	8e e8                	mov    %eax,%gs
     841f:	8e d0                	mov    %eax,%ss
-    8421:	bc d5 c2 00 00       	mov    $0xc2d5,%esp
+    8421:	bc b1 c2 00 00       	mov    $0xc2b1,%esp
     8426:	bf 40 b4 00 00       	mov    $0xb440,%edi
-    842b:	b9 29 bf 00 00       	mov    $0xbf29,%ecx
+    842b:	b9 05 bf 00 00       	mov    $0xbf05,%ecx
 
 00008430 <.init_bss>:
     8430:	39 f9                	cmp    %edi,%ecx
@@ -582,7 +582,7 @@ Disassembly of section .text:
     8480:	c1 eb 05             	shr    $0x5,%ebx
     8483:	83 c3 01             	add    $0x1,%ebx
     8486:	0f af da             	imul   %edx,%ebx
-    8489:	88 1d 28 bf 00 00    	mov    %bl,0xbf28
+    8489:	88 1d 04 bf 00 00    	mov    %bl,0xbf04
 
 0000848f <.avx_done>:
     848f:	89 e5                	mov    %esp,%ebp
@@ -614,7 +614,7 @@ Disassembly of section .text:
     84d3:	89 1c 24             	mov    %ebx,(%esp)
     84d6:	e8 95 0d 00 00       	call   9270 <_ZN6kernel6memory19get_e820_memory_mapEv>
     84db:	89 d8                	mov    %ebx,%eax
-    84dd:	b9 79 d5 00 00       	mov    $0xd579,%ecx
+    84dd:	b9 55 d5 00 00       	mov    $0xd555,%ecx
     84e2:	ba 00 7e 00 00       	mov    $0x7e00,%edx
     84e7:	83 c4 0c             	add    $0xc,%esp
     84ea:	8d 9d 08 ff ff ff    	lea    -0xf8(%ebp),%ebx
@@ -668,8 +668,8 @@ Disassembly of section .text:
 
 00008570 <_ZN12_GLOBAL__N_1L23execute_interrupt_stackEPN3app5shellE>:
     8570:	55                   	push   %ebp
-    8571:	ba 79 d5 00 00       	mov    $0xd579,%edx
-    8576:	81 ea d5 c2 00 00    	sub    $0xc2d5,%edx
+    8571:	ba 55 d5 00 00       	mov    $0xd555,%edx
+    8576:	81 ea b1 c2 00 00    	sub    $0xc2b1,%edx
     857c:	89 e5                	mov    %esp,%ebp
     857e:	83 ec 08             	sub    $0x8,%esp
     8581:	8b 45 08             	mov    0x8(%ebp),%eax
@@ -685,8 +685,8 @@ Disassembly of section .text:
 
 000085a0 <_ZN12_GLOBAL__N_1L20execute_kernel_stackEPN3app5shellE>:
     85a0:	55                   	push   %ebp
-    85a1:	ba d5 c2 00 00       	mov    $0xc2d5,%edx
-    85a6:	81 ea 29 bf 00 00    	sub    $0xbf29,%edx
+    85a1:	ba b1 c2 00 00       	mov    $0xc2b1,%edx
+    85a6:	81 ea 05 bf 00 00    	sub    $0xbf05,%edx
     85ac:	89 e5                	mov    %esp,%ebp
     85ae:	83 ec 08             	sub    $0x8,%esp
     85b1:	8b 45 08             	mov    0x8(%ebp),%eax
@@ -708,7 +708,7 @@ Disassembly of section .text:
     85db:	8b 45 08             	mov    0x8(%ebp),%eax
     85de:	05 8c 00 00 00       	add    $0x8c,%eax
     85e3:	e8 a8 13 00 00       	call   9990 <_ZN8terminal6outputlsEPKc>
-    85e8:	0f b6 15 28 bf 00 00 	movzbl 0xbf28,%edx
+    85e8:	0f b6 15 04 bf 00 00 	movzbl 0xbf04,%edx
     85ef:	e8 4c 14 00 00       	call   9a40 <_ZN8terminal6outputlsEh>
     85f4:	ba 0a 00 00 00       	mov    $0xa,%edx
     85f9:	c9                   	leave
@@ -1883,10 +1883,10 @@ Disassembly of section .text:
     9317:	8d 51 07             	lea    0x7(%ecx),%edx
     931a:	89 4d dc             	mov    %ecx,-0x24(%ebp)
     931d:	c1 ea 03             	shr    $0x3,%edx
-    9320:	89 0d 20 bf 00 00    	mov    %ecx,0xbf20
+    9320:	89 0d fc be 00 00    	mov    %ecx,0xbefc
     9326:	01 da                	add    %ebx,%edx
-    9328:	89 1d 00 bf 00 00    	mov    %ebx,0xbf00
-    932e:	89 15 08 bf 00 00    	mov    %edx,0xbf08
+    9328:	89 1d e8 be 00 00    	mov    %ebx,0xbee8
+    932e:	89 15 f0 be 00 00    	mov    %edx,0xbef0
     9334:	89 55 ec             	mov    %edx,-0x14(%ebp)
     9337:	39 d6                	cmp    %edx,%esi
     9339:	0f 83 7f 03 00 00    	jae    96be <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm+0x3fe>
@@ -2008,7 +2008,7 @@ Disassembly of section .text:
     949c:	8b 45 dc             	mov    -0x24(%ebp),%eax
     949f:	8b 4d ec             	mov    -0x14(%ebp),%ecx
     94a2:	31 d2                	xor    %edx,%edx
-    94a4:	a3 24 bf 00 00       	mov    %eax,0xbf24
+    94a4:	a3 00 bf 00 00       	mov    %eax,0xbf00
     94a9:	89 c8                	mov    %ecx,%eax
     94ab:	c1 e9 0c             	shr    $0xc,%ecx
     94ae:	83 e1 07             	and    $0x7,%ecx
@@ -2016,11 +2016,11 @@ Disassembly of section .text:
     94b4:	89 cb                	mov    %ecx,%ebx
     94b6:	88 4d d3             	mov    %cl,-0x2d(%ebp)
     94b9:	8d 0c 06             	lea    (%esi,%eax,1),%ecx
-    94bc:	89 0d 04 bf 00 00    	mov    %ecx,0xbf04
+    94bc:	89 0d ec be 00 00    	mov    %ecx,0xbeec
     94c2:	8b 4d e0             	mov    -0x20(%ebp),%ecx
     94c5:	88 da                	mov    %bl,%dl
-    94c7:	a3 0c bf 00 00       	mov    %eax,0xbf0c
-    94cc:	89 15 10 bf 00 00    	mov    %edx,0xbf10
+    94c7:	a3 f4 be 00 00       	mov    %eax,0xbef4
+    94cc:	89 15 f8 be 00 00    	mov    %edx,0xbef8
     94d2:	39 cf                	cmp    %ecx,%edi
     94d4:	0f 83 8e 01 00 00    	jae    9668 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm+0x3a8>
     94da:	c6 45 e8 00          	movb   $0x0,-0x18(%ebp)
@@ -2086,7 +2086,7 @@ Disassembly of section .text:
     9593:	8b 75 d8             	mov    -0x28(%ebp),%esi
     9596:	80 7d e8 00          	cmpb   $0x0,-0x18(%ebp)
     959a:	0f 84 c8 00 00 00    	je     9668 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm+0x3a8>
-    95a0:	89 1d 24 bf 00 00    	mov    %ebx,0xbf24
+    95a0:	89 1d 00 bf 00 00    	mov    %ebx,0xbf00
     95a6:	0f b6 55 d3          	movzbl -0x2d(%ebp),%edx
     95aa:	c6 45 e0 00          	movb   $0x0,-0x20(%ebp)
     95ae:	8d 3c c2             	lea    (%edx,%eax,8),%edi
@@ -2131,7 +2131,7 @@ Disassembly of section .text:
     9631:	8b 5d e8             	mov    -0x18(%ebp),%ebx
     9634:	80 7d e0 00          	cmpb   $0x0,-0x20(%ebp)
     9638:	74 06                	je     9640 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm+0x380>
-    963a:	89 1d 24 bf 00 00    	mov    %ebx,0xbf24
+    963a:	89 1d 00 bf 00 00    	mov    %ebx,0xbf00
     9640:	83 c4 2c             	add    $0x2c,%esp
     9643:	5b                   	pop    %ebx
     9644:	5e                   	pop    %esi
@@ -2155,12 +2155,12 @@ Disassembly of section .text:
     9680:	8d 58 02             	lea    0x2(%eax),%ebx
     9683:	89 5d e8             	mov    %ebx,-0x18(%ebp)
     9686:	e9 87 fd ff ff       	jmp    9412 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm+0x152>
-    968b:	c7 05 20 bf 00 00 00 	movl   $0x0,0xbf20
+    968b:	c7 05 fc be 00 00 00 	movl   $0x0,0xbefc
     9692:	00 00 00 
     9695:	89 ca                	mov    %ecx,%edx
     9697:	89 cb                	mov    %ecx,%ebx
-    9699:	89 0d 00 bf 00 00    	mov    %ecx,0xbf00
-    969f:	89 0d 08 bf 00 00    	mov    %ecx,0xbf08
+    9699:	89 0d e8 be 00 00    	mov    %ecx,0xbee8
+    969f:	89 0d f0 be 00 00    	mov    %ecx,0xbef0
     96a5:	c7 45 dc 00 00 00 00 	movl   $0x0,-0x24(%ebp)
     96ac:	83 e3 fc             	and    $0xfffffffc,%ebx
     96af:	89 f0                	mov    %esi,%eax
@@ -3454,7 +3454,7 @@ Disassembly of section .text:
     a4ab:	ba a0 0f 00 00       	mov    $0xfa0,%edx
     a4b0:	89 e5                	mov    %esp,%ebp
     a4b2:	56                   	push   %esi
-    a4b3:	0f b6 35 28 bf 00 00 	movzbl 0xbf28,%esi
+    a4b3:	0f b6 35 04 bf 00 00 	movzbl 0xbf04,%esi
     a4ba:	53                   	push   %ebx
     a4bb:	8b 5d 08             	mov    0x8(%ebp),%ebx
     a4be:	ff 14 b5 00 b4 00 00 	call   *0xb400(,%esi,4)
@@ -3532,7 +3532,7 @@ Disassembly of section .text:
     a575:	8d 76 00             	lea    0x0(%esi),%esi
     a578:	89 cb                	mov    %ecx,%ebx
     a57a:	0f b6 4d e6          	movzbl -0x1a(%ebp),%ecx
-    a57e:	0f b6 35 28 bf 00 00 	movzbl 0xbf28,%esi
+    a57e:	0f b6 35 04 bf 00 00 	movzbl 0xbf04,%esi
     a585:	80 f9 b3             	cmp    $0xb3,%cl
     a588:	77 46                	ja     a5d0 <_ZN8terminal15vga_text_buffer3putEc+0xf0>
     a58a:	83 c1 18             	add    $0x18,%ecx
@@ -3669,7 +3669,7 @@ Disassembly of section .text:
     a6e8:	89 c6                	mov    %eax,%esi
     a6ea:	89 f9                	mov    %edi,%ecx
     a6ec:	89 f8                	mov    %edi,%eax
-    a6ee:	0f b6 1d 28 bf 00 00 	movzbl 0xbf28,%ebx
+    a6ee:	0f b6 1d 04 bf 00 00 	movzbl 0xbf04,%ebx
     a6f5:	0f b6 c0             	movzbl %al,%eax
     a6f8:	80 f9 b3             	cmp    $0xb3,%cl
     a6fb:	77 4b                	ja     a748 <_ZN8terminal15vga_text_buffer12move_forwardEv+0xb8>
@@ -3776,7 +3776,7 @@ Disassembly of section .text:
     a80e:	83 c0 18             	add    $0x18,%eax
     a811:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
     a816:	ba a0 00 00 00       	mov    $0xa0,%edx
-    a81b:	0f b6 35 28 bf 00 00 	movzbl 0xbf28,%esi
+    a81b:	0f b6 35 04 bf 00 00 	movzbl 0xbf04,%esi
     a822:	0f b6 c0             	movzbl %al,%eax
     a825:	8d 04 80             	lea    (%eax,%eax,4),%eax
     a828:	c1 e0 04             	shl    $0x4,%eax
@@ -3794,7 +3794,7 @@ Disassembly of section .text:
     a84c:	0f b7 c0             	movzwl %ax,%eax
     a84f:	e9 9c 01 00 00       	jmp    a9f0 <_ZN8terminal19vga_hardware_cursor17set_display_startEt>
     a854:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-    a858:	0f b6 35 28 bf 00 00 	movzbl 0xbf28,%esi
+    a858:	0f b6 35 04 bf 00 00 	movzbl 0xbf04,%esi
     a85f:	8d 04 80             	lea    (%eax,%eax,4),%eax
     a862:	b9 00 0f 00 00       	mov    $0xf00,%ecx
     a867:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
