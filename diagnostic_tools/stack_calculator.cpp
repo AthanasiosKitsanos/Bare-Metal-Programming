@@ -14,8 +14,8 @@ constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagn
 constexpr const char* stack_result{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/calc_results.txt"};
 constexpr const char* relationships{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/relationships.txt"};
 
-constexpr uint32_t undepended_interrupt_methods_size{12};
-constexpr const char* undepended_interrupt_methods[undepended_interrupt_methods_size] =
+constexpr uint32_t undepended_interrupt_methods_size{13};
+constexpr const char* undepended_interrupt_methods[] =
 {
     "_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE",
     "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE",
@@ -29,6 +29,9 @@ constexpr const char* undepended_interrupt_methods[undepended_interrupt_methods_
     "_ZN8terminal3hexERNS_6outputE",
     "_ZN8terminal10bool_alphaERNS_6outputE",
     "_ZN8terminal13bool_no_alphaERNS_6outputE",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm"
 };
 
 constexpr uint32_t depended_interrupt_methods_size{2};

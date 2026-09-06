@@ -1,4 +1,4 @@
 #Kernel Stack
-888
+444
 #Interrupt Stack
-216
+268

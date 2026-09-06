@@ -7,7 +7,7 @@
 #include "exceptions/kernel_exceptions.h"
 #include "timer/kernel_timer.h"
 #include "pit/kernel_pit.h"
-#include "keyboard/keyboard.h"
+#include "drivers.h"
 #include "internal/kernel_interrupt_guard.h"
 #include "memory/e820/kernel_e820.h"
 #include "memory/pmm/kernel_pmm.h"
