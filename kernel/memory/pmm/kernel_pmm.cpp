@@ -574,7 +574,7 @@ namespace
         {
             current_value = _mm_load_si128(current);
             is_first_run = (run->length == 0);
-            // run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + ();
+            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run);
         }
 
     }

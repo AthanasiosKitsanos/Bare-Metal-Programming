@@ -7,15 +7,15 @@ edge: { sourcename: "kernel_main" targetname: "_ZN6kernel19set_timer_frequencyEm
 node: { title: "_ZN8terminal6output10initializeEv" label: "static void terminal::output::initialize()\nutilities/io/output/terminal_output.h:122:25" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6output10initializeEv" label: "main.cpp:12:33" }
 node: { title: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "kernel::memory::e820_memory_map kernel::memory::get_e820_memory_map()\nkernel/memory/e820/kernel_e820.h:30:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "main.cpp:15:80" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "main.cpp:16:80" }
 node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t)\nkernel/memory/pmm/kernel_pmm.h:22:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" label: "main.cpp:16:39" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" label: "main.cpp:17:39" }
 node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initialize_exceptions()\nkernel/exceptions/kernel_exceptions.h:5:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:19:34" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:20:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
 node: { title: "_ZN3app5shellC1Ev" label: "app::shell::shell()\napps/shell/shell.h:19:13" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3app5shellC1Ev" label: "main.cpp:22:22" }
+edge: { sourcename: "kernel_main" targetname: "_ZN3app5shellC1Ev" label: "main.cpp:23:22" }
 node: { title: "_ZN3app5shell3runEv" label: "void app::shell::run()\napps/shell/shell.h:23:18" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3app5shell3runEv" label: "main.cpp:26:14" }
+edge: { sourcename: "kernel_main" targetname: "_ZN3app5shell3runEv" label: "main.cpp:27:14" }
 }

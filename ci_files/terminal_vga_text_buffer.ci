@@ -6,30 +6,40 @@ node: { title: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12
 node: { title: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_avx_2_copyEPVKmPVmt" label: "volatile uint32_t* {anonymous}::use_avx_2_copy(const volatile uint32_t*, volatile uint32_t*, uint16_t)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:76:24\n16 bytes (static)" }
 node: { title: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_copyEPVKmPVmt" label: "volatile uint32_t* {anonymous}::fallback_copy(const volatile uint32_t*, volatile uint32_t*, uint16_t)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:92:24\n20 bytes (static)" }
 node: { title: "_ZN8terminal15vga_text_buffer5resetEv" label: "void terminal::vga_text_buffer::reset()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:118:10\n16 bytes (static)" }
+node: { title: "_ZN3cpu8features3getEv" label: "cpu::features::simd_flags cpu::features::get()\nutilities/cpu/features.h:9:16" shape : ellipse }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer5resetEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:126:39" }
 node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer5resetEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:127:50" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer5resetEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:136:32" }
 node: { title: "_ZN8terminal15vga_text_buffer5clearEv" label: "void terminal::vga_text_buffer::clear()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:139:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer5clearEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:145:46" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer5clearEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:145:49" }
 node: { title: "_ZN8terminal19vga_hardware_cursor17set_display_startEt" label: "static void terminal::vga_hardware_cursor::set_display_start(uint16_t)\nutilities/vga/vga_hardware_cursor/terminal_vga_hardware_cursor.h:26:25" shape : ellipse }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer5clearEv" targetname: "_ZN8terminal19vga_hardware_cursor17set_display_startEt" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:151:47" }
 node: { title: "_ZN8terminal15vga_text_buffer9clear_rowEv" label: "void terminal::vga_text_buffer::clear_row()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:155:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer9clear_rowEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:46" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer9clear_rowEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:49" }
 node: { title: "_ZN8terminal15vga_text_buffer3putEc" label: "void terminal::vga_text_buffer::put(char)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:165:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer3putEc" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:126:39" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer3putEc" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:127:50" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer3putEc" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:136:32" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer3putEc" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:46" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer3putEc" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:49" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer3putEc" targetname: "_ZN8terminal19vga_hardware_cursor17set_display_startEt" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:195:51" }
 node: { title: "_ZN8terminal15vga_text_buffer16remove_last_charEv" label: "void terminal::vga_text_buffer::remove_last_char()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:172:10\n24 bytes (static)" }
 node: { title: "_ZN8terminal15vga_text_buffer12move_forwardEv" label: "void terminal::vga_text_buffer::move_forward()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:179:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer12move_forwardEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:126:39" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer12move_forwardEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:127:50" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer12move_forwardEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:136:32" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer12move_forwardEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:46" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer12move_forwardEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:49" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer12move_forwardEv" targetname: "_ZN8terminal19vga_hardware_cursor17set_display_startEt" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:195:51" }
 node: { title: "_ZN8terminal15vga_text_buffer14move_backwardsEv" label: "void terminal::vga_text_buffer::move_backwards()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:200:10\n12 bytes (static)" }
-node: { title: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "void terminal::vga_text_buffer::move_to_next_line()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:211:10\n32 bytes (static)" }
+node: { title: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" label: "void terminal::vga_text_buffer::move_to_next_line()\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:211:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:126:39" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:127:50" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:136:32" }
+edge: { sourcename: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" targetname: "_ZN3cpu8features3getEv" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:46" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" targetname: "__indirect_call" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:161:49" }
 edge: { sourcename: "_ZN8terminal15vga_text_buffer17move_to_next_lineEv" targetname: "_ZN8terminal19vga_hardware_cursor17set_display_startEt" label: "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:223:51" }
 node: { title: "_ZN8terminal15vga_text_buffer18move_cursor_left_nEh" label: "void terminal::vga_text_buffer::move_cursor_left_n(uint8_t)\nutilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:228:10\n20 bytes (static)" }

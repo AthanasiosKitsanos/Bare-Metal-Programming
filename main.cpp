@@ -10,6 +10,7 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_pit(timer_frequency_hz);
     kernel::set_timer_frequency(timer_frequency_hz);
     terminal::output::initialize();
+    terminal::output out{};
     
     {
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};
@@ -18,7 +19,7 @@ extern "C" [[noreturn]] void kernel_main()
     
     kernel::initialize_exceptions();
     drivers::initialize();
-
+    
     app::shell shell{};
     
     asm volatile("sti");
