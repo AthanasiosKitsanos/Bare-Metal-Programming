@@ -503,8 +503,8 @@ Disassembly of section .text:
 
 000083ca <common_interrupt_entry>:
     83ca:	89 e2                	mov    %esp,%edx
-    83cc:	bb b1 c4 00 00       	mov    $0xc4b1,%ebx
-    83d1:	b9 0d e0 00 00       	mov    $0xe00d,%ecx
+    83cc:	bb bd c4 00 00       	mov    $0xc4bd,%ebx
+    83d1:	b9 f1 e0 00 00       	mov    $0xe0f1,%ecx
     83d6:	39 da                	cmp    %ebx,%edx
     83d8:	0f 46 e1             	cmovbe %ecx,%esp
     83db:	39 ca                	cmp    %ecx,%edx
@@ -542,7 +542,7 @@ Disassembly of section .text:
     841b:	8e e0                	mov    %eax,%fs
     841d:	8e e8                	mov    %eax,%gs
     841f:	8e d0                	mov    %eax,%ss
-    8421:	bc b1 c4 00 00       	mov    $0xc4b1,%esp
+    8421:	bc bd c4 00 00       	mov    $0xc4bd,%esp
     8426:	bf c0 b5 00 00       	mov    $0xb5c0,%edi
     842b:	b9 89 c0 00 00       	mov    $0xc089,%ecx
 
@@ -613,7 +613,7 @@ Disassembly of section .text:
     84ce:	e8 2d 15 00 00       	call   9a00 <_ZN8terminal6output10initializeEv>
     84d3:	89 1c 24             	mov    %ebx,(%esp)
     84d6:	e8 95 0d 00 00       	call   9270 <_ZN6kernel6memory19get_e820_memory_mapEv>
-    84db:	ba 0d e0 00 00       	mov    $0xe00d,%edx
+    84db:	ba f1 e0 00 00       	mov    $0xe0f1,%edx
     84e0:	89 d8                	mov    %ebx,%eax
     84e2:	83 c4 0c             	add    $0xc,%esp
     84e5:	e8 d6 0d 00 00       	call   92c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>
@@ -664,8 +664,8 @@ Disassembly of section .text:
 
 00008560 <_ZN12_GLOBAL__N_1L23execute_interrupt_stackEPN3app5shellE>:
     8560:	55                   	push   %ebp
-    8561:	ba 0d e0 00 00       	mov    $0xe00d,%edx
-    8566:	81 ea b1 c4 00 00    	sub    $0xc4b1,%edx
+    8561:	ba f1 e0 00 00       	mov    $0xe0f1,%edx
+    8566:	81 ea bd c4 00 00    	sub    $0xc4bd,%edx
     856c:	89 e5                	mov    %esp,%ebp
     856e:	83 ec 08             	sub    $0x8,%esp
     8571:	8b 45 08             	mov    0x8(%ebp),%eax
@@ -681,7 +681,7 @@ Disassembly of section .text:
 
 00008590 <_ZN12_GLOBAL__N_1L20execute_kernel_stackEPN3app5shellE>:
     8590:	55                   	push   %ebp
-    8591:	ba b1 c4 00 00       	mov    $0xc4b1,%edx
+    8591:	ba bd c4 00 00       	mov    $0xc4bd,%edx
     8596:	81 ea 89 c0 00 00    	sub    $0xc089,%edx
     859c:	89 e5                	mov    %esp,%ebp
     859e:	83 ec 08             	sub    $0x8,%esp
