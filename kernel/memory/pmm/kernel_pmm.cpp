@@ -760,7 +760,37 @@ namespace
     [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_sse2_core_inline(allocation_run* run, const size_t frames, const __m128i* const end, const __m128i** start) noexcept
     {
+        const __m128i* current{*start};
+        const __m128i cmp{_mm_setzero_si128()};
+        __m128i current_value{_mm_setzero_si128()};
+        __m128i cmp_result{_mm_setzero_si128()};
+        uint16_t packed_result{0};
+        bool is_first_run{false};
+        bool greater_equal{false};
 
+        for(; current < end; ++current)
+        {
+            current_value = _mm_load_si128(current);
+            cmp_result = _mm_cmpeq_epi8(current_value, cmp);
+            packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
+
+            is_first_run = (run->length == 0);
+            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
+            run->start_index.byte_index *= !is_first_run;
+
+            if(packed_result == 0xFF)
+            {
+                run->length += 128;
+                if(run->length >= frames) return;
+            }
+            else if(packed_result == 0x00) run->length = 0;
+            else
+            {
+                // WORKING ON IT
+                const uint8_t trailing_zeros{safe_trailing_zeros(packed_result)};
+                const uint8_t leading_zeros{safe_leading_zeros(packed_result)};
+            }
+        }
     }
 
     //IMPORTANT: Keep is sync with the contiguous_sse2_core_inline right above
