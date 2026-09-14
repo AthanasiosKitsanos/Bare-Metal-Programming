@@ -762,40 +762,51 @@ namespace
     {
         const __m128i* current{*start};
         const __m128i cmp{_mm_setzero_si128()};
-        __m128i current_value{_mm_setzero_si128()};
-        __m128i cmp_result{_mm_setzero_si128()};
+        const __m128i all_ones{_mm_cmpeq_epi8(cmp, cmp)};
+
+        __m128i current_value{cmp};
+        __m128i cmp_result{cmp};
+        __m128i all_ones_cmp_result{cmp};
+
         uint16_t packed_result{0};
-        const uint32_t* lane{nullptr};
+        uint16_t all_ones_packed{0};
+        
+        const uint32_t* lane_start{nullptr};
         const uint32_t* lane_end{nullptr};
 
         bool is_first_run{false};
-        bool greater_equal{false};
 
         for(; current < end; ++current)
         {
             current_value = _mm_load_si128(current);
+            
             cmp_result = _mm_cmpeq_epi8(current_value, cmp);
             packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
 
+            all_ones_cmp_result = _mm_cmpeq_epi8(current_value, all_ones);
+            all_ones_packed = static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result));
+
             is_first_run = (run->length == 0);
             run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.byte_index *= !is_first_run;
+            run->start_index.bit_index *= !is_first_run;
 
             if(packed_result == 0xFFFF)
             {
                 run->length += 128;
                 if(run->length >= frames) return;
             }
-            else if(packed_result == 0x0000) run->length = 0;
+            else if(all_ones_packed == 0xFFFF) run->length ^= run->length;
             else
             {
                 // WORKING ON IT
-                lane = reinterpret_cast<const uint32_t*>(current);
+                lane_start = reinterpret_cast<const uint32_t*>(current);
                 constexpr uint8_t end_pos{sizeof(__m128i) >> 2};
-                lane_end = lane + end_pos;
-                contiguous_32_core_inline(run, frames, lane_end, &lane);
+                lane_end = lane_start + end_pos;
+                contiguous_32_core_inline(run, frames, lane_end, &lane_start);
+                if(run->length >= frames) return;
             }
         }
+        *start = current;
     }
 
     //IMPORTANT: Keep is sync with the contiguous_sse2_core_inline right above

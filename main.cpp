@@ -19,39 +19,47 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
     
-    // terminal::output out{};
-    // out << kernel::memory::pmm_free_frames() << '\n';
-    // const uint8_t* ptr_1{reinterpret_cast<uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(32480))};
-    // if(!ptr_1) out << "Failed to allocate ptr 1\n";
-    // else out << "Allocated ptr 1'\n" << "Free Frames " << kernel::memory::pmm_free_frames() << '\n';
+    const uint8_t* first_allocation{nullptr};
+    const uint8_t* second_allocation{nullptr};
+    terminal::output out{};
+    const size_t frames{kernel::memory::pmm_free_frames()};
+    out << "Free Frames before first allication: " << frames << '\n';
+    {
+        diagnostics::stopwatch watch{};
+        first_allocation = reinterpret_cast<const uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(32480));
+        if(!first_allocation) out << "Failed to do first allocation\n";
+    }
+    const size_t frames_after{kernel::memory::pmm_free_frames()};
+    if(frames_after < frames)
+    {
+        out << "Free frames after first allocation: " << frames_after << '\n';
+    }
+    else out << "Free frames did not chagne: " << frames_after << '\n';
 
-    // const uint8_t* ptr_2{reinterpret_cast<uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(144))};
-    // if(!ptr_2) out << "Failed to allocate ptr 2\n";
-    // else out << "Allocated ptr 2'\n";
+    {
+        diagnostics::stopwatch watch{};
+        second_allocation = reinterpret_cast<const uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(141));
+        if(!second_allocation) out << "Failed to do second allocation\n";
+    }
 
-    // if(kernel::memory::pmm_free_contiguous_frames(ptr_1, 32480) == kernel::memory::pmm_result::success)
-    // {
-    //     out << "Deallocated ptr 1\n";
-    // }
-    // else out << "Failed to deallocate ptr 1\n";
+    if(first_allocation)
+    {
+        diagnostics::stopwatch watch{};
+        kernel::memory::pmm_free_contiguous_frames(first_allocation, 32480);
+    }
+    if(second_allocation)
+    {
+        diagnostics::stopwatch watch{};
+        kernel::memory::pmm_free_contiguous_frames(second_allocation, 141);
+    }
 
-    // out << kernel::memory::pmm_free_frames() << '\n';
-
-    // if(kernel::memory::pmm_free_contiguous_frames(ptr_2, 144) == kernel::memory::pmm_result::success)
-    // {
-    //     out << "Deallocated ptr 2\n";
-    // }
-    // else out << "Failed to deallocate ptr 2\n";
-
-    // out << kernel::memory::pmm_free_frames() << '\n'; 
-
-    app::shell shell{};
+    // app::shell shell{};
     
     asm volatile("sti");
 
-    shell.run();
+    // shell.run();
 
-    for(;;)
+    for(;;) 
     {
         asm volatile("hlt");
     }
