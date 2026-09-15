@@ -813,7 +813,53 @@ namespace
     [[gnu::target("sse2")]] [[gnu::regparm(3)]] [[gnu::noinline]]
     void contiguous_sse2_core(allocation_run* run, const size_t frames, const __m128i* const end, const __m128i** start) noexcept
     {
+        const __m128i* current{*start};
+        const __m128i cmp{_mm_setzero_si128()};
+        const __m128i all_ones{_mm_cmpeq_epi8(cmp, cmp)};
 
+        __m128i current_value{cmp};
+        __m128i cmp_result{cmp};
+        __m128i all_ones_cmp_result{cmp};
+
+        uint16_t packed_result{0};
+        uint16_t all_ones_packed{0};
+        
+        const uint32_t* lane_start{nullptr};
+        const uint32_t* lane_end{nullptr};
+
+        bool is_first_run{false};
+
+        for(; current < end; ++current)
+        {
+            current_value = _mm_load_si128(current);
+            
+            cmp_result = _mm_cmpeq_epi8(current_value, cmp);
+            packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
+
+            all_ones_cmp_result = _mm_cmpeq_epi8(current_value, all_ones);
+            all_ones_packed = static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result));
+
+            is_first_run = (run->length == 0);
+            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
+            run->start_index.bit_index *= !is_first_run;
+
+            if(packed_result == 0xFFFF)
+            {
+                run->length += 128;
+                if(run->length >= frames) return;
+            }
+            else if(all_ones_packed == 0xFFFF) run->length ^= run->length;
+            else
+            {
+                // WORKING ON IT
+                lane_start = reinterpret_cast<const uint32_t*>(current);
+                constexpr uint8_t end_pos{sizeof(__m128i) >> 2};
+                lane_end = lane_start + end_pos;
+                contiguous_32_core_inline(run, frames, lane_end, &lane_start);
+                if(run->length >= frames) return;
+            }
+        }
+        *start = current;
     }
 
     [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
@@ -872,7 +918,52 @@ namespace
     [[gnu::target("avx2")]] [[gnu::regparm(3)]] [[gnu::always_inline]]
     inline void contiguous_avx2_core_inline(allocation_run* run, const size_t frames, const __m256i* const end, const __m256i** start) noexcept
     {
+        const __m256i* current{*start};
+        const __m256i cmp{_mm256_setzero_si256()};
+        const __m256i all_ones{_mm256_cmpeq_epi8(cmp, cmp)};
 
+        __m256i current_value{cmp};
+        __m256i cmp_result{cmp};
+        __m256i all_ones_cmp_result{cmp};
+
+        uint32_t packed_result{0};
+        uint32_t all_ones_packed{0};
+
+        const __m128i* lane_start{nullptr};
+        const __m128i* lane_end{nullptr};
+
+        bool is_first_run{false};
+
+        for(; current < end; ++current)
+        {
+            current_value = _mm256_load_si256(current);
+
+            cmp_result = _mm256_cmpeq_epi8(current_value, cmp);
+            packed_result = static_cast<uint32_t>(_mm256_movemask_epi8(cmp_result));
+
+            all_ones_cmp_result = _mm256_cmpeq_epi8(current_value, all_ones);
+            all_ones_packed = static_cast<uint32_t>(_mm256_movemask_epi8(all_ones_cmp_result));
+
+            is_first_run = (run->length == 0);
+            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>(reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run);
+            run->start_index.bit_index *= !is_first_run;
+
+            if(packed_result == 0xFFFFFFFF)
+            {
+                run->length += 256;
+                if(run->length >= frames) return;
+            }
+            else if(all_ones_packed == 0xFFFFFFFF) run->length ^= run->length;
+            else
+            {
+                lane_start = reinterpret_cast<const __m128i*>(current);
+                constexpr uint8_t end_pos{sizeof(__m256i) >> 4};
+                lane_end = lane_start + end_pos;
+                contiguous_sse2_core_inline(run, frames, lane_end, &lane_start);
+                if(run->length >= frames) return;
+            }
+        }
+        *start = current;
     }
 
     //IMPORTANT: Keep is sync with the contiguous_avx2_core_inline right above
@@ -981,7 +1072,7 @@ namespace kernel::memory
                     current = max(start);
                     greater = (highest_address > current);
                     highest_address = (highest_address * greater) + (current * !greater);
-                }
+                } 
             }
             g_total_frames = (highest_address >> frame_size_bit_mask);
         }
