@@ -248,6 +248,10 @@ namespace
     }
 
     // SIMD Methods
+    constexpr uint8_t gpr_flag{0x00};
+    constexpr uint8_t simd_flag{0x01};
+    constexpr uint8_t avx2_flag{0x02};
+
     struct allocation_run
     {
         bit_n_byte start_index{};
@@ -798,7 +802,6 @@ namespace
             else if(all_ones_packed == 0xFFFF) run->length ^= run->length;
             else
             {
-                // WORKING ON IT
                 lane_start = reinterpret_cast<const uint32_t*>(current);
                 constexpr uint8_t end_pos{sizeof(__m128i) >> 2};
                 lane_end = lane_start + end_pos;
@@ -972,6 +975,7 @@ namespace
     // {
 
     // }
+    // Until an update of cpu features and versions of SIMD etc, the above will stay commented
 
     [[gnu::target("avx2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
     inline const uint8_t* sweep_avx_2(allocation_run* const run, const size_t frames) noexcept
@@ -1043,13 +1047,162 @@ namespace
         
         constexpr simd_alloc_lut() noexcept: entries{}
         {
-            entries[0] = find_contiguous_frames_32;
-            entries[1] = find_contiguous_frames_sse2;
-            entries[2] = find_contiguous_frames_avx2;
+            entries[gpr_flag] = find_contiguous_frames_32;
+            entries[simd_flag] = find_contiguous_frames_sse2;
+            entries[avx2_flag] = find_contiguous_frames_avx2;
         }
     };
 
     constexpr simd_alloc_lut simd_lut{};
+
+    // Peeling methods for bulk setting frames as used or as free
+    [[gnu::always_inline]] [[gnu::regparm(2)]]
+    inline void set_frames_used_8_core_inline(void** const start, const void* const end) noexcept
+    {
+        uint8_t* current{reinterpret_cast<uint8_t*>(*start)};
+        for(; current < end; ++current) *current = 0xFF;
+        *start = current;
+    }
+
+    //IMPORTANT: Keep is sync with set_frames_used_8_inline right above
+    [[gnu::regparm(2)]]
+    void set_frames_used_8_core(void** const start, const void* const end) noexcept
+    {
+        uint8_t* current{reinterpret_cast<uint8_t*>(*start)};
+        for(; current < end; ++current) *current = 0xFF;
+        *start = current;
+    }
+
+    [[gnu::always_inline]] [[gnu::regparm(2)]]
+    inline void set_frames_used_16_core_inline(void** const start, const void* const end) noexcept
+    {
+        uint16_t* current{reinterpret_cast<uint16_t*>(*start)};
+        for(; current < end; ++current) *current = 0xFFFF;
+        *start = current;
+    }
+
+    //IMPORTANT: Keep is sync with set_frames_used_16_inline right above
+    [[gnu::regparm(2)]]
+    void set_frames_used_16_core(void** const start, const void* const end) noexcept
+    {
+        uint16_t* current{reinterpret_cast<uint16_t*>(*start)};
+        for(; current < end; ++current) *current = 0xFFFF;
+        *start = current;
+    }
+
+    [[gnu::always_inline]] [[gnu::regparm(2)]]
+    inline void set_frames_used_32_core_inline(void** const start, const void* const end) noexcept
+    {
+        uint32_t* current{reinterpret_cast<uint32_t*>(*start)};
+        for(; current < end; ++current) *current = 0xFFFFFFFF;
+        *start = current;
+    }
+
+    //IMPORTANT: Keep is sync with set_frames_used_32_inline right above
+    [[gnu::regparm(2)]]
+    void set_frames_used_32_core(void** const start, const void* const end) noexcept
+    {
+        uint32_t* current{reinterpret_cast<uint32_t*>(*start)};
+        for(; current < end; ++current) *current = 0xFFFFFFFF;
+        *start = current;
+    }
+
+    [[gnu::regparm(2)]]
+    void set_frames_used_32(void* start, const void* const end) noexcept
+    {
+        constexpr uint8_t mask_2_byte{0x01};
+        constexpr uint8_t mask_4_byte{0x03};
+
+        const uintptr_t unaligbed_end{reinterpret_cast<const uintptr_t>(end)};
+
+        const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
+        const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
+        set_frames_used_8_core_inline(&start, temp_end);
+
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
+        set_frames_used_16_core_inline(&start, temp_end);
+
+        set_frames_used_32_core_inline(&start, reinterpret_cast<const void*>(aligned_end_4_byte_address));
+
+        // Fallback
+        set_frames_used_16_core(&start, reinterpret_cast<const void*>(aligned_end_2_byte_address));
+
+        set_frames_used_8_core(&start, end);
+    }
+
+    [[gnu::always_inline]] [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+    inline void set_frames_used_sse2_inline(void** const start, const void* const end) noexcept
+    {
+         __m128i* current{reinterpret_cast<__m128i*>(*start)};
+        const __m128i cmp_value{_mm_setzero_si128()};
+        const __m128i set_value{_mm_cmpeq_epi32(cmp_value, cmp_value)};
+        for(; current < end; ++current) _mm_store_si128(current, set_value);
+        *start = current;
+    }
+
+    //IMPORTANT: Keep is sync with set_frames_used_sse2_inline right above
+    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+    void set_frames_used_sse2(void** const start, const void* const end) noexcept
+    {
+        __m128i* current{reinterpret_cast<__m128i*>(*start)};
+        const __m128i cmp_value{_mm_setzero_si128()};
+        const __m128i set_value{_mm_cmpeq_epi32(cmp_value, cmp_value)};
+        for(; current < end; ++current) _mm_store_si128(current, set_value);
+        *start = current;
+    }
+
+    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+    void set_frames_used_sse2(void* start, const void* const end) noexcept
+    {
+        constexpr uint8_t mask_2_byte{0x01};
+        constexpr uint8_t mask_4_byte{0x03};
+        constexpr uint8_t mask_16_byte{0x0F};
+
+        const uintptr_t unaligbed_end{reinterpret_cast<const uintptr_t>(end)};
+
+        const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
+        const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
+        set_frames_used_8_core_inline(&start, temp_end);
+
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
+        set_frames_used_16_core_inline(&start, temp_end);
+
+        const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
+        set_frames_used_32_core_inline(&start, temp_end);
+
+        set_frames_used_sse2_inline(&start, reinterpret_cast<const void*>(aligned_end_16_byte_address));
+
+        // Fallback
+        set_frames_used_32_core(&start, reinterpret_cast<const void*>(aligned_end_4_byte_address));
+        set_frames_used_16_core(&start, reinterpret_cast<const void*>(aligned_end_2_byte_address));
+        set_frames_used_8_core(&start, end);
+    }
+
+    [[gnu::target("avx2")]] [[gnu::regparm(2)]]
+    void set_frames_used_avx2(void* start, const void* const end) noexcept
+    {
+
+    }
+
+    using simd_set_methods = void(*)(void* start, const void* const end) noexcept [[gnu::regparm(2)]];
+
+    constexpr uint8_t set_methods_size{3};
+    struct simd_set_lut
+    {
+        simd_set_methods entries[set_methods_size];
+
+        constexpr simd_set_lut(): entries{}
+        {
+            entries[gpr_flag] = set_frames_used_32;
+            entries[simd_flag] = set_frames_used_sse2;
+            entries[avx2_flag] = set_frames_used_avx2;
+        }
+    };
+
+    constexpr simd_set_lut set_methods_table{};
 }
 
 namespace kernel::memory
@@ -1196,32 +1349,39 @@ namespace kernel::memory
         if(frames == 0) return nullptr;
 
         allocation_run run{};
-        // simd_lut.entries[0](&run, frames);
         simd_lut.entries[cpu::features::get()](&run, frames);
 
         if(run.length < frames) return nullptr;
 
         const uintptr_t start_address{(run.start_index.byte_index << bit_size_byte_mask) + run.start_index.bit_index};
         const bit_n_byte end_byte{get_bit_n_byte(start_address + frames - 1)};
+
+        uint8_t* set_start{g_bitmap.start + run.start_index.byte_index};
+        uint8_t* const set_end{g_bitmap.start + end_byte.byte_index};
+
         if(run.start_index.byte_index == end_byte.byte_index)
         {
-            const uint8_t mask{static_cast<uint8_t>(front_byte_mask_used(run.start_index.bit_index) & back_byte_mask_used(end_byte.bit_index))};
-            set_frames_in_byte_used(run.start_index.byte_index, mask, frames);
+            const uint8_t front_mask{(0xFF << run.start_index.bit_index)};
+            const uint8_t end_mask{(0xFF >> (bit_max_pos - end_byte.bit_index))};
+            *set_start |= (front_mask & end_mask);
         }
         else
         {
-            set_frames_in_byte_used(run.start_index.byte_index, front_byte_mask_used(run.start_index.bit_index), bit_max_pos - run.start_index.bit_index + 1);
-            for(size_t start{run.start_index.byte_index + 1}; start < end_byte.byte_index; ++start)
-            {
-                mark_whole_byte_used(start);
-            }
-            set_frames_in_byte_used(end_byte.byte_index, back_byte_mask_used(end_byte.bit_index), end_byte.bit_index + 1);
+            
+            *set_start |= (0xFF << run.start_index.bit_index);
+            
+            set_methods_table.entries[cpu::features::get()](++set_start, set_end);
+            
+            *set_end |= (0xFF >> (bit_max_pos - end_byte.bit_index));
+            g_used_frames += frames;
         }
+        
+        g_used_frames += frames;
         const uint8_t* temp_end{g_bitmap.start + end_byte.byte_index};
         g_bitmap.search_begin = temp_end + (*temp_end == 0xFF);
         return reinterpret_cast<void*>(frame_address(start_address));
     }
-
+        
     [[gnu::regparm(2)]]
     pmm_result pmm_free_contiguous_frames(const void* address, const size_t frames) noexcept
     {
@@ -1244,10 +1404,14 @@ namespace kernel::memory
         else
         {
             set_frames_in_byte_free(start_byte.byte_index, front_byte_free_mask(start_byte.bit_index), bit_max_pos - start_byte.bit_index + 1);
-            for(size_t start{start_byte.byte_index + 1}; start < end_byte.byte_index; ++start)
-            {
-                mark_whole_byte_free(start);
-            }
+            // Making peeling set of used frames in bitmap
+            // using again a table of set_free_allocations
+
+            
+            // for(size_t start{start_byte.byte_index + 1}; start < end_byte.byte_index; ++start)
+            // {
+            //     mark_whole_byte_free(start);
+            // }
             set_frames_in_byte_free(end_byte.byte_index, back_byte_free_mask(end_byte.bit_index), end_byte.bit_index + 1);
         }
 
