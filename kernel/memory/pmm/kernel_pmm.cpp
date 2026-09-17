@@ -1055,139 +1055,99 @@ namespace
 
     constexpr simd_alloc_lut simd_lut{};
 
-    // Peeling methods for bulk setting frames as used or as free
-    [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline void set_frames_used_8_core_inline(void** const start, const void* const end) noexcept
-    {
-        uint8_t* current{reinterpret_cast<uint8_t*>(*start)};
-        for(; current < end; ++current) *current = 0xFF;
-        *start = current;
-    }
-
-    //IMPORTANT: Keep is sync with set_frames_used_8_inline right above
-    [[gnu::regparm(2)]]
-    void set_frames_used_8_core(void** const start, const void* const end) noexcept
-    {
-        uint8_t* current{reinterpret_cast<uint8_t*>(*start)};
-        for(; current < end; ++current) *current = 0xFF;
-        *start = current;
-    }
-
-    [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline void set_frames_used_16_core_inline(void** const start, const void* const end) noexcept
-    {
-        uint16_t* current{reinterpret_cast<uint16_t*>(*start)};
-        for(; current < end; ++current) *current = 0xFFFF;
-        *start = current;
-    }
-
-    //IMPORTANT: Keep is sync with set_frames_used_16_inline right above
-    [[gnu::regparm(2)]]
-    void set_frames_used_16_core(void** const start, const void* const end) noexcept
-    {
-        uint16_t* current{reinterpret_cast<uint16_t*>(*start)};
-        for(; current < end; ++current) *current = 0xFFFF;
-        *start = current;
-    }
-
-    [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline void set_frames_used_32_core_inline(void** const start, const void* const end) noexcept
-    {
-        uint32_t* current{reinterpret_cast<uint32_t*>(*start)};
-        for(; current < end; ++current) *current = 0xFFFFFFFF;
-        *start = current;
-    }
-
-    //IMPORTANT: Keep is sync with set_frames_used_32_inline right above
-    [[gnu::regparm(2)]]
-    void set_frames_used_32_core(void** const start, const void* const end) noexcept
-    {
-        uint32_t* current{reinterpret_cast<uint32_t*>(*start)};
-        for(; current < end; ++current) *current = 0xFFFFFFFF;
-        *start = current;
-    }
+// Peeling methods for bulk setting frames as used
+    #include "pmm_templates.tpp"
 
     [[gnu::regparm(2)]]
-    void set_frames_used_32(void* start, const void* const end) noexcept
+    void set_frames_used_32(uint8_t* start, const uint8_t* const end) noexcept
     {
         constexpr uint8_t mask_2_byte{0x01};
         constexpr uint8_t mask_4_byte{0x03};
 
-        const uintptr_t unaligbed_end{reinterpret_cast<const uintptr_t>(end)};
+        const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
 
-        const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
+        const uintptr_t aligned_end_2_byte_address{(reinterpret_cast<uintptr_t>(unaligbed_end) & ~mask_2_byte)};
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
-        set_frames_used_8_core_inline(&start, temp_end);
+        set_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
         const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
-        set_frames_used_16_core_inline(&start, temp_end);
+        set_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
-        set_frames_used_32_core_inline(&start, reinterpret_cast<const void*>(aligned_end_4_byte_address));
+        set_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
 
         // Fallback
-        set_frames_used_16_core(&start, reinterpret_cast<const void*>(aligned_end_2_byte_address));
+        set<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
 
-        set_frames_used_8_core(&start, end);
+        set<uint8_t, set_bits::all_ones>(&start, end);
     }
 
-    [[gnu::always_inline]] [[gnu::target("sse2")]] [[gnu::regparm(2)]]
-    inline void set_frames_used_sse2_inline(void** const start, const void* const end) noexcept
-    {
-         __m128i* current{reinterpret_cast<__m128i*>(*start)};
-        const __m128i cmp_value{_mm_setzero_si128()};
-        const __m128i set_value{_mm_cmpeq_epi32(cmp_value, cmp_value)};
-        for(; current < end; ++current) _mm_store_si128(current, set_value);
-        *start = current;
-    }
-
-    //IMPORTANT: Keep is sync with set_frames_used_sse2_inline right above
-    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
-    void set_frames_used_sse2(void** const start, const void* const end) noexcept
-    {
-        __m128i* current{reinterpret_cast<__m128i*>(*start)};
-        const __m128i cmp_value{_mm_setzero_si128()};
-        const __m128i set_value{_mm_cmpeq_epi32(cmp_value, cmp_value)};
-        for(; current < end; ++current) _mm_store_si128(current, set_value);
-        *start = current;
-    }
-
-    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
-    void set_frames_used_sse2(void* start, const void* const end) noexcept
+    // For sse2 to work I could target only the avx2, but I target both for readability
+    [[gnu::target("sse2", "avx2")]] [[gnu::regparm(2)]]
+    void set_frames_used_sse2(uint8_t* start, const uint8_t* const end) noexcept
     {
         constexpr uint8_t mask_2_byte{0x01};
         constexpr uint8_t mask_4_byte{0x03};
         constexpr uint8_t mask_16_byte{0x0F};
 
-        const uintptr_t unaligbed_end{reinterpret_cast<const uintptr_t>(end)};
+        const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
-        set_frames_used_8_core_inline(&start, temp_end);
+        set_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
         const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
-        set_frames_used_16_core_inline(&start, temp_end);
+        set_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
         const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
-        set_frames_used_32_core_inline(&start, temp_end);
+        set_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
 
-        set_frames_used_sse2_inline(&start, reinterpret_cast<const void*>(aligned_end_16_byte_address));
+        set_extend_inline<__m128i, set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
 
         // Fallback
-        set_frames_used_32_core(&start, reinterpret_cast<const void*>(aligned_end_4_byte_address));
-        set_frames_used_16_core(&start, reinterpret_cast<const void*>(aligned_end_2_byte_address));
-        set_frames_used_8_core(&start, end);
+        set<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
+        set<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set<uint8_t, set_bits::all_ones>(&start, end);
     }
 
     [[gnu::target("avx2")]] [[gnu::regparm(2)]]
-    void set_frames_used_avx2(void* start, const void* const end) noexcept
+    void set_frames_used_avx2(uint8_t* start, const uint8_t* const end) noexcept
     {
+        constexpr uint8_t mask_2_byte{0x01};
+        constexpr uint8_t mask_4_byte{0x03};
+        constexpr uint8_t mask_16_byte{0x0F};
+        constexpr uint8_t mask_32_byte{0x1F};
 
+        const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
+
+        const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
+        const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
+        set_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)}; 
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
+        set_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+
+        const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
+        set_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+
+        const uintptr_t aligned_end_32_byte_address{(unaligbed_end & ~mask_32_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_32_byte) & ~mask_32_byte), aligned_end_32_byte_address);
+        set_extend_inline<__m128i, set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(temp_end));
+
+        set_extend_inline<__m256i, set_bits::all_ones>(reinterpret_cast<__m256i**>(&start), reinterpret_cast<const __m256i*>(aligned_end_32_byte_address));
+
+        // Fallback
+        set_extend<__m128i, set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
+        set<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
+        set<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set<uint8_t, set_bits::all_ones>(&start, end);
     }
 
-    using simd_set_methods = void(*)(void* start, const void* const end) noexcept [[gnu::regparm(2)]];
+    using simd_set_methods = void(*)(uint8_t* start, const uint8_t* const end) noexcept [[gnu::regparm(2)]];
 
     constexpr uint8_t set_methods_size{3};
     struct simd_set_lut
@@ -1202,7 +1162,7 @@ namespace
         }
     };
 
-    constexpr simd_set_lut set_methods_table{};
+    constexpr simd_set_lut set_used_lut{};
 }
 
 namespace kernel::memory
@@ -1361,19 +1321,15 @@ namespace kernel::memory
 
         if(run.start_index.byte_index == end_byte.byte_index)
         {
-            const uint8_t front_mask{(0xFF << run.start_index.bit_index)};
-            const uint8_t end_mask{(0xFF >> (bit_max_pos - end_byte.bit_index))};
+            const uint8_t front_mask{static_cast<uint8_t>(0xFF << run.start_index.bit_index)};
+            const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index))};
             *set_start |= (front_mask & end_mask);
         }
         else
         {
-            
-            *set_start |= (0xFF << run.start_index.bit_index);
-            
-            set_methods_table.entries[cpu::features::get()](++set_start, set_end);
-            
-            *set_end |= (0xFF >> (bit_max_pos - end_byte.bit_index));
-            g_used_frames += frames;
+            *set_start |= static_cast<uint8_t>(0xFF << run.start_index.bit_index);
+            set_used_lut.entries[cpu::features::get()](++set_start, set_end);
+            *set_end |= static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index));
         }
         
         g_used_frames += frames;

@@ -14,4 +14,17 @@ node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initia
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:19:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
+node: { title: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "void* kernel::memory::pmm_allocate_contiguous_frames(size_t)\nkernel/memory/pmm/kernel_pmm.h:27:11" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "main.cpp:38:90" }
+node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\nutilities/io/output/terminal_output.h:187:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:42:22" }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:42:32" }
+node: { title: "_ZN6kernel6memory15pmm_free_framesEv" label: "size_t kernel::memory::pmm_free_frames()\nkernel/memory/pmm/kernel_pmm.h:37:12" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_free_framesEv" label: "main.cpp:45:55" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "main.cpp:46:91" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nutilities/io/output/terminal_output.h:172:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:47:27" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:47:48" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:47:58" }
 }
