@@ -764,9 +764,9 @@ namespace
     [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_sse2_core_inline(allocation_run* run, const size_t frames, const __m128i* const end, const __m128i** start) noexcept
     {
-        const __m128i* current{*start};
+       const __m128i* current{*start};
         const __m128i cmp{_mm_setzero_si128()};
-        const __m128i all_ones{_mm_cmpeq_epi8(cmp, cmp)};
+        const __m128i all_ones{_mm_cmpeq_epi32(cmp, cmp)};
 
         __m128i current_value{cmp};
         __m128i cmp_result{cmp};
@@ -784,10 +784,10 @@ namespace
         {
             current_value = _mm_load_si128(current);
             
-            cmp_result = _mm_cmpeq_epi8(current_value, cmp);
+            cmp_result = _mm_cmpeq_epi32(current_value, cmp);
             packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
 
-            all_ones_cmp_result = _mm_cmpeq_epi8(current_value, all_ones);
+            all_ones_cmp_result = _mm_cmpeq_epi32(current_value, all_ones);
             all_ones_packed = static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result));
 
             is_first_run = (run->length == 0);
@@ -818,7 +818,7 @@ namespace
     {
         const __m128i* current{*start};
         const __m128i cmp{_mm_setzero_si128()};
-        const __m128i all_ones{_mm_cmpeq_epi8(cmp, cmp)};
+        const __m128i all_ones{_mm_cmpeq_epi32(cmp, cmp)};
 
         __m128i current_value{cmp};
         __m128i cmp_result{cmp};
@@ -836,10 +836,10 @@ namespace
         {
             current_value = _mm_load_si128(current);
             
-            cmp_result = _mm_cmpeq_epi8(current_value, cmp);
+            cmp_result = _mm_cmpeq_epi32(current_value, cmp);
             packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
 
-            all_ones_cmp_result = _mm_cmpeq_epi8(current_value, all_ones);
+            all_ones_cmp_result = _mm_cmpeq_epi32(current_value, all_ones);
             all_ones_packed = static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result));
 
             is_first_run = (run->length == 0);
@@ -854,7 +854,6 @@ namespace
             else if(all_ones_packed == 0xFFFF) run->length ^= run->length;
             else
             {
-                // WORKING ON IT
                 lane_start = reinterpret_cast<const uint32_t*>(current);
                 constexpr uint8_t end_pos{sizeof(__m128i) >> 2};
                 lane_end = lane_start + end_pos;
@@ -923,7 +922,7 @@ namespace
     {
         const __m256i* current{*start};
         const __m256i cmp{_mm256_setzero_si256()};
-        const __m256i all_ones{_mm256_cmpeq_epi8(cmp, cmp)};
+        const __m256i all_ones{_mm256_cmpeq_epi32(cmp, cmp)};
 
         __m256i current_value{cmp};
         __m256i cmp_result{cmp};
@@ -941,7 +940,7 @@ namespace
         {
             current_value = _mm256_load_si256(current);
 
-            cmp_result = _mm256_cmpeq_epi8(current_value, cmp);
+            cmp_result = _mm256_cmpeq_epi32(current_value, cmp);
             packed_result = static_cast<uint32_t>(_mm256_movemask_epi8(cmp_result));
 
             all_ones_cmp_result = _mm256_cmpeq_epi8(current_value, all_ones);
@@ -968,14 +967,6 @@ namespace
         }
         *start = current;
     }
-
-    //IMPORTANT: Keep is sync with the contiguous_avx2_core_inline right above
-    // [[gnu::target("avx2")]] [[gnu::regparm(3)]] [[gnu::noinline]]
-    // void contiguous_avx2_core(allocation_run* run, const size_t frames, const __m256i* const end, const __m256i** start) noexcept
-    // {
-
-    // }
-    // Until an update of cpu features and versions of SIMD etc, the above will stay commented
 
     [[gnu::target("avx2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
     inline const uint8_t* sweep_avx_2(allocation_run* const run, const size_t frames) noexcept
@@ -1058,8 +1049,91 @@ namespace
 // Peeling methods for bulk setting frames as used
     #include "pmm_templates.tpp"
 
+    constexpr uint8_t mask_2_byte{0x01};
+    constexpr uint8_t mask_4_byte{0x03};
+    constexpr uint8_t mask_16_byte{0x0F};
+    constexpr uint8_t mask_32_byte{0x1F};
+
     [[gnu::regparm(2)]]
     void set_frames_used_32(uint8_t* start, const uint8_t* const end) noexcept
+    {
+        const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
+
+        const uintptr_t aligned_end_2_byte_address{(reinterpret_cast<uintptr_t>(unaligbed_end) & ~mask_2_byte)};
+        const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
+        set_gpr_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
+        set_gpr_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+
+        set_gpr_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+
+        // Fallback
+        set_gpr<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+
+        set_gpr<uint8_t, set_bits::all_ones>(&start, end);
+    }
+
+    [[gnu::target("sse2")]] [[gnu::regparm(2)]] 
+    void set_frames_used_sse2(uint8_t* start, const uint8_t* const end) noexcept
+    {
+        const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
+
+        const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
+        const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
+        set_gpr_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
+        set_gpr_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+
+        const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
+        set_gpr_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+
+        set_sse2_inline<set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
+
+        // Fallback
+        set_gpr<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
+        set_gpr<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set_gpr<uint8_t, set_bits::all_ones>(&start, end);
+    }
+
+    [[gnu::target("avx2")]] [[gnu::regparm(2)]]
+    void set_frames_used_avx2(uint8_t* start, const uint8_t* const end) noexcept
+    {
+        const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
+
+        const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
+        const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
+        set_gpr_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)}; 
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
+        set_gpr_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+
+        const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
+        set_gpr_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+
+        const uintptr_t aligned_end_32_byte_address{(unaligbed_end & ~mask_32_byte)};
+        temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_32_byte) & ~mask_32_byte), aligned_end_32_byte_address);
+        set_sse2_inline<set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(temp_end));
+
+        set_avx2_inline<set_bits::all_ones>(reinterpret_cast<__m256i**>(&start), reinterpret_cast<const __m256i*>(aligned_end_32_byte_address));
+
+        // Fallback
+        set_sse2<set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
+        set_gpr<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
+        set_gpr<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set_gpr<uint8_t, set_bits::all_ones>(&start, end);
+    }
+
+// Peeling methods for bulk setting frames as free
+
+    [[gnu::regparm(2)]]
+    void set_frames_free_32(uint8_t* start, const uint8_t* const end) noexcept
     {
         constexpr uint8_t mask_2_byte{0x01};
         constexpr uint8_t mask_4_byte{0x03};
@@ -1068,23 +1142,22 @@ namespace
 
         const uintptr_t aligned_end_2_byte_address{(reinterpret_cast<uintptr_t>(unaligbed_end) & ~mask_2_byte)};
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
-        set_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+        set_gpr_inline<uint8_t, set_bits::all_zeros>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
         const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
-        set_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+        set_gpr_inline<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
-        set_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+        set_gpr_inline<uint32_t, set_bits::all_zeros>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
 
         // Fallback
-        set<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set_gpr<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
 
-        set<uint8_t, set_bits::all_ones>(&start, end);
+        set_gpr<uint8_t, set_bits::all_zeros>(&start, end);
     }
 
-    // For sse2 to work I could target only the avx2, but I target both for readability
-    [[gnu::target("sse2", "avx2")]] [[gnu::regparm(2)]]
-    void set_frames_used_sse2(uint8_t* start, const uint8_t* const end) noexcept
+    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+    void set_frames_free_sse2(uint8_t* start, const uint8_t* const end) noexcept
     {
         constexpr uint8_t mask_2_byte{0x01};
         constexpr uint8_t mask_4_byte{0x03};
@@ -1094,75 +1167,82 @@ namespace
 
         const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
-        set_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+        set_gpr_inline<uint8_t, set_bits::all_zeros>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
         const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
-        set_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+        set_gpr_inline<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
         const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
-        set_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+        set_gpr_inline<uint32_t, set_bits::all_zeros>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
 
-        set_extend_inline<__m128i, set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
+        set_sse2_inline<set_bits::all_zeros>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
 
         // Fallback
-        set<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
-        set<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
-        set<uint8_t, set_bits::all_ones>(&start, end);
+        set_gpr<uint32_t, set_bits::all_zeros>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
+        set_gpr<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set_gpr<uint8_t, set_bits::all_zeros>(&start, end);
     }
 
     [[gnu::target("avx2")]] [[gnu::regparm(2)]]
-    void set_frames_used_avx2(uint8_t* start, const uint8_t* const end) noexcept
+    void set_frames_free_avx2(uint8_t* start, const uint8_t* const end) noexcept
     {
-        constexpr uint8_t mask_2_byte{0x01};
-        constexpr uint8_t mask_4_byte{0x03};
-        constexpr uint8_t mask_16_byte{0x0F};
-        constexpr uint8_t mask_32_byte{0x1F};
-
         const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_byte_address{(unaligbed_end & ~mask_2_byte)};
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
-        set_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
+        set_gpr_inline<uint8_t, set_bits::all_zeros>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
         const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)}; 
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
-        set_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
+        set_gpr_inline<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
         const uintptr_t aligned_end_16_byte_address{(unaligbed_end & ~mask_16_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_16_byte) & ~mask_16_byte), aligned_end_16_byte_address);
-        set_inline<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
+        set_gpr_inline<uint32_t, set_bits::all_zeros>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(temp_end));
 
         const uintptr_t aligned_end_32_byte_address{(unaligbed_end & ~mask_32_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_32_byte) & ~mask_32_byte), aligned_end_32_byte_address);
-        set_extend_inline<__m128i, set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(temp_end));
+        set_sse2_inline<set_bits::all_zeros>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(temp_end));
 
-        set_extend_inline<__m256i, set_bits::all_ones>(reinterpret_cast<__m256i**>(&start), reinterpret_cast<const __m256i*>(aligned_end_32_byte_address));
+        set_avx2_inline<set_bits::all_zeros>(reinterpret_cast<__m256i**>(&start), reinterpret_cast<const __m256i*>(aligned_end_32_byte_address));
 
         // Fallback
-        set_extend<__m128i, set_bits::all_ones>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
-        set<uint32_t, set_bits::all_ones>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
-        set<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
-        set<uint8_t, set_bits::all_ones>(&start, end);
+        set_sse2<set_bits::all_zeros>(reinterpret_cast<__m128i**>(&start), reinterpret_cast<const __m128i*>(aligned_end_16_byte_address));
+        set_gpr<uint32_t, set_bits::all_zeros>(reinterpret_cast<uint32_t**>(&start), reinterpret_cast<const uint32_t*>(aligned_end_4_byte_address));
+        set_gpr<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(aligned_end_2_byte_address));
+        set_gpr<uint8_t, set_bits::all_zeros>(&start, end);
     }
 
     using simd_set_methods = void(*)(uint8_t* start, const uint8_t* const end) noexcept [[gnu::regparm(2)]];
-
     constexpr uint8_t set_methods_size{3};
+    template<::set_bits Set>
     struct simd_set_lut
     {
-        simd_set_methods entries[set_methods_size];
+        simd_set_methods entries[::set_methods_size];
 
         constexpr simd_set_lut(): entries{}
         {
-            entries[gpr_flag] = set_frames_used_32;
-            entries[simd_flag] = set_frames_used_sse2;
-            entries[avx2_flag] = set_frames_used_avx2;
+            if constexpr(Set == set_bits::all_ones)
+            {
+                entries[gpr_flag] = set_frames_used_32;
+                entries[simd_flag] = set_frames_used_sse2;
+                entries[avx2_flag] = set_frames_used_avx2;
+            }
+            else
+            {
+                entries[gpr_flag] = set_frames_free_32;
+                entries[simd_flag] = set_frames_free_sse2;
+                entries[avx2_flag] = set_frames_free_avx2;
+            }
         }
     };
 
-    constexpr simd_set_lut set_used_lut{};
+    constexpr simd_set_lut<set_bits::all_ones> set_used_lut{};
+    constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
+
+    
 }
 
 namespace kernel::memory
@@ -1298,7 +1378,8 @@ namespace kernel::memory
         set_frame_free(&bitmap_frame_pos);
 
         const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
-        g_bitmap.search_begin -= ((g_bitmap.search_begin - addr) * (addr < g_bitmap.search_begin));
+        const bool is_addr_less{addr < g_bitmap.search_end};
+        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_addr_less) + reinterpret_cast<uintptr_t>(addr) * is_addr_less);
         
         return pmm_result::success;
     }
@@ -1319,26 +1400,23 @@ namespace kernel::memory
         uint8_t* set_start{g_bitmap.start + run.start_index.byte_index};
         uint8_t* const set_end{g_bitmap.start + end_byte.byte_index};
 
-        if(run.start_index.byte_index == end_byte.byte_index)
-        {
-            const uint8_t front_mask{static_cast<uint8_t>(0xFF << run.start_index.bit_index)};
-            const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index))};
-            *set_start |= (front_mask & end_mask);
-        }
+        const uint8_t front_mask{static_cast<uint8_t>(0xFF << run.start_index.bit_index)};
+        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index))};
+
+        if(run.start_index.byte_index == end_byte.byte_index) *set_start |= (front_mask & end_mask);
         else
         {
-            *set_start |= static_cast<uint8_t>(0xFF << run.start_index.bit_index);
+            *set_start |= front_mask;
             set_used_lut.entries[cpu::features::get()](++set_start, set_end);
-            *set_end |= static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index));
+            *set_end |= end_mask;
         }
         
         g_used_frames += frames;
-        const uint8_t* temp_end{g_bitmap.start + end_byte.byte_index};
-        g_bitmap.search_begin = temp_end + (*temp_end == 0xFF);
+        g_bitmap.search_begin = set_end + (*set_end == 0xFF);
         return reinterpret_cast<void*>(frame_address(start_address));
     }
         
-    [[gnu::regparm(2)]]
+    [[gnu::regparm(2)]] 
     pmm_result pmm_free_contiguous_frames(const void* address, const size_t frames) noexcept
     {
         if(frames == 0) return pmm_result::zero_frames;
@@ -1352,27 +1430,22 @@ namespace kernel::memory
 
         const bit_n_byte end_byte{get_bit_n_byte(index + frames - 1)};
 
-        if(start_byte.byte_index == end_byte.byte_index)
-        {
-            const uint8_t mask{static_cast<uint8_t>(front_byte_free_mask(start_byte.bit_index) | static_cast<uint8_t>(back_byte_free_mask(end_byte.bit_index)))};
-            set_frames_in_byte_free(start_byte.byte_index, mask, frames);
-        }
+        uint8_t* free_start{g_bitmap.start + start_byte.byte_index};
+        uint8_t* const end{g_bitmap.start + end_byte.byte_index};
+
+        const uint8_t front_mask{static_cast<uint8_t>(0xFF >> (bit_size_byte - start_byte.bit_index))};
+        const uint8_t back_mask{static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1))};
+
+        if(start_byte.byte_index == end_byte.byte_index) *free_start &= (front_mask | back_mask);
         else
         {
-            set_frames_in_byte_free(start_byte.byte_index, front_byte_free_mask(start_byte.bit_index), bit_max_pos - start_byte.bit_index + 1);
-            // Making peeling set of used frames in bitmap
-            // using again a table of set_free_allocations
-
-            
-            // for(size_t start{start_byte.byte_index + 1}; start < end_byte.byte_index; ++start)
-            // {
-            //     mark_whole_byte_free(start);
-            // }
-            set_frames_in_byte_free(end_byte.byte_index, back_byte_free_mask(end_byte.bit_index), end_byte.bit_index + 1);
+            *free_start &= front_mask;
+            set_free_lut.entries[cpu::features::get()](free_start + 1, end);
+            *end &= back_mask;
         }
 
-        const uint8_t* const addr{g_bitmap.start + start_byte.byte_index};
-        g_bitmap.search_begin -= ((g_bitmap.search_begin - addr) * (addr < g_bitmap.search_begin));
+        const bool is_free_start_less{free_start < g_bitmap.search_begin};
+        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
 
         return pmm_result::success;
     }

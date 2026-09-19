@@ -31,7 +31,11 @@ constexpr const char* undepended_interrupt_methods[] =
     "_ZN8terminal13bool_no_alphaERNS_6outputE",
     "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm",
     "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm"
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh"
+
 };
 
 constexpr uint32_t depended_interrupt_methods_size{2};

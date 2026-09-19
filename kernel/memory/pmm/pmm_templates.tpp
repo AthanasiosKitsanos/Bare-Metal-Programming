@@ -7,11 +7,12 @@ enum class set_bits: uint8_t
     all_ones = 0x01
 };
 
+// General Purpose Registers
 template<typename T, ::set_bits Set>
-[[gnu::always_inline]] [[gnu::regparm(2)]]
-inline void set_inline(T** start, const T* const end) noexcept
+[[gnu::always_inline]]
+inline void set_gpr_inline(T** start, const T* const end) noexcept
 {
-    constexpr uint32_t all_ones{UINT32_MAX};
+    constexpr uint64_t all_ones{UINT64_MAX};
     constexpr T value{static_cast<T>(all_ones) * static_cast<T>(Set)};
     
     T* current{*start};
@@ -21,7 +22,7 @@ inline void set_inline(T** start, const T* const end) noexcept
 
 template<typename T, ::set_bits Set>
 [[gnu::noinline]] [[gnu::regparm(2)]]
-void set(T** start, const T* const end) noexcept
+void set_gpr(T** start, const T* const end) noexcept
 {
     constexpr uint32_t all_ones{UINT32_MAX};
     constexpr T value{static_cast<T>(all_ones) * static_cast<T>(Set)};
@@ -32,56 +33,71 @@ void set(T** start, const T* const end) noexcept
     *start = current;
 }
 
-[[gnu::always_inline]] [[gnu::target("sse2")]]
-inline __m128i make_zero(const __m128i*) noexcept { return _mm_setzero_si128(); }
-
-[[gnu::always_inline]] [[gnu::target("sse2")]]
-inline __m128i make_all_ones(const __m128i*) noexcept
+// SIMD and AVX Templates
+template<::set_bits Set>
+[[gnu::always_inline]] [[gnu::target("sse2")]]  
+inline void set_sse2_inline(__m128i** start, const __m128i* const end) noexcept
 {
-    const __m128i zero{_mm_setzero_si128()};
-    return _mm_cmpeq_epi32(zero, zero);
-}
+    __m128i* current{*start};
+    __m128i value;
+    if constexpr(Set == set_bits::all_ones)
+    {
+        __m128i temp{_mm_setzero_si128()};
+        value = _mm_cmpeq_epi32(temp, temp);
+    }
+    else value = _mm_setzero_si128();
 
-[[gnu::always_inline]] [[gnu::target("sse2")]]
-inline void store(__m128i* const ptr, const __m128i value) noexcept { _mm_store_si128(ptr, value); }
-
-[[gnu::always_inline]] [[gnu::target("avx2")]]
-inline __m256i make_zero(const __m256i*) noexcept { return _mm256_setzero_si256(); }
-
-[[gnu::always_inline]] [[gnu::target("avx2")]]
-inline __m256i make_all_ones(const __m256i*) noexcept
-{
-    const __m256i zero{_mm256_setzero_si256()};
-    return _mm256_cmpeq_epi32(zero, zero);
-}
-
-[[gnu::always_inline]] [[gnu::target("avx2")]]
-inline void store(__m256i* const ptr, const __m256i value) noexcept { _mm256_store_si256(ptr, value); }
-
-template<typename T, ::set_bits Set>
-[[gnu::always_inline]] [[gnu::regparm(2)]] [[gnu::target("sse2", "avx2")]]
-inline void set_extend_inline(T** start, const T* const end) noexcept
-{
-    T* current{*start};
-
-    T value;
-    if constexpr(Set == set_bits::all_ones) value = make_all_ones(current);
-    else value = make_zero(current);
-
-    for(; current < end; ++current) store(current, value);
+    for(; current < end; ++current) _mm_store_si128(current, value);
     *start = current;
 }
 
-template<typename T, ::set_bits Set>
-[[gnu::noinline]] [[gnu::regparm(2)]] [[gnu::target("sse2", "avx2")]]
-void set_extend(T** start, const T* const end) noexcept
+template<::set_bits Set>
+[[gnu::noinline]] [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+void set_sse2(__m128i** start, const __m128i* const end) noexcept
 {
-    T* current{*start};
+    __m128i* current{*start};
+    __m128i value;
+    if constexpr(Set == set_bits::all_ones)
+    {
+        __m128i temp{_mm_setzero_si128()};
+        value = _mm_cmpeq_epi32(temp, temp);
+    }
+    else value = _mm_setzero_si128();
 
-    T value;
-    if constexpr(Set == set_bits::all_ones) value = make_all_ones(current);
-    else value = make_zero(current);
+    for(; current < end; ++current) _mm_store_si128(current, value);
+    *start = current;
+}
 
-    for(; current < end; ++current) store(current, value);
+template<::set_bits Set>
+[[gnu::always_inline]] [[gnu::target("avx2")]]
+inline void set_avx2_inline(__m256i** start, const __m256i* const end) noexcept
+{
+    __m256i* current{*start};
+    __m256i value;
+    if constexpr(Set == set_bits::all_ones)
+    {
+        __m256i temp{_mm256_setzero_si256()};
+        value = _mm256_cmpeq_epi32(temp, temp);
+    }
+    else value = _mm256_setzero_si256();
+
+    for(; current < end; ++current) _mm256_store_si256(current, value);
+    *start = current;
+}
+
+template<::set_bits Set>
+[[gnu::noinline]] [[gnu::target("avx2")]] [[gnu::regparm(2)]]
+void set_avx2(__m256i** start, const __m256i* const end) noexcept
+{
+    __m256i* current{*start};
+    __m256i value;
+    if constexpr(Set == set_bits::all_ones)
+    {
+        __m256i temp{_mm256_setzero_si256()};
+        value = _mm256_cmpeq_epi32(temp, temp);
+    }
+    else value = _mm256_setzero_si256();
+
+    for(; current < end; ++current) _mm256_store_si256(current, value);
     *start = current;
 }
