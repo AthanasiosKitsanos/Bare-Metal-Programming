@@ -9,13 +9,13 @@
 #include <stddef.h>
 #include <algorithm>
 
-constexpr const char* path{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/ci_files"};
-constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/inderect_calls.txt"};
-constexpr const char* stack_result{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/calc_results.txt"};
-constexpr const char* relationships{"C:/Users/thano/OneDrive/Desktop/C++/my_OS/diagnostic_tools/relationships.txt"};
+constexpr const char* path{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/ci_files"};
+constexpr const char* exc_txt{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/inderect_calls.txt"};
+constexpr const char* stack_result{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/calc_results.txt"};
+constexpr const char* relationships{"C:/Users/thano/OneDrive/Desktop/C++/Than_OS/diagnostic_tools/relationships.txt"};
 
-constexpr uint32_t undepended_interrupt_methods_size{12};
-constexpr const char* undepended_interrupt_methods[undepended_interrupt_methods_size] =
+constexpr uint32_t undepended_interrupt_methods_size{13};
+constexpr const char* undepended_interrupt_methods[] =
 {
     "_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE",
     "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE",
@@ -26,9 +26,16 @@ constexpr const char* undepended_interrupt_methods[undepended_interrupt_methods_
     "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_avx_2_copyEPVKmPVmt",
     "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_copyEPVKmPVmt",
     "_ZN8terminal3decERNS_6outputE",
-    "_ZN8terminal3hexERNS_6outputE",
+    "_ZN8terminal3hexERNS_6outputE", 
     "_ZN8terminal10bool_alphaERNS_6outputE",
     "_ZN8terminal13bool_no_alphaERNS_6outputE",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh",
+    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh"
+
 };
 
 constexpr uint32_t depended_interrupt_methods_size{2};
@@ -70,7 +77,7 @@ struct alignas(8) graph_ci
     
     graph_ci& operator=(const graph_ci& other) noexcept
     {
-        children = other.children;
+        children = other.children; 
         frame_size = other.frame_size;
         col = other.col;
         dist = other.dist;
@@ -133,7 +140,15 @@ uint64_t get_interrupt_stack_size() noexcept
     const char* const* current_interrupt_end{current_interrupt + undepended_interrupt_methods_size};
     for(; current_interrupt < current_interrupt_end; ++current_interrupt)
     {
-        stack_size = std::max(stack_size, get_subtree_depth(&u_map.at(*current_interrupt)));
+        try
+        {
+            stack_size = std::max(stack_size, get_subtree_depth(&u_map.at(*current_interrupt)));
+        }
+        catch(std::exception& ex)
+        {
+            std::cout << ex.what() << '\n'
+            << *current_interrupt << " does not exist\n";
+        }
     }
     
     indirect_call->frame_size = static_cast<uint32_t>(stack_size);
@@ -142,7 +157,15 @@ uint64_t get_interrupt_stack_size() noexcept
     current_interrupt_end = current_interrupt + depended_interrupt_methods_size;
     for(; current_interrupt < current_interrupt_end; ++current_interrupt)
     {
-        stack_size = std::max(stack_size, get_subtree_depth(&u_map.at(*current_interrupt)));
+        try
+        {
+            stack_size = std::max(stack_size, get_subtree_depth(&u_map.at(*current_interrupt)));
+        }
+        catch(std::exception& ex)
+        {
+            std::cout << ex.what() << '\n'
+            << *current_interrupt << " does not exist\n";
+        }
     }
     indirect_call->frame_size = static_cast<uint32_t>(stack_size);
     return stack_size;

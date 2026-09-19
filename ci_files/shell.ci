@@ -16,6 +16,8 @@ edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L20execute_kernel_sta
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L20execute_kernel_stackEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:148:37" }
 node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" label: "void {anonymous}::execute_flag(app::shell*)\napps/shell/shell.cpp:49:17\n16 bytes (static)" }
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:132:47" }
+node: { title: "_ZN3cpu8features3getEv" label: "cpu::features::simd_flags cpu::features::get()\nutilities/cpu/features.h:9:16" shape : ellipse }
+edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN3cpu8features3getEv" label: "apps/shell/shell.cpp:132:80" }
 node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\nutilities/io/output/terminal_output.h:175:21" shape : ellipse }
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_flagEPN3app5shellE" targetname: "_ZN8terminal6outputlsEh" label: "apps/shell/shell.cpp:132:81" }
 node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nutilities/io/output/terminal_output.h:169:21" shape : ellipse }
@@ -51,6 +53,7 @@ node: { title: "_ZN3app5shell4exitEv" label: "void app::shell::exit()\napps/shel
 edge: { sourcename: "_ZN3app5shell4exitEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:129:21" }
 node: { title: "_ZN3app5shell4flagEv" label: "void app::shell::flag()\napps/shell/shell.cpp:132:10\n16 bytes (static)" }
 edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEPKc" label: "apps/shell/shell.cpp:132:47" }
+edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN3cpu8features3getEv" label: "apps/shell/shell.cpp:132:80" }
 edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEh" label: "apps/shell/shell.cpp:132:81" }
 edge: { sourcename: "_ZN3app5shell4flagEv" targetname: "_ZN8terminal6outputlsEc" label: "apps/shell/shell.cpp:132:86" }
 node: { title: "_ZN3app5shell5ticksEv" label: "void app::shell::ticks()\napps/shell/shell.cpp:134:10\n16 bytes (static)" }
