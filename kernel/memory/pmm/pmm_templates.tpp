@@ -3,9 +3,29 @@
 
 enum class set_bits: uint8_t
 {
+    
     all_zeros = 0x00,
     all_ones = 0x01
 };
+
+template<typename T>
+[[gnu::always_inline]]
+inline uint8_t leading_zeros(const T value) noexcept
+{
+    constexpr uint8_t shift
+    {
+        sizeof(T) == sizeof(uint32_t) ? 0 :
+        sizeof(T) == sizeof(uint16_t) ? 16 : 24
+    };
+    return static_cast<uint8_t>(__builtin_clz(static_cast<unsigned int>(value) << shift));
+}
+
+template<typename T>
+[[gnu::always_inline]]
+inline uint8_t trailing_zeros(const T value) noexcept
+{
+    return static_cast<uint8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
+}
 
 // General Purpose Registers
 template<typename T, ::set_bits Set>

@@ -84,37 +84,6 @@ namespace
         --g_used_frames;
     }
     
-    template<typename T>
-    [[gnu::always_inline]]
-    inline uint8_t leading_zeros(const T value) noexcept
-    {
-        constexpr uint8_t shift
-        {
-            sizeof(T) == sizeof(uint32_t) ? 0 :
-            sizeof(T) == sizeof(uint16_t) ? 16 : 24
-        };
-        return static_cast<uint8_t>(__builtin_clz(static_cast<unsigned int>(value) << shift));
-    }
-
-    template<typename T>
-    [[gnu::always_inline]]
-    inline uint8_t trailing_zeros(const T value) noexcept
-    {
-        return static_cast<uint8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
-    }
-
-    [[gnu::always_inline]]
-    inline uint8_t safe_trailing_zeros(const uint8_t value) noexcept
-    {
-        return (value !=0) ? trailing_zeros(value) : bit_size_byte;
-    }
-
-    [[gnu::always_inline]]
-    inline uint8_t safe_leading_zeros(const uint8_t value) noexcept
-    {
-        return (value != 0) ? leading_zeros(value) : bit_size_byte; 
-    }
-    
     struct run
     {
         uint8_t position{0};
@@ -248,6 +217,8 @@ namespace
     }
 
     // SIMD Methods
+    #include "pmm_templates.tpp"
+
     constexpr uint8_t gpr_flag{0x00};
     constexpr uint8_t simd_flag{0x01};
     constexpr uint8_t avx2_flag{0x02};
@@ -257,6 +228,12 @@ namespace
         bit_n_byte start_index{};
         size_t length{};
     };
+
+    [[gnu::always_inline]]
+    inline uint8_t safe_trailing_zeros(const uint8_t value) noexcept { return (value !=0) ? trailing_zeros (value) : bit_size_byte; }
+
+    [[gnu::always_inline]]
+    inline uint8_t safe_leading_zeros(const uint8_t value) noexcept { return (value != 0) ? leading_zeros(value) : bit_size_byte; }
 
     [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_8_core_inline(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
@@ -1047,8 +1024,6 @@ namespace
     constexpr simd_alloc_lut simd_lut{};
 
 // Peeling methods for bulk setting frames as used
-    #include "pmm_templates.tpp"
-
     constexpr uint8_t mask_2_byte{0x01};
     constexpr uint8_t mask_4_byte{0x03};
     constexpr uint8_t mask_16_byte{0x0F};
@@ -1254,13 +1229,13 @@ namespace kernel::memory
     [[gnu::regparm(2)]]
     void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_end) noexcept
     {
-        const e820_entry* const entry_end{map->entries + map->count};
+        const e820_entry* const entries_end{map->entries + map->count};
         {
             uintptr_t highest_address{0};
             uintptr_t current{0};
             {
                 bool greater{false};
-                for(const e820_entry* start{map->entries}; start < entry_end; ++start)
+                for(const e820_entry* start{map->entries}; start < entries_end; ++start)
                 {
                     current = max(start);
                     greater = (highest_address > current);
@@ -1274,56 +1249,52 @@ namespace kernel::memory
         g_bitmap.end = g_bitmap.start + ((g_total_frames + 7) >> bit_size_byte_mask);
         g_bitmap.search_end = g_bitmap.end;
         
-        uint8_t* current{g_bitmap.start};
-        constexpr uintptr_t alignment_mask{0x3};
-        constexpr uintptr_t alignment_mask_not{~alignment_mask};
-        const uint8_t* bitmap_end{reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(current) + alignment_mask) & alignment_mask_not)};
-        for(; current < bitmap_end; ++current)
-        {
-            *current = 0xFF;
-        }
+        uint8_t* bitmap_current{g_bitmap.start};
+        const uint8_t* bitmap_end{g_bitmap.end};
+        const uint8_t features_flag{cpu::features::get()};
+        set_used_lut.entries[features_flag](bitmap_current, bitmap_end);
         
-        {
-            uint32_t* current_32{reinterpret_cast<uint32_t*>(current)};
-            uint32_t* const current_32_end{reinterpret_cast<uint32_t*>(reinterpret_cast<uintptr_t>(g_bitmap.end) & alignment_mask_not)};
-            for(; current_32 < current_32_end; ++current_32)
-            {
-                *current_32 = 0xFFFFFFFF;
-            }
-            current = reinterpret_cast<uint8_t*>(current_32);
-        }
-        
-        for(; current < g_bitmap.end; ++current)
-        {
-            *current = 0xFF;
-        }
         g_used_frames = g_total_frames;
-        
-        size_t index{frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end))};
-        bit_n_byte pair{get_bit_n_byte(index)};
+
+        bit_n_byte pair{get_bit_n_byte(frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end)))};
         g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
         g_bitmap.lower_limit = pair;
         
-        for(const e820_entry* current{map->entries}; current < entry_end; ++current)
+        bit_n_byte end_byte{};
+        uint8_t* entry_end{nullptr};
+        for(const e820_entry* current{map->entries}; current < entries_end; ++current)
         {
             if(current->type == e820_memory_type::usable)
             {
-                const uint64_t end{max(current)};
-                for(uint64_t start{current->base}; start < end; start += frame_size)
+                pair = get_bit_n_byte(frame_index(current->base));
+                end_byte = get_bit_n_byte(frame_index(max(current) - 1));
+
+                bitmap_current = (g_bitmap.start + pair.byte_index);
+
+                if(pair.byte_index == end_byte.byte_index)
                 {
-                    index = frame_index(static_cast<uintptr_t>(start));
-                    pair = get_bit_n_byte(index);
-                    set_frame_free(&pair);
+                    *bitmap_current &= (static_cast<uint8_t>(0xFF >> (bit_size_byte - pair.bit_index)) | static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1)));
+                    // IMPORTANT: specialized form of the general formula below — keep in sync
+                    g_used_frames -= (end_byte.bit_index - pair.bit_index + 1);
+                    continue;
                 }
+
+                entry_end = (g_bitmap.start + end_byte.byte_index);
+
+                *bitmap_current &= static_cast<uint8_t>(0xFF >> (bit_size_byte - pair.bit_index));
+                set_free_lut.entries[features_flag](++bitmap_current, entry_end);
+
+                *entry_end &= static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1));
+
+                g_used_frames -= (((end_byte.byte_index - pair.byte_index) << bit_size_byte_mask) + (end_byte.bit_index - pair.bit_index) + 1);
             }
         }
         
-        for(index = 0; index < g_bitmap.lower_limit.byte_index; ++index)
-        {
-            mark_whole_byte_used(index);
-        }
-
-        set_frames_in_byte_used(index, back_byte_mask_used(g_bitmap.lower_limit.bit_index), g_bitmap.lower_limit.bit_index + 1);
+        bitmap_current = g_bitmap.start; 
+        entry_end = (bitmap_current + g_bitmap.lower_limit.byte_index);
+        set_used_lut.entries[features_flag](bitmap_current, entry_end);
+        *entry_end |= (static_cast<uint8_t>(0xFF >> (bit_max_pos - g_bitmap.lower_limit.bit_index)));
+        g_used_frames += (g_bitmap.lower_limit.byte_index << bit_size_byte_mask) + (static_cast<size_t>(g_bitmap.lower_limit.bit_index) + 1);
     }
 
     void* pmm_allocate_frame() noexcept
