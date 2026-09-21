@@ -1262,31 +1262,34 @@ namespace kernel::memory
         
         bit_n_byte end_byte{};
         uint8_t* entry_end{nullptr};
+        size_t entry_start_index{0x00};
+        size_t entry_end_index{0x00};
+        constexpr uintptr_t frame_aligned_mask{frame_size - 1};
         for(const e820_entry* current{map->entries}; current < entries_end; ++current)
         {
             if(current->type == e820_memory_type::usable)
             {
-                pair = get_bit_n_byte(frame_index(current->base));
-                end_byte = get_bit_n_byte(frame_index(max(current) - 1));
+                entry_start_index = frame_index(current->base + frame_aligned_mask);
+                entry_end_index = frame_index(max(current));
 
+                if(entry_start_index >= entry_end_index) continue;
+                g_used_frames -= (entry_end_index - entry_start_index);
+
+                pair = get_bit_n_byte(entry_start_index);
+                end_byte = get_bit_n_byte(entry_end_index);
                 bitmap_current = (g_bitmap.start + pair.byte_index);
 
                 if(pair.byte_index == end_byte.byte_index)
                 {
-                    *bitmap_current &= (static_cast<uint8_t>(0xFF >> (bit_size_byte - pair.bit_index)) | static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1)));
-                    // IMPORTANT: specialized form of the general formula below — keep in sync
-                    g_used_frames -= (end_byte.bit_index - pair.bit_index + 1);
+                    *bitmap_current &= static_cast<uint8_t>((0xFF >> (bit_size_byte - pair.bit_index)) | (0xFF << (end_byte.bit_index)));
                     continue;
                 }
-
+                
                 entry_end = (g_bitmap.start + end_byte.byte_index);
 
                 *bitmap_current &= static_cast<uint8_t>(0xFF >> (bit_size_byte - pair.bit_index));
                 set_free_lut.entries[features_flag](++bitmap_current, entry_end);
-
-                *entry_end &= static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1));
-
-                g_used_frames -= (((end_byte.byte_index - pair.byte_index) << bit_size_byte_mask) + (end_byte.bit_index - pair.bit_index) + 1);
+                if(end_byte.bit_index != 0) *entry_end &= static_cast<uint8_t>(0xFF << end_byte.bit_index);
             }
         }
         
@@ -1417,7 +1420,7 @@ namespace kernel::memory
 
         const bool is_free_start_less{free_start < g_bitmap.search_begin};
         g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
-
+        g_used_frames -= frames;
         return pmm_result::success;
     }
 }
