@@ -23,7 +23,7 @@ include mk_files/apps/decl.mk
 include mk_files/assembly/decl.mk
 include mk_files/drivers/decl.mk
 include mk_files/kernel/decl.mk
-include mk_files/links/decl.mk
+include mk_files/link_scripts/decl.mk
 include mk_files/utilities/decl.mk
 include mk_files/stack_calculator/decl.mk
 

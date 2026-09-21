@@ -2,14 +2,15 @@ _interrupt_preamble_size = 52;
 _kernel_stack_size = _kernel_raw_stack + _interrupt_preamble_size;
 _interrupt_stack_size = _interrupt_raw_stack + (_interrupt_raw_stack + _interrupt_preamble_size) * 17;
 
-ENTRY(_start_stage_2)
+ENTRY(kernel_entry)
 
 SECTIONS
 {
-    . = 0x7E00;
+    . = 0x100000;
     _kernel_start = .;
     .text :
     {
+        *kernel_entry.o(.text*)
         *(.text*)
     }
     .rodata :
