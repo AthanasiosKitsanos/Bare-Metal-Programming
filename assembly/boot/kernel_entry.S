@@ -6,7 +6,6 @@
 .extern _bss_end
 .extern _kernel_stack_top
 .extern mm_flag
-.extern kernel_entry
 
 .set DATA_SEG, 0x10
 

@@ -4,6 +4,7 @@
 
 .extern _bss_start
 .extern _kernel_start
+.extern kernel_entry
 
 .set DATA_SEG, 0x10
 
@@ -29,6 +30,8 @@ pm_entry:
     andl $0x03, %eax            # find the remaning bytes that are left
     movl %eax, %ecx             # move left bytes to %ecx
     rep movsb (%esi), (%edi)    # copy the rest of the bytes
+
+    jmp kernel_entry
 
 hang:
     cli

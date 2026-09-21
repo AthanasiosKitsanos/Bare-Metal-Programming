@@ -35,12 +35,20 @@ extern "C" [[noreturn]] void kernel_main()
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};
         out << terminal::hex;
         uint8_t count{1};
+        uintptr_t kernel_start{reinterpret_cast<uintptr_t>(&_kernel_start)};
+        uintptr_t kernel_end{reinterpret_cast<uintptr_t>(&_kernel_end)};
+        uintptr_t entry_size{0};
         for(const kernel::memory::e820_entry* entry{map.entries}; entry < map.entries + map.count; ++entry)
         {
+            entry_size = entry->base + entry->length;
             out << count++ << ". entry_base: " << terminal::hex << entry->base
-            << " entry_end: " << entry->base + entry->length
+            << " entry_end: " << entry_size
             << " type: " << types[static_cast<uint8_t>(entry->type)]
             << "\nstorage: " << terminal::dec << entry->length << "\n\n";
+            if(kernel_start >= entry->base & kernel_start < entry_size)
+            {
+                out << "Kernel is here\n";
+            }
         }
         kernel::memory::pmm_initialize(&map, reinterpret_cast<uintptr_t>(&_kernel_end));
     }
