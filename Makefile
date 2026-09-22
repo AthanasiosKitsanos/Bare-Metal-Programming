@@ -41,7 +41,7 @@ MAIN_OBJ = obj/main.o
 
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE) $(CODE_32_DISASM) $(CI_FILES)
+all: $(OS_IMAGE) $(KERNEL_DISASM) $(CI_FILES)
 
 #------------------------ Source MK Files ---------------------------------
 include mk_files/apps/rules.mk
@@ -71,9 +71,9 @@ clean:
 	rm -f obj/boot/*
 	rm -f obj/drivers/*
 	rm -f obj/exception_stubs/*
-	rm -f obj/hardware_exceptions/*
 	rm -f obj/kernel/*
-	rm -f obj/utilities/*
+	rm -f obj/terminal/*
+	rm -f obj/io/*
 	rm -f obj/*.o
 	rm -f bin/*
 	rm -f elf/*

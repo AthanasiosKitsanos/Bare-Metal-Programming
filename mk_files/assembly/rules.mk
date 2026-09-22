@@ -38,17 +38,17 @@ $(CODE_16_BIN): $(CODE_16_ELF)
 	$(OBJC) -O binary $(CODE_16_ELF) $(CODE_16_BIN)
 
 # Code 32
-$(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER)
+$(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER) $(LIBRARIES) $(MAIN_OBJ)
 	kernel_stack=$$(grep -v '^#' $(CALC_RESULT_FILE) | head -n 1) &&	\
 	interrupt_stack=$$(grep -v '^#' $(CALC_RESULT_FILE) | tail -n 1);	\
 	$(LD) $(LINKING_FLAGS) -T $(KERNEL_LINKING_FLAG) $(DEF_KERNEL_STACK)=$$kernel_stack $(DEF_INTERRUPT_STACK)=$$interrupt_stack -o $(KERNEL_ELF) \
 		$(INTERRUPT_ENTRY_OBJ) $(KERNEL_ENTRY_OBJ) $(MAIN_OBJ) \
-		$(LINK_APPS_LIB) $(LINK_DRIVERS_LIB) $(LINK_KERNEL_LIB) $(LINK_KERNEL_MEMORY_LIB)  $(LINK_UTILITIES_LIB)
+		$(LINK_LIBRARIES)
 
 $(KERNEL_DISASM): $(KERNEL_ELF)
 	$(OBJDUMP) -d $(KERNEL_ELF) > $(KERNEL_DISASM)
 
-$(KERNEL_BIN): $(KERNEL_ELF) $(KERNEL_DISASM)
+$(KERNEL_BIN): $(KERNEL_ELF)
 	$(OBJC) -O binary $(KERNEL_ELF) $(KERNEL_BIN)
 	size=$$(wc -c < $(KERNEL_BIN) ); \
 	sectors=$$(( ($$size + $(SECTOR_SIZE) - 1) / $(SECTOR_SIZE) )); \

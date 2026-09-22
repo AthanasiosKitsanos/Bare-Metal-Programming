@@ -5,4 +5,4 @@ OUTPUT_OBJ = obj/terminal/output.o
 
 INPUT_H = terminal/input.h
 INPUT_CPP = terminal/input.cpp
-INPUT_OBJ = terminal/input.o
+INPUT_OBJ = obj/terminal/input.o
