@@ -1,4 +1,4 @@
-_sertor_size = 512;
+_sector_size = 512;
 
 ENTRY(_start_stage_2)
 
@@ -19,7 +19,7 @@ SECTIONS
         *(.data*)
     }
 
-    . = ALIGN(_sertor_size);
+    . = ALIGN(_sector_size);
     _kernel_source_image = .;
 
     .bss :

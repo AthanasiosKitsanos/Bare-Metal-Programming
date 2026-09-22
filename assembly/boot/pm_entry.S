@@ -31,6 +31,54 @@ pm_entry:
     movl %eax, %ecx             # move left bytes to %ecx
     rep movsb (%esi), (%edi)    # copy the rest of the bytes
 
+.leaf_1:
+    movl $1, %eax
+    cpuid
+
+    andl $0x04000000, %edx
+    jz .kernel_entry_jump
+
+    shrl $26, %edx
+    pushl %edx
+    xorl %ebx, %ebx
+
+    andl $0x14000000, %ecx
+    cmpl $0x14000000, %ecx
+    jne .compute_mm_flag
+
+    movl %cr4, %eax
+    orl $0x00040000, %eax
+    movl %eax, %cr4
+
+// .leaf_7:
+//     xorl %ecx, %ecx
+//     movl $0x7, %eax
+
+//     cpuid
+//     andl $0x00000020, %ebx
+//     jz .compute_mm_flag
+
+//     xorl %ecx, %ecx
+//     xorl %edx, %edx
+//     movl $0x7, %eax
+//     xsetbv
+
+//     xorl %ecx, %ecx
+//     xgetbv
+//     andl  $0x04, %eax
+//     jnz .compute_mm_flag
+//     xorl %ebx, %ebx
+
+.compute_mm_flag:
+    popl %edx
+
+    shrl $5, %ebx
+    addl $1, %ebx
+    imull %edx, %ebx
+    
+    movb %bl, %al
+
+.kernel_entry_jump:
     jmp kernel_entry
 
 hang:
