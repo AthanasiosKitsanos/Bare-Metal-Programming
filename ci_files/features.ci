@@ -1,3 +1,0 @@
-graph: { title: "cpu/features.cpp"
-node: { title: "_ZN3cpu8features3getEv" label: "cpu::features::simd_flags cpu::features::get()\ncpu/features.cpp:7:16\n4 bytes (static)" }
-}

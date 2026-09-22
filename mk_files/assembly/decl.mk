@@ -19,7 +19,7 @@ STAGE_2_SECTORS = assembly/internal/stage_2_sectors.inc
 
 #-------------------------Common Interrupt Entry-------------------------------
 INTERRUPT_ENTRY_S = assembly/exception_stubs/common_interrupt_entry.S
-INTERRUPT_ENTRY_OBJ = obj/exception_stubs/commom_interrupt_entry.o
+INTERRUPT_ENTRY_OBJ = obj/exception_stubs/common_interrupt_entry.o
 
 #----------------------Boot Code 16 -----------------------------
 CODE_16_ELF = elf/code_16.elf
