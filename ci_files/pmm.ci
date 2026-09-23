@@ -60,8 +60,6 @@ node: { title: "_ZN6kernel6memory16pmm_total_framesEv" label: "size_t kernel::me
 node: { title: "_ZN6kernel6memory15pmm_used_framesEv" label: "size_t kernel::memory::pmm_used_frames()\nkernel/pmm.cpp:1225:12\n4 bytes (static)" }
 node: { title: "_ZN6kernel6memory15pmm_free_framesEv" label: "size_t kernel::memory::pmm_free_frames()\nkernel/pmm.cpp:1226:12\n4 bytes (static)" }
 node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t)\nkernel/pmm.cpp:1229:10\n64 bytes (static)" }
-node: { title: "_ZN3cpu8features3getEv" label: "cpu::features::simd_flags cpu::features::get()\n./cpu/features.h:9:16" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN3cpu8features3getEv" label: "kernel/pmm.cpp:1253:55" }
 node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
 edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1254:44" }
 edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1290:52" }
@@ -69,11 +67,8 @@ edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm
 node: { title: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "void* kernel::memory::pmm_allocate_frame()\nkernel/pmm.cpp:1302:11\n24 bytes (static)" }
 node: { title: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "kernel::memory::pmm_result kernel::memory::pmm_free_frame(const void*)\nkernel/pmm.cpp:1340:16\n16 bytes (static)" }
 node: { title: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "void* kernel::memory::pmm_allocate_contiguous_frames(size_t)\nkernel/pmm.cpp:1361:11\n64 bytes (static)" }
-edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "_ZN3cpu8features3getEv" label: "kernel/pmm.cpp:1366:44" }
 edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1366:47" }
-edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "_ZN3cpu8features3getEv" label: "kernel/pmm.cpp:1383:52" }
 edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1383:55" }
 node: { title: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "kernel::memory::pmm_result kernel::memory::pmm_free_contiguous_frames(const void*, size_t)\nkernel/pmm.cpp:1393:16\n48 bytes (static)" }
-edge: { sourcename: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" targetname: "_ZN3cpu8features3getEv" label: "kernel/pmm.cpp:1416:52" }
 edge: { sourcename: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1416:55" }
 }

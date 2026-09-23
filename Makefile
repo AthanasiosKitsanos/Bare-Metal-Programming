@@ -18,7 +18,8 @@ SECTOR_SIZE = 512
 INCLUDE_MAP_FILE = -Map=output.map
 
 CI_FILES = ci_files
-#-----------------------Include Mk Files---------------------------------------
+#----------------------- Mk Declaretions ---------------------------------------
+include mk_files/tools/decl.mk
 include mk_files/apps/decl.mk
 include mk_files/assembly/decl.mk
 include mk_files/drivers/decl.mk
@@ -43,7 +44,7 @@ MAIN_OBJ = obj/main.o
 
 all: $(OS_IMAGE) $(KERNEL_DISASM) $(CI_FILES)
 
-#------------------------ Source MK Files ---------------------------------
+#------------------------  MK Rules ---------------------------------
 include mk_files/apps/rules.mk
 include mk_files/assembly/rules.mk
 include mk_files/drivers/rules.mk

@@ -56,7 +56,6 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
 
-
     // struct something
     // {
     //     uint8_t* ptr;

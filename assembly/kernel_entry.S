@@ -5,10 +5,11 @@
 .extern _bss_start
 .extern _bss_end
 .extern _kernel_stack_top
-.extern mm_flag
+.extern _mm_flag
 
 .set DATA_SEG, 0x10
 
+# DO NOT USE EBX UNTIL AFTER movb %bl, _mm_flag in the kernel_call label
 kernel_entry:
     movw $DATA_SEG, %ax
     movw %ax, %ds
@@ -24,22 +25,13 @@ kernel_entry:
 
 .init_bss:
     cmpl %edi, %ecx
-    je .init_end
+    je .kernel_call
     movb $0, (%edi)
     incl %edi
-    jmp .init_bss
-
-.init_end:
-    movl %cr0, %eax
-    andl $0xFFFFFFFB, %eax
-    orl $0x00000002, %eax
-    movl %eax, %cr0
-
-    movl %cr4, %eax
-    orl $0x00000600, %eax
-    movl %eax, %cr4 
+    jmp .init_bss 
 
 .kernel_call:
+    movb %bl, _mm_flag
     movl %esp, %ebp
     call kernel_main
 

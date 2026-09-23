@@ -1,8 +1,20 @@
 #include "features.h"
 
-namespace cpu::features
-{
-    extern "C" simd_flags mm_flag{0}; 
+extern "C" uint8_t _mm_flag{0};
 
-    simd_flags get() noexcept { return mm_flag; }
-}
+// namespace cpu::features
+// {
+//     uint8_t get() noexcept { return _mm_flag; }
+// }
+
+// namespace cpu
+// {
+//     class mm_flag
+//     {
+//         static uint8_t flag;
+
+//         public:
+//         [[gnu::always_inline]]
+//         static inline uint8_t get() noexcept { return flag; }
+//     };
+// }

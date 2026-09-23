@@ -17,6 +17,9 @@ edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptions
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
 node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\nterminal/output.h:175:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEh" label: "main.cpp:59:31" }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nterminal/output.h:169:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:59:36" }
 edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEh" label: "main.cpp:44:25" }
 node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nterminal/output.h:172:21" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:44:31" }

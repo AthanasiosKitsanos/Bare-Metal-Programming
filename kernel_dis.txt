@@ -11,1124 +11,1116 @@ Disassembly of section .text:
   100008:	8e e0                	mov    %eax,%fs
   10000a:	8e e8                	mov    %eax,%gs
   10000c:	8e d0                	mov    %eax,%ss
-  10000e:	bc d7 4d 10 00       	mov    $0x104dd7,%esp
-  100013:	bf c0 40 10 00       	mov    $0x1040c0,%edi
-  100018:	b9 83 4b 10 00       	mov    $0x104b83,%ecx
+  10000e:	bc 97 4d 10 00       	mov    $0x104d97,%esp
+  100013:	bf 80 40 10 00       	mov    $0x104080,%edi
+  100018:	b9 43 4b 10 00       	mov    $0x104b43,%ecx
 
 0010001d <.init_bss>:
   10001d:	39 f9                	cmp    %edi,%ecx
-  10001f:	74 06                	je     100027 <.init_end>
+  10001f:	74 06                	je     100027 <.kernel_call>
   100021:	c6 07 00             	movb   $0x0,(%edi)
   100024:	47                   	inc    %edi
   100025:	eb f6                	jmp    10001d <.init_bss>
 
-00100027 <.init_end>:
-  100027:	0f 20 c0             	mov    %cr0,%eax
-  10002a:	83 e0 fb             	and    $0xfffffffb,%eax
-  10002d:	83 c8 02             	or     $0x2,%eax
-  100030:	0f 22 c0             	mov    %eax,%cr0
-  100033:	0f 20 e0             	mov    %cr4,%eax
-  100036:	0d 00 06 00 00       	or     $0x600,%eax
-  10003b:	0f 22 e0             	mov    %eax,%cr4
+00100027 <.kernel_call>:
+  100027:	88 1d 42 4b 10 00    	mov    %bl,0x104b42
+  10002d:	89 e5                	mov    %esp,%ebp
+  10002f:	e8 9c 05 00 00       	call   1005d0 <kernel_main>
 
-0010003e <.kernel_call>:
-  10003e:	89 e5                	mov    %esp,%ebp
-  100040:	e8 9b 05 00 00       	call   1005e0 <kernel_main>
+00100034 <hang>:
+  100034:	fa                   	cli
+  100035:	f4                   	hlt
+  100036:	eb fc                	jmp    100034 <hang>
 
-00100045 <hang>:
-  100045:	fa                   	cli
-  100046:	f4                   	hlt
-  100047:	eb fc                	jmp    100045 <hang>
+00100038 <isr_0>:
+  100038:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10003f:	0f 83 7c 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100045:	fe 05 81 40 10 00    	incb   0x104081
+  10004b:	6a 00                	push   $0x0
+  10004d:	6a 00                	push   $0x0
+  10004f:	60                   	pusha
+  100050:	e9 27 05 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100049 <isr_0>:
-  100049:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100050:	0f 83 7c 05 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100056:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10005c:	6a 00                	push   $0x0
-  10005e:	6a 00                	push   $0x0
-  100060:	60                   	pusha
-  100061:	e9 27 05 00 00       	jmp    10058d <common_interrupt_entry>
+00100055 <isr_1>:
+  100055:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10005c:	0f 83 5f 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100062:	fe 05 81 40 10 00    	incb   0x104081
+  100068:	6a 00                	push   $0x0
+  10006a:	6a 01                	push   $0x1
+  10006c:	60                   	pusha
+  10006d:	e9 0a 05 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100066 <isr_1>:
-  100066:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10006d:	0f 83 5f 05 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100073:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100079:	6a 00                	push   $0x0
-  10007b:	6a 01                	push   $0x1
-  10007d:	60                   	pusha
-  10007e:	e9 0a 05 00 00       	jmp    10058d <common_interrupt_entry>
+00100072 <isr_2>:
+  100072:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100079:	0f 83 42 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10007f:	fe 05 81 40 10 00    	incb   0x104081
+  100085:	6a 00                	push   $0x0
+  100087:	6a 02                	push   $0x2
+  100089:	60                   	pusha
+  10008a:	e9 ed 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100083 <isr_2>:
-  100083:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10008a:	0f 83 42 05 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100090:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100096:	6a 00                	push   $0x0
-  100098:	6a 02                	push   $0x2
-  10009a:	60                   	pusha
-  10009b:	e9 ed 04 00 00       	jmp    10058d <common_interrupt_entry>
+0010008f <isr_3>:
+  10008f:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100096:	0f 83 25 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10009c:	fe 05 81 40 10 00    	incb   0x104081
+  1000a2:	6a 00                	push   $0x0
+  1000a4:	6a 03                	push   $0x3
+  1000a6:	60                   	pusha
+  1000a7:	e9 d0 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-001000a0 <isr_3>:
-  1000a0:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1000a7:	0f 83 25 05 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1000ad:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1000b3:	6a 00                	push   $0x0
-  1000b5:	6a 03                	push   $0x3
-  1000b7:	60                   	pusha
-  1000b8:	e9 d0 04 00 00       	jmp    10058d <common_interrupt_entry>
+001000ac <isr_4>:
+  1000ac:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1000b3:	0f 83 08 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1000b9:	fe 05 81 40 10 00    	incb   0x104081
+  1000bf:	6a 00                	push   $0x0
+  1000c1:	6a 04                	push   $0x4
+  1000c3:	60                   	pusha
+  1000c4:	e9 b3 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-001000bd <isr_4>:
-  1000bd:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1000c4:	0f 83 08 05 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1000ca:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1000d0:	6a 00                	push   $0x0
-  1000d2:	6a 04                	push   $0x4
-  1000d4:	60                   	pusha
-  1000d5:	e9 b3 04 00 00       	jmp    10058d <common_interrupt_entry>
+001000c9 <isr_5>:
+  1000c9:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1000d0:	0f 83 eb 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1000d6:	fe 05 81 40 10 00    	incb   0x104081
+  1000dc:	6a 00                	push   $0x0
+  1000de:	6a 05                	push   $0x5
+  1000e0:	60                   	pusha
+  1000e1:	e9 96 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-001000da <isr_5>:
-  1000da:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1000e1:	0f 83 eb 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1000e7:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1000ed:	6a 00                	push   $0x0
-  1000ef:	6a 05                	push   $0x5
-  1000f1:	60                   	pusha
-  1000f2:	e9 96 04 00 00       	jmp    10058d <common_interrupt_entry>
+001000e6 <isr_6>:
+  1000e6:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1000ed:	0f 83 ce 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1000f3:	fe 05 81 40 10 00    	incb   0x104081
+  1000f9:	6a 00                	push   $0x0
+  1000fb:	6a 06                	push   $0x6
+  1000fd:	60                   	pusha
+  1000fe:	e9 79 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-001000f7 <isr_6>:
-  1000f7:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1000fe:	0f 83 ce 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100104:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10010a:	6a 00                	push   $0x0
-  10010c:	6a 06                	push   $0x6
-  10010e:	60                   	pusha
-  10010f:	e9 79 04 00 00       	jmp    10058d <common_interrupt_entry>
+00100103 <isr_7>:
+  100103:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10010a:	0f 83 b1 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100110:	fe 05 81 40 10 00    	incb   0x104081
+  100116:	6a 00                	push   $0x0
+  100118:	6a 07                	push   $0x7
+  10011a:	60                   	pusha
+  10011b:	e9 5c 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100114 <isr_7>:
-  100114:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10011b:	0f 83 b1 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100121:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100127:	6a 00                	push   $0x0
-  100129:	6a 07                	push   $0x7
-  10012b:	60                   	pusha
-  10012c:	e9 5c 04 00 00       	jmp    10058d <common_interrupt_entry>
+00100120 <isr_9>:
+  100120:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100127:	0f 83 94 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10012d:	fe 05 81 40 10 00    	incb   0x104081
+  100133:	6a 00                	push   $0x0
+  100135:	6a 09                	push   $0x9
+  100137:	60                   	pusha
+  100138:	e9 3f 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100131 <isr_9>:
-  100131:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100138:	0f 83 94 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10013e:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100144:	6a 00                	push   $0x0
-  100146:	6a 09                	push   $0x9
-  100148:	60                   	pusha
-  100149:	e9 3f 04 00 00       	jmp    10058d <common_interrupt_entry>
+0010013d <isr_15>:
+  10013d:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100144:	0f 83 77 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10014a:	fe 05 81 40 10 00    	incb   0x104081
+  100150:	6a 00                	push   $0x0
+  100152:	6a 0f                	push   $0xf
+  100154:	60                   	pusha
+  100155:	e9 22 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010014e <isr_15>:
-  10014e:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100155:	0f 83 77 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10015b:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100161:	6a 00                	push   $0x0
-  100163:	6a 0f                	push   $0xf
-  100165:	60                   	pusha
-  100166:	e9 22 04 00 00       	jmp    10058d <common_interrupt_entry>
+0010015a <isr_16>:
+  10015a:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100161:	0f 83 5a 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100167:	fe 05 81 40 10 00    	incb   0x104081
+  10016d:	6a 00                	push   $0x0
+  10016f:	6a 10                	push   $0x10
+  100171:	60                   	pusha
+  100172:	e9 05 04 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010016b <isr_16>:
-  10016b:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100172:	0f 83 5a 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100178:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10017e:	6a 00                	push   $0x0
-  100180:	6a 10                	push   $0x10
-  100182:	60                   	pusha
-  100183:	e9 05 04 00 00       	jmp    10058d <common_interrupt_entry>
+00100177 <isr_8>:
+  100177:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10017e:	0f 83 3d 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100184:	fe 05 81 40 10 00    	incb   0x104081
+  10018a:	6a 08                	push   $0x8
+  10018c:	60                   	pusha
+  10018d:	e9 ea 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100188 <isr_8>:
-  100188:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10018f:	0f 83 3d 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100195:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10019b:	6a 08                	push   $0x8
-  10019d:	60                   	pusha
-  10019e:	e9 ea 03 00 00       	jmp    10058d <common_interrupt_entry>
+00100192 <isr_10>:
+  100192:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100199:	0f 83 22 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10019f:	fe 05 81 40 10 00    	incb   0x104081
+  1001a5:	6a 0a                	push   $0xa
+  1001a7:	60                   	pusha
+  1001a8:	e9 cf 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-001001a3 <isr_10>:
-  1001a3:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1001aa:	0f 83 22 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1001b0:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1001b6:	6a 0a                	push   $0xa
-  1001b8:	60                   	pusha
-  1001b9:	e9 cf 03 00 00       	jmp    10058d <common_interrupt_entry>
+001001ad <isr_11>:
+  1001ad:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1001b4:	0f 83 07 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1001ba:	fe 05 81 40 10 00    	incb   0x104081
+  1001c0:	6a 0b                	push   $0xb
+  1001c2:	60                   	pusha
+  1001c3:	e9 b4 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-001001be <isr_11>:
-  1001be:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1001c5:	0f 83 07 04 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1001cb:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1001d1:	6a 0b                	push   $0xb
-  1001d3:	60                   	pusha
-  1001d4:	e9 b4 03 00 00       	jmp    10058d <common_interrupt_entry>
+001001c8 <isr_12>:
+  1001c8:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1001cf:	0f 83 ec 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1001d5:	fe 05 81 40 10 00    	incb   0x104081
+  1001db:	6a 0c                	push   $0xc
+  1001dd:	60                   	pusha
+  1001de:	e9 99 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-001001d9 <isr_12>:
-  1001d9:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1001e0:	0f 83 ec 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1001e6:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1001ec:	6a 0c                	push   $0xc
-  1001ee:	60                   	pusha
-  1001ef:	e9 99 03 00 00       	jmp    10058d <common_interrupt_entry>
+001001e3 <isr_13>:
+  1001e3:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1001ea:	0f 83 d1 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1001f0:	fe 05 81 40 10 00    	incb   0x104081
+  1001f6:	6a 0d                	push   $0xd
+  1001f8:	60                   	pusha
+  1001f9:	e9 7e 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-001001f4 <isr_13>:
-  1001f4:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1001fb:	0f 83 d1 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100201:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100207:	6a 0d                	push   $0xd
-  100209:	60                   	pusha
-  10020a:	e9 7e 03 00 00       	jmp    10058d <common_interrupt_entry>
+001001fe <isr_14>:
+  1001fe:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100205:	0f 83 b6 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10020b:	fe 05 81 40 10 00    	incb   0x104081
+  100211:	6a 0e                	push   $0xe
+  100213:	60                   	pusha
+  100214:	e9 63 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010020f <isr_14>:
-  10020f:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100216:	0f 83 b6 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10021c:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100222:	6a 0e                	push   $0xe
-  100224:	60                   	pusha
-  100225:	e9 63 03 00 00       	jmp    10058d <common_interrupt_entry>
+00100219 <isr_17>:
+  100219:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100220:	0f 83 9b 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100226:	fe 05 81 40 10 00    	incb   0x104081
+  10022c:	6a 11                	push   $0x11
+  10022e:	60                   	pusha
+  10022f:	e9 48 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010022a <isr_17>:
-  10022a:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100231:	0f 83 9b 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100237:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10023d:	6a 11                	push   $0x11
-  10023f:	60                   	pusha
-  100240:	e9 48 03 00 00       	jmp    10058d <common_interrupt_entry>
+00100234 <isr_18>:
+  100234:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10023b:	0f 83 80 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100241:	fe 05 81 40 10 00    	incb   0x104081
+  100247:	6a 00                	push   $0x0
+  100249:	6a 12                	push   $0x12
+  10024b:	60                   	pusha
+  10024c:	e9 2b 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100245 <isr_18>:
-  100245:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10024c:	0f 83 80 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100252:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100258:	6a 00                	push   $0x0
-  10025a:	6a 12                	push   $0x12
-  10025c:	60                   	pusha
-  10025d:	e9 2b 03 00 00       	jmp    10058d <common_interrupt_entry>
+00100251 <isr_19>:
+  100251:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100258:	0f 83 63 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10025e:	fe 05 81 40 10 00    	incb   0x104081
+  100264:	6a 00                	push   $0x0
+  100266:	6a 13                	push   $0x13
+  100268:	60                   	pusha
+  100269:	e9 0e 03 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100262 <isr_19>:
-  100262:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100269:	0f 83 63 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10026f:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100275:	6a 00                	push   $0x0
-  100277:	6a 13                	push   $0x13
-  100279:	60                   	pusha
-  10027a:	e9 0e 03 00 00       	jmp    10058d <common_interrupt_entry>
+0010026e <isr_20>:
+  10026e:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100275:	0f 83 46 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10027b:	fe 05 81 40 10 00    	incb   0x104081
+  100281:	6a 00                	push   $0x0
+  100283:	6a 14                	push   $0x14
+  100285:	60                   	pusha
+  100286:	e9 f1 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010027f <isr_20>:
-  10027f:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100286:	0f 83 46 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10028c:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100292:	6a 00                	push   $0x0
-  100294:	6a 14                	push   $0x14
-  100296:	60                   	pusha
-  100297:	e9 f1 02 00 00       	jmp    10058d <common_interrupt_entry>
+0010028b <isr_21>:
+  10028b:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100292:	0f 83 29 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100298:	fe 05 81 40 10 00    	incb   0x104081
+  10029e:	6a 00                	push   $0x0
+  1002a0:	6a 15                	push   $0x15
+  1002a2:	60                   	pusha
+  1002a3:	e9 d4 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010029c <isr_21>:
-  10029c:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1002a3:	0f 83 29 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1002a9:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1002af:	6a 00                	push   $0x0
-  1002b1:	6a 15                	push   $0x15
-  1002b3:	60                   	pusha
-  1002b4:	e9 d4 02 00 00       	jmp    10058d <common_interrupt_entry>
+001002a8 <isr_22>:
+  1002a8:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1002af:	0f 83 0c 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1002b5:	fe 05 81 40 10 00    	incb   0x104081
+  1002bb:	6a 00                	push   $0x0
+  1002bd:	6a 16                	push   $0x16
+  1002bf:	60                   	pusha
+  1002c0:	e9 b7 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-001002b9 <isr_22>:
-  1002b9:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1002c0:	0f 83 0c 03 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1002c6:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1002cc:	6a 00                	push   $0x0
-  1002ce:	6a 16                	push   $0x16
-  1002d0:	60                   	pusha
-  1002d1:	e9 b7 02 00 00       	jmp    10058d <common_interrupt_entry>
+001002c5 <isr_23>:
+  1002c5:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1002cc:	0f 83 ef 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1002d2:	fe 05 81 40 10 00    	incb   0x104081
+  1002d8:	6a 00                	push   $0x0
+  1002da:	6a 17                	push   $0x17
+  1002dc:	60                   	pusha
+  1002dd:	e9 9a 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-001002d6 <isr_23>:
-  1002d6:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1002dd:	0f 83 ef 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1002e3:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1002e9:	6a 00                	push   $0x0
-  1002eb:	6a 17                	push   $0x17
-  1002ed:	60                   	pusha
-  1002ee:	e9 9a 02 00 00       	jmp    10058d <common_interrupt_entry>
+001002e2 <isr_24>:
+  1002e2:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1002e9:	0f 83 d2 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1002ef:	fe 05 81 40 10 00    	incb   0x104081
+  1002f5:	6a 00                	push   $0x0
+  1002f7:	6a 18                	push   $0x18
+  1002f9:	60                   	pusha
+  1002fa:	e9 7d 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-001002f3 <isr_24>:
-  1002f3:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1002fa:	0f 83 d2 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100300:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100306:	6a 00                	push   $0x0
-  100308:	6a 18                	push   $0x18
-  10030a:	60                   	pusha
-  10030b:	e9 7d 02 00 00       	jmp    10058d <common_interrupt_entry>
+001002ff <isr_25>:
+  1002ff:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100306:	0f 83 b5 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10030c:	fe 05 81 40 10 00    	incb   0x104081
+  100312:	6a 00                	push   $0x0
+  100314:	6a 19                	push   $0x19
+  100316:	60                   	pusha
+  100317:	e9 60 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100310 <isr_25>:
-  100310:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100317:	0f 83 b5 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10031d:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100323:	6a 00                	push   $0x0
-  100325:	6a 19                	push   $0x19
-  100327:	60                   	pusha
-  100328:	e9 60 02 00 00       	jmp    10058d <common_interrupt_entry>
+0010031c <isr_26>:
+  10031c:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100323:	0f 83 98 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100329:	fe 05 81 40 10 00    	incb   0x104081
+  10032f:	6a 00                	push   $0x0
+  100331:	6a 1a                	push   $0x1a
+  100333:	60                   	pusha
+  100334:	e9 43 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010032d <isr_26>:
-  10032d:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100334:	0f 83 98 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10033a:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100340:	6a 00                	push   $0x0
-  100342:	6a 1a                	push   $0x1a
-  100344:	60                   	pusha
-  100345:	e9 43 02 00 00       	jmp    10058d <common_interrupt_entry>
+00100339 <isr_27>:
+  100339:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100340:	0f 83 7b 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100346:	fe 05 81 40 10 00    	incb   0x104081
+  10034c:	6a 00                	push   $0x0
+  10034e:	6a 1b                	push   $0x1b
+  100350:	60                   	pusha
+  100351:	e9 26 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010034a <isr_27>:
-  10034a:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  100351:	0f 83 7b 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100357:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10035d:	6a 00                	push   $0x0
-  10035f:	6a 1b                	push   $0x1b
-  100361:	60                   	pusha
-  100362:	e9 26 02 00 00       	jmp    10058d <common_interrupt_entry>
+00100356 <isr_28>:
+  100356:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10035d:	0f 83 5e 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100363:	fe 05 81 40 10 00    	incb   0x104081
+  100369:	6a 00                	push   $0x0
+  10036b:	6a 1c                	push   $0x1c
+  10036d:	60                   	pusha
+  10036e:	e9 09 02 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100367 <isr_28>:
-  100367:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10036e:	0f 83 5e 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100374:	fe 05 c1 40 10 00    	incb   0x1040c1
-  10037a:	6a 00                	push   $0x0
-  10037c:	6a 1c                	push   $0x1c
-  10037e:	60                   	pusha
-  10037f:	e9 09 02 00 00       	jmp    10058d <common_interrupt_entry>
+00100373 <isr_29>:
+  100373:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  10037a:	0f 83 41 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100380:	fe 05 81 40 10 00    	incb   0x104081
+  100386:	6a 00                	push   $0x0
+  100388:	6a 1d                	push   $0x1d
+  10038a:	60                   	pusha
+  10038b:	e9 ec 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100384 <isr_29>:
-  100384:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  10038b:	0f 83 41 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100391:	fe 05 c1 40 10 00    	incb   0x1040c1
-  100397:	6a 00                	push   $0x0
-  100399:	6a 1d                	push   $0x1d
-  10039b:	60                   	pusha
-  10039c:	e9 ec 01 00 00       	jmp    10058d <common_interrupt_entry>
+00100390 <isr_30>:
+  100390:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  100397:	0f 83 24 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10039d:	fe 05 81 40 10 00    	incb   0x104081
+  1003a3:	6a 00                	push   $0x0
+  1003a5:	6a 1e                	push   $0x1e
+  1003a7:	60                   	pusha
+  1003a8:	e9 cf 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-001003a1 <isr_30>:
-  1003a1:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1003a8:	0f 83 24 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1003ae:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1003b4:	6a 00                	push   $0x0
-  1003b6:	6a 1e                	push   $0x1e
-  1003b8:	60                   	pusha
-  1003b9:	e9 cf 01 00 00       	jmp    10058d <common_interrupt_entry>
+001003ad <isr_31>:
+  1003ad:	80 3d 81 40 10 00 03 	cmpb   $0x3,0x104081
+  1003b4:	0f 83 07 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1003ba:	fe 05 81 40 10 00    	incb   0x104081
+  1003c0:	6a 00                	push   $0x0
+  1003c2:	6a 1f                	push   $0x1f
+  1003c4:	60                   	pusha
+  1003c5:	e9 b2 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-001003be <isr_31>:
-  1003be:	80 3d c1 40 10 00 03 	cmpb   $0x3,0x1040c1
-  1003c5:	0f 83 07 02 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1003cb:	fe 05 c1 40 10 00    	incb   0x1040c1
-  1003d1:	6a 00                	push   $0x0
-  1003d3:	6a 1f                	push   $0x1f
-  1003d5:	60                   	pusha
-  1003d6:	e9 b2 01 00 00       	jmp    10058d <common_interrupt_entry>
+001003ca <irq_32>:
+  1003ca:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  1003d1:	0f 83 ea 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1003d7:	fe 05 80 40 10 00    	incb   0x104080
+  1003dd:	6a 00                	push   $0x0
+  1003df:	6a 20                	push   $0x20
+  1003e1:	60                   	pusha
+  1003e2:	e9 95 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-001003db <irq_32>:
-  1003db:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  1003e2:	0f 83 ea 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1003e8:	fe 05 c0 40 10 00    	incb   0x1040c0
-  1003ee:	6a 00                	push   $0x0
-  1003f0:	6a 20                	push   $0x20
-  1003f2:	60                   	pusha
-  1003f3:	e9 95 01 00 00       	jmp    10058d <common_interrupt_entry>
+001003e7 <irq_33>:
+  1003e7:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  1003ee:	0f 83 cd 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1003f4:	fe 05 80 40 10 00    	incb   0x104080
+  1003fa:	6a 00                	push   $0x0
+  1003fc:	6a 21                	push   $0x21
+  1003fe:	60                   	pusha
+  1003ff:	e9 78 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-001003f8 <irq_33>:
-  1003f8:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  1003ff:	0f 83 cd 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100405:	fe 05 c0 40 10 00    	incb   0x1040c0
-  10040b:	6a 00                	push   $0x0
-  10040d:	6a 21                	push   $0x21
-  10040f:	60                   	pusha
-  100410:	e9 78 01 00 00       	jmp    10058d <common_interrupt_entry>
+00100404 <irq_34>:
+  100404:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  10040b:	0f 83 b0 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100411:	fe 05 80 40 10 00    	incb   0x104080
+  100417:	6a 00                	push   $0x0
+  100419:	6a 22                	push   $0x22
+  10041b:	60                   	pusha
+  10041c:	e9 5b 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100415 <irq_34>:
-  100415:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  10041c:	0f 83 b0 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100422:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100428:	6a 00                	push   $0x0
-  10042a:	6a 22                	push   $0x22
-  10042c:	60                   	pusha
-  10042d:	e9 5b 01 00 00       	jmp    10058d <common_interrupt_entry>
+00100421 <irq_35>:
+  100421:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  100428:	0f 83 93 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10042e:	fe 05 80 40 10 00    	incb   0x104080
+  100434:	6a 00                	push   $0x0
+  100436:	6a 23                	push   $0x23
+  100438:	60                   	pusha
+  100439:	e9 3e 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100432 <irq_35>:
-  100432:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100439:	0f 83 93 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10043f:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100445:	6a 00                	push   $0x0
-  100447:	6a 23                	push   $0x23
-  100449:	60                   	pusha
-  10044a:	e9 3e 01 00 00       	jmp    10058d <common_interrupt_entry>
+0010043e <irq_36>:
+  10043e:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  100445:	0f 83 76 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10044b:	fe 05 80 40 10 00    	incb   0x104080
+  100451:	6a 00                	push   $0x0
+  100453:	6a 24                	push   $0x24
+  100455:	60                   	pusha
+  100456:	e9 21 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010044f <irq_36>:
-  10044f:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100456:	0f 83 76 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10045c:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100462:	6a 00                	push   $0x0
-  100464:	6a 24                	push   $0x24
-  100466:	60                   	pusha
-  100467:	e9 21 01 00 00       	jmp    10058d <common_interrupt_entry>
+0010045b <irq_37>:
+  10045b:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  100462:	0f 83 59 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100468:	fe 05 80 40 10 00    	incb   0x104080
+  10046e:	6a 00                	push   $0x0
+  100470:	6a 25                	push   $0x25
+  100472:	60                   	pusha
+  100473:	e9 04 01 00 00       	jmp    10057c <common_interrupt_entry>
 
-0010046c <irq_37>:
-  10046c:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100473:	0f 83 59 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100479:	fe 05 c0 40 10 00    	incb   0x1040c0
-  10047f:	6a 00                	push   $0x0
-  100481:	6a 25                	push   $0x25
-  100483:	60                   	pusha
-  100484:	e9 04 01 00 00       	jmp    10058d <common_interrupt_entry>
+00100478 <irq_38>:
+  100478:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  10047f:	0f 83 3c 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100485:	fe 05 80 40 10 00    	incb   0x104080
+  10048b:	6a 00                	push   $0x0
+  10048d:	6a 26                	push   $0x26
+  10048f:	60                   	pusha
+  100490:	e9 e7 00 00 00       	jmp    10057c <common_interrupt_entry>
 
-00100489 <irq_38>:
-  100489:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100490:	0f 83 3c 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100496:	fe 05 c0 40 10 00    	incb   0x1040c0
-  10049c:	6a 00                	push   $0x0
-  10049e:	6a 26                	push   $0x26
-  1004a0:	60                   	pusha
-  1004a1:	e9 e7 00 00 00       	jmp    10058d <common_interrupt_entry>
+00100495 <irq_39>:
+  100495:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  10049c:	0f 83 1f 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1004a2:	fe 05 80 40 10 00    	incb   0x104080
+  1004a8:	6a 00                	push   $0x0
+  1004aa:	6a 27                	push   $0x27
+  1004ac:	60                   	pusha
+  1004ad:	e9 ca 00 00 00       	jmp    10057c <common_interrupt_entry>
 
-001004a6 <irq_39>:
-  1004a6:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  1004ad:	0f 83 1f 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1004b3:	fe 05 c0 40 10 00    	incb   0x1040c0
-  1004b9:	6a 00                	push   $0x0
-  1004bb:	6a 27                	push   $0x27
-  1004bd:	60                   	pusha
-  1004be:	e9 ca 00 00 00       	jmp    10058d <common_interrupt_entry>
+001004b2 <irq_40>:
+  1004b2:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  1004b9:	0f 83 02 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1004bf:	fe 05 80 40 10 00    	incb   0x104080
+  1004c5:	6a 00                	push   $0x0
+  1004c7:	6a 28                	push   $0x28
+  1004c9:	60                   	pusha
+  1004ca:	e9 ad 00 00 00       	jmp    10057c <common_interrupt_entry>
 
-001004c3 <irq_40>:
-  1004c3:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  1004ca:	0f 83 02 01 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1004d0:	fe 05 c0 40 10 00    	incb   0x1040c0
-  1004d6:	6a 00                	push   $0x0
-  1004d8:	6a 28                	push   $0x28
-  1004da:	60                   	pusha
-  1004db:	e9 ad 00 00 00       	jmp    10058d <common_interrupt_entry>
+001004cf <irq_41>:
+  1004cf:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  1004d6:	0f 83 e5 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1004dc:	fe 05 80 40 10 00    	incb   0x104080
+  1004e2:	6a 00                	push   $0x0
+  1004e4:	6a 29                	push   $0x29
+  1004e6:	60                   	pusha
+  1004e7:	e9 90 00 00 00       	jmp    10057c <common_interrupt_entry>
 
-001004e0 <irq_41>:
-  1004e0:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  1004e7:	0f 83 e5 00 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  1004ed:	fe 05 c0 40 10 00    	incb   0x1040c0
-  1004f3:	6a 00                	push   $0x0
-  1004f5:	6a 29                	push   $0x29
-  1004f7:	60                   	pusha
-  1004f8:	e9 90 00 00 00       	jmp    10058d <common_interrupt_entry>
+001004ec <irq_42>:
+  1004ec:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  1004f3:	0f 83 c8 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  1004f9:	fe 05 80 40 10 00    	incb   0x104080
+  1004ff:	6a 00                	push   $0x0
+  100501:	6a 2a                	push   $0x2a
+  100503:	60                   	pusha
+  100504:	eb 76                	jmp    10057c <common_interrupt_entry>
 
-001004fd <irq_42>:
-  1004fd:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100504:	0f 83 c8 00 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10050a:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100510:	6a 00                	push   $0x0
-  100512:	6a 2a                	push   $0x2a
-  100514:	60                   	pusha
-  100515:	eb 76                	jmp    10058d <common_interrupt_entry>
+00100506 <irq_43>:
+  100506:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  10050d:	0f 83 ae 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  100513:	fe 05 80 40 10 00    	incb   0x104080
+  100519:	6a 00                	push   $0x0
+  10051b:	6a 2b                	push   $0x2b
+  10051d:	60                   	pusha
+  10051e:	eb 5c                	jmp    10057c <common_interrupt_entry>
 
-00100517 <irq_43>:
-  100517:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  10051e:	0f 83 ae 00 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  100524:	fe 05 c0 40 10 00    	incb   0x1040c0
-  10052a:	6a 00                	push   $0x0
-  10052c:	6a 2b                	push   $0x2b
-  10052e:	60                   	pusha
-  10052f:	eb 5c                	jmp    10058d <common_interrupt_entry>
+00100520 <irq_44>:
+  100520:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  100527:	0f 83 94 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
+  10052d:	fe 05 80 40 10 00    	incb   0x104080
+  100533:	6a 00                	push   $0x0
+  100535:	6a 2c                	push   $0x2c
+  100537:	60                   	pusha
+  100538:	eb 42                	jmp    10057c <common_interrupt_entry>
 
-00100531 <irq_44>:
-  100531:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100538:	0f 83 94 00 00 00    	jae    1005d2 <nesting_overflow_hlt>
-  10053e:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100544:	6a 00                	push   $0x0
-  100546:	6a 2c                	push   $0x2c
-  100548:	60                   	pusha
-  100549:	eb 42                	jmp    10058d <common_interrupt_entry>
+0010053a <irq_45>:
+  10053a:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  100541:	73 7e                	jae    1005c1 <nesting_overflow_hlt>
+  100543:	fe 05 80 40 10 00    	incb   0x104080
+  100549:	6a 00                	push   $0x0
+  10054b:	6a 2d                	push   $0x2d
+  10054d:	60                   	pusha
+  10054e:	eb 2c                	jmp    10057c <common_interrupt_entry>
 
-0010054b <irq_45>:
-  10054b:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100552:	73 7e                	jae    1005d2 <nesting_overflow_hlt>
-  100554:	fe 05 c0 40 10 00    	incb   0x1040c0
-  10055a:	6a 00                	push   $0x0
-  10055c:	6a 2d                	push   $0x2d
-  10055e:	60                   	pusha
-  10055f:	eb 2c                	jmp    10058d <common_interrupt_entry>
+00100550 <irq_46>:
+  100550:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  100557:	73 68                	jae    1005c1 <nesting_overflow_hlt>
+  100559:	fe 05 80 40 10 00    	incb   0x104080
+  10055f:	6a 00                	push   $0x0
+  100561:	6a 2e                	push   $0x2e
+  100563:	60                   	pusha
+  100564:	eb 16                	jmp    10057c <common_interrupt_entry>
 
-00100561 <irq_46>:
-  100561:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  100568:	73 68                	jae    1005d2 <nesting_overflow_hlt>
-  10056a:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100570:	6a 00                	push   $0x0
-  100572:	6a 2e                	push   $0x2e
-  100574:	60                   	pusha
-  100575:	eb 16                	jmp    10058d <common_interrupt_entry>
+00100566 <irq_47>:
+  100566:	80 3d 80 40 10 00 0f 	cmpb   $0xf,0x104080
+  10056d:	73 52                	jae    1005c1 <nesting_overflow_hlt>
+  10056f:	fe 05 80 40 10 00    	incb   0x104080
+  100575:	6a 00                	push   $0x0
+  100577:	6a 2f                	push   $0x2f
+  100579:	60                   	pusha
+  10057a:	eb 00                	jmp    10057c <common_interrupt_entry>
 
-00100577 <irq_47>:
-  100577:	80 3d c0 40 10 00 0f 	cmpb   $0xf,0x1040c0
-  10057e:	73 52                	jae    1005d2 <nesting_overflow_hlt>
-  100580:	fe 05 c0 40 10 00    	incb   0x1040c0
-  100586:	6a 00                	push   $0x0
-  100588:	6a 2f                	push   $0x2f
-  10058a:	60                   	pusha
-  10058b:	eb 00                	jmp    10058d <common_interrupt_entry>
+0010057c <common_interrupt_entry>:
+  10057c:	89 e2                	mov    %esp,%edx
+  10057e:	bb 97 4d 10 00       	mov    $0x104d97,%ebx
+  100583:	b9 eb 6a 10 00       	mov    $0x106aeb,%ecx
+  100588:	39 da                	cmp    %ebx,%edx
+  10058a:	0f 46 e1             	cmovbe %ecx,%esp
+  10058d:	39 ca                	cmp    %ecx,%edx
+  10058f:	0f 47 e1             	cmova  %ecx,%esp
 
-0010058d <common_interrupt_entry>:
-  10058d:	89 e2                	mov    %esp,%edx
-  10058f:	bb d7 4d 10 00       	mov    $0x104dd7,%ebx
-  100594:	b9 2b 6b 10 00       	mov    $0x106b2b,%ecx
-  100599:	39 da                	cmp    %ebx,%edx
-  10059b:	0f 46 e1             	cmovbe %ecx,%esp
-  10059e:	39 ca                	cmp    %ecx,%edx
-  1005a0:	0f 47 e1             	cmova  %ecx,%esp
+00100592 <set_interrupt_grounds>:
+  100592:	52                   	push   %edx
+  100593:	66 b8 10 00          	mov    $0x10,%ax
+  100597:	8e d8                	mov    %eax,%ds
+  100599:	8e c0                	mov    %eax,%es
+  10059b:	52                   	push   %edx
+  10059c:	e8 4f 04 00 00       	call   1009f0 <interrupt_dispatcher>
+  1005a1:	83 c4 04             	add    $0x4,%esp
+  1005a4:	5c                   	pop    %esp
+  1005a5:	83 7c 24 20 20       	cmpl   $0x20,0x20(%esp)
+  1005aa:	0f 93 c0             	setae  %al
+  1005ad:	0f 92 c3             	setb   %bl
+  1005b0:	28 05 80 40 10 00    	sub    %al,0x104080
+  1005b6:	28 1d 81 40 10 00    	sub    %bl,0x104081
+  1005bc:	61                   	popa
+  1005bd:	83 c4 08             	add    $0x8,%esp
+  1005c0:	cf                   	iret
 
-001005a3 <set_interrupt_grounds>:
-  1005a3:	52                   	push   %edx
-  1005a4:	66 b8 10 00          	mov    $0x10,%ax
-  1005a8:	8e d8                	mov    %eax,%ds
-  1005aa:	8e c0                	mov    %eax,%es
-  1005ac:	52                   	push   %edx
-  1005ad:	e8 2e 04 00 00       	call   1009e0 <interrupt_dispatcher>
-  1005b2:	83 c4 04             	add    $0x4,%esp
-  1005b5:	5c                   	pop    %esp
-  1005b6:	83 7c 24 20 20       	cmpl   $0x20,0x20(%esp)
-  1005bb:	0f 93 c0             	setae  %al
-  1005be:	0f 92 c3             	setb   %bl
-  1005c1:	28 05 c0 40 10 00    	sub    %al,0x1040c0
-  1005c7:	28 1d c1 40 10 00    	sub    %bl,0x1040c1
-  1005cd:	61                   	popa
-  1005ce:	83 c4 08             	add    $0x8,%esp
-  1005d1:	cf                   	iret
+001005c1 <nesting_overflow_hlt>:
+  1005c1:	fa                   	cli
 
-001005d2 <nesting_overflow_hlt>:
-  1005d2:	fa                   	cli
+001005c2 <halt_interrupt_table>:
+  1005c2:	f4                   	hlt
+  1005c3:	eb fd                	jmp    1005c2 <halt_interrupt_table>
+  1005c5:	66 90                	xchg   %ax,%ax
+  1005c7:	66 90                	xchg   %ax,%ax
+  1005c9:	66 90                	xchg   %ax,%ax
+  1005cb:	66 90                	xchg   %ax,%ax
+  1005cd:	66 90                	xchg   %ax,%ax
+  1005cf:	90                   	nop
 
-001005d3 <halt_interrupt_table>:
-  1005d3:	f4                   	hlt
-  1005d4:	eb fd                	jmp    1005d3 <halt_interrupt_table>
-  1005d6:	66 90                	xchg   %ax,%ax
-  1005d8:	66 90                	xchg   %ax,%ax
-  1005da:	66 90                	xchg   %ax,%ax
-  1005dc:	66 90                	xchg   %ax,%ax
-  1005de:	66 90                	xchg   %ax,%ax
-
-001005e0 <kernel_main>:
-  1005e0:	55                   	push   %ebp
-  1005e1:	89 e5                	mov    %esp,%ebp
-  1005e3:	57                   	push   %edi
-  1005e4:	bf 01 00 00 00       	mov    $0x1,%edi
-  1005e9:	56                   	push   %esi
-  1005ea:	53                   	push   %ebx
-  1005eb:	83 ec 38             	sub    $0x38,%esp
-  1005ee:	6a 64                	push   $0x64
-  1005f0:	e8 7b 06 00 00       	call   100c70 <_ZN6kernel14initialize_pitEm>
-  1005f5:	c7 04 24 64 00 00 00 	movl   $0x64,(%esp)
-  1005fc:	e8 cf 06 00 00       	call   100cd0 <_ZN6kernel19set_timer_frequencyEm>
-  100601:	e8 0a 27 00 00       	call   102d10 <_ZN8terminal6output10initializeEv>
-  100606:	31 c0                	xor    %eax,%eax
-  100608:	66 89 45 de          	mov    %ax,-0x22(%ebp)
-  10060c:	8d 45 e0             	lea    -0x20(%ebp),%eax
-  10060f:	89 04 24             	mov    %eax,(%esp)
-  100612:	e8 c9 06 00 00       	call   100ce0 <_ZN6kernel6memory19get_e820_memory_mapEv>
-  100617:	ba 00 32 10 00       	mov    $0x103200,%edx
-  10061c:	8d 45 de             	lea    -0x22(%ebp),%eax
-  10061f:	83 c4 0c             	add    $0xc,%esp
-  100622:	e8 b9 2b 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  100627:	0f b7 45 e4          	movzwl -0x1c(%ebp),%eax
-  10062b:	8b 5d e0             	mov    -0x20(%ebp),%ebx
-  10062e:	b9 00 00 10 00       	mov    $0x100000,%ecx
-  100633:	89 4d d0             	mov    %ecx,-0x30(%ebp)
-  100636:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  100639:	c7 45 d4 00 00 00 00 	movl   $0x0,-0x2c(%ebp)
-  100640:	8d 04 83             	lea    (%ebx,%eax,4),%eax
-  100643:	39 c3                	cmp    %eax,%ebx
-  100645:	72 0c                	jb     100653 <kernel_main+0x73>
-  100647:	e9 c8 00 00 00       	jmp    100714 <kernel_main+0x134>
-  10064c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  100650:	83 c7 01             	add    $0x1,%edi
-  100653:	89 f8                	mov    %edi,%eax
-  100655:	8b 73 08             	mov    0x8(%ebx),%esi
-  100658:	03 33                	add    (%ebx),%esi
-  10065a:	0f b6 d0             	movzbl %al,%edx
-  10065d:	8d 45 de             	lea    -0x22(%ebp),%eax
-  100660:	e8 1b 28 00 00       	call   102e80 <_ZN8terminal6outputlsEh>
-  100665:	ba a0 37 10 00       	mov    $0x1037a0,%edx
-  10066a:	e8 71 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10066f:	ba 00 32 10 00       	mov    $0x103200,%edx
-  100674:	e8 67 2b 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  100679:	8b 4b 04             	mov    0x4(%ebx),%ecx
-  10067c:	8b 13                	mov    (%ebx),%edx
-  10067e:	e8 ed 29 00 00       	call   103070 <_ZN8terminal6outputlsEy>
-  100683:	ba af 37 10 00       	mov    $0x1037af,%edx
-  100688:	e8 53 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10068d:	89 f2                	mov    %esi,%edx
-  10068f:	e8 ec 28 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  100694:	ba bc 37 10 00       	mov    $0x1037bc,%edx
+001005d0 <kernel_main>:
+  1005d0:	55                   	push   %ebp
+  1005d1:	89 e5                	mov    %esp,%ebp
+  1005d3:	57                   	push   %edi
+  1005d4:	bf 01 00 00 00       	mov    $0x1,%edi
+  1005d9:	56                   	push   %esi
+  1005da:	53                   	push   %ebx
+  1005db:	83 ec 38             	sub    $0x38,%esp
+  1005de:	6a 64                	push   $0x64
+  1005e0:	e8 9b 06 00 00       	call   100c80 <_ZN6kernel14initialize_pitEm>
+  1005e5:	c7 04 24 64 00 00 00 	movl   $0x64,(%esp)
+  1005ec:	e8 ef 06 00 00       	call   100ce0 <_ZN6kernel19set_timer_frequencyEm>
+  1005f1:	e8 1a 27 00 00       	call   102d10 <_ZN8terminal6output10initializeEv>
+  1005f6:	31 c0                	xor    %eax,%eax
+  1005f8:	66 89 45 de          	mov    %ax,-0x22(%ebp)
+  1005fc:	8d 45 e0             	lea    -0x20(%ebp),%eax
+  1005ff:	89 04 24             	mov    %eax,(%esp)
+  100602:	e8 e9 06 00 00       	call   100cf0 <_ZN6kernel6memory19get_e820_memory_mapEv>
+  100607:	ba 00 32 10 00       	mov    $0x103200,%edx
+  10060c:	8d 45 de             	lea    -0x22(%ebp),%eax
+  10060f:	83 c4 0c             	add    $0xc,%esp
+  100612:	e8 c9 2b 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  100617:	0f b7 45 e4          	movzwl -0x1c(%ebp),%eax
+  10061b:	8b 5d e0             	mov    -0x20(%ebp),%ebx
+  10061e:	b9 00 00 10 00       	mov    $0x100000,%ecx
+  100623:	89 4d d0             	mov    %ecx,-0x30(%ebp)
+  100626:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  100629:	c7 45 d4 00 00 00 00 	movl   $0x0,-0x2c(%ebp)
+  100630:	8d 04 83             	lea    (%ebx,%eax,4),%eax
+  100633:	39 c3                	cmp    %eax,%ebx
+  100635:	72 0c                	jb     100643 <kernel_main+0x73>
+  100637:	e9 c8 00 00 00       	jmp    100704 <kernel_main+0x134>
+  10063c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  100640:	83 c7 01             	add    $0x1,%edi
+  100643:	89 f8                	mov    %edi,%eax
+  100645:	8b 73 08             	mov    0x8(%ebx),%esi
+  100648:	03 33                	add    (%ebx),%esi
+  10064a:	0f b6 d0             	movzbl %al,%edx
+  10064d:	8d 45 de             	lea    -0x22(%ebp),%eax
+  100650:	e8 2b 28 00 00       	call   102e80 <_ZN8terminal6outputlsEh>
+  100655:	ba 80 37 10 00       	mov    $0x103780,%edx
+  10065a:	e8 81 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10065f:	ba 00 32 10 00       	mov    $0x103200,%edx
+  100664:	e8 77 2b 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  100669:	8b 4b 04             	mov    0x4(%ebx),%ecx
+  10066c:	8b 13                	mov    (%ebx),%edx
+  10066e:	e8 fd 29 00 00       	call   103070 <_ZN8terminal6outputlsEy>
+  100673:	ba 8f 37 10 00       	mov    $0x10378f,%edx
+  100678:	e8 63 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10067d:	89 f2                	mov    %esi,%edx
+  10067f:	e8 fc 28 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  100684:	ba 9c 37 10 00       	mov    $0x10379c,%edx
+  100689:	e8 52 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10068e:	0f b6 53 10          	movzbl 0x10(%ebx),%edx
+  100692:	8b 14 95 3c 39 10 00 	mov    0x10393c(,%edx,4),%edx
   100699:	e8 42 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10069e:	0f b6 53 10          	movzbl 0x10(%ebx),%edx
-  1006a2:	8b 14 95 5c 39 10 00 	mov    0x10395c(,%edx,4),%edx
-  1006a9:	e8 32 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1006ae:	ba c4 37 10 00       	mov    $0x1037c4,%edx
-  1006b3:	e8 28 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1006b8:	ba f0 31 10 00       	mov    $0x1031f0,%edx
-  1006bd:	e8 1e 2b 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1006c2:	8b 53 08             	mov    0x8(%ebx),%edx
-  1006c5:	8b 4b 0c             	mov    0xc(%ebx),%ecx
-  1006c8:	e8 a3 29 00 00       	call   103070 <_ZN8terminal6outputlsEy>
-  1006cd:	ba cf 37 10 00       	mov    $0x1037cf,%edx
-  1006d2:	e8 09 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1006d7:	8b 55 d4             	mov    -0x2c(%ebp),%edx
-  1006da:	8b 45 d0             	mov    -0x30(%ebp),%eax
-  1006dd:	3b 03                	cmp    (%ebx),%eax
-  1006df:	89 d0                	mov    %edx,%eax
-  1006e1:	1b 43 04             	sbb    0x4(%ebx),%eax
-  1006e4:	72 16                	jb     1006fc <kernel_main+0x11c>
-  1006e6:	b8 00 00 10 00       	mov    $0x100000,%eax
-  1006eb:	39 f0                	cmp    %esi,%eax
-  1006ed:	73 0d                	jae    1006fc <kernel_main+0x11c>
-  1006ef:	ba d2 37 10 00       	mov    $0x1037d2,%edx
-  1006f4:	8d 45 de             	lea    -0x22(%ebp),%eax
-  1006f7:	e8 e4 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1006fc:	0f b7 45 e4          	movzwl -0x1c(%ebp),%eax
-  100700:	83 c3 14             	add    $0x14,%ebx
-  100703:	8d 14 80             	lea    (%eax,%eax,4),%edx
-  100706:	8b 45 e0             	mov    -0x20(%ebp),%eax
-  100709:	8d 04 90             	lea    (%eax,%edx,4),%eax
-  10070c:	39 c3                	cmp    %eax,%ebx
-  10070e:	0f 82 3c ff ff ff    	jb     100650 <kernel_main+0x70>
-  100714:	ba 2b 6b 10 00       	mov    $0x106b2b,%edx
-  100719:	8d 45 e0             	lea    -0x20(%ebp),%eax
-  10071c:	e8 5f 1e 00 00       	call   102580 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>
-  100721:	e8 fa 02 00 00       	call   100a20 <_ZN6kernel21initialize_exceptionsEv>
-  100726:	e8 55 20 00 00       	call   102780 <_ZN6driver19initialize_keyboardEv>
-  10072b:	fb                   	sti
-  10072c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  100730:	f4                   	hlt
-  100731:	eb fd                	jmp    100730 <kernel_main+0x150>
-  100733:	66 90                	xchg   %ax,%ax
-  100735:	66 90                	xchg   %ax,%ax
-  100737:	66 90                	xchg   %ax,%ax
-  100739:	66 90                	xchg   %ax,%ax
-  10073b:	66 90                	xchg   %ax,%ax
-  10073d:	66 90                	xchg   %ax,%ax
-  10073f:	90                   	nop
+  10069e:	ba a4 37 10 00       	mov    $0x1037a4,%edx
+  1006a3:	e8 38 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1006a8:	ba f0 31 10 00       	mov    $0x1031f0,%edx
+  1006ad:	e8 2e 2b 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  1006b2:	8b 53 08             	mov    0x8(%ebx),%edx
+  1006b5:	8b 4b 0c             	mov    0xc(%ebx),%ecx
+  1006b8:	e8 b3 29 00 00       	call   103070 <_ZN8terminal6outputlsEy>
+  1006bd:	ba af 37 10 00       	mov    $0x1037af,%edx
+  1006c2:	e8 19 27 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1006c7:	8b 55 d4             	mov    -0x2c(%ebp),%edx
+  1006ca:	8b 45 d0             	mov    -0x30(%ebp),%eax
+  1006cd:	3b 03                	cmp    (%ebx),%eax
+  1006cf:	89 d0                	mov    %edx,%eax
+  1006d1:	1b 43 04             	sbb    0x4(%ebx),%eax
+  1006d4:	72 16                	jb     1006ec <kernel_main+0x11c>
+  1006d6:	b8 00 00 10 00       	mov    $0x100000,%eax
+  1006db:	39 f0                	cmp    %esi,%eax
+  1006dd:	73 0d                	jae    1006ec <kernel_main+0x11c>
+  1006df:	ba b2 37 10 00       	mov    $0x1037b2,%edx
+  1006e4:	8d 45 de             	lea    -0x22(%ebp),%eax
+  1006e7:	e8 f4 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1006ec:	0f b7 45 e4          	movzwl -0x1c(%ebp),%eax
+  1006f0:	83 c3 14             	add    $0x14,%ebx
+  1006f3:	8d 14 80             	lea    (%eax,%eax,4),%edx
+  1006f6:	8b 45 e0             	mov    -0x20(%ebp),%eax
+  1006f9:	8d 04 90             	lea    (%eax,%edx,4),%eax
+  1006fc:	39 c3                	cmp    %eax,%ebx
+  1006fe:	0f 82 3c ff ff ff    	jb     100640 <kernel_main+0x70>
+  100704:	8d 45 e0             	lea    -0x20(%ebp),%eax
+  100707:	ba eb 6a 10 00       	mov    $0x106aeb,%edx
+  10070c:	e8 6f 1e 00 00       	call   102580 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>
+  100711:	e8 1a 03 00 00       	call   100a30 <_ZN6kernel21initialize_exceptionsEv>
+  100716:	e8 65 20 00 00       	call   102780 <_ZN6driver19initialize_keyboardEv>
+  10071b:	0f b6 15 42 4b 10 00 	movzbl 0x104b42,%edx
+  100722:	8d 45 de             	lea    -0x22(%ebp),%eax
+  100725:	e8 56 27 00 00       	call   102e80 <_ZN8terminal6outputlsEh>
+  10072a:	ba 0a 00 00 00       	mov    $0xa,%edx
+  10072f:	e8 2c 26 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
+  100734:	fb                   	sti
+  100735:	8d 76 00             	lea    0x0(%esi),%esi
+  100738:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  10073f:	00 
+  100740:	f4                   	hlt
+  100741:	eb fd                	jmp    100740 <kernel_main+0x170>
+  100743:	66 90                	xchg   %ax,%ax
+  100745:	66 90                	xchg   %ax,%ax
+  100747:	66 90                	xchg   %ax,%ax
+  100749:	66 90                	xchg   %ax,%ax
+  10074b:	66 90                	xchg   %ax,%ax
+  10074d:	66 90                	xchg   %ax,%ax
+  10074f:	90                   	nop
 
-00100740 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>:
-  100740:	55                   	push   %ebp
-  100741:	89 e5                	mov    %esp,%ebp
-  100743:	56                   	push   %esi
-  100744:	89 c6                	mov    %eax,%esi
-  100746:	53                   	push   %ebx
-  100747:	8b 5d 0c             	mov    0xc(%ebp),%ebx
-  10074a:	6a 00                	push   $0x0
-  10074c:	6a 0c                	push   $0xc
-  10074e:	68 1f 38 10 00       	push   $0x10381f
-  100753:	68 c2 40 10 00       	push   $0x1040c2
-  100758:	e8 c3 03 00 00       	call   100b20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  10075d:	ba 29 38 10 00       	mov    $0x103829,%edx
-  100762:	b8 c2 40 10 00       	mov    $0x1040c2,%eax
-  100767:	e8 74 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10076c:	89 f2                	mov    %esi,%edx
-  10076e:	e8 6d 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100773:	ba 20 00 00 00       	mov    $0x20,%edx
-  100778:	e8 e3 25 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
-  10077d:	8b 55 08             	mov    0x8(%ebp),%edx
-  100780:	e8 5b 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100785:	ba 00 32 10 00       	mov    $0x103200,%edx
-  10078a:	e8 51 2a 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  10078f:	ba 39 38 10 00       	mov    $0x103839,%edx
-  100794:	e8 47 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100799:	8b 53 28             	mov    0x28(%ebx),%edx
-  10079c:	e8 df 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1007a1:	ba 3f 38 10 00       	mov    $0x10383f,%edx
-  1007a6:	e8 35 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1007ab:	8b 53 30             	mov    0x30(%ebx),%edx
-  1007ae:	e8 cd 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1007b3:	ba 48 38 10 00       	mov    $0x103848,%edx
-  1007b8:	e8 23 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1007bd:	8b 53 24             	mov    0x24(%ebx),%edx
-  1007c0:	e8 bb 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1007c5:	ba 55 38 10 00       	mov    $0x103855,%edx
-  1007ca:	e8 11 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1007cf:	8b 53 1c             	mov    0x1c(%ebx),%edx
-  1007d2:	e8 a9 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1007d7:	ba 5b 38 10 00       	mov    $0x10385b,%edx
-  1007dc:	e8 ff 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1007e1:	8b 53 18             	mov    0x18(%ebx),%edx
-  1007e4:	e8 97 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1007e9:	ba 65 38 10 00       	mov    $0x103865,%edx
-  1007ee:	e8 ed 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1007f3:	8b 53 14             	mov    0x14(%ebx),%edx
-  1007f6:	e8 85 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1007fb:	ba 6b 38 10 00       	mov    $0x10386b,%edx
-  100800:	e8 db 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100805:	8b 53 10             	mov    0x10(%ebx),%edx
-  100808:	e8 73 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  10080d:	ba 71 38 10 00       	mov    $0x103871,%edx
-  100812:	e8 c9 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100817:	8b 53 0c             	mov    0xc(%ebx),%edx
-  10081a:	e8 61 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  10081f:	ba 77 38 10 00       	mov    $0x103877,%edx
-  100824:	e8 b7 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100829:	8b 53 08             	mov    0x8(%ebx),%edx
-  10082c:	e8 4f 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  100831:	ba 7d 38 10 00       	mov    $0x10387d,%edx
-  100836:	e8 a5 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10083b:	8b 53 04             	mov    0x4(%ebx),%edx
-  10083e:	e8 3d 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  100843:	ba 83 38 10 00       	mov    $0x103883,%edx
-  100848:	e8 93 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10084d:	8b 13                	mov    (%ebx),%edx
-  10084f:	e8 2c 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  100854:	ba 8a 38 10 00       	mov    $0x10388a,%edx
-  100859:	e8 82 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  10085e:	8b 53 20             	mov    0x20(%ebx),%edx
-  100861:	e8 1a 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  100866:	ba 0a 00 00 00       	mov    $0xa,%edx
-  10086b:	e8 f0 24 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
-  100870:	58                   	pop    %eax
-  100871:	5a                   	pop    %edx
-  100872:	68 93 38 10 00       	push   $0x103893
-  100877:	68 c2 40 10 00       	push   $0x1040c2
-  10087c:	e8 df 02 00 00       	call   100b60 <_ZN6kernel6logger5panicEPKc>
-  100881:	66 90                	xchg   %ax,%ax
-  100883:	66 90                	xchg   %ax,%ax
-  100885:	66 90                	xchg   %ax,%ax
-  100887:	66 90                	xchg   %ax,%ax
-  100889:	66 90                	xchg   %ax,%ax
-  10088b:	66 90                	xchg   %ax,%ax
-  10088d:	66 90                	xchg   %ax,%ax
-  10088f:	90                   	nop
+00100750 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>:
+  100750:	55                   	push   %ebp
+  100751:	89 e5                	mov    %esp,%ebp
+  100753:	56                   	push   %esi
+  100754:	89 c6                	mov    %eax,%esi
+  100756:	53                   	push   %ebx
+  100757:	8b 5d 0c             	mov    0xc(%ebp),%ebx
+  10075a:	6a 00                	push   $0x0
+  10075c:	6a 0c                	push   $0xc
+  10075e:	68 ff 37 10 00       	push   $0x1037ff
+  100763:	68 82 40 10 00       	push   $0x104082
+  100768:	e8 c3 03 00 00       	call   100b30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
+  10076d:	ba 09 38 10 00       	mov    $0x103809,%edx
+  100772:	b8 82 40 10 00       	mov    $0x104082,%eax
+  100777:	e8 64 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10077c:	89 f2                	mov    %esi,%edx
+  10077e:	e8 5d 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100783:	ba 20 00 00 00       	mov    $0x20,%edx
+  100788:	e8 d3 25 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
+  10078d:	8b 55 08             	mov    0x8(%ebp),%edx
+  100790:	e8 4b 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100795:	ba 00 32 10 00       	mov    $0x103200,%edx
+  10079a:	e8 41 2a 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  10079f:	ba 19 38 10 00       	mov    $0x103819,%edx
+  1007a4:	e8 37 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1007a9:	8b 53 28             	mov    0x28(%ebx),%edx
+  1007ac:	e8 cf 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  1007b1:	ba 1f 38 10 00       	mov    $0x10381f,%edx
+  1007b6:	e8 25 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1007bb:	8b 53 30             	mov    0x30(%ebx),%edx
+  1007be:	e8 bd 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  1007c3:	ba 28 38 10 00       	mov    $0x103828,%edx
+  1007c8:	e8 13 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1007cd:	8b 53 24             	mov    0x24(%ebx),%edx
+  1007d0:	e8 ab 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  1007d5:	ba 35 38 10 00       	mov    $0x103835,%edx
+  1007da:	e8 01 26 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1007df:	8b 53 1c             	mov    0x1c(%ebx),%edx
+  1007e2:	e8 99 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  1007e7:	ba 3b 38 10 00       	mov    $0x10383b,%edx
+  1007ec:	e8 ef 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1007f1:	8b 53 18             	mov    0x18(%ebx),%edx
+  1007f4:	e8 87 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  1007f9:	ba 45 38 10 00       	mov    $0x103845,%edx
+  1007fe:	e8 dd 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100803:	8b 53 14             	mov    0x14(%ebx),%edx
+  100806:	e8 75 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  10080b:	ba 4b 38 10 00       	mov    $0x10384b,%edx
+  100810:	e8 cb 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100815:	8b 53 10             	mov    0x10(%ebx),%edx
+  100818:	e8 63 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  10081d:	ba 51 38 10 00       	mov    $0x103851,%edx
+  100822:	e8 b9 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100827:	8b 53 0c             	mov    0xc(%ebx),%edx
+  10082a:	e8 51 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  10082f:	ba 57 38 10 00       	mov    $0x103857,%edx
+  100834:	e8 a7 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100839:	8b 53 08             	mov    0x8(%ebx),%edx
+  10083c:	e8 3f 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  100841:	ba 5d 38 10 00       	mov    $0x10385d,%edx
+  100846:	e8 95 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10084b:	8b 53 04             	mov    0x4(%ebx),%edx
+  10084e:	e8 2d 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  100853:	ba 63 38 10 00       	mov    $0x103863,%edx
+  100858:	e8 83 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10085d:	8b 13                	mov    (%ebx),%edx
+  10085f:	e8 1c 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  100864:	ba 6a 38 10 00       	mov    $0x10386a,%edx
+  100869:	e8 72 25 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10086e:	8b 53 20             	mov    0x20(%ebx),%edx
+  100871:	e8 0a 27 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  100876:	ba 0a 00 00 00       	mov    $0xa,%edx
+  10087b:	e8 e0 24 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
+  100880:	58                   	pop    %eax
+  100881:	5a                   	pop    %edx
+  100882:	68 73 38 10 00       	push   $0x103873
+  100887:	68 82 40 10 00       	push   $0x104082
+  10088c:	e8 df 02 00 00       	call   100b70 <_ZN6kernel6logger5panicEPKc>
+  100891:	66 90                	xchg   %ax,%ax
+  100893:	66 90                	xchg   %ax,%ax
+  100895:	66 90                	xchg   %ax,%ax
+  100897:	66 90                	xchg   %ax,%ax
+  100899:	66 90                	xchg   %ax,%ax
+  10089b:	66 90                	xchg   %ax,%ax
+  10089d:	66 90                	xchg   %ax,%ax
+  10089f:	90                   	nop
 
-00100890 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE>:
-  100890:	55                   	push   %ebp
-  100891:	89 c1                	mov    %eax,%ecx
-  100893:	89 e5                	mov    %esp,%ebp
-  100895:	83 ec 18             	sub    $0x18,%esp
-  100898:	8b 40 20             	mov    0x20(%eax),%eax
-  10089b:	83 f8 0d             	cmp    $0xd,%eax
-  10089e:	74 74                	je     100914 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x84>
-  1008a0:	77 1f                	ja     1008c1 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x31>
-  1008a2:	85 c0                	test   %eax,%eax
-  1008a4:	0f 84 7c 00 00 00    	je     100926 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x96>
-  1008aa:	83 f8 06             	cmp    $0x6,%eax
-  1008ad:	75 29                	jne    1008d8 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x48>
-  1008af:	50                   	push   %eax
-  1008b0:	50                   	push   %eax
-  1008b1:	b8 bc 38 10 00       	mov    $0x1038bc,%eax
-  1008b6:	51                   	push   %ecx
-  1008b7:	68 cb 38 10 00       	push   $0x1038cb
-  1008bc:	e8 7f fe ff ff       	call   100740 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  1008c1:	83 f8 0e             	cmp    $0xe,%eax
-  1008c4:	75 12                	jne    1008d8 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x48>
-  1008c6:	50                   	push   %eax
-  1008c7:	50                   	push   %eax
-  1008c8:	b8 ec 38 10 00       	mov    $0x1038ec,%eax
-  1008cd:	51                   	push   %ecx
-  1008ce:	68 f7 38 10 00       	push   $0x1038f7
-  1008d3:	e8 68 fe ff ff       	call   100740 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  1008d8:	6a 00                	push   $0x0
-  1008da:	6a 0e                	push   $0xe
-  1008dc:	68 fb 38 10 00       	push   $0x1038fb
-  1008e1:	68 c2 40 10 00       	push   $0x1040c2
-  1008e6:	89 4d f4             	mov    %ecx,-0xc(%ebp)
-  1008e9:	e8 32 02 00 00       	call   100b20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  1008ee:	ba 74 39 10 00       	mov    $0x103974,%edx
-  1008f3:	b8 c2 40 10 00       	mov    $0x1040c2,%eax
-  1008f8:	e8 e3 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  1008fd:	8b 4d f4             	mov    -0xc(%ebp),%ecx
-  100900:	8b 51 20             	mov    0x20(%ecx),%edx
-  100903:	e8 78 26 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  100908:	83 c4 10             	add    $0x10,%esp
-  10090b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  100910:	fa                   	cli
-  100911:	f4                   	hlt
-  100912:	eb fc                	jmp    100910 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x80>
-  100914:	52                   	push   %edx
-  100915:	b8 cf 38 10 00       	mov    $0x1038cf,%eax
-  10091a:	52                   	push   %edx
-  10091b:	51                   	push   %ecx
-  10091c:	68 e8 38 10 00       	push   $0x1038e8
-  100921:	e8 1a fe ff ff       	call   100740 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  100926:	50                   	push   %eax
-  100927:	50                   	push   %eax
-  100928:	b8 ab 38 10 00       	mov    $0x1038ab,%eax
-  10092d:	51                   	push   %ecx
-  10092e:	68 b8 38 10 00       	push   $0x1038b8
-  100933:	e8 08 fe ff ff       	call   100740 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  100938:	66 90                	xchg   %ax,%ax
-  10093a:	66 90                	xchg   %ax,%ax
-  10093c:	66 90                	xchg   %ax,%ax
-  10093e:	66 90                	xchg   %ax,%ax
+001008a0 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE>:
+  1008a0:	55                   	push   %ebp
+  1008a1:	89 c1                	mov    %eax,%ecx
+  1008a3:	89 e5                	mov    %esp,%ebp
+  1008a5:	83 ec 18             	sub    $0x18,%esp
+  1008a8:	8b 40 20             	mov    0x20(%eax),%eax
+  1008ab:	83 f8 0d             	cmp    $0xd,%eax
+  1008ae:	74 74                	je     100924 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x84>
+  1008b0:	77 1f                	ja     1008d1 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x31>
+  1008b2:	85 c0                	test   %eax,%eax
+  1008b4:	0f 84 7c 00 00 00    	je     100936 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x96>
+  1008ba:	83 f8 06             	cmp    $0x6,%eax
+  1008bd:	75 29                	jne    1008e8 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x48>
+  1008bf:	50                   	push   %eax
+  1008c0:	50                   	push   %eax
+  1008c1:	b8 9c 38 10 00       	mov    $0x10389c,%eax
+  1008c6:	51                   	push   %ecx
+  1008c7:	68 ab 38 10 00       	push   $0x1038ab
+  1008cc:	e8 7f fe ff ff       	call   100750 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
+  1008d1:	83 f8 0e             	cmp    $0xe,%eax
+  1008d4:	75 12                	jne    1008e8 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x48>
+  1008d6:	50                   	push   %eax
+  1008d7:	50                   	push   %eax
+  1008d8:	b8 cc 38 10 00       	mov    $0x1038cc,%eax
+  1008dd:	51                   	push   %ecx
+  1008de:	68 d7 38 10 00       	push   $0x1038d7
+  1008e3:	e8 68 fe ff ff       	call   100750 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
+  1008e8:	6a 00                	push   $0x0
+  1008ea:	6a 0e                	push   $0xe
+  1008ec:	68 db 38 10 00       	push   $0x1038db
+  1008f1:	68 82 40 10 00       	push   $0x104082
+  1008f6:	89 4d f4             	mov    %ecx,-0xc(%ebp)
+  1008f9:	e8 32 02 00 00       	call   100b30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
+  1008fe:	ba 54 39 10 00       	mov    $0x103954,%edx
+  100903:	b8 82 40 10 00       	mov    $0x104082,%eax
+  100908:	e8 d3 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  10090d:	8b 4d f4             	mov    -0xc(%ebp),%ecx
+  100910:	8b 51 20             	mov    0x20(%ecx),%edx
+  100913:	e8 68 26 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  100918:	83 c4 10             	add    $0x10,%esp
+  10091b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  100920:	fa                   	cli
+  100921:	f4                   	hlt
+  100922:	eb fc                	jmp    100920 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x80>
+  100924:	52                   	push   %edx
+  100925:	b8 af 38 10 00       	mov    $0x1038af,%eax
+  10092a:	52                   	push   %edx
+  10092b:	51                   	push   %ecx
+  10092c:	68 c8 38 10 00       	push   $0x1038c8
+  100931:	e8 1a fe ff ff       	call   100750 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
+  100936:	50                   	push   %eax
+  100937:	50                   	push   %eax
+  100938:	b8 8b 38 10 00       	mov    $0x10388b,%eax
+  10093d:	51                   	push   %ecx
+  10093e:	68 98 38 10 00       	push   $0x103898
+  100943:	e8 08 fe ff ff       	call   100750 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
+  100948:	66 90                	xchg   %ax,%ax
+  10094a:	66 90                	xchg   %ax,%ax
+  10094c:	66 90                	xchg   %ax,%ax
+  10094e:	66 90                	xchg   %ax,%ax
 
-00100940 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE>:
-  100940:	85 c0                	test   %eax,%eax
-  100942:	0f 84 88 00 00 00    	je     1009d0 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x90>
-  100948:	55                   	push   %ebp
-  100949:	89 e5                	mov    %esp,%ebp
-  10094b:	56                   	push   %esi
-  10094c:	53                   	push   %ebx
-  10094d:	8b 70 20             	mov    0x20(%eax),%esi
-  100950:	89 c3                	mov    %eax,%ebx
-  100952:	6a 00                	push   $0x0
-  100954:	6a 0c                	push   $0xc
-  100956:	68 1f 38 10 00       	push   $0x10381f
-  10095b:	68 c2 40 10 00       	push   $0x1040c2
-  100960:	e8 bb 01 00 00       	call   100b20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  100965:	ba 07 39 10 00       	mov    $0x103907,%edx
-  10096a:	b8 c2 40 10 00       	mov    $0x1040c2,%eax
-  10096f:	e8 6c 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100974:	89 f2                	mov    %esi,%edx
-  100976:	e8 05 26 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  10097b:	ba 24 39 10 00       	mov    $0x103924,%edx
-  100980:	e8 5b 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100985:	8b 53 24             	mov    0x24(%ebx),%edx
-  100988:	e8 f3 25 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  10098d:	ba 32 39 10 00       	mov    $0x103932,%edx
-  100992:	e8 49 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100997:	ba 00 32 10 00       	mov    $0x103200,%edx
-  10099c:	e8 3f 28 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1009a1:	8b 53 28             	mov    0x28(%ebx),%edx
-  1009a4:	e8 d7 25 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
-  1009a9:	ba 0a 00 00 00       	mov    $0xa,%edx
-  1009ae:	e8 ad 23 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
-  1009b3:	ba f0 31 10 00       	mov    $0x1031f0,%edx
-  1009b8:	e8 23 28 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1009bd:	8d 46 e0             	lea    -0x20(%esi),%eax
-  1009c0:	83 c4 10             	add    $0x10,%esp
-  1009c3:	83 f8 0f             	cmp    $0xf,%eax
-  1009c6:	77 10                	ja     1009d8 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x98>
-  1009c8:	8d 65 f8             	lea    -0x8(%ebp),%esp
-  1009cb:	5b                   	pop    %ebx
-  1009cc:	5e                   	pop    %esi
-  1009cd:	5d                   	pop    %ebp
-  1009ce:	c3                   	ret
-  1009cf:	90                   	nop
-  1009d0:	fa                   	cli
-  1009d1:	f4                   	hlt
-  1009d2:	eb fc                	jmp    1009d0 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x90>
-  1009d4:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  1009d8:	fa                   	cli
-  1009d9:	f4                   	hlt
-  1009da:	eb fc                	jmp    1009d8 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x98>
-  1009dc:	66 90                	xchg   %ax,%ax
-  1009de:	66 90                	xchg   %ax,%ax
+00100950 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE>:
+  100950:	85 c0                	test   %eax,%eax
+  100952:	0f 84 88 00 00 00    	je     1009e0 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x90>
+  100958:	55                   	push   %ebp
+  100959:	89 e5                	mov    %esp,%ebp
+  10095b:	56                   	push   %esi
+  10095c:	53                   	push   %ebx
+  10095d:	8b 70 20             	mov    0x20(%eax),%esi
+  100960:	89 c3                	mov    %eax,%ebx
+  100962:	6a 00                	push   $0x0
+  100964:	6a 0c                	push   $0xc
+  100966:	68 ff 37 10 00       	push   $0x1037ff
+  10096b:	68 82 40 10 00       	push   $0x104082
+  100970:	e8 bb 01 00 00       	call   100b30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
+  100975:	ba e7 38 10 00       	mov    $0x1038e7,%edx
+  10097a:	b8 82 40 10 00       	mov    $0x104082,%eax
+  10097f:	e8 5c 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100984:	89 f2                	mov    %esi,%edx
+  100986:	e8 f5 25 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  10098b:	ba 04 39 10 00       	mov    $0x103904,%edx
+  100990:	e8 4b 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100995:	8b 53 24             	mov    0x24(%ebx),%edx
+  100998:	e8 e3 25 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  10099d:	ba 12 39 10 00       	mov    $0x103912,%edx
+  1009a2:	e8 39 24 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  1009a7:	ba 00 32 10 00       	mov    $0x103200,%edx
+  1009ac:	e8 2f 28 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  1009b1:	8b 53 28             	mov    0x28(%ebx),%edx
+  1009b4:	e8 c7 25 00 00       	call   102f80 <_ZN8terminal6outputlsEm>
+  1009b9:	ba 0a 00 00 00       	mov    $0xa,%edx
+  1009be:	e8 9d 23 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
+  1009c3:	ba f0 31 10 00       	mov    $0x1031f0,%edx
+  1009c8:	e8 13 28 00 00       	call   1031e0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  1009cd:	8d 46 e0             	lea    -0x20(%esi),%eax
+  1009d0:	83 c4 10             	add    $0x10,%esp
+  1009d3:	83 f8 0f             	cmp    $0xf,%eax
+  1009d6:	77 10                	ja     1009e8 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x98>
+  1009d8:	8d 65 f8             	lea    -0x8(%ebp),%esp
+  1009db:	5b                   	pop    %ebx
+  1009dc:	5e                   	pop    %esi
+  1009dd:	5d                   	pop    %ebp
+  1009de:	c3                   	ret
+  1009df:	90                   	nop
+  1009e0:	fa                   	cli
+  1009e1:	f4                   	hlt
+  1009e2:	eb fc                	jmp    1009e0 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x90>
+  1009e4:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  1009e8:	fa                   	cli
+  1009e9:	f4                   	hlt
+  1009ea:	eb fc                	jmp    1009e8 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x98>
+  1009ec:	66 90                	xchg   %ax,%ax
+  1009ee:	66 90                	xchg   %ax,%ax
 
-001009e0 <interrupt_dispatcher>:
-  1009e0:	55                   	push   %ebp
-  1009e1:	89 e5                	mov    %esp,%ebp
-  1009e3:	53                   	push   %ebx
-  1009e4:	83 ec 04             	sub    $0x4,%esp
-  1009e7:	8b 45 08             	mov    0x8(%ebp),%eax
-  1009ea:	8b 58 20             	mov    0x20(%eax),%ebx
-  1009ed:	ff 14 9d c0 39 10 00 	call   *0x1039c0(,%ebx,4)
-  1009f4:	8d 43 e0             	lea    -0x20(%ebx),%eax
-  1009f7:	83 f8 0f             	cmp    $0xf,%eax
-  1009fa:	76 0c                	jbe    100a08 <interrupt_dispatcher+0x28>
-  1009fc:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  1009ff:	c9                   	leave
-  100a00:	c3                   	ret
-  100a01:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  100a08:	8d 43 e0             	lea    -0x20(%ebx),%eax
-  100a0b:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  100a0e:	c9                   	leave
-  100a0f:	0f b6 c0             	movzbl %al,%eax
-  100a12:	e9 19 02 00 00       	jmp    100c30 <_ZN6kernel8send_eoiEh>
-  100a17:	66 90                	xchg   %ax,%ax
-  100a19:	66 90                	xchg   %ax,%ax
-  100a1b:	66 90                	xchg   %ax,%ax
-  100a1d:	66 90                	xchg   %ax,%ax
-  100a1f:	90                   	nop
+001009f0 <interrupt_dispatcher>:
+  1009f0:	55                   	push   %ebp
+  1009f1:	89 e5                	mov    %esp,%ebp
+  1009f3:	53                   	push   %ebx
+  1009f4:	83 ec 04             	sub    $0x4,%esp
+  1009f7:	8b 45 08             	mov    0x8(%ebp),%eax
+  1009fa:	8b 58 20             	mov    0x20(%eax),%ebx
+  1009fd:	ff 14 9d a0 39 10 00 	call   *0x1039a0(,%ebx,4)
+  100a04:	8d 43 e0             	lea    -0x20(%ebx),%eax
+  100a07:	83 f8 0f             	cmp    $0xf,%eax
+  100a0a:	76 0c                	jbe    100a18 <interrupt_dispatcher+0x28>
+  100a0c:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  100a0f:	c9                   	leave
+  100a10:	c3                   	ret
+  100a11:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  100a18:	8d 43 e0             	lea    -0x20(%ebx),%eax
+  100a1b:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  100a1e:	c9                   	leave
+  100a1f:	0f b6 c0             	movzbl %al,%eax
+  100a22:	e9 19 02 00 00       	jmp    100c40 <_ZN6kernel8send_eoiEh>
+  100a27:	66 90                	xchg   %ax,%ax
+  100a29:	66 90                	xchg   %ax,%ax
+  100a2b:	66 90                	xchg   %ax,%ax
+  100a2d:	66 90                	xchg   %ax,%ax
+  100a2f:	90                   	nop
 
-00100a20 <_ZN6kernel21initialize_exceptionsEv>:
-  100a20:	55                   	push   %ebp
-  100a21:	89 e5                	mov    %esp,%ebp
-  100a23:	83 ec 10             	sub    $0x10,%esp
-  100a26:	6a 28                	push   $0x28
-  100a28:	6a 20                	push   $0x20
-  100a2a:	e8 71 01 00 00       	call   100ba0 <_ZN6kernel9pic_remapEhh>
-  100a2f:	68 8e 00 00 00       	push   $0x8e
-  100a34:	6a 08                	push   $0x8
-  100a36:	68 49 00 10 00       	push   $0x100049
-  100a3b:	6a 00                	push   $0x0
-  100a3d:	e8 7e 00 00 00       	call   100ac0 <_ZN6kernel18set_interrupt_gateEhmth>
-  100a42:	83 c4 20             	add    $0x20,%esp
-  100a45:	68 8e 00 00 00       	push   $0x8e
-  100a4a:	6a 08                	push   $0x8
-  100a4c:	68 f7 00 10 00       	push   $0x1000f7
-  100a51:	6a 06                	push   $0x6
-  100a53:	e8 68 00 00 00       	call   100ac0 <_ZN6kernel18set_interrupt_gateEhmth>
-  100a58:	68 8e 00 00 00       	push   $0x8e
-  100a5d:	6a 08                	push   $0x8
-  100a5f:	68 f4 01 10 00       	push   $0x1001f4
-  100a64:	6a 0d                	push   $0xd
-  100a66:	e8 55 00 00 00       	call   100ac0 <_ZN6kernel18set_interrupt_gateEhmth>
-  100a6b:	83 c4 20             	add    $0x20,%esp
-  100a6e:	68 8e 00 00 00       	push   $0x8e
-  100a73:	6a 08                	push   $0x8
-  100a75:	68 0f 02 10 00       	push   $0x10020f
-  100a7a:	6a 0e                	push   $0xe
-  100a7c:	e8 3f 00 00 00       	call   100ac0 <_ZN6kernel18set_interrupt_gateEhmth>
-  100a81:	68 8e 00 00 00       	push   $0x8e
-  100a86:	6a 08                	push   $0x8
-  100a88:	68 db 03 10 00       	push   $0x1003db
-  100a8d:	6a 20                	push   $0x20
-  100a8f:	e8 2c 00 00 00       	call   100ac0 <_ZN6kernel18set_interrupt_gateEhmth>
-  100a94:	83 c4 20             	add    $0x20,%esp
-  100a97:	68 8e 00 00 00       	push   $0x8e
-  100a9c:	6a 08                	push   $0x8
-  100a9e:	68 f8 03 10 00       	push   $0x1003f8
-  100aa3:	6a 21                	push   $0x21
-  100aa5:	e8 16 00 00 00       	call   100ac0 <_ZN6kernel18set_interrupt_gateEhmth>
-  100aaa:	e8 a1 01 00 00       	call   100c50 <_ZN6kernel34mask_all_except_timer_and_keyboardEv>
-  100aaf:	83 c4 10             	add    $0x10,%esp
-  100ab2:	c9                   	leave
-  100ab3:	e9 48 00 00 00       	jmp    100b00 <_ZN6kernel8load_idtEv>
-  100ab8:	66 90                	xchg   %ax,%ax
-  100aba:	66 90                	xchg   %ax,%ax
-  100abc:	66 90                	xchg   %ax,%ax
-  100abe:	66 90                	xchg   %ax,%ax
+00100a30 <_ZN6kernel21initialize_exceptionsEv>:
+  100a30:	55                   	push   %ebp
+  100a31:	89 e5                	mov    %esp,%ebp
+  100a33:	83 ec 10             	sub    $0x10,%esp
+  100a36:	6a 28                	push   $0x28
+  100a38:	6a 20                	push   $0x20
+  100a3a:	e8 71 01 00 00       	call   100bb0 <_ZN6kernel9pic_remapEhh>
+  100a3f:	68 8e 00 00 00       	push   $0x8e
+  100a44:	6a 08                	push   $0x8
+  100a46:	68 38 00 10 00       	push   $0x100038
+  100a4b:	6a 00                	push   $0x0
+  100a4d:	e8 7e 00 00 00       	call   100ad0 <_ZN6kernel18set_interrupt_gateEhmth>
+  100a52:	83 c4 20             	add    $0x20,%esp
+  100a55:	68 8e 00 00 00       	push   $0x8e
+  100a5a:	6a 08                	push   $0x8
+  100a5c:	68 e6 00 10 00       	push   $0x1000e6
+  100a61:	6a 06                	push   $0x6
+  100a63:	e8 68 00 00 00       	call   100ad0 <_ZN6kernel18set_interrupt_gateEhmth>
+  100a68:	68 8e 00 00 00       	push   $0x8e
+  100a6d:	6a 08                	push   $0x8
+  100a6f:	68 e3 01 10 00       	push   $0x1001e3
+  100a74:	6a 0d                	push   $0xd
+  100a76:	e8 55 00 00 00       	call   100ad0 <_ZN6kernel18set_interrupt_gateEhmth>
+  100a7b:	83 c4 20             	add    $0x20,%esp
+  100a7e:	68 8e 00 00 00       	push   $0x8e
+  100a83:	6a 08                	push   $0x8
+  100a85:	68 fe 01 10 00       	push   $0x1001fe
+  100a8a:	6a 0e                	push   $0xe
+  100a8c:	e8 3f 00 00 00       	call   100ad0 <_ZN6kernel18set_interrupt_gateEhmth>
+  100a91:	68 8e 00 00 00       	push   $0x8e
+  100a96:	6a 08                	push   $0x8
+  100a98:	68 ca 03 10 00       	push   $0x1003ca
+  100a9d:	6a 20                	push   $0x20
+  100a9f:	e8 2c 00 00 00       	call   100ad0 <_ZN6kernel18set_interrupt_gateEhmth>
+  100aa4:	83 c4 20             	add    $0x20,%esp
+  100aa7:	68 8e 00 00 00       	push   $0x8e
+  100aac:	6a 08                	push   $0x8
+  100aae:	68 e7 03 10 00       	push   $0x1003e7
+  100ab3:	6a 21                	push   $0x21
+  100ab5:	e8 16 00 00 00       	call   100ad0 <_ZN6kernel18set_interrupt_gateEhmth>
+  100aba:	e8 a1 01 00 00       	call   100c60 <_ZN6kernel34mask_all_except_timer_and_keyboardEv>
+  100abf:	83 c4 10             	add    $0x10,%esp
+  100ac2:	c9                   	leave
+  100ac3:	e9 48 00 00 00       	jmp    100b10 <_ZN6kernel8load_idtEv>
+  100ac8:	66 90                	xchg   %ax,%ax
+  100aca:	66 90                	xchg   %ax,%ax
+  100acc:	66 90                	xchg   %ax,%ax
+  100ace:	66 90                	xchg   %ax,%ax
 
-00100ac0 <_ZN6kernel18set_interrupt_gateEhmth>:
-  100ac0:	55                   	push   %ebp
-  100ac1:	89 e5                	mov    %esp,%ebp
-  100ac3:	56                   	push   %esi
-  100ac4:	0f b6 4d 08          	movzbl 0x8(%ebp),%ecx
-  100ac8:	8b 45 0c             	mov    0xc(%ebp),%eax
-  100acb:	53                   	push   %ebx
-  100acc:	8b 75 10             	mov    0x10(%ebp),%esi
-  100acf:	8b 5d 14             	mov    0x14(%ebp),%ebx
-  100ad2:	8d 14 cd e0 40 10 00 	lea    0x1040e0(,%ecx,8),%edx
-  100ad9:	66 89 04 cd e0 40 10 	mov    %ax,0x1040e0(,%ecx,8)
-  100ae0:	00 
-  100ae1:	0f b7 0d c0 3d 10 00 	movzwl 0x103dc0,%ecx
-  100ae8:	c1 e8 10             	shr    $0x10,%eax
-  100aeb:	66 89 72 02          	mov    %si,0x2(%edx)
-  100aef:	88 dd                	mov    %bl,%ch
-  100af1:	66 89 42 06          	mov    %ax,0x6(%edx)
-  100af5:	66 89 4a 04          	mov    %cx,0x4(%edx)
-  100af9:	5b                   	pop    %ebx
-  100afa:	5e                   	pop    %esi
-  100afb:	5d                   	pop    %ebp
-  100afc:	c3                   	ret
-  100afd:	66 90                	xchg   %ax,%ax
-  100aff:	90                   	nop
+00100ad0 <_ZN6kernel18set_interrupt_gateEhmth>:
+  100ad0:	55                   	push   %ebp
+  100ad1:	89 e5                	mov    %esp,%ebp
+  100ad3:	56                   	push   %esi
+  100ad4:	0f b6 4d 08          	movzbl 0x8(%ebp),%ecx
+  100ad8:	8b 45 0c             	mov    0xc(%ebp),%eax
+  100adb:	53                   	push   %ebx
+  100adc:	8b 75 10             	mov    0x10(%ebp),%esi
+  100adf:	8b 5d 14             	mov    0x14(%ebp),%ebx
+  100ae2:	8d 14 cd a0 40 10 00 	lea    0x1040a0(,%ecx,8),%edx
+  100ae9:	66 89 04 cd a0 40 10 	mov    %ax,0x1040a0(,%ecx,8)
+  100af0:	00 
+  100af1:	0f b7 0d a0 3d 10 00 	movzwl 0x103da0,%ecx
+  100af8:	c1 e8 10             	shr    $0x10,%eax
+  100afb:	66 89 72 02          	mov    %si,0x2(%edx)
+  100aff:	88 dd                	mov    %bl,%ch
+  100b01:	66 89 42 06          	mov    %ax,0x6(%edx)
+  100b05:	66 89 4a 04          	mov    %cx,0x4(%edx)
+  100b09:	5b                   	pop    %ebx
+  100b0a:	5e                   	pop    %esi
+  100b0b:	5d                   	pop    %ebp
+  100b0c:	c3                   	ret
+  100b0d:	66 90                	xchg   %ax,%ax
+  100b0f:	90                   	nop
 
-00100b00 <_ZN6kernel8load_idtEv>:
-  100b00:	55                   	push   %ebp
-  100b01:	b8 ff 07 00 00       	mov    $0x7ff,%eax
-  100b06:	89 e5                	mov    %esp,%ebp
-  100b08:	83 ec 10             	sub    $0x10,%esp
-  100b0b:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
-  100b0f:	c7 45 fc e0 40 10 00 	movl   $0x1040e0,-0x4(%ebp)
-  100b16:	0f 01 5d fa          	lidtl  -0x6(%ebp)
-  100b1a:	c9                   	leave
-  100b1b:	c3                   	ret
-  100b1c:	66 90                	xchg   %ax,%ax
-  100b1e:	66 90                	xchg   %ax,%ax
+00100b10 <_ZN6kernel8load_idtEv>:
+  100b10:	55                   	push   %ebp
+  100b11:	b8 ff 07 00 00       	mov    $0x7ff,%eax
+  100b16:	89 e5                	mov    %esp,%ebp
+  100b18:	83 ec 10             	sub    $0x10,%esp
+  100b1b:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
+  100b1f:	c7 45 fc a0 40 10 00 	movl   $0x1040a0,-0x4(%ebp)
+  100b26:	0f 01 5d fa          	lidtl  -0x6(%ebp)
+  100b2a:	c9                   	leave
+  100b2b:	c3                   	ret
+  100b2c:	66 90                	xchg   %ax,%ax
+  100b2e:	66 90                	xchg   %ax,%ax
 
-00100b20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>:
-  100b20:	55                   	push   %ebp
-  100b21:	89 e5                	mov    %esp,%ebp
-  100b23:	53                   	push   %ebx
-  100b24:	83 ec 04             	sub    $0x4,%esp
-  100b27:	0f b6 45 14          	movzbl 0x14(%ebp),%eax
-  100b2b:	0f b6 1d 8b 40 10 00 	movzbl 0x10408b,%ebx
-  100b32:	8b 55 0c             	mov    0xc(%ebp),%edx
-  100b35:	c1 e0 04             	shl    $0x4,%eax
-  100b38:	0a 45 10             	or     0x10(%ebp),%al
-  100b3b:	a2 8b 40 10 00       	mov    %al,0x10408b
-  100b40:	8b 45 08             	mov    0x8(%ebp),%eax
-  100b43:	e8 98 22 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100b48:	88 1d 8b 40 10 00    	mov    %bl,0x10408b
-  100b4e:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  100b51:	c9                   	leave
-  100b52:	c3                   	ret
-  100b53:	66 90                	xchg   %ax,%ax
-  100b55:	66 90                	xchg   %ax,%ax
-  100b57:	66 90                	xchg   %ax,%ax
-  100b59:	66 90                	xchg   %ax,%ax
-  100b5b:	66 90                	xchg   %ax,%ax
-  100b5d:	66 90                	xchg   %ax,%ax
-  100b5f:	90                   	nop
+00100b30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>:
+  100b30:	55                   	push   %ebp
+  100b31:	89 e5                	mov    %esp,%ebp
+  100b33:	53                   	push   %ebx
+  100b34:	83 ec 04             	sub    $0x4,%esp
+  100b37:	0f b6 45 14          	movzbl 0x14(%ebp),%eax
+  100b3b:	0f b6 1d 6b 40 10 00 	movzbl 0x10406b,%ebx
+  100b42:	8b 55 0c             	mov    0xc(%ebp),%edx
+  100b45:	c1 e0 04             	shl    $0x4,%eax
+  100b48:	0a 45 10             	or     0x10(%ebp),%al
+  100b4b:	a2 6b 40 10 00       	mov    %al,0x10406b
+  100b50:	8b 45 08             	mov    0x8(%ebp),%eax
+  100b53:	e8 88 22 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100b58:	88 1d 6b 40 10 00    	mov    %bl,0x10406b
+  100b5e:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  100b61:	c9                   	leave
+  100b62:	c3                   	ret
+  100b63:	66 90                	xchg   %ax,%ax
+  100b65:	66 90                	xchg   %ax,%ax
+  100b67:	66 90                	xchg   %ax,%ax
+  100b69:	66 90                	xchg   %ax,%ax
+  100b6b:	66 90                	xchg   %ax,%ax
+  100b6d:	66 90                	xchg   %ax,%ax
+  100b6f:	90                   	nop
 
-00100b60 <_ZN6kernel6logger5panicEPKc>:
-  100b60:	55                   	push   %ebp
-  100b61:	ba 39 39 10 00       	mov    $0x103939,%edx
-  100b66:	89 e5                	mov    %esp,%ebp
-  100b68:	83 ec 08             	sub    $0x8,%esp
-  100b6b:	c6 05 8b 40 10 00 4f 	movb   $0x4f,0x10408b
-  100b72:	8b 45 08             	mov    0x8(%ebp),%eax
-  100b75:	e8 66 22 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100b7a:	8b 55 0c             	mov    0xc(%ebp),%edx
-  100b7d:	e8 5e 22 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
-  100b82:	ba 0a 00 00 00       	mov    $0xa,%edx
-  100b87:	e8 d4 21 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
-  100b8c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  100b90:	fa                   	cli
-  100b91:	f4                   	hlt
-  100b92:	eb fc                	jmp    100b90 <_ZN6kernel6logger5panicEPKc+0x30>
-  100b94:	66 90                	xchg   %ax,%ax
-  100b96:	66 90                	xchg   %ax,%ax
-  100b98:	66 90                	xchg   %ax,%ax
-  100b9a:	66 90                	xchg   %ax,%ax
-  100b9c:	66 90                	xchg   %ax,%ax
-  100b9e:	66 90                	xchg   %ax,%ax
+00100b70 <_ZN6kernel6logger5panicEPKc>:
+  100b70:	55                   	push   %ebp
+  100b71:	ba 19 39 10 00       	mov    $0x103919,%edx
+  100b76:	89 e5                	mov    %esp,%ebp
+  100b78:	83 ec 08             	sub    $0x8,%esp
+  100b7b:	c6 05 6b 40 10 00 4f 	movb   $0x4f,0x10406b
+  100b82:	8b 45 08             	mov    0x8(%ebp),%eax
+  100b85:	e8 56 22 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100b8a:	8b 55 0c             	mov    0xc(%ebp),%edx
+  100b8d:	e8 4e 22 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
+  100b92:	ba 0a 00 00 00       	mov    $0xa,%edx
+  100b97:	e8 c4 21 00 00       	call   102d60 <_ZN8terminal6outputlsEc>
+  100b9c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  100ba0:	fa                   	cli
+  100ba1:	f4                   	hlt
+  100ba2:	eb fc                	jmp    100ba0 <_ZN6kernel6logger5panicEPKc+0x30>
+  100ba4:	66 90                	xchg   %ax,%ax
+  100ba6:	66 90                	xchg   %ax,%ax
+  100ba8:	66 90                	xchg   %ax,%ax
+  100baa:	66 90                	xchg   %ax,%ax
+  100bac:	66 90                	xchg   %ax,%ax
+  100bae:	66 90                	xchg   %ax,%ax
 
-00100ba0 <_ZN6kernel9pic_remapEhh>:
-  100ba0:	55                   	push   %ebp
-  100ba1:	89 e5                	mov    %esp,%ebp
-  100ba3:	53                   	push   %ebx
-  100ba4:	83 ec 04             	sub    $0x4,%esp
-  100ba7:	0f b6 45 08          	movzbl 0x8(%ebp),%eax
-  100bab:	0f b6 5d 0c          	movzbl 0xc(%ebp),%ebx
-  100baf:	88 45 fb             	mov    %al,-0x5(%ebp)
-  100bb2:	e4 21                	in     $0x21,%al
-  100bb4:	88 45 fa             	mov    %al,-0x6(%ebp)
-  100bb7:	e4 a1                	in     $0xa1,%al
-  100bb9:	88 45 f9             	mov    %al,-0x7(%ebp)
-  100bbc:	b8 11 00 00 00       	mov    $0x11,%eax
-  100bc1:	e6 20                	out    %al,$0x20
-  100bc3:	31 c0                	xor    %eax,%eax
-  100bc5:	e6 80                	out    %al,$0x80
-  100bc7:	b8 11 00 00 00       	mov    $0x11,%eax
-  100bcc:	e6 a0                	out    %al,$0xa0
-  100bce:	31 c0                	xor    %eax,%eax
-  100bd0:	e6 80                	out    %al,$0x80
-  100bd2:	0f b6 45 fb          	movzbl -0x5(%ebp),%eax
-  100bd6:	e6 21                	out    %al,$0x21
-  100bd8:	31 c0                	xor    %eax,%eax
-  100bda:	e6 80                	out    %al,$0x80
-  100bdc:	89 d8                	mov    %ebx,%eax
-  100bde:	e6 a1                	out    %al,$0xa1
-  100be0:	31 c0                	xor    %eax,%eax
-  100be2:	e6 80                	out    %al,$0x80
-  100be4:	b8 04 00 00 00       	mov    $0x4,%eax
-  100be9:	e6 21                	out    %al,$0x21
-  100beb:	31 c0                	xor    %eax,%eax
-  100bed:	e6 80                	out    %al,$0x80
-  100bef:	b8 02 00 00 00       	mov    $0x2,%eax
-  100bf4:	e6 a1                	out    %al,$0xa1
-  100bf6:	31 c0                	xor    %eax,%eax
-  100bf8:	e6 80                	out    %al,$0x80
-  100bfa:	b8 01 00 00 00       	mov    $0x1,%eax
-  100bff:	e6 21                	out    %al,$0x21
-  100c01:	31 c0                	xor    %eax,%eax
-  100c03:	e6 80                	out    %al,$0x80
-  100c05:	b8 01 00 00 00       	mov    $0x1,%eax
-  100c0a:	e6 a1                	out    %al,$0xa1
-  100c0c:	31 c0                	xor    %eax,%eax
-  100c0e:	e6 80                	out    %al,$0x80
-  100c10:	0f b6 45 fa          	movzbl -0x6(%ebp),%eax
-  100c14:	e6 21                	out    %al,$0x21
-  100c16:	31 c0                	xor    %eax,%eax
-  100c18:	e6 80                	out    %al,$0x80
-  100c1a:	0f b6 45 f9          	movzbl -0x7(%ebp),%eax
-  100c1e:	e6 a1                	out    %al,$0xa1
-  100c20:	31 c0                	xor    %eax,%eax
-  100c22:	e6 80                	out    %al,$0x80
-  100c24:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  100c27:	c9                   	leave
-  100c28:	c3                   	ret
-  100c29:	66 90                	xchg   %ax,%ax
-  100c2b:	66 90                	xchg   %ax,%ax
-  100c2d:	66 90                	xchg   %ax,%ax
-  100c2f:	90                   	nop
+00100bb0 <_ZN6kernel9pic_remapEhh>:
+  100bb0:	55                   	push   %ebp
+  100bb1:	89 e5                	mov    %esp,%ebp
+  100bb3:	53                   	push   %ebx
+  100bb4:	83 ec 04             	sub    $0x4,%esp
+  100bb7:	0f b6 45 08          	movzbl 0x8(%ebp),%eax
+  100bbb:	0f b6 5d 0c          	movzbl 0xc(%ebp),%ebx
+  100bbf:	88 45 fb             	mov    %al,-0x5(%ebp)
+  100bc2:	e4 21                	in     $0x21,%al
+  100bc4:	88 45 fa             	mov    %al,-0x6(%ebp)
+  100bc7:	e4 a1                	in     $0xa1,%al
+  100bc9:	88 45 f9             	mov    %al,-0x7(%ebp)
+  100bcc:	b8 11 00 00 00       	mov    $0x11,%eax
+  100bd1:	e6 20                	out    %al,$0x20
+  100bd3:	31 c0                	xor    %eax,%eax
+  100bd5:	e6 80                	out    %al,$0x80
+  100bd7:	b8 11 00 00 00       	mov    $0x11,%eax
+  100bdc:	e6 a0                	out    %al,$0xa0
+  100bde:	31 c0                	xor    %eax,%eax
+  100be0:	e6 80                	out    %al,$0x80
+  100be2:	0f b6 45 fb          	movzbl -0x5(%ebp),%eax
+  100be6:	e6 21                	out    %al,$0x21
+  100be8:	31 c0                	xor    %eax,%eax
+  100bea:	e6 80                	out    %al,$0x80
+  100bec:	89 d8                	mov    %ebx,%eax
+  100bee:	e6 a1                	out    %al,$0xa1
+  100bf0:	31 c0                	xor    %eax,%eax
+  100bf2:	e6 80                	out    %al,$0x80
+  100bf4:	b8 04 00 00 00       	mov    $0x4,%eax
+  100bf9:	e6 21                	out    %al,$0x21
+  100bfb:	31 c0                	xor    %eax,%eax
+  100bfd:	e6 80                	out    %al,$0x80
+  100bff:	b8 02 00 00 00       	mov    $0x2,%eax
+  100c04:	e6 a1                	out    %al,$0xa1
+  100c06:	31 c0                	xor    %eax,%eax
+  100c08:	e6 80                	out    %al,$0x80
+  100c0a:	b8 01 00 00 00       	mov    $0x1,%eax
+  100c0f:	e6 21                	out    %al,$0x21
+  100c11:	31 c0                	xor    %eax,%eax
+  100c13:	e6 80                	out    %al,$0x80
+  100c15:	b8 01 00 00 00       	mov    $0x1,%eax
+  100c1a:	e6 a1                	out    %al,$0xa1
+  100c1c:	31 c0                	xor    %eax,%eax
+  100c1e:	e6 80                	out    %al,$0x80
+  100c20:	0f b6 45 fa          	movzbl -0x6(%ebp),%eax
+  100c24:	e6 21                	out    %al,$0x21
+  100c26:	31 c0                	xor    %eax,%eax
+  100c28:	e6 80                	out    %al,$0x80
+  100c2a:	0f b6 45 f9          	movzbl -0x7(%ebp),%eax
+  100c2e:	e6 a1                	out    %al,$0xa1
+  100c30:	31 c0                	xor    %eax,%eax
+  100c32:	e6 80                	out    %al,$0x80
+  100c34:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  100c37:	c9                   	leave
+  100c38:	c3                   	ret
+  100c39:	66 90                	xchg   %ax,%ax
+  100c3b:	66 90                	xchg   %ax,%ax
+  100c3d:	66 90                	xchg   %ax,%ax
+  100c3f:	90                   	nop
 
-00100c30 <_ZN6kernel8send_eoiEh>:
-  100c30:	3c 07                	cmp    $0x7,%al
-  100c32:	76 07                	jbe    100c3b <_ZN6kernel8send_eoiEh+0xb>
-  100c34:	b8 20 00 00 00       	mov    $0x20,%eax
-  100c39:	e6 a0                	out    %al,$0xa0
-  100c3b:	b8 20 00 00 00       	mov    $0x20,%eax
-  100c40:	e6 20                	out    %al,$0x20
-  100c42:	c3                   	ret
-  100c43:	66 90                	xchg   %ax,%ax
-  100c45:	66 90                	xchg   %ax,%ax
-  100c47:	66 90                	xchg   %ax,%ax
-  100c49:	66 90                	xchg   %ax,%ax
-  100c4b:	66 90                	xchg   %ax,%ax
-  100c4d:	66 90                	xchg   %ax,%ax
-  100c4f:	90                   	nop
+00100c40 <_ZN6kernel8send_eoiEh>:
+  100c40:	3c 07                	cmp    $0x7,%al
+  100c42:	76 07                	jbe    100c4b <_ZN6kernel8send_eoiEh+0xb>
+  100c44:	b8 20 00 00 00       	mov    $0x20,%eax
+  100c49:	e6 a0                	out    %al,$0xa0
+  100c4b:	b8 20 00 00 00       	mov    $0x20,%eax
+  100c50:	e6 20                	out    %al,$0x20
+  100c52:	c3                   	ret
+  100c53:	66 90                	xchg   %ax,%ax
+  100c55:	66 90                	xchg   %ax,%ax
+  100c57:	66 90                	xchg   %ax,%ax
+  100c59:	66 90                	xchg   %ax,%ax
+  100c5b:	66 90                	xchg   %ax,%ax
+  100c5d:	66 90                	xchg   %ax,%ax
+  100c5f:	90                   	nop
 
-00100c50 <_ZN6kernel34mask_all_except_timer_and_keyboardEv>:
-  100c50:	b8 fc ff ff ff       	mov    $0xfffffffc,%eax
-  100c55:	e6 21                	out    %al,$0x21
-  100c57:	31 c0                	xor    %eax,%eax
-  100c59:	e6 80                	out    %al,$0x80
-  100c5b:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
-  100c60:	e6 a1                	out    %al,$0xa1
-  100c62:	31 c0                	xor    %eax,%eax
-  100c64:	e6 80                	out    %al,$0x80
-  100c66:	c3                   	ret
-  100c67:	66 90                	xchg   %ax,%ax
-  100c69:	66 90                	xchg   %ax,%ax
-  100c6b:	66 90                	xchg   %ax,%ax
-  100c6d:	66 90                	xchg   %ax,%ax
-  100c6f:	90                   	nop
+00100c60 <_ZN6kernel34mask_all_except_timer_and_keyboardEv>:
+  100c60:	b8 fc ff ff ff       	mov    $0xfffffffc,%eax
+  100c65:	e6 21                	out    %al,$0x21
+  100c67:	31 c0                	xor    %eax,%eax
+  100c69:	e6 80                	out    %al,$0x80
+  100c6b:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
+  100c70:	e6 a1                	out    %al,$0xa1
+  100c72:	31 c0                	xor    %eax,%eax
+  100c74:	e6 80                	out    %al,$0x80
+  100c76:	c3                   	ret
+  100c77:	66 90                	xchg   %ax,%ax
+  100c79:	66 90                	xchg   %ax,%ax
+  100c7b:	66 90                	xchg   %ax,%ax
+  100c7d:	66 90                	xchg   %ax,%ax
+  100c7f:	90                   	nop
 
-00100c70 <_ZN6kernel14initialize_pitEm>:
-  100c70:	55                   	push   %ebp
-  100c71:	89 e5                	mov    %esp,%ebp
-  100c73:	83 ec 18             	sub    $0x18,%esp
-  100c76:	8b 4d 08             	mov    0x8(%ebp),%ecx
-  100c79:	8d 41 ec             	lea    -0x14(%ecx),%eax
-  100c7c:	83 f8 50             	cmp    $0x50,%eax
-  100c7f:	77 24                	ja     100ca5 <_ZN6kernel14initialize_pitEm+0x35>
-  100c81:	89 c8                	mov    %ecx,%eax
-  100c83:	31 d2                	xor    %edx,%edx
-  100c85:	d1 e8                	shr    $1,%eax
-  100c87:	05 de 34 12 00       	add    $0x1234de,%eax
-  100c8c:	f7 f1                	div    %ecx
-  100c8e:	89 c1                	mov    %eax,%ecx
-  100c90:	b8 36 00 00 00       	mov    $0x36,%eax
-  100c95:	e6 43                	out    %al,$0x43
-  100c97:	89 c8                	mov    %ecx,%eax
-  100c99:	e6 40                	out    %al,$0x40
-  100c9b:	89 c8                	mov    %ecx,%eax
-  100c9d:	66 c1 e8 08          	shr    $0x8,%ax
-  100ca1:	e6 40                	out    %al,$0x40
-  100ca3:	c9                   	leave
-  100ca4:	c3                   	ret
-  100ca5:	50                   	push   %eax
-  100ca6:	50                   	push   %eax
-  100ca7:	8d 45 f6             	lea    -0xa(%ebp),%eax
-  100caa:	68 43 39 10 00       	push   $0x103943
-  100caf:	50                   	push   %eax
-  100cb0:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
-  100cb6:	e8 a5 fe ff ff       	call   100b60 <_ZN6kernel6logger5panicEPKc>
-  100cbb:	66 90                	xchg   %ax,%ax
-  100cbd:	66 90                	xchg   %ax,%ax
-  100cbf:	90                   	nop
+00100c80 <_ZN6kernel14initialize_pitEm>:
+  100c80:	55                   	push   %ebp
+  100c81:	89 e5                	mov    %esp,%ebp
+  100c83:	83 ec 18             	sub    $0x18,%esp
+  100c86:	8b 4d 08             	mov    0x8(%ebp),%ecx
+  100c89:	8d 41 ec             	lea    -0x14(%ecx),%eax
+  100c8c:	83 f8 50             	cmp    $0x50,%eax
+  100c8f:	77 24                	ja     100cb5 <_ZN6kernel14initialize_pitEm+0x35>
+  100c91:	89 c8                	mov    %ecx,%eax
+  100c93:	31 d2                	xor    %edx,%edx
+  100c95:	d1 e8                	shr    $1,%eax
+  100c97:	05 de 34 12 00       	add    $0x1234de,%eax
+  100c9c:	f7 f1                	div    %ecx
+  100c9e:	89 c1                	mov    %eax,%ecx
+  100ca0:	b8 36 00 00 00       	mov    $0x36,%eax
+  100ca5:	e6 43                	out    %al,$0x43
+  100ca7:	89 c8                	mov    %ecx,%eax
+  100ca9:	e6 40                	out    %al,$0x40
+  100cab:	89 c8                	mov    %ecx,%eax
+  100cad:	66 c1 e8 08          	shr    $0x8,%ax
+  100cb1:	e6 40                	out    %al,$0x40
+  100cb3:	c9                   	leave
+  100cb4:	c3                   	ret
+  100cb5:	50                   	push   %eax
+  100cb6:	50                   	push   %eax
+  100cb7:	8d 45 f6             	lea    -0xa(%ebp),%eax
+  100cba:	68 23 39 10 00       	push   $0x103923
+  100cbf:	50                   	push   %eax
+  100cc0:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
+  100cc6:	e8 a5 fe ff ff       	call   100b70 <_ZN6kernel6logger5panicEPKc>
+  100ccb:	66 90                	xchg   %ax,%ax
+  100ccd:	66 90                	xchg   %ax,%ax
+  100ccf:	90                   	nop
 
-00100cc0 <_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE>:
-  100cc0:	a1 e4 48 10 00       	mov    0x1048e4,%eax
-  100cc5:	83 c0 01             	add    $0x1,%eax
-  100cc8:	a3 e4 48 10 00       	mov    %eax,0x1048e4
-  100ccd:	c3                   	ret
-  100cce:	66 90                	xchg   %ax,%ax
+00100cd0 <_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE>:
+  100cd0:	a1 a4 48 10 00       	mov    0x1048a4,%eax
+  100cd5:	83 c0 01             	add    $0x1,%eax
+  100cd8:	a3 a4 48 10 00       	mov    %eax,0x1048a4
+  100cdd:	c3                   	ret
+  100cde:	66 90                	xchg   %ax,%ax
 
-00100cd0 <_ZN6kernel19set_timer_frequencyEm>:
-  100cd0:	55                   	push   %ebp
-  100cd1:	89 e5                	mov    %esp,%ebp
-  100cd3:	8b 45 08             	mov    0x8(%ebp),%eax
-  100cd6:	5d                   	pop    %ebp
-  100cd7:	a3 e0 48 10 00       	mov    %eax,0x1048e0
-  100cdc:	c3                   	ret
-  100cdd:	66 90                	xchg   %ax,%ax
-  100cdf:	90                   	nop
-
-00100ce0 <_ZN6kernel6memory19get_e820_memory_mapEv>:
+00100ce0 <_ZN6kernel19set_timer_frequencyEm>:
   100ce0:	55                   	push   %ebp
-  100ce1:	0f b7 15 00 05 00 00 	movzwl 0x500,%edx
-  100ce8:	31 c9                	xor    %ecx,%ecx
-  100cea:	89 e5                	mov    %esp,%ebp
-  100cec:	8b 45 08             	mov    0x8(%ebp),%eax
-  100cef:	66 89 48 06          	mov    %cx,0x6(%eax)
-  100cf3:	c7 00 02 05 00 00    	movl   $0x502,(%eax)
-  100cf9:	66 89 50 04          	mov    %dx,0x4(%eax)
-  100cfd:	5d                   	pop    %ebp
-  100cfe:	c2 04 00             	ret    $0x4
-  100d01:	66 90                	xchg   %ax,%ax
-  100d03:	66 90                	xchg   %ax,%ax
-  100d05:	66 90                	xchg   %ax,%ax
-  100d07:	66 90                	xchg   %ax,%ax
-  100d09:	66 90                	xchg   %ax,%ax
-  100d0b:	66 90                	xchg   %ax,%ax
-  100d0d:	66 90                	xchg   %ax,%ax
-  100d0f:	66 90                	xchg   %ax,%ax
+  100ce1:	89 e5                	mov    %esp,%ebp
+  100ce3:	8b 45 08             	mov    0x8(%ebp),%eax
+  100ce6:	5d                   	pop    %ebp
+  100ce7:	a3 a0 48 10 00       	mov    %eax,0x1048a0
+  100cec:	c3                   	ret
+  100ced:	66 90                	xchg   %ax,%ax
+  100cef:	90                   	nop
+
+00100cf0 <_ZN6kernel6memory19get_e820_memory_mapEv>:
+  100cf0:	55                   	push   %ebp
+  100cf1:	0f b7 15 00 05 00 00 	movzwl 0x500,%edx
+  100cf8:	31 c9                	xor    %ecx,%ecx
+  100cfa:	89 e5                	mov    %esp,%ebp
+  100cfc:	8b 45 08             	mov    0x8(%ebp),%eax
+  100cff:	66 89 48 06          	mov    %cx,0x6(%eax)
+  100d03:	c7 00 02 05 00 00    	movl   $0x502,(%eax)
+  100d09:	66 89 50 04          	mov    %dx,0x4(%eax)
+  100d0d:	5d                   	pop    %ebp
+  100d0e:	c2 04 00             	ret    $0x4
   100d11:	66 90                	xchg   %ax,%ax
   100d13:	66 90                	xchg   %ax,%ax
   100d15:	66 90                	xchg   %ax,%ax
@@ -1629,7 +1621,7 @@ Disassembly of section .text:
   10126d:	8d 7e ff             	lea    -0x1(%esi),%edi
   101270:	83 ff 02             	cmp    $0x2,%edi
   101273:	76 36                	jbe    1012ab <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xbb>
-  101275:	66 0f 6e 05 dc 3d 10 	movd   0x103ddc,%xmm0
+  101275:	66 0f 6e 05 bc 3d 10 	movd   0x103dbc,%xmm0
   10127c:	00 
   10127d:	89 f7                	mov    %esi,%edi
   10127f:	c1 ef 02             	shr    $0x2,%edi
@@ -1949,7 +1941,7 @@ Disassembly of section .text:
   101603:	03 74 24 14          	add    0x14(%esp),%esi
   101607:	c1 ef 02             	shr    $0x2,%edi
   10160a:	01 de                	add    %ebx,%esi
-  10160c:	8b 1d dc 3d 10 00    	mov    0x103ddc,%ebx
+  10160c:	8b 1d bc 3d 10 00    	mov    0x103dbc,%ebx
   101612:	89 7c 24 08          	mov    %edi,0x8(%esp)
   101616:	8b 7c 24 08          	mov    0x8(%esp),%edi
   10161a:	89 1e                	mov    %ebx,(%esi)
@@ -3338,17 +3330,17 @@ Disassembly of section .text:
   102581:	89 e5                	mov    %esp,%ebp
   102583:	57                   	push   %edi
   102584:	56                   	push   %esi
-  102585:	89 d6                	mov    %edx,%esi
-  102587:	53                   	push   %ebx
-  102588:	89 c3                	mov    %eax,%ebx
+  102585:	53                   	push   %ebx
+  102586:	89 c3                	mov    %eax,%ebx
+  102588:	89 d0                	mov    %edx,%eax
   10258a:	83 ec 2c             	sub    $0x2c,%esp
-  10258d:	0f b7 53 04          	movzwl 0x4(%ebx),%edx
-  102591:	8b 00                	mov    (%eax),%eax
-  102593:	8d 14 92             	lea    (%edx,%edx,4),%edx
-  102596:	8d 3c 90             	lea    (%eax,%edx,4),%edi
-  102599:	39 f8                	cmp    %edi,%eax
+  10258d:	0f b7 4b 04          	movzwl 0x4(%ebx),%ecx
+  102591:	8b 13                	mov    (%ebx),%edx
+  102593:	8d 0c 89             	lea    (%ecx,%ecx,4),%ecx
+  102596:	8d 3c 8a             	lea    (%edx,%ecx,4),%edi
+  102599:	39 fa                	cmp    %edi,%edx
   10259b:	0f 83 cf 01 00 00    	jae    102770 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x1f0>
-  1025a1:	31 c9                	xor    %ecx,%ecx
+  1025a1:	31 f6                	xor    %esi,%esi
   1025a3:	eb 1b                	jmp    1025c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x40>
   1025a5:	8d 76 00             	lea    0x0(%esi),%esi
   1025a8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
@@ -3357,52 +3349,50 @@ Disassembly of section .text:
   1025b7:	00 
   1025b8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   1025bf:	00 
-  1025c0:	8b 10                	mov    (%eax),%edx
-  1025c2:	03 50 08             	add    0x8(%eax),%edx
-  1025c5:	39 d1                	cmp    %edx,%ecx
-  1025c7:	0f 42 ca             	cmovb  %edx,%ecx
-  1025ca:	83 c0 14             	add    $0x14,%eax
-  1025cd:	39 f8                	cmp    %edi,%eax
+  1025c0:	8b 0a                	mov    (%edx),%ecx
+  1025c2:	03 4a 08             	add    0x8(%edx),%ecx
+  1025c5:	39 ce                	cmp    %ecx,%esi
+  1025c7:	0f 42 f1             	cmovb  %ecx,%esi
+  1025ca:	83 c2 14             	add    $0x14,%edx
+  1025cd:	39 fa                	cmp    %edi,%edx
   1025cf:	72 ef                	jb     1025c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x40>
-  1025d1:	c1 e9 0c             	shr    $0xc,%ecx
-  1025d4:	8d 41 07             	lea    0x7(%ecx),%eax
-  1025d7:	c1 e8 03             	shr    $0x3,%eax
-  1025da:	8d 14 06             	lea    (%esi,%eax,1),%edx
-  1025dd:	89 0d 00 49 10 00    	mov    %ecx,0x104900
-  1025e3:	89 35 e8 48 10 00    	mov    %esi,0x1048e8
-  1025e9:	89 15 ec 48 10 00    	mov    %edx,0x1048ec
-  1025ef:	89 15 f4 48 10 00    	mov    %edx,0x1048f4
-  1025f5:	89 55 e4             	mov    %edx,-0x1c(%ebp)
-  1025f8:	e8 93 11 00 00       	call   103790 <_ZN3cpu8features3getEv>
-  1025fd:	8b 55 e4             	mov    -0x1c(%ebp),%edx
-  102600:	0f b6 c0             	movzbl %al,%eax
-  102603:	8b 0c 85 d0 3d 10 00 	mov    0x103dd0(,%eax,4),%ecx
-  10260a:	89 45 d8             	mov    %eax,-0x28(%ebp)
-  10260d:	89 f0                	mov    %esi,%eax
-  10260f:	89 4d d4             	mov    %ecx,-0x2c(%ebp)
-  102612:	ff d1                	call   *%ecx
-  102614:	8b 35 ec 48 10 00    	mov    0x1048ec,%esi
-  10261a:	8b 0d e8 48 10 00    	mov    0x1048e8,%ecx
-  102620:	a1 00 49 10 00       	mov    0x104900,%eax
-  102625:	8b 1b                	mov    (%ebx),%ebx
-  102627:	89 f2                	mov    %esi,%edx
-  102629:	89 4d e0             	mov    %ecx,-0x20(%ebp)
-  10262c:	c1 ee 0c             	shr    $0xc,%esi
-  10262f:	c1 ea 0f             	shr    $0xf,%edx
-  102632:	a3 04 49 10 00       	mov    %eax,0x104904
-  102637:	31 c0                	xor    %eax,%eax
-  102639:	01 d1                	add    %edx,%ecx
-  10263b:	89 15 f8 48 10 00    	mov    %edx,0x1048f8
-  102641:	89 0d f0 48 10 00    	mov    %ecx,0x1048f0
-  102647:	89 f1                	mov    %esi,%ecx
-  102649:	88 c8                	mov    %cl,%al
-  10264b:	24 07                	and    $0x7,%al
-  10264d:	a3 fc 48 10 00       	mov    %eax,0x1048fc
-  102652:	39 fb                	cmp    %edi,%ebx
-  102654:	0f 83 b1 00 00 00    	jae    10270b <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18b>
-  10265a:	89 7d e4             	mov    %edi,-0x1c(%ebp)
-  10265d:	eb 0d                	jmp    10266c <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xec>
-  10265f:	90                   	nop
+  1025d1:	c1 ee 0c             	shr    $0xc,%esi
+  1025d4:	8d 56 07             	lea    0x7(%esi),%edx
+  1025d7:	c1 ea 03             	shr    $0x3,%edx
+  1025da:	89 35 c0 48 10 00    	mov    %esi,0x1048c0
+  1025e0:	0f b6 35 42 4b 10 00 	movzbl 0x104b42,%esi
+  1025e7:	01 c2                	add    %eax,%edx
+  1025e9:	a3 a8 48 10 00       	mov    %eax,0x1048a8
+  1025ee:	89 75 d8             	mov    %esi,-0x28(%ebp)
+  1025f1:	8b 34 b5 b0 3d 10 00 	mov    0x103db0(,%esi,4),%esi
+  1025f8:	89 15 ac 48 10 00    	mov    %edx,0x1048ac
+  1025fe:	89 15 b4 48 10 00    	mov    %edx,0x1048b4
+  102604:	89 75 d4             	mov    %esi,-0x2c(%ebp)
+  102607:	ff d6                	call   *%esi
+  102609:	8b 35 ac 48 10 00    	mov    0x1048ac,%esi
+  10260f:	8b 0d a8 48 10 00    	mov    0x1048a8,%ecx
+  102615:	a1 c0 48 10 00       	mov    0x1048c0,%eax
+  10261a:	8b 1b                	mov    (%ebx),%ebx
+  10261c:	89 f2                	mov    %esi,%edx
+  10261e:	89 4d e0             	mov    %ecx,-0x20(%ebp)
+  102621:	c1 ee 0c             	shr    $0xc,%esi
+  102624:	c1 ea 0f             	shr    $0xf,%edx
+  102627:	a3 c4 48 10 00       	mov    %eax,0x1048c4
+  10262c:	31 c0                	xor    %eax,%eax
+  10262e:	01 d1                	add    %edx,%ecx
+  102630:	89 15 b8 48 10 00    	mov    %edx,0x1048b8
+  102636:	89 0d b0 48 10 00    	mov    %ecx,0x1048b0
+  10263c:	89 f1                	mov    %esi,%ecx
+  10263e:	88 c8                	mov    %cl,%al
+  102640:	24 07                	and    $0x7,%al
+  102642:	a3 bc 48 10 00       	mov    %eax,0x1048bc
+  102647:	39 fb                	cmp    %edi,%ebx
+  102649:	0f 83 bc 00 00 00    	jae    10270b <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18b>
+  10264f:	89 7d e4             	mov    %edi,-0x1c(%ebp)
+  102652:	eb 18                	jmp    10266c <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xec>
+  102654:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102658:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  10265f:	00 
   102660:	83 c3 14             	add    $0x14,%ebx
   102663:	3b 5d e4             	cmp    -0x1c(%ebp),%ebx
   102666:	0f 83 9f 00 00 00    	jae    10270b <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18b>
@@ -3423,7 +3413,7 @@ Disassembly of section .text:
   102693:	c1 ea 0f             	shr    $0xf,%edx
   102696:	29 c1                	sub    %eax,%ecx
   102698:	83 e0 07             	and    $0x7,%eax
-  10269b:	01 0d 04 49 10 00    	add    %ecx,0x104904
+  10269b:	01 0d c4 48 10 00    	add    %ecx,0x1048c4
   1026a1:	88 45 df             	mov    %al,-0x21(%ebp)
   1026a4:	8b 45 e0             	mov    -0x20(%ebp),%eax
   1026a7:	01 f0                	add    %esi,%eax
@@ -3443,8 +3433,8 @@ Disassembly of section .text:
   1026d3:	8b 7d d8             	mov    -0x28(%ebp),%edi
   1026d6:	88 50 ff             	mov    %dl,-0x1(%eax)
   1026d9:	89 f2                	mov    %esi,%edx
-  1026db:	ff 14 bd c4 3d 10 00 	call   *0x103dc4(,%edi,4)
-  1026e2:	a1 e8 48 10 00       	mov    0x1048e8,%eax
+  1026db:	ff 14 bd a4 3d 10 00 	call   *0x103da4(,%edi,4)
+  1026e2:	a1 a8 48 10 00       	mov    0x1048a8,%eax
   1026e7:	0f b6 4d df          	movzbl -0x21(%ebp),%ecx
   1026eb:	89 45 e0             	mov    %eax,-0x20(%ebp)
   1026ee:	84 c9                	test   %cl,%cl
@@ -3456,22 +3446,22 @@ Disassembly of section .text:
   102702:	3b 5d e4             	cmp    -0x1c(%ebp),%ebx
   102705:	0f 82 61 ff ff ff    	jb     10266c <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xec>
   10270b:	8b 45 e0             	mov    -0x20(%ebp),%eax
-  10270e:	8b 1d f8 48 10 00    	mov    0x1048f8,%ebx
-  102714:	8b 75 d4             	mov    -0x2c(%ebp),%esi
+  10270e:	8b 1d b8 48 10 00    	mov    0x1048b8,%ebx
+  102714:	8b 7d d4             	mov    -0x2c(%ebp),%edi
   102717:	01 c3                	add    %eax,%ebx
   102719:	89 da                	mov    %ebx,%edx
-  10271b:	ff d6                	call   *%esi
-  10271d:	0f b6 15 fc 48 10 00 	movzbl 0x1048fc,%edx
+  10271b:	ff d7                	call   *%edi
+  10271d:	0f b6 15 bc 48 10 00 	movzbl 0x1048bc,%edx
   102724:	b9 07 00 00 00       	mov    $0x7,%ecx
   102729:	b8 ff 00 00 00       	mov    $0xff,%eax
   10272e:	29 d1                	sub    %edx,%ecx
   102730:	d3 f8                	sar    %cl,%eax
-  102732:	8b 0d f8 48 10 00    	mov    0x1048f8,%ecx
+  102732:	8b 0d b8 48 10 00    	mov    0x1048b8,%ecx
   102738:	08 03                	or     %al,(%ebx)
-  10273a:	a1 04 49 10 00       	mov    0x104904,%eax
+  10273a:	a1 c4 48 10 00       	mov    0x1048c4,%eax
   10273f:	8d 44 c8 01          	lea    0x1(%eax,%ecx,8),%eax
   102743:	01 d0                	add    %edx,%eax
-  102745:	a3 04 49 10 00       	mov    %eax,0x104904
+  102745:	a3 c4 48 10 00       	mov    %eax,0x1048c4
   10274a:	83 c4 2c             	add    $0x2c,%esp
   10274d:	5b                   	pop    %ebx
   10274e:	5e                   	pop    %esi
@@ -3487,8 +3477,8 @@ Disassembly of section .text:
   102768:	88 10                	mov    %dl,(%eax)
   10276a:	e9 f1 fe ff ff       	jmp    102660 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
   10276f:	90                   	nop
-  102770:	31 c0                	xor    %eax,%eax
-  102772:	31 c9                	xor    %ecx,%ecx
+  102770:	31 d2                	xor    %edx,%edx
+  102772:	31 f6                	xor    %esi,%esi
   102774:	e9 61 fe ff ff       	jmp    1025da <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x5a>
   102779:	66 90                	xchg   %ax,%ax
   10277b:	66 90                	xchg   %ax,%ax
@@ -3496,7 +3486,7 @@ Disassembly of section .text:
   10277f:	90                   	nop
 
 00102780 <_ZN6driver19initialize_keyboardEv>:
-  102780:	c6 05 80 4b 10 00 00 	movb   $0x0,0x104b80
+  102780:	c6 05 40 4b 10 00 00 	movb   $0x0,0x104b40
   102787:	ba a0 86 01 00       	mov    $0x186a0,%edx
   10278c:	eb 0d                	jmp    10279b <_ZN6driver19initialize_keyboardEv+0x1b>
   10278e:	66 90                	xchg   %ax,%ax
@@ -3567,11 +3557,11 @@ Disassembly of section .text:
   102834:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
   102838:	6a 00                	push   $0x0
   10283a:	6a 0e                	push   $0xe
-  10283c:	68 fb 38 10 00       	push   $0x1038fb
+  10283c:	68 db 38 10 00       	push   $0x1038db
   102841:	53                   	push   %ebx
-  102842:	e8 d9 e2 ff ff       	call   100b20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
+  102842:	e8 e9 e2 ff ff       	call   100b30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
   102847:	89 d8                	mov    %ebx,%eax
-  102849:	ba 98 39 10 00       	mov    $0x103998,%edx
+  102849:	ba 78 39 10 00       	mov    $0x103978,%edx
   10284e:	e8 8d 05 00 00       	call   102de0 <_ZN8terminal6outputlsEPKc>
   102853:	8b 5d fc             	mov    -0x4(%ebp),%ebx
   102856:	83 c4 10             	add    $0x10,%esp
@@ -3588,7 +3578,7 @@ Disassembly of section .text:
   102866:	e4 60                	in     $0x60,%al
   102868:	3c e0                	cmp    $0xe0,%al
   10286a:	0f 84 e0 00 00 00    	je     102950 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0xf0>
-  102870:	0f b6 15 42 4b 10 00 	movzbl 0x104b42,%edx
+  102870:	0f b6 15 02 4b 10 00 	movzbl 0x104b02,%edx
   102877:	80 fa 3f             	cmp    $0x3f,%dl
   10287a:	77 64                	ja     1028e0 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x80>
   10287c:	55                   	push   %ebp
@@ -3599,20 +3589,20 @@ Disassembly of section .text:
   102885:	56                   	push   %esi
   102886:	53                   	push   %ebx
   102887:	83 ec 04             	sub    $0x4,%esp
-  10288a:	0f b6 1d 81 4b 10 00 	movzbl 0x104b81,%ebx
+  10288a:	0f b6 1d 41 4b 10 00 	movzbl 0x104b41,%ebx
   102891:	88 4d f3             	mov    %cl,-0xd(%ebp)
   102894:	89 c1                	mov    %eax,%ecx
   102896:	83 e1 7f             	and    $0x7f,%ecx
   102899:	89 df                	mov    %ebx,%edi
   10289b:	84 db                	test   %bl,%bl
   10289d:	0f 85 bd 00 00 00    	jne    102960 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x100>
-  1028a3:	0f b7 8c 09 60 3f 10 	movzwl 0x103f60(%ecx,%ecx,1),%ecx
+  1028a3:	0f b7 8c 09 40 3f 10 	movzwl 0x103f40(%ecx,%ecx,1),%ecx
   1028aa:	00 
   1028ab:	89 c3                	mov    %eax,%ebx
   1028ad:	f7 d3                	not    %ebx
   1028af:	c0 eb 07             	shr    $0x7,%bl
   1028b2:	88 5d f2             	mov    %bl,-0xe(%ebp)
-  1028b5:	0f b6 1d 80 4b 10 00 	movzbl 0x104b80,%ebx
+  1028b5:	0f b6 1d 40 4b 10 00 	movzbl 0x104b40,%ebx
   1028bc:	66 83 f9 3a          	cmp    $0x3a,%cx
   1028c0:	0f 87 aa 00 00 00    	ja     102970 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x110>
   1028c6:	66 83 f9 1c          	cmp    $0x1c,%cx
@@ -3621,30 +3611,30 @@ Disassembly of section .text:
   1028cf:	66 83 fe 1d          	cmp    $0x1d,%si
   1028d3:	77 1d                	ja     1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   1028d5:	0f b7 f6             	movzwl %si,%esi
-  1028d8:	ff 24 b5 e0 3d 10 00 	jmp    *0x103de0(,%esi,4)
+  1028d8:	ff 24 b5 c0 3d 10 00 	jmp    *0x103dc0(,%esi,4)
   1028df:	90                   	nop
   1028e0:	c3                   	ret
   1028e1:	84 c0                	test   %al,%al
   1028e3:	0f 89 77 01 00 00    	jns    102a60 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x200>
   1028e9:	83 e3 fe             	and    $0xfffffffe,%ebx
-  1028ec:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
-  1028f2:	0f b6 35 41 4b 10 00 	movzbl 0x104b41,%esi
+  1028ec:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  1028f2:	0f b6 35 01 4b 10 00 	movzbl 0x104b01,%esi
   1028f9:	83 c2 01             	add    $0x1,%edx
-  1028fc:	c6 05 81 4b 10 00 00 	movb   $0x0,0x104b81
-  102903:	88 15 42 4b 10 00    	mov    %dl,0x104b42
-  102909:	66 89 0c f5 40 49 10 	mov    %cx,0x104940(,%esi,8)
+  1028fc:	c6 05 41 4b 10 00 00 	movb   $0x0,0x104b41
+  102903:	88 15 02 4b 10 00    	mov    %dl,0x104b02
+  102909:	66 89 0c f5 00 49 10 	mov    %cx,0x104900(,%esi,8)
   102910:	00 
   102911:	0f b6 4d f3          	movzbl -0xd(%ebp),%ecx
   102915:	89 f0                	mov    %esi,%eax
   102917:	83 c0 01             	add    $0x1,%eax
-  10291a:	88 1c f5 45 49 10 00 	mov    %bl,0x104945(,%esi,8)
-  102921:	88 0c f5 42 49 10 00 	mov    %cl,0x104942(,%esi,8)
+  10291a:	88 1c f5 05 49 10 00 	mov    %bl,0x104905(,%esi,8)
+  102921:	88 0c f5 02 49 10 00 	mov    %cl,0x104902(,%esi,8)
   102928:	0f b6 4d f2          	movzbl -0xe(%ebp),%ecx
   10292c:	83 e0 3f             	and    $0x3f,%eax
-  10292f:	a2 41 4b 10 00       	mov    %al,0x104b41
-  102934:	88 0c f5 43 49 10 00 	mov    %cl,0x104943(,%esi,8)
+  10292f:	a2 01 4b 10 00       	mov    %al,0x104b01
+  102934:	88 0c f5 03 49 10 00 	mov    %cl,0x104903(,%esi,8)
   10293b:	89 f9                	mov    %edi,%ecx
-  10293d:	88 0c f5 44 49 10 00 	mov    %cl,0x104944(,%esi,8)
+  10293d:	88 0c f5 04 49 10 00 	mov    %cl,0x104904(,%esi,8)
   102944:	83 c4 04             	add    $0x4,%esp
   102947:	5b                   	pop    %ebx
   102948:	5e                   	pop    %esi
@@ -3652,11 +3642,11 @@ Disassembly of section .text:
   10294a:	5d                   	pop    %ebp
   10294b:	c3                   	ret
   10294c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102950:	c6 05 81 4b 10 00 01 	movb   $0x1,0x104b81
+  102950:	c6 05 41 4b 10 00 01 	movb   $0x1,0x104b41
   102957:	c3                   	ret
   102958:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   10295f:	00 
-  102960:	0f b7 8c 09 60 3e 10 	movzwl 0x103e60(%ecx,%ecx,1),%ecx
+  102960:	0f b7 8c 09 40 3e 10 	movzwl 0x103e40(%ecx,%ecx,1),%ecx
   102967:	00 
   102968:	e9 3e ff ff ff       	jmp    1028ab <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x4b>
   10296d:	8d 76 00             	lea    0x0(%esi),%esi
@@ -3667,47 +3657,47 @@ Disassembly of section .text:
   102982:	84 c0                	test   %al,%al
   102984:	0f 89 7e 00 00 00    	jns    102a08 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1a8>
   10298a:	83 e3 df             	and    $0xffffffdf,%ebx
-  10298d:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  10298d:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102993:	e9 5a ff ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102998:	84 c0                	test   %al,%al
   10299a:	0f 89 a0 00 00 00    	jns    102a40 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1e0>
   1029a0:	83 e3 bf             	and    $0xffffffbf,%ebx
-  1029a3:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  1029a3:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   1029a9:	e9 44 ff ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   1029ae:	84 c0                	test   %al,%al
   1029b0:	0f 89 ba 00 00 00    	jns    102a70 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x210>
   1029b6:	83 e3 ef             	and    $0xffffffef,%ebx
-  1029b9:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  1029b9:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   1029bf:	e9 2e ff ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   1029c4:	84 c0                	test   %al,%al
   1029c6:	0f 89 b4 00 00 00    	jns    102a80 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x220>
   1029cc:	83 e3 fd             	and    $0xfffffffd,%ebx
-  1029cf:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  1029cf:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   1029d5:	e9 18 ff ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   1029da:	84 c0                	test   %al,%al
   1029dc:	79 42                	jns    102a20 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1c0>
   1029de:	83 e3 fb             	and    $0xfffffffb,%ebx
-  1029e1:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  1029e1:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   1029e7:	e9 06 ff ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   1029ec:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   1029f0:	84 c0                	test   %al,%al
   1029f2:	79 3c                	jns    102a30 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1d0>
   1029f4:	83 e3 f7             	and    $0xfffffff7,%ebx
-  1029f7:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  1029f7:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   1029fd:	e9 f0 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a02:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   102a08:	83 cb 20             	or     $0x20,%ebx
-  102a0b:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a0b:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a11:	e9 dc fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a16:	66 90                	xchg   %ax,%ax
   102a18:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   102a1f:	00 
   102a20:	83 cb 04             	or     $0x4,%ebx
-  102a23:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a23:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a29:	e9 c4 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a2e:	66 90                	xchg   %ax,%ax
   102a30:	83 cb 08             	or     $0x8,%ebx
-  102a33:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a33:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a39:	e9 b4 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a3e:	66 90                	xchg   %ax,%ax
   102a40:	f6 c3 40             	test   $0x40,%bl
@@ -3715,29 +3705,29 @@ Disassembly of section .text:
   102a49:	84 db                	test   %bl,%bl
   102a4b:	78 41                	js     102a8e <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x22e>
   102a4d:	83 cb c0             	or     $0xffffffc0,%ebx
-  102a50:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a50:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a56:	e9 97 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a5b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
   102a60:	83 cb 01             	or     $0x1,%ebx
-  102a63:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a63:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a69:	e9 84 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a6e:	66 90                	xchg   %ax,%ax
   102a70:	83 cb 10             	or     $0x10,%ebx
-  102a73:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a73:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a79:	e9 74 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a7e:	66 90                	xchg   %ax,%ax
   102a80:	83 cb 02             	or     $0x2,%ebx
-  102a83:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a83:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a89:	e9 64 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a8e:	83 e3 7f             	and    $0x7f,%ebx
   102a91:	83 cb 40             	or     $0x40,%ebx
-  102a94:	88 1d 80 4b 10 00    	mov    %bl,0x104b80
+  102a94:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
   102a9a:	e9 53 fe ff ff       	jmp    1028f2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102a9f:	90                   	nop
 
 00102aa0 <_ZN8terminal6output19write_hex_8_no_syncEh>:
   102aa0:	55                   	push   %ebp
-  102aa1:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102aa1:	b8 68 40 10 00       	mov    $0x104068,%eax
   102aa6:	89 e5                	mov    %esp,%ebp
   102aa8:	56                   	push   %esi
   102aa9:	89 d6                	mov    %edx,%esi
@@ -3745,7 +3735,7 @@ Disassembly of section .text:
   102ab0:	53                   	push   %ebx
   102ab1:	e8 ca 09 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102ab6:	ba 78 00 00 00       	mov    $0x78,%edx
-  102abb:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102abb:	b8 68 40 10 00       	mov    $0x104068,%eax
   102ac0:	e8 bb 09 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102ac5:	89 f0                	mov    %esi,%eax
   102ac7:	ba 30 00 00 00       	mov    $0x30,%edx
@@ -3759,27 +3749,27 @@ Disassembly of section .text:
   102ae3:	83 f1 04             	xor    $0x4,%ecx
   102ae6:	d3 f8                	sar    %cl,%eax
   102ae8:	83 e0 0f             	and    $0xf,%eax
-  102aeb:	0f be 90 60 40 10 00 	movsbl 0x104060(%eax),%edx
+  102aeb:	0f be 90 40 40 10 00 	movsbl 0x104040(%eax),%edx
   102af2:	80 fa 0a             	cmp    $0xa,%dl
   102af5:	74 51                	je     102b48 <_ZN8terminal6output19write_hex_8_no_syncEh+0xa8>
   102af7:	80 fa 0d             	cmp    $0xd,%dl
   102afa:	75 34                	jne    102b30 <_ZN8terminal6output19write_hex_8_no_syncEh+0x90>
-  102afc:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102afc:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102b03:	83 fb 07             	cmp    $0x7,%ebx
   102b06:	74 37                	je     102b3f <_ZN8terminal6output19write_hex_8_no_syncEh+0x9f>
   102b08:	83 e6 0f             	and    $0xf,%esi
-  102b0b:	0f be 96 60 40 10 00 	movsbl 0x104060(%esi),%edx
+  102b0b:	0f be 96 40 40 10 00 	movsbl 0x104040(%esi),%edx
   102b12:	80 fa 0a             	cmp    $0xa,%dl
   102b15:	74 51                	je     102b68 <_ZN8terminal6output19write_hex_8_no_syncEh+0xc8>
   102b17:	80 fa 0d             	cmp    $0xd,%dl
   102b1a:	74 3c                	je     102b58 <_ZN8terminal6output19write_hex_8_no_syncEh+0xb8>
   102b1c:	5b                   	pop    %ebx
-  102b1d:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102b1d:	b8 68 40 10 00       	mov    $0x104068,%eax
   102b22:	5e                   	pop    %esi
   102b23:	5d                   	pop    %ebp
   102b24:	e9 57 09 00 00       	jmp    103480 <_ZN2io15vga_text_buffer3putEc>
   102b29:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102b30:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102b30:	b8 68 40 10 00       	mov    $0x104068,%eax
   102b35:	e8 46 09 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102b3a:	83 fb 07             	cmp    $0x7,%ebx
   102b3d:	75 c9                	jne    102b08 <_ZN8terminal6output19write_hex_8_no_syncEh+0x68>
@@ -3788,21 +3778,21 @@ Disassembly of section .text:
   102b41:	5d                   	pop    %ebp
   102b42:	c3                   	ret
   102b43:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102b48:	b8 88 40 10 00       	mov    $0x104088,%eax
-  102b4d:	e8 6e 0a 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102b48:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102b4d:	e8 5e 0a 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   102b52:	eb af                	jmp    102b03 <_ZN8terminal6output19write_hex_8_no_syncEh+0x63>
   102b54:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   102b58:	5b                   	pop    %ebx
   102b59:	5e                   	pop    %esi
-  102b5a:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102b5a:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102b61:	5d                   	pop    %ebp
   102b62:	c3                   	ret
   102b63:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
   102b68:	5b                   	pop    %ebx
-  102b69:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102b69:	b8 68 40 10 00       	mov    $0x104068,%eax
   102b6e:	5e                   	pop    %esi
   102b6f:	5d                   	pop    %ebp
-  102b70:	e9 4b 0a 00 00       	jmp    1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102b70:	e9 3b 0a 00 00       	jmp    1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   102b75:	66 90                	xchg   %ax,%ax
   102b77:	66 90                	xchg   %ax,%ax
   102b79:	66 90                	xchg   %ax,%ax
@@ -3812,7 +3802,7 @@ Disassembly of section .text:
 
 00102b80 <_ZN8terminal6output20write_hex_32_no_syncEm>:
   102b80:	55                   	push   %ebp
-  102b81:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102b81:	b8 68 40 10 00       	mov    $0x104068,%eax
   102b86:	89 e5                	mov    %esp,%ebp
   102b88:	56                   	push   %esi
   102b89:	89 d6                	mov    %edx,%esi
@@ -3820,7 +3810,7 @@ Disassembly of section .text:
   102b90:	53                   	push   %ebx
   102b91:	e8 ea 08 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102b96:	ba 78 00 00 00       	mov    $0x78,%edx
-  102b9b:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102b9b:	b8 68 40 10 00       	mov    $0x104068,%eax
   102ba0:	e8 db 08 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102ba5:	85 f6                	test   %esi,%esi
   102ba7:	74 67                	je     102c10 <_ZN8terminal6output20write_hex_32_no_syncEm+0x90>
@@ -3834,18 +3824,18 @@ Disassembly of section .text:
   102bbe:	66 90                	xchg   %ax,%ax
   102bc0:	80 fa 0d             	cmp    $0xd,%dl
   102bc3:	75 3b                	jne    102c00 <_ZN8terminal6output20write_hex_32_no_syncEm+0x80>
-  102bc5:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102bc5:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102bcc:	83 eb 04             	sub    $0x4,%ebx
   102bcf:	78 24                	js     102bf5 <_ZN8terminal6output20write_hex_32_no_syncEm+0x75>
   102bd1:	89 f0                	mov    %esi,%eax
   102bd3:	89 d9                	mov    %ebx,%ecx
   102bd5:	d3 e8                	shr    %cl,%eax
   102bd7:	83 e0 0f             	and    $0xf,%eax
-  102bda:	0f be 90 60 40 10 00 	movsbl 0x104060(%eax),%edx
+  102bda:	0f be 90 40 40 10 00 	movsbl 0x104040(%eax),%edx
   102be1:	80 fa 0a             	cmp    $0xa,%dl
   102be4:	75 da                	jne    102bc0 <_ZN8terminal6output20write_hex_32_no_syncEm+0x40>
-  102be6:	b8 88 40 10 00       	mov    $0x104088,%eax
-  102beb:	e8 d0 09 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102be6:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102beb:	e8 c0 09 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   102bf0:	83 eb 04             	sub    $0x4,%ebx
   102bf3:	79 dc                	jns    102bd1 <_ZN8terminal6output20write_hex_32_no_syncEm+0x51>
   102bf5:	5b                   	pop    %ebx
@@ -3853,14 +3843,14 @@ Disassembly of section .text:
   102bf7:	5d                   	pop    %ebp
   102bf8:	c3                   	ret
   102bf9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102c00:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102c00:	b8 68 40 10 00       	mov    $0x104068,%eax
   102c05:	e8 76 08 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102c0a:	eb c0                	jmp    102bcc <_ZN8terminal6output20write_hex_32_no_syncEm+0x4c>
   102c0c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   102c10:	5b                   	pop    %ebx
   102c11:	ba 30 00 00 00       	mov    $0x30,%edx
   102c16:	5e                   	pop    %esi
-  102c17:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102c17:	b8 68 40 10 00       	mov    $0x104068,%eax
   102c1c:	5d                   	pop    %ebp
   102c1d:	e9 5e 08 00 00       	jmp    103480 <_ZN2io15vga_text_buffer3putEc>
   102c22:	66 90                	xchg   %ax,%ax
@@ -3873,7 +3863,7 @@ Disassembly of section .text:
 
 00102c30 <_ZN8terminal6output20write_hex_64_no_syncEy>:
   102c30:	55                   	push   %ebp
-  102c31:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102c31:	b8 68 40 10 00       	mov    $0x104068,%eax
   102c36:	89 e5                	mov    %esp,%ebp
   102c38:	57                   	push   %edi
   102c39:	89 cf                	mov    %ecx,%edi
@@ -3883,7 +3873,7 @@ Disassembly of section .text:
   102c43:	53                   	push   %ebx
   102c44:	83 ec 0c             	sub    $0xc,%esp
   102c47:	e8 34 08 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
-  102c4c:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102c4c:	b8 68 40 10 00       	mov    $0x104068,%eax
   102c51:	ba 78 00 00 00       	mov    $0x78,%edx
   102c56:	e8 25 08 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102c5b:	89 f0                	mov    %esi,%eax
@@ -3901,7 +3891,7 @@ Disassembly of section .text:
   102c7e:	66 90                	xchg   %ax,%ax
   102c80:	80 fa 0d             	cmp    $0xd,%dl
   102c83:	75 5b                	jne    102ce0 <_ZN8terminal6output20write_hex_64_no_syncEy+0xb0>
-  102c85:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102c85:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102c8c:	83 eb 04             	sub    $0x4,%ebx
   102c8f:	78 30                	js     102cc1 <_ZN8terminal6output20write_hex_64_no_syncEy+0x91>
   102c91:	89 fa                	mov    %edi,%edx
@@ -3913,11 +3903,11 @@ Disassembly of section .text:
   102c9f:	74 02                	je     102ca3 <_ZN8terminal6output20write_hex_64_no_syncEy+0x73>
   102ca1:	89 d0                	mov    %edx,%eax
   102ca3:	83 e0 0f             	and    $0xf,%eax
-  102ca6:	0f be 90 60 40 10 00 	movsbl 0x104060(%eax),%edx
+  102ca6:	0f be 90 40 40 10 00 	movsbl 0x104040(%eax),%edx
   102cad:	80 fa 0a             	cmp    $0xa,%dl
   102cb0:	75 ce                	jne    102c80 <_ZN8terminal6output20write_hex_64_no_syncEy+0x50>
-  102cb2:	b8 88 40 10 00       	mov    $0x104088,%eax
-  102cb7:	e8 04 09 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102cb2:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102cb7:	e8 f4 08 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   102cbc:	83 eb 04             	sub    $0x4,%ebx
   102cbf:	79 d0                	jns    102c91 <_ZN8terminal6output20write_hex_64_no_syncEy+0x61>
   102cc1:	83 c4 0c             	add    $0xc,%esp
@@ -3932,13 +3922,13 @@ Disassembly of section .text:
   102cd6:	83 c0 20             	add    $0x20,%eax
   102cd9:	eb 94                	jmp    102c6f <_ZN8terminal6output20write_hex_64_no_syncEy+0x3f>
   102cdb:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102ce0:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102ce0:	b8 68 40 10 00       	mov    $0x104068,%eax
   102ce5:	e8 96 07 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102cea:	eb a0                	jmp    102c8c <_ZN8terminal6output20write_hex_64_no_syncEy+0x5c>
   102cec:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   102cf0:	83 c4 0c             	add    $0xc,%esp
   102cf3:	ba 30 00 00 00       	mov    $0x30,%edx
-  102cf8:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102cf8:	b8 68 40 10 00       	mov    $0x104068,%eax
   102cfd:	5b                   	pop    %ebx
   102cfe:	5e                   	pop    %esi
   102cff:	5f                   	pop    %edi
@@ -3954,24 +3944,24 @@ Disassembly of section .text:
   102d10:	55                   	push   %ebp
   102d11:	89 e5                	mov    %esp,%ebp
   102d13:	83 ec 14             	sub    $0x14,%esp
-  102d16:	68 88 40 10 00       	push   $0x104088
+  102d16:	68 68 40 10 00       	push   $0x104068
   102d1b:	e8 20 07 00 00       	call   103440 <_ZN2io15vga_text_buffer5clearEv>
   102d20:	58                   	pop    %eax
   102d21:	5a                   	pop    %edx
   102d22:	6a 0f                	push   $0xf
   102d24:	6a 0e                	push   $0xe
-  102d26:	e8 85 09 00 00       	call   1036b0 <_ZN2io15hardware_cursor6enableEhh>
-  102d2b:	0f b6 15 89 40 10 00 	movzbl 0x104089,%edx
-  102d32:	0f b6 05 88 40 10 00 	movzbl 0x104088,%eax
+  102d26:	e8 65 09 00 00       	call   103690 <_ZN2io15hardware_cursor6enableEhh>
+  102d2b:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  102d32:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
   102d39:	83 c4 10             	add    $0x10,%esp
   102d3c:	01 d0                	add    %edx,%eax
-  102d3e:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  102d3e:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   102d45:	c9                   	leave
   102d46:	8d 04 80             	lea    (%eax,%eax,4),%eax
   102d49:	c1 e0 04             	shl    $0x4,%eax
   102d4c:	01 d0                	add    %edx,%eax
   102d4e:	0f b7 c0             	movzwl %ax,%eax
-  102d51:	e9 da 09 00 00       	jmp    103730 <_ZN2io15hardware_cursor12set_positionEt>
+  102d51:	e9 ba 09 00 00       	jmp    103710 <_ZN2io15hardware_cursor12set_positionEt>
   102d56:	66 90                	xchg   %ax,%ax
   102d58:	66 90                	xchg   %ax,%ax
   102d5a:	66 90                	xchg   %ax,%ax
@@ -3988,30 +3978,30 @@ Disassembly of section .text:
   102d6c:	74 52                	je     102dc0 <_ZN8terminal6outputlsEc+0x60>
   102d6e:	80 fa 0d             	cmp    $0xd,%dl
   102d71:	75 35                	jne    102da8 <_ZN8terminal6outputlsEc+0x48>
-  102d73:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102d73:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102d7a:	31 d2                	xor    %edx,%edx
-  102d7c:	0f b6 05 88 40 10 00 	movzbl 0x104088,%eax
-  102d83:	0f b6 0d 89 40 10 00 	movzbl 0x104089,%ecx
+  102d7c:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
+  102d83:	0f b6 0d 69 40 10 00 	movzbl 0x104069,%ecx
   102d8a:	01 c8                	add    %ecx,%eax
   102d8c:	8d 04 80             	lea    (%eax,%eax,4),%eax
   102d8f:	c1 e0 04             	shl    $0x4,%eax
   102d92:	01 d0                	add    %edx,%eax
   102d94:	0f b7 c0             	movzwl %ax,%eax
-  102d97:	e8 94 09 00 00       	call   103730 <_ZN2io15hardware_cursor12set_positionEt>
+  102d97:	e8 74 09 00 00       	call   103710 <_ZN2io15hardware_cursor12set_positionEt>
   102d9c:	89 d8                	mov    %ebx,%eax
   102d9e:	8b 5d fc             	mov    -0x4(%ebp),%ebx
   102da1:	c9                   	leave
   102da2:	c3                   	ret
   102da3:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
   102da8:	0f be d2             	movsbl %dl,%edx
-  102dab:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102dab:	b8 68 40 10 00       	mov    $0x104068,%eax
   102db0:	e8 cb 06 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
-  102db5:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  102db5:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   102dbc:	eb be                	jmp    102d7c <_ZN8terminal6outputlsEc+0x1c>
   102dbe:	66 90                	xchg   %ax,%ax
-  102dc0:	b8 88 40 10 00       	mov    $0x104088,%eax
-  102dc5:	e8 f6 07 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
-  102dca:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  102dc0:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102dc5:	e8 e6 07 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102dca:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   102dd1:	eb a9                	jmp    102d7c <_ZN8terminal6outputlsEc+0x1c>
   102dd3:	66 90                	xchg   %ax,%ax
   102dd5:	66 90                	xchg   %ax,%ax
@@ -4035,35 +4025,35 @@ Disassembly of section .text:
   102df2:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   102df8:	80 fa 0d             	cmp    $0xd,%dl
   102dfb:	75 5b                	jne    102e58 <_ZN8terminal6outputlsEPKc+0x78>
-  102dfd:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102dfd:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102e04:	0f be 56 01          	movsbl 0x1(%esi),%edx
   102e08:	83 c6 01             	add    $0x1,%esi
   102e0b:	84 d2                	test   %dl,%dl
   102e0d:	74 19                	je     102e28 <_ZN8terminal6outputlsEPKc+0x48>
   102e0f:	80 fa 0a             	cmp    $0xa,%dl
   102e12:	75 e4                	jne    102df8 <_ZN8terminal6outputlsEPKc+0x18>
-  102e14:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102e14:	b8 68 40 10 00       	mov    $0x104068,%eax
   102e19:	83 c6 01             	add    $0x1,%esi
-  102e1c:	e8 9f 07 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102e1c:	e8 8f 07 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   102e21:	0f be 16             	movsbl (%esi),%edx
   102e24:	84 d2                	test   %dl,%dl
   102e26:	75 e7                	jne    102e0f <_ZN8terminal6outputlsEPKc+0x2f>
-  102e28:	0f b6 15 89 40 10 00 	movzbl 0x104089,%edx
-  102e2f:	0f b6 05 88 40 10 00 	movzbl 0x104088,%eax
+  102e28:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  102e2f:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
   102e36:	01 d0                	add    %edx,%eax
-  102e38:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  102e38:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   102e3f:	8d 04 80             	lea    (%eax,%eax,4),%eax
   102e42:	c1 e0 04             	shl    $0x4,%eax
   102e45:	01 d0                	add    %edx,%eax
   102e47:	0f b7 c0             	movzwl %ax,%eax
-  102e4a:	e8 e1 08 00 00       	call   103730 <_ZN2io15hardware_cursor12set_positionEt>
+  102e4a:	e8 c1 08 00 00       	call   103710 <_ZN2io15hardware_cursor12set_positionEt>
   102e4f:	89 d8                	mov    %ebx,%eax
   102e51:	5b                   	pop    %ebx
   102e52:	5e                   	pop    %esi
   102e53:	5d                   	pop    %ebp
   102e54:	c3                   	ret
   102e55:	8d 76 00             	lea    0x0(%esi),%esi
-  102e58:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102e58:	b8 68 40 10 00       	mov    $0x104068,%eax
   102e5d:	e8 1e 06 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102e62:	eb a0                	jmp    102e04 <_ZN8terminal6outputlsEPKc+0x24>
   102e64:	66 90                	xchg   %ax,%ax
@@ -4094,15 +4084,15 @@ Disassembly of section .text:
   102e90:	74 4e                	je     102ee0 <_ZN8terminal6outputlsEh+0x60>
   102e92:	3c 01                	cmp    $0x1,%al
   102e94:	74 3a                	je     102ed0 <_ZN8terminal6outputlsEh+0x50>
-  102e96:	0f b6 15 89 40 10 00 	movzbl 0x104089,%edx
-  102e9d:	0f b6 05 88 40 10 00 	movzbl 0x104088,%eax
+  102e96:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  102e9d:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
   102ea4:	01 d0                	add    %edx,%eax
-  102ea6:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  102ea6:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   102ead:	8d 04 80             	lea    (%eax,%eax,4),%eax
   102eb0:	c1 e0 04             	shl    $0x4,%eax
   102eb3:	01 d0                	add    %edx,%eax
   102eb5:	0f b7 c0             	movzwl %ax,%eax
-  102eb8:	e8 73 08 00 00       	call   103730 <_ZN2io15hardware_cursor12set_positionEt>
+  102eb8:	e8 53 08 00 00       	call   103710 <_ZN2io15hardware_cursor12set_positionEt>
   102ebd:	83 c4 1c             	add    $0x1c,%esp
   102ec0:	89 f0                	mov    %esi,%eax
   102ec2:	5b                   	pop    %ebx
@@ -4147,7 +4137,7 @@ Disassembly of section .text:
   102f31:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
   102f38:	80 fa 0d             	cmp    $0xd,%dl
   102f3b:	75 33                	jne    102f70 <_ZN8terminal6outputlsEh+0xf0>
-  102f3d:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  102f3d:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   102f44:	83 c3 01             	add    $0x1,%ebx
   102f47:	8d 45 e8             	lea    -0x18(%ebp),%eax
   102f4a:	39 c3                	cmp    %eax,%ebx
@@ -4155,13 +4145,13 @@ Disassembly of section .text:
   102f52:	0f be 13             	movsbl (%ebx),%edx
   102f55:	80 fa 0a             	cmp    $0xa,%dl
   102f58:	75 de                	jne    102f38 <_ZN8terminal6outputlsEh+0xb8>
-  102f5a:	b8 88 40 10 00       	mov    $0x104088,%eax
-  102f5f:	e8 5c 06 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102f5a:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102f5f:	e8 4c 06 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   102f64:	eb de                	jmp    102f44 <_ZN8terminal6outputlsEh+0xc4>
   102f66:	66 90                	xchg   %ax,%ax
   102f68:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   102f6f:	00 
-  102f70:	b8 88 40 10 00       	mov    $0x104088,%eax
+  102f70:	b8 68 40 10 00       	mov    $0x104068,%eax
   102f75:	e8 06 05 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   102f7a:	eb c8                	jmp    102f44 <_ZN8terminal6outputlsEh+0xc4>
   102f7c:	66 90                	xchg   %ax,%ax
@@ -4181,15 +4171,15 @@ Disassembly of section .text:
   102f92:	74 4c                	je     102fe0 <_ZN8terminal6outputlsEm+0x60>
   102f94:	3c 01                	cmp    $0x1,%al
   102f96:	74 38                	je     102fd0 <_ZN8terminal6outputlsEm+0x50>
-  102f98:	0f b6 15 89 40 10 00 	movzbl 0x104089,%edx
-  102f9f:	0f b6 05 88 40 10 00 	movzbl 0x104088,%eax
+  102f98:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  102f9f:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
   102fa6:	01 d0                	add    %edx,%eax
-  102fa8:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  102fa8:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   102faf:	8d 04 80             	lea    (%eax,%eax,4),%eax
   102fb2:	c1 e0 04             	shl    $0x4,%eax
   102fb5:	01 d0                	add    %edx,%eax
   102fb7:	0f b7 c0             	movzwl %ax,%eax
-  102fba:	e8 71 07 00 00       	call   103730 <_ZN2io15hardware_cursor12set_positionEt>
+  102fba:	e8 51 07 00 00       	call   103710 <_ZN2io15hardware_cursor12set_positionEt>
   102fbf:	83 c4 1c             	add    $0x1c,%esp
   102fc2:	89 f0                	mov    %esi,%eax
   102fc4:	5b                   	pop    %ebx
@@ -4231,7 +4221,7 @@ Disassembly of section .text:
   10302e:	66 90                	xchg   %ax,%ax
   103030:	80 fa 0d             	cmp    $0xd,%dl
   103033:	75 2b                	jne    103060 <_ZN8terminal6outputlsEm+0xe0>
-  103035:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  103035:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   10303c:	83 c3 01             	add    $0x1,%ebx
   10303f:	8d 45 e8             	lea    -0x18(%ebp),%eax
   103042:	39 c3                	cmp    %eax,%ebx
@@ -4239,11 +4229,11 @@ Disassembly of section .text:
   10304a:	0f be 13             	movsbl (%ebx),%edx
   10304d:	80 fa 0a             	cmp    $0xa,%dl
   103050:	75 de                	jne    103030 <_ZN8terminal6outputlsEm+0xb0>
-  103052:	b8 88 40 10 00       	mov    $0x104088,%eax
-  103057:	e8 64 05 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  103052:	b8 68 40 10 00       	mov    $0x104068,%eax
+  103057:	e8 54 05 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   10305c:	eb de                	jmp    10303c <_ZN8terminal6outputlsEm+0xbc>
   10305e:	66 90                	xchg   %ax,%ax
-  103060:	b8 88 40 10 00       	mov    $0x104088,%eax
+  103060:	b8 68 40 10 00       	mov    $0x104068,%eax
   103065:	e8 16 04 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   10306a:	eb d0                	jmp    10303c <_ZN8terminal6outputlsEm+0xbc>
   10306c:	66 90                	xchg   %ax,%ax
@@ -4262,15 +4252,15 @@ Disassembly of section .text:
   103080:	74 4e                	je     1030d0 <_ZN8terminal6outputlsEy+0x60>
   103082:	3c 01                	cmp    $0x1,%al
   103084:	74 3a                	je     1030c0 <_ZN8terminal6outputlsEy+0x50>
-  103086:	0f b6 15 89 40 10 00 	movzbl 0x104089,%edx
-  10308d:	0f b6 05 88 40 10 00 	movzbl 0x104088,%eax
+  103086:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  10308d:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
   103094:	01 d0                	add    %edx,%eax
-  103096:	0f b6 15 8a 40 10 00 	movzbl 0x10408a,%edx
+  103096:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
   10309d:	8d 04 80             	lea    (%eax,%eax,4),%eax
   1030a0:	c1 e0 04             	shl    $0x4,%eax
   1030a3:	01 d0                	add    %edx,%eax
   1030a5:	0f b7 c0             	movzwl %ax,%eax
-  1030a8:	e8 83 06 00 00       	call   103730 <_ZN2io15hardware_cursor12set_positionEt>
+  1030a8:	e8 63 06 00 00       	call   103710 <_ZN2io15hardware_cursor12set_positionEt>
   1030ad:	83 c4 4c             	add    $0x4c,%esp
   1030b0:	89 d8                	mov    %ebx,%eax
   1030b2:	5b                   	pop    %ebx
@@ -4357,7 +4347,7 @@ Disassembly of section .text:
   103195:	8d 76 00             	lea    0x0(%esi),%esi
   103198:	80 fa 0d             	cmp    $0xd,%dl
   10319b:	75 33                	jne    1031d0 <_ZN8terminal6outputlsEy+0x160>
-  10319d:	c6 05 8a 40 10 00 00 	movb   $0x0,0x10408a
+  10319d:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
   1031a4:	83 c6 01             	add    $0x1,%esi
   1031a7:	8d 45 e8             	lea    -0x18(%ebp),%eax
   1031aa:	39 c6                	cmp    %eax,%esi
@@ -4365,13 +4355,13 @@ Disassembly of section .text:
   1031b2:	0f be 16             	movsbl (%esi),%edx
   1031b5:	80 fa 0a             	cmp    $0xa,%dl
   1031b8:	75 de                	jne    103198 <_ZN8terminal6outputlsEy+0x128>
-  1031ba:	b8 88 40 10 00       	mov    $0x104088,%eax
-  1031bf:	e8 fc 03 00 00       	call   1035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  1031ba:	b8 68 40 10 00       	mov    $0x104068,%eax
+  1031bf:	e8 ec 03 00 00       	call   1035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
   1031c4:	eb de                	jmp    1031a4 <_ZN8terminal6outputlsEy+0x134>
   1031c6:	66 90                	xchg   %ax,%ax
   1031c8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   1031cf:	00 
-  1031d0:	b8 88 40 10 00       	mov    $0x104088,%eax
+  1031d0:	b8 68 40 10 00       	mov    $0x104068,%eax
   1031d5:	e8 a6 02 00 00       	call   103480 <_ZN2io15vga_text_buffer3putEc>
   1031da:	eb c8                	jmp    1031a4 <_ZN8terminal6outputlsEy+0x134>
   1031dc:	66 90                	xchg   %ax,%ax
@@ -4588,7 +4578,7 @@ Disassembly of section .text:
   1033a6:	53                   	push   %ebx
   1033a7:	89 cb                	mov    %ecx,%ebx
   1033a9:	66 c1 eb 05          	shr    $0x5,%bx
-  1033ad:	0f b7 db             	movzwl %bx,%ebx
+  1033ad:	0f b7 db             	movzwl %bx,%ebxesi
   1033b0:	c1 e3 05             	shl    $0x5,%ebx
   1033b3:	8d 0c 18             	lea    (%eax,%ebx,1),%ecx
   1033b6:	39 c8                	cmp    %ecx,%eax
@@ -4662,28 +4652,27 @@ Disassembly of section .text:
 
 00103440 <_ZN2io15vga_text_buffer5clearEv>:
   103440:	55                   	push   %ebp
-  103441:	89 e5                	mov    %esp,%ebp
-  103443:	56                   	push   %esi
-  103444:	53                   	push   %ebx
-  103445:	8b 75 08             	mov    0x8(%ebp),%esi
-  103448:	e8 43 03 00 00       	call   103790 <_ZN3cpu8features3getEv>
-  10344d:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  103452:	ba a0 0f 00 00       	mov    $0xfa0,%edx
-  103457:	0f b6 d8             	movzbl %al,%ebx
-  10345a:	b8 00 80 0b 00       	mov    $0xb8000,%eax
-  10345f:	ff 14 9d 7c 40 10 00 	call   *0x10407c(,%ebx,4)
-  103466:	31 c0                	xor    %eax,%eax
-  103468:	c6 46 02 00          	movb   $0x0,0x2(%esi)
-  10346c:	66 89 06             	mov    %ax,(%esi)
-  10346f:	31 c0                	xor    %eax,%eax
-  103471:	5b                   	pop    %ebx
-  103472:	5e                   	pop    %esi
-  103473:	5d                   	pop    %ebp
-  103474:	e9 e7 02 00 00       	jmp    103760 <_ZN2io15hardware_cursor17set_display_startEt>
-  103479:	66 90                	xchg   %ax,%ax
-  10347b:	66 90                	xchg   %ax,%ax
-  10347d:	66 90                	xchg   %ax,%ax
-  10347f:	90                   	nop
+  103441:	b8 00 80 0b 00       	mov    $0xb8000,%eax
+  103446:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  10344b:	ba a0 0f 00 00       	mov    $0xfa0,%edx
+  103450:	89 e5                	mov    %esp,%ebp
+  103452:	56                   	push   %esi
+  103453:	0f b6 35 42 4b 10 00 	movzbl 0x104b42,%esi
+  10345a:	53                   	push   %ebx
+  10345b:	8b 5d 08             	mov    0x8(%ebp),%ebx
+  10345e:	ff 14 b5 5c 40 10 00 	call   *0x10405c(,%esi,4)
+  103465:	31 c0                	xor    %eax,%eax
+  103467:	66 89 03             	mov    %ax,(%ebx)
+  10346a:	31 c0                	xor    %eax,%eax
+  10346c:	c6 43 02 00          	movb   $0x0,0x2(%ebx)
+  103470:	5b                   	pop    %ebx
+  103471:	5e                   	pop    %esi
+  103472:	5d                   	pop    %ebp
+  103473:	e9 c8 02 00 00       	jmp    103740 <_ZN2io15hardware_cursor17set_display_startEt>
+  103478:	66 90                	xchg   %ax,%ax
+  10347a:	66 90                	xchg   %ax,%ax
+  10347c:	66 90                	xchg   %ax,%ax
+  10347e:	66 90                	xchg   %ax,%ax
 
 00103480 <_ZN2io15vga_text_buffer3putEc>:
   103480:	55                   	push   %ebp
@@ -4719,253 +4708,235 @@ Disassembly of section .text:
   1034d6:	bb 00 00 00 00       	mov    $0x0,%ebx
   1034db:	0f 45 c3             	cmovne %ebx,%eax
   1034de:	01 f8                	add    %edi,%eax
-  1034e0:	88 41 02             	mov    %al,0x2(%ecx)
-  1034e3:	89 f8                	mov    %edi,%eax
-  1034e5:	3c 50                	cmp    $0x50,%al
-  1034e7:	0f 94 c0             	sete   %al
-  1034ea:	01 f0                	add    %esi,%eax
-  1034ec:	3c 19                	cmp    $0x19,%al
-  1034ee:	0f 94 c3             	sete   %bl
-  1034f1:	89 de                	mov    %ebx,%esi
-  1034f3:	8d 1c 32             	lea    (%edx,%esi,1),%ebx
-  1034f6:	89 c2                	mov    %eax,%edx
-  1034f8:	88 19                	mov    %bl,(%ecx)
-  1034fa:	89 df                	mov    %ebx,%edi
-  1034fc:	89 f3                	mov    %esi,%ebx
-  1034fe:	29 da                	sub    %ebx,%edx
-  103500:	88 51 01             	mov    %dl,0x1(%ecx)
-  103503:	3c 19                	cmp    $0x19,%al
-  103505:	74 09                	je     103510 <_ZN2io15vga_text_buffer3putEc+0x90>
-  103507:	83 c4 1c             	add    $0x1c,%esp
-  10350a:	5b                   	pop    %ebx
-  10350b:	5e                   	pop    %esi
-  10350c:	5f                   	pop    %edi
-  10350d:	5d                   	pop    %ebp
-  10350e:	c3                   	ret
-  10350f:	90                   	nop
-  103510:	89 fb                	mov    %edi,%ebx
-  103512:	89 ce                	mov    %ecx,%esi
-  103514:	80 fb b3             	cmp    $0xb3,%bl
-  103517:	77 57                	ja     103570 <_ZN2io15vga_text_buffer3putEc+0xf0>
-  103519:	e8 72 02 00 00       	call   103790 <_ZN3cpu8features3getEv>
-  10351e:	0f b6 4e 01          	movzbl 0x1(%esi),%ecx
-  103522:	ba a0 00 00 00       	mov    $0xa0,%edx
-  103527:	0f b6 d8             	movzbl %al,%ebx
-  10352a:	0f b6 06             	movzbl (%esi),%eax
-  10352d:	01 c8                	add    %ecx,%eax
-  10352f:	0f b6 4e 02          	movzbl 0x2(%esi),%ecx
-  103533:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  103536:	c1 e0 04             	shl    $0x4,%eax
-  103539:	01 c8                	add    %ecx,%eax
-  10353b:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  103540:	0f b7 c0             	movzwl %ax,%eax
-  103543:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
-  10354a:	ff 14 9d 7c 40 10 00 	call   *0x10407c(,%ebx,4)
-  103551:	0f b6 06             	movzbl (%esi),%eax
-  103554:	83 c4 1c             	add    $0x1c,%esp
-  103557:	5b                   	pop    %ebx
-  103558:	5e                   	pop    %esi
-  103559:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  10355c:	5f                   	pop    %edi
-  10355d:	5d                   	pop    %ebp
-  10355e:	c1 e0 04             	shl    $0x4,%eax
-  103561:	0f b7 c0             	movzwl %ax,%eax
-  103564:	e9 f7 01 00 00       	jmp    103760 <_ZN2io15hardware_cursor17set_display_startEt>
-  103569:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  103570:	e8 1b 02 00 00       	call   103790 <_ZN3cpu8features3getEv>
-  103575:	0f b6 d3             	movzbl %bl,%edx
+  1034e0:	88 45 e5             	mov    %al,-0x1b(%ebp)
+  1034e3:	88 41 02             	mov    %al,0x2(%ecx)
+  1034e6:	89 f8                	mov    %edi,%eax
+  1034e8:	3c 50                	cmp    $0x50,%al
+  1034ea:	0f 94 c3             	sete   %bl
+  1034ed:	01 f3                	add    %esi,%ebx
+  1034ef:	80 fb 19             	cmp    $0x19,%bl
+  1034f2:	0f 94 c0             	sete   %al
+  1034f5:	89 c6                	mov    %eax,%esi
+  1034f7:	8d 04 32             	lea    (%edx,%esi,1),%eax
+  1034fa:	89 f2                	mov    %esi,%edx
+  1034fc:	88 45 e6             	mov    %al,-0x1a(%ebp)
+  1034ff:	88 01                	mov    %al,(%ecx)
+  103501:	89 d8                	mov    %ebx,%eax
+  103503:	29 d0                	sub    %edx,%eax
+  103505:	88 41 01             	mov    %al,0x1(%ecx)
+  103508:	80 fb 19             	cmp    $0x19,%bl
+  10350b:	74 0b                	je     103518 <_ZN2io15vga_text_buffer3putEc+0x98>
+  10350d:	83 c4 1c             	add    $0x1c,%esp
+  103510:	5b                   	pop    %ebx
+  103511:	5e                   	pop    %esi
+  103512:	5f                   	pop    %edi
+  103513:	5d                   	pop    %ebp
+  103514:	c3                   	ret
+  103515:	8d 76 00             	lea    0x0(%esi),%esi
+  103518:	89 cb                	mov    %ecx,%ebx
+  10351a:	0f b6 4d e6          	movzbl -0x1a(%ebp),%ecx
+  10351e:	0f b6 35 42 4b 10 00 	movzbl 0x104b42,%esi
+  103525:	80 f9 b3             	cmp    $0xb3,%cl
+  103528:	77 46                	ja     103570 <_ZN2io15vga_text_buffer3putEc+0xf0>
+  10352a:	83 c1 18             	add    $0x18,%ecx
+  10352d:	0f b6 45 e5          	movzbl -0x1b(%ebp),%eax
+  103531:	ba a0 00 00 00       	mov    $0xa0,%edx
+  103536:	0f b6 c9             	movzbl %cl,%ecx
+  103539:	8d 0c 89             	lea    (%ecx,%ecx,4),%ecx
+  10353c:	c1 e1 04             	shl    $0x4,%ecx
+  10353f:	01 c8                	add    %ecx,%eax
+  103541:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  103546:	0f b7 c0             	movzwl %ax,%eax
+  103549:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
+  103550:	ff 14 b5 5c 40 10 00 	call   *0x10405c(,%esi,4)
+  103557:	0f b6 03             	movzbl (%ebx),%eax
+  10355a:	83 c4 1c             	add    $0x1c,%esp
+  10355d:	5b                   	pop    %ebx
+  10355e:	5e                   	pop    %esi
+  10355f:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  103562:	5f                   	pop    %edi
+  103563:	5d                   	pop    %ebp
+  103564:	c1 e0 04             	shl    $0x4,%eax
+  103567:	0f b7 c0             	movzwl %ax,%eax
+  10356a:	e9 d1 01 00 00       	jmp    103740 <_ZN2io15hardware_cursor17set_display_startEt>
+  10356f:	90                   	nop
+  103570:	8d 04 89             	lea    (%ecx,%ecx,4),%eax
+  103573:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
   103578:	b9 00 0f 00 00       	mov    $0xf00,%ecx
-  10357d:	0f b6 f8             	movzbl %al,%edi
-  103580:	8d 04 92             	lea    (%edx,%edx,4),%eax
-  103583:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
-  103588:	c1 e0 05             	shl    $0x5,%eax
-  10358b:	05 00 80 0b 00       	add    $0xb8000,%eax
-  103590:	ff 14 bd 70 40 10 00 	call   *0x104070(,%edi,4)
-  103597:	ba 01 18 00 00       	mov    $0x1801,%edx
-  10359c:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  1035a1:	66 89 16             	mov    %dx,(%esi)
-  1035a4:	ba a0 00 00 00       	mov    $0xa0,%edx
-  1035a9:	ff 14 bd 7c 40 10 00 	call   *0x10407c(,%edi,4)
-  1035b0:	eb 9f                	jmp    103551 <_ZN2io15vga_text_buffer3putEc+0xd1>
-  1035b2:	66 90                	xchg   %ax,%ax
-  1035b4:	66 90                	xchg   %ax,%ax
-  1035b6:	66 90                	xchg   %ax,%ax
-  1035b8:	66 90                	xchg   %ax,%ax
-  1035ba:	66 90                	xchg   %ax,%ax
-  1035bc:	66 90                	xchg   %ax,%ax
-  1035be:	66 90                	xchg   %ax,%ax
+  10357d:	c1 e0 05             	shl    $0x5,%eax
+  103580:	05 00 80 0b 00       	add    $0xb8000,%eax
+  103585:	ff 14 b5 50 40 10 00 	call   *0x104050(,%esi,4)
+  10358c:	ba 01 18 00 00       	mov    $0x1801,%edx
+  103591:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  103596:	66 89 13             	mov    %dx,(%ebx)
+  103599:	ba a0 00 00 00       	mov    $0xa0,%edx
+  10359e:	ff 14 b5 5c 40 10 00 	call   *0x10405c(,%esi,4)
+  1035a5:	eb b0                	jmp    103557 <_ZN2io15vga_text_buffer3putEc+0xd7>
+  1035a7:	66 90                	xchg   %ax,%ax
+  1035a9:	66 90                	xchg   %ax,%ax
+  1035ab:	66 90                	xchg   %ax,%ax
+  1035ad:	66 90                	xchg   %ax,%ax
+  1035af:	90                   	nop
 
-001035c0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>:
-  1035c0:	55                   	push   %ebp
-  1035c1:	89 e5                	mov    %esp,%ebp
-  1035c3:	57                   	push   %edi
-  1035c4:	56                   	push   %esi
-  1035c5:	53                   	push   %ebx
-  1035c6:	83 ec 1c             	sub    $0x1c,%esp
-  1035c9:	0f b6 50 01          	movzbl 0x1(%eax),%edx
-  1035cd:	c6 40 02 00          	movb   $0x0,0x2(%eax)
-  1035d1:	80 fa 18             	cmp    $0x18,%dl
-  1035d4:	8d 4a 01             	lea    0x1(%edx),%ecx
-  1035d7:	0f b6 10             	movzbl (%eax),%edx
-  1035da:	0f 94 c3             	sete   %bl
-  1035dd:	01 da                	add    %ebx,%edx
-  1035df:	88 10                	mov    %dl,(%eax)
-  1035e1:	89 d7                	mov    %edx,%edi
-  1035e3:	89 ca                	mov    %ecx,%edx
-  1035e5:	29 da                	sub    %ebx,%edx
-  1035e7:	88 50 01             	mov    %dl,0x1(%eax)
-  1035ea:	80 f9 19             	cmp    $0x19,%cl
-  1035ed:	74 11                	je     103600 <_ZN2io15vga_text_buffer17move_to_next_lineEv+0x40>
-  1035ef:	83 c4 1c             	add    $0x1c,%esp
-  1035f2:	5b                   	pop    %ebx
-  1035f3:	5e                   	pop    %esi
-  1035f4:	5f                   	pop    %edi
-  1035f5:	5d                   	pop    %ebp
-  1035f6:	c3                   	ret
-  1035f7:	90                   	nop
-  1035f8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1035ff:	00 
-  103600:	89 c3                	mov    %eax,%ebx
-  103602:	89 f8                	mov    %edi,%eax
-  103604:	3c b3                	cmp    $0xb3,%al
-  103606:	77 58                	ja     103660 <_ZN2io15vga_text_buffer17move_to_next_lineEv+0xa0>
-  103608:	e8 83 01 00 00       	call   103790 <_ZN3cpu8features3getEv>
-  10360d:	0f b6 4b 01          	movzbl 0x1(%ebx),%ecx
-  103611:	ba a0 00 00 00       	mov    $0xa0,%edx
-  103616:	0f b6 f0             	movzbl %al,%esi
-  103619:	0f b6 03             	movzbl (%ebx),%eax
-  10361c:	01 c8                	add    %ecx,%eax
-  10361e:	0f b6 4b 02          	movzbl 0x2(%ebx),%ecx
-  103622:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  103625:	c1 e0 04             	shl    $0x4,%eax
-  103628:	01 c8                	add    %ecx,%eax
-  10362a:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  10362f:	0f b7 c0             	movzwl %ax,%eax
-  103632:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
-  103639:	ff 14 b5 7c 40 10 00 	call   *0x10407c(,%esi,4)
-  103640:	0f b6 03             	movzbl (%ebx),%eax
-  103643:	83 c4 1c             	add    $0x1c,%esp
-  103646:	5b                   	pop    %ebx
-  103647:	5e                   	pop    %esi
-  103648:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  10364b:	5f                   	pop    %edi
-  10364c:	5d                   	pop    %ebp
-  10364d:	c1 e0 04             	shl    $0x4,%eax
-  103650:	0f b7 c0             	movzwl %ax,%eax
-  103653:	e9 08 01 00 00       	jmp    103760 <_ZN2io15hardware_cursor17set_display_startEt>
-  103658:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  10365f:	00 
-  103660:	88 45 e7             	mov    %al,-0x19(%ebp)
-  103663:	e8 28 01 00 00       	call   103790 <_ZN3cpu8features3getEv>
-  103668:	0f b6 55 e7          	movzbl -0x19(%ebp),%edx
-  10366c:	b9 00 0f 00 00       	mov    $0xf00,%ecx
-  103671:	0f b6 f0             	movzbl %al,%esi
-  103674:	8d 04 92             	lea    (%edx,%edx,4),%eax
-  103677:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
-  10367c:	c1 e0 05             	shl    $0x5,%eax
-  10367f:	05 00 80 0b 00       	add    $0xb8000,%eax
-  103684:	ff 14 b5 70 40 10 00 	call   *0x104070(,%esi,4)
-  10368b:	ba 01 18 00 00       	mov    $0x1801,%edx
-  103690:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  103695:	66 89 13             	mov    %dx,(%ebx)
-  103698:	ba a0 00 00 00       	mov    $0xa0,%edx
-  10369d:	ff 14 b5 7c 40 10 00 	call   *0x10407c(,%esi,4)
-  1036a4:	eb 9a                	jmp    103640 <_ZN2io15vga_text_buffer17move_to_next_lineEv+0x80>
-  1036a6:	66 90                	xchg   %ax,%ax
-  1036a8:	66 90                	xchg   %ax,%ax
-  1036aa:	66 90                	xchg   %ax,%ax
-  1036ac:	66 90                	xchg   %ax,%ax
-  1036ae:	66 90                	xchg   %ax,%ax
+001035b0 <_ZN2io15vga_text_buffer17move_to_next_lineEv>:
+  1035b0:	55                   	push   %ebp
+  1035b1:	89 e5                	mov    %esp,%ebp
+  1035b3:	57                   	push   %edi
+  1035b4:	56                   	push   %esi
+  1035b5:	53                   	push   %ebx
+  1035b6:	83 ec 0c             	sub    $0xc,%esp
+  1035b9:	0f b6 48 01          	movzbl 0x1(%eax),%ecx
+  1035bd:	c6 40 02 00          	movb   $0x0,0x2(%eax)
+  1035c1:	80 f9 18             	cmp    $0x18,%cl
+  1035c4:	8d 51 01             	lea    0x1(%ecx),%edx
+  1035c7:	0f b6 08             	movzbl (%eax),%ecx
+  1035ca:	0f 94 c3             	sete   %bl
+  1035cd:	01 d9                	add    %ebx,%ecx
+  1035cf:	88 08                	mov    %cl,(%eax)
+  1035d1:	89 ce                	mov    %ecx,%esi
+  1035d3:	89 d1                	mov    %edx,%ecx
+  1035d5:	29 d9                	sub    %ebx,%ecx
+  1035d7:	88 48 01             	mov    %cl,0x1(%eax)
+  1035da:	80 fa 19             	cmp    $0x19,%dl
+  1035dd:	74 11                	je     1035f0 <_ZN2io15vga_text_buffer17move_to_next_lineEv+0x40>
+  1035df:	83 c4 0c             	add    $0xc,%esp
+  1035e2:	5b                   	pop    %ebx
+  1035e3:	5e                   	pop    %esi
+  1035e4:	5f                   	pop    %edi
+  1035e5:	5d                   	pop    %ebp
+  1035e6:	c3                   	ret
+  1035e7:	90                   	nop
+  1035e8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  1035ef:	00 
+  1035f0:	89 c3                	mov    %eax,%ebx
+  1035f2:	89 f2                	mov    %esi,%edx
+  1035f4:	89 f0                	mov    %esi,%eax
+  1035f6:	0f b6 c0             	movzbl %al,%eax
+  1035f9:	80 fa b3             	cmp    $0xb3,%dl
+  1035fc:	77 4a                	ja     103648 <_ZN2io15vga_text_buffer17move_to_next_lineEv+0x98>
+  1035fe:	83 c0 18             	add    $0x18,%eax
+  103601:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  103606:	ba a0 00 00 00       	mov    $0xa0,%edx
+  10360b:	0f b6 35 42 4b 10 00 	movzbl 0x104b42,%esi
+  103612:	0f b6 c0             	movzbl %al,%eax
+  103615:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  103618:	c1 e0 04             	shl    $0x4,%eax
+  10361b:	0f b7 c0             	movzwl %ax,%eax
+  10361e:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
+  103625:	ff 14 b5 5c 40 10 00 	call   *0x10405c(,%esi,4)
+  10362c:	0f b6 03             	movzbl (%ebx),%eax
+  10362f:	83 c4 0c             	add    $0xc,%esp
+  103632:	5b                   	pop    %ebx
+  103633:	5e                   	pop    %esi
+  103634:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  103637:	5f                   	pop    %edi
+  103638:	5d                   	pop    %ebp
+  103639:	c1 e0 04             	shl    $0x4,%eax
+  10363c:	0f b7 c0             	movzwl %ax,%eax
+  10363f:	e9 fc 00 00 00       	jmp    103740 <_ZN2io15hardware_cursor17set_display_startEt>
+  103644:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  103648:	0f b6 35 42 4b 10 00 	movzbl 0x104b42,%esi
+  10364f:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  103652:	b9 00 0f 00 00       	mov    $0xf00,%ecx
+  103657:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
+  10365c:	c1 e0 05             	shl    $0x5,%eax
+  10365f:	05 00 80 0b 00       	add    $0xb8000,%eax
+  103664:	ff 14 b5 50 40 10 00 	call   *0x104050(,%esi,4)
+  10366b:	ba 01 18 00 00       	mov    $0x1801,%edx
+  103670:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  103675:	66 89 13             	mov    %dx,(%ebx)
+  103678:	ba a0 00 00 00       	mov    $0xa0,%edx
+  10367d:	ff 14 b5 5c 40 10 00 	call   *0x10405c(,%esi,4)
+  103684:	eb a6                	jmp    10362c <_ZN2io15vga_text_buffer17move_to_next_lineEv+0x7c>
+  103686:	66 90                	xchg   %ax,%ax
+  103688:	66 90                	xchg   %ax,%ax
+  10368a:	66 90                	xchg   %ax,%ax
+  10368c:	66 90                	xchg   %ax,%ax
+  10368e:	66 90                	xchg   %ax,%ax
 
-001036b0 <_ZN2io15hardware_cursor6enableEhh>:
-  1036b0:	55                   	push   %ebp
-  1036b1:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  1036b6:	89 e5                	mov    %esp,%ebp
-  1036b8:	57                   	push   %edi
-  1036b9:	56                   	push   %esi
-  1036ba:	53                   	push   %ebx
-  1036bb:	83 ec 04             	sub    $0x4,%esp
-  1036be:	8b 45 0c             	mov    0xc(%ebp),%eax
-  1036c1:	8b 75 08             	mov    0x8(%ebp),%esi
-  1036c4:	89 45 f0             	mov    %eax,-0x10(%ebp)
-  1036c7:	b8 0a 00 00 00       	mov    $0xa,%eax
-  1036cc:	ee                   	out    %al,(%dx)
-  1036cd:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  1036d2:	ec                   	in     (%dx),%al
-  1036d3:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  1036d8:	89 c1                	mov    %eax,%ecx
-  1036da:	b8 0a 00 00 00       	mov    $0xa,%eax
-  1036df:	ee                   	out    %al,(%dx)
-  1036e0:	89 c8                	mov    %ecx,%eax
-  1036e2:	83 e6 1f             	and    $0x1f,%esi
-  1036e5:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  1036ea:	83 e0 c0             	and    $0xffffffc0,%eax
-  1036ed:	09 f0                	or     %esi,%eax
-  1036ef:	ee                   	out    %al,(%dx)
-  1036f0:	b8 0b 00 00 00       	mov    $0xb,%eax
-  1036f5:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  1036fa:	ee                   	out    %al,(%dx)
-  1036fb:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103700:	ec                   	in     (%dx),%al
-  103701:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  103706:	89 c1                	mov    %eax,%ecx
-  103708:	b8 0b 00 00 00       	mov    $0xb,%eax
-  10370d:	ee                   	out    %al,(%dx)
-  10370e:	0f b6 55 f0          	movzbl -0x10(%ebp),%edx
-  103712:	89 c8                	mov    %ecx,%eax
-  103714:	83 e0 e0             	and    $0xffffffe0,%eax
-  103717:	83 e2 1f             	and    $0x1f,%edx
-  10371a:	09 d0                	or     %edx,%eax
-  10371c:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103721:	ee                   	out    %al,(%dx)
-  103722:	83 c4 04             	add    $0x4,%esp
-  103725:	5b                   	pop    %ebx
-  103726:	5e                   	pop    %esi
-  103727:	5f                   	pop    %edi
-  103728:	5d                   	pop    %ebp
-  103729:	c3                   	ret
-  10372a:	66 90                	xchg   %ax,%ax
-  10372c:	66 90                	xchg   %ax,%ax
-  10372e:	66 90                	xchg   %ax,%ax
+00103690 <_ZN2io15hardware_cursor6enableEhh>:
+  103690:	55                   	push   %ebp
+  103691:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103696:	89 e5                	mov    %esp,%ebp
+  103698:	57                   	push   %edi
+  103699:	56                   	push   %esi
+  10369a:	53                   	push   %ebx
+  10369b:	83 ec 04             	sub    $0x4,%esp
+  10369e:	8b 45 0c             	mov    0xc(%ebp),%eax
+  1036a1:	8b 75 08             	mov    0x8(%ebp),%esi
+  1036a4:	89 45 f0             	mov    %eax,-0x10(%ebp)
+  1036a7:	b8 0a 00 00 00       	mov    $0xa,%eax
+  1036ac:	ee                   	out    %al,(%dx)
+  1036ad:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  1036b2:	ec                   	in     (%dx),%al
+  1036b3:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  1036b8:	89 c1                	mov    %eax,%ecx
+  1036ba:	b8 0a 00 00 00       	mov    $0xa,%eax
+  1036bf:	ee                   	out    %al,(%dx)
+  1036c0:	89 c8                	mov    %ecx,%eax
+  1036c2:	83 e6 1f             	and    $0x1f,%esi
+  1036c5:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  1036ca:	83 e0 c0             	and    $0xffffffc0,%eax
+  1036cd:	09 f0                	or     %esi,%eax
+  1036cf:	ee                   	out    %al,(%dx)
+  1036d0:	b8 0b 00 00 00       	mov    $0xb,%eax
+  1036d5:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  1036da:	ee                   	out    %al,(%dx)
+  1036db:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  1036e0:	ec                   	in     (%dx),%al
+  1036e1:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  1036e6:	89 c1                	mov    %eax,%ecx
+  1036e8:	b8 0b 00 00 00       	mov    $0xb,%eax
+  1036ed:	ee                   	out    %al,(%dx)
+  1036ee:	0f b6 55 f0          	movzbl -0x10(%ebp),%edx
+  1036f2:	89 c8                	mov    %ecx,%eax
+  1036f4:	83 e0 e0             	and    $0xffffffe0,%eax
+  1036f7:	83 e2 1f             	and    $0x1f,%edx
+  1036fa:	09 d0                	or     %edx,%eax
+  1036fc:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103701:	ee                   	out    %al,(%dx)
+  103702:	83 c4 04             	add    $0x4,%esp
+  103705:	5b                   	pop    %ebx
+  103706:	5e                   	pop    %esi
+  103707:	5f                   	pop    %edi
+  103708:	5d                   	pop    %ebp
+  103709:	c3                   	ret
+  10370a:	66 90                	xchg   %ax,%ax
+  10370c:	66 90                	xchg   %ax,%ax
+  10370e:	66 90                	xchg   %ax,%ax
 
-00103730 <_ZN2io15hardware_cursor12set_positionEt>:
-  103730:	89 c1                	mov    %eax,%ecx
-  103732:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  103737:	b8 0f 00 00 00       	mov    $0xf,%eax
-  10373c:	ee                   	out    %al,(%dx)
-  10373d:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103742:	89 c8                	mov    %ecx,%eax
-  103744:	ee                   	out    %al,(%dx)
-  103745:	b8 0e 00 00 00       	mov    $0xe,%eax
-  10374a:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  10374f:	ee                   	out    %al,(%dx)
-  103750:	89 c8                	mov    %ecx,%eax
-  103752:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103757:	66 c1 e8 08          	shr    $0x8,%ax
-  10375b:	ee                   	out    %al,(%dx)
-  10375c:	c3                   	ret
-  10375d:	66 90                	xchg   %ax,%ax
-  10375f:	90                   	nop
+00103710 <_ZN2io15hardware_cursor12set_positionEt>:
+  103710:	89 c1                	mov    %eax,%ecx
+  103712:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103717:	b8 0f 00 00 00       	mov    $0xf,%eax
+  10371c:	ee                   	out    %al,(%dx)
+  10371d:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103722:	89 c8                	mov    %ecx,%eax
+  103724:	ee                   	out    %al,(%dx)
+  103725:	b8 0e 00 00 00       	mov    $0xe,%eax
+  10372a:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  10372f:	ee                   	out    %al,(%dx)
+  103730:	89 c8                	mov    %ecx,%eax
+  103732:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103737:	66 c1 e8 08          	shr    $0x8,%ax
+  10373b:	ee                   	out    %al,(%dx)
+  10373c:	c3                   	ret
+  10373d:	66 90                	xchg   %ax,%ax
+  10373f:	90                   	nop
 
-00103760 <_ZN2io15hardware_cursor17set_display_startEt>:
-  103760:	89 c1                	mov    %eax,%ecx
-  103762:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  103767:	b8 0d 00 00 00       	mov    $0xd,%eax
-  10376c:	ee                   	out    %al,(%dx)
-  10376d:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103772:	89 c8                	mov    %ecx,%eax
-  103774:	ee                   	out    %al,(%dx)
-  103775:	b8 0c 00 00 00       	mov    $0xc,%eax
-  10377a:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  10377f:	ee                   	out    %al,(%dx)
-  103780:	89 c8                	mov    %ecx,%eax
-  103782:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103787:	66 c1 e8 08          	shr    $0x8,%ax
-  10378b:	ee                   	out    %al,(%dx)
-  10378c:	c3                   	ret
-  10378d:	66 90                	xchg   %ax,%ax
-  10378f:	90                   	nop
-
-00103790 <_ZN3cpu8features3getEv>:
-  103790:	0f b6 05 82 4b 10 00 	movzbl 0x104b82,%eax
-  103797:	c3                   	ret
+00103740 <_ZN2io15hardware_cursor17set_display_startEt>:
+  103740:	89 c1                	mov    %eax,%ecx
+  103742:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103747:	b8 0d 00 00 00       	mov    $0xd,%eax
+  10374c:	ee                   	out    %al,(%dx)
+  10374d:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103752:	89 c8                	mov    %ecx,%eax
+  103754:	ee                   	out    %al,(%dx)
+  103755:	b8 0c 00 00 00       	mov    $0xc,%eax
+  10375a:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  10375f:	ee                   	out    %al,(%dx)
+  103760:	89 c8                	mov    %ecx,%eax
+  103762:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103767:	66 c1 e8 08          	shr    $0x8,%ax
+  10376b:	ee                   	out    %al,(%dx)
+  10376c:	c3                   	ret
