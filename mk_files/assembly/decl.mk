@@ -10,6 +10,10 @@ BOOT_STAGE_2_OBJ = obj/boot/boot_stage_2.o
 PM_ENTRY = assembly/pm_entry.S
 PM_ENTRY_OBJ = obj/boot/pm_entry.o
 
+#----------------Pm Entry Helper Function-----------------------
+MOVE_KERNEL_CPP = assembly/move_kernel.cpp
+MOVE_KERNEL_OBJ = obj/boot/move_kernel.o
+
 #-------------------------Kernel Entry
 KENREL_ENTRY = assembly/kernel_entry.S
 KERNEL_ENTRY_OBJ = obj/boot/kernel_entry.o
@@ -35,8 +39,10 @@ KERNEL_BIN = bin/kernel.bin
 KERNEL_DISASM = kernel_dis.txt
 
 # --------------------Code 32--------------------------------
+
 CODE_32_ELF = elf/code_32.elf
 CODE_32_BIN = bin/code_32.bin
+CODE_32_DISASM = code_32_dis.txt
 
 # ------------------------OS Image---------------------------
 OS_IMAGE = bin/os_image.bin

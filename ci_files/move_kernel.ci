@@ -1,0 +1,12 @@
+graph: { title: "assembly/move_kernel.cpp"
+node: { title: "_Z7copy_32PKmPmm" label: "void copy_32(const uint32_t*, uint32_t*, size_t)\nassembly/move_kernel.cpp:10:6\n12 bytes (static)" }
+node: { title: "_Z9copy_sse2PKmPmm" label: "void copy_sse2(const uint32_t*, uint32_t*, size_t)\nassembly/move_kernel.cpp:16:6\n4 bytes (static)" }
+node: { title: "_Z9copy_avx2PKmPmm" label: "void copy_avx2(const uint32_t*, uint32_t*, size_t)\nassembly/move_kernel.cpp:23:6\n4 bytes (static)" }
+node: { title: "_ZN5tools9copy_sse2EPKDv2_xPS0_m" label: "void tools::copy_sse2(const __m128i*, __m128i*, size_t)\n./tools/copy.h:34:10\n4 bytes (static)" }
+node: { title: "_ZN5tools16copy_sse2_inlineEPKDv2_xPS0_m" label: "void tools::copy_sse2_inline(const __m128i*, __m128i*, size_t)\n./tools/copy.h:47:10\n8 bytes (static)" }
+node: { title: "_ZN5tools9copy_avx2EPKDv4_xPS0_m" label: "void tools::copy_avx2(const __m256i*, __m256i*, size_t)\n./tools/copy.h:60:10\n4 bytes (static)" }
+node: { title: "_ZN5tools16copy_avx2_inlineEPKDv4_xPS0_m" label: "void tools::copy_avx2_inline(const __m256i*, __m256i*, size_t)\n./tools/copy.h:73:10\n8 bytes (static)" }
+node: { title: "move_kernel" label: "void move_kernel(uint8_t)\nassembly/move_kernel.cpp:44:37\n16 bytes (static)" }
+node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
+edge: { sourcename: "move_kernel" targetname: "__indirect_call" label: "assembly/move_kernel.cpp:49:26" }
+}

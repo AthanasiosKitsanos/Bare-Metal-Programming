@@ -5,6 +5,8 @@
 .extern _bss_start
 .extern _kernel_start
 .extern kernel_entry
+.extern move_kernel
+.extern _sp_32_address
 
 .set DATA_SEG, 0x10
 
@@ -16,16 +18,18 @@ pm_entry:
     movw %ax, %gs
     movw %ax, %ss
 
-    cld
-    movl $_kernel_source_image, %esi
-    movl $_kernel_start, %edi
+    movl $_sp_32_address, %esp
 
-    movl $_bss_start, %eax      # Load the address of _bss_start
-    subl $_kernel_start, %eax   # Substruct the address of _kernel_start to get the byte difference
-    movl %eax, %ecx             # move the result to %ecx, since it is needed for rep movsl
+    # cld
+    # movl $_kernel_source_image, %esi
+    # movl $_kernel_start, %edi
 
-    shrl $0x02, %ecx            # find how many dwords fit in that distance
-    rep movsl (%esi), (%edi)    # copy from one address to another
+    # movl $_bss_start, %eax      # Load the address of _bss_start
+    # subl $_kernel_start, %eax   # Substruct the address of _kernel_start to get the byte difference
+    # movl %eax, %ecx             # move the result to %ecx, since it is needed for rep movsl
+
+    # shrl $0x02, %ecx            # find how many dwords fit in that distance
+    # rep movsl (%esi), (%edi)    # copy from one address to another
 
 .set_leaf_1:
     movl %cr0, %eax
@@ -85,6 +89,9 @@ pm_entry:
 
     # DO NOT USE THE REGISTER EBX, IT HOLDS THE SIMD AND AVX FLAG
 .kernel_entry_jump:
+    # move_kernel is regparm(1): expects the mm flag in %eax (copied from %ebx, which must stay intact for kernel_entry)
+    movl %ebx, %eax
+    call move_kernel
     jmp kernel_entry
 
 hang:

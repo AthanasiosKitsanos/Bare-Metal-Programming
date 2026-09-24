@@ -5,6 +5,7 @@ ENTRY(_start_stage_2)
 SECTIONS
 {
     . = 0x7E00;
+    _sp_32_address = .;
     .text :
     {
         *(.text*)

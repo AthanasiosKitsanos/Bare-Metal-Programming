@@ -1,6 +1,7 @@
 .code16
 .section .text
 .global _start
+.extern _sp_16_address
 .include "stage_2_sectors.inc"
 _start:
     cli
@@ -8,7 +9,7 @@ _start:
     movw %ax, %ds
     movw %ax, %es
     movw %ax, %ss
-    movw $0x7C00, %sp
+    movw $_sp_16_address, %sp
     cld
     sti
 
