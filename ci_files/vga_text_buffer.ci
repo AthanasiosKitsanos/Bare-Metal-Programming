@@ -1,0 +1,37 @@
+graph: { title: "io/vga_text_buffer.cpp"
+node: { title: "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_sse_2EPVmtm" label: "void {anonymous}::use_sse_2(volatile uint32_t*, uint16_t, uint32_t)\nio/vga_text_buffer.cpp:9:10\n4 bytes (static)" }
+node: { title: "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_avx_2EPVmtm" label: "void {anonymous}::use_avx_2(volatile uint32_t*, uint16_t, uint32_t)\nio/vga_text_buffer.cpp:23:10\n4 bytes (static)" }
+node: { title: "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_fillEPVmtm" label: "void {anonymous}::fallback_fill(volatile uint32_t*, uint16_t, uint32_t)\nio/vga_text_buffer.cpp:37:10\n12 bytes (static)" }
+node: { title: "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_sse_2_copyEPVKmPVmt" label: "volatile uint32_t* {anonymous}::use_sse_2_copy(const volatile uint32_t*, volatile uint32_t*, uint16_t)\nio/vga_text_buffer.cpp:60:24\n16 bytes (static)" }
+node: { title: "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_avx_2_copyEPVKmPVmt" label: "volatile uint32_t* {anonymous}::use_avx_2_copy(const volatile uint32_t*, volatile uint32_t*, uint16_t)\nio/vga_text_buffer.cpp:76:24\n16 bytes (static)" }
+node: { title: "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_copyEPVKmPVmt" label: "volatile uint32_t* {anonymous}::fallback_copy(const volatile uint32_t*, volatile uint32_t*, uint16_t)\nio/vga_text_buffer.cpp:92:24\n20 bytes (static)" }
+node: { title: "_ZN2io15vga_text_buffer5resetEv" label: "void io::vga_text_buffer::reset()\nio/vga_text_buffer.cpp:118:10\n16 bytes (static)" }
+node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
+edge: { sourcename: "_ZN2io15vga_text_buffer5resetEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:127:50" }
+edge: { sourcename: "_ZN2io15vga_text_buffer5resetEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:136:32" }
+node: { title: "_ZN2io15vga_text_buffer5clearEv" label: "void io::vga_text_buffer::clear()\nio/vga_text_buffer.cpp:139:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN2io15vga_text_buffer5clearEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:145:49" }
+node: { title: "_ZN2io15hardware_cursor17set_display_startEt" label: "static void io::hardware_cursor::set_display_start(uint16_t)\nio/hardware_cursor.h:26:25" shape : ellipse }
+edge: { sourcename: "_ZN2io15vga_text_buffer5clearEv" targetname: "_ZN2io15hardware_cursor17set_display_startEt" label: "io/vga_text_buffer.cpp:151:43" }
+node: { title: "_ZN2io15vga_text_buffer9clear_rowEv" label: "void io::vga_text_buffer::clear_row()\nio/vga_text_buffer.cpp:155:10\n16 bytes (static)" }
+edge: { sourcename: "_ZN2io15vga_text_buffer9clear_rowEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:161:49" }
+node: { title: "_ZN2io15vga_text_buffer3putEc" label: "void io::vga_text_buffer::put(char)\nio/vga_text_buffer.cpp:165:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN2io15vga_text_buffer3putEc" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:127:50" }
+edge: { sourcename: "_ZN2io15vga_text_buffer3putEc" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:136:32" }
+edge: { sourcename: "_ZN2io15vga_text_buffer3putEc" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:161:49" }
+edge: { sourcename: "_ZN2io15vga_text_buffer3putEc" targetname: "_ZN2io15hardware_cursor17set_display_startEt" label: "io/vga_text_buffer.cpp:195:47" }
+node: { title: "_ZN2io15vga_text_buffer16remove_last_charEv" label: "void io::vga_text_buffer::remove_last_char()\nio/vga_text_buffer.cpp:172:10\n24 bytes (static)" }
+node: { title: "_ZN2io15vga_text_buffer12move_forwardEv" label: "void io::vga_text_buffer::move_forward()\nio/vga_text_buffer.cpp:179:10\n48 bytes (static)" }
+edge: { sourcename: "_ZN2io15vga_text_buffer12move_forwardEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:127:50" }
+edge: { sourcename: "_ZN2io15vga_text_buffer12move_forwardEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:136:32" }
+edge: { sourcename: "_ZN2io15vga_text_buffer12move_forwardEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:161:49" }
+edge: { sourcename: "_ZN2io15vga_text_buffer12move_forwardEv" targetname: "_ZN2io15hardware_cursor17set_display_startEt" label: "io/vga_text_buffer.cpp:195:47" }
+node: { title: "_ZN2io15vga_text_buffer14move_backwardsEv" label: "void io::vga_text_buffer::move_backwards()\nio/vga_text_buffer.cpp:200:10\n12 bytes (static)" }
+node: { title: "_ZN2io15vga_text_buffer17move_to_next_lineEv" label: "void io::vga_text_buffer::move_to_next_line()\nio/vga_text_buffer.cpp:211:10\n32 bytes (static)" }
+edge: { sourcename: "_ZN2io15vga_text_buffer17move_to_next_lineEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:127:50" }
+edge: { sourcename: "_ZN2io15vga_text_buffer17move_to_next_lineEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:136:32" }
+edge: { sourcename: "_ZN2io15vga_text_buffer17move_to_next_lineEv" targetname: "__indirect_call" label: "io/vga_text_buffer.cpp:161:49" }
+edge: { sourcename: "_ZN2io15vga_text_buffer17move_to_next_lineEv" targetname: "_ZN2io15hardware_cursor17set_display_startEt" label: "io/vga_text_buffer.cpp:223:47" }
+node: { title: "_ZN2io15vga_text_buffer18move_cursor_left_nEh" label: "void io::vga_text_buffer::move_cursor_left_n(uint8_t)\nio/vga_text_buffer.cpp:228:10\n20 bytes (static)" }
+node: { title: "_ZN2io15vga_text_buffer19move_cursor_right_nEh" label: "void io::vga_text_buffer::move_cursor_right_n(uint8_t)\nio/vga_text_buffer.cpp:240:10\n20 bytes (static)" }
+}

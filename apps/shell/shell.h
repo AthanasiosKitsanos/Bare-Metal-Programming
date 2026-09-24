@@ -1,8 +1,8 @@
 #pragma once
 
 #include <stdint.h>
-#include "io/input/terminal_input.h"
-#include "io/output/terminal_output.h"
+#include "terminal/input.h"
+#include "terminal/output.h"
 
 namespace app
 {   

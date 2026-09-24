@@ -1,0 +1,7 @@
+# VGA cursor
+$(CURSOR_OBJ): $(IO_H) $(CURSOR_H)
+	$(CC) $(COMPILE_FLAGS) -c $(CURSOR_CPP) -o $(CURSOR_OBJ)
+
+# VGA Buffer
+$(VGA_OBJ): $(VGA_CPP) $(VGA_H) $(CPU_FEATURES_H) $(CURSOR_H)
+	$(CC) $(COMPILE_FLAGS) -c $(VGA_CPP) -o $(VGA_OBJ)

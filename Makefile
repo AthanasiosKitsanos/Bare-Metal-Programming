@@ -18,14 +18,17 @@ SECTOR_SIZE = 512
 INCLUDE_MAP_FILE = -Map=output.map
 
 CI_FILES = ci_files
-#-----------------------Include Mk Files---------------------------------------
+#----------------------- Mk Declaretions ---------------------------------------
+include mk_files/tools/decl.mk
 include mk_files/apps/decl.mk
 include mk_files/assembly/decl.mk
 include mk_files/drivers/decl.mk
 include mk_files/kernel/decl.mk
 include mk_files/link_scripts/decl.mk
-include mk_files/utilities/decl.mk
 include mk_files/stack_calculator/decl.mk
+include mk_files/terminal/decl.mk
+include mk_files/cpu/decl.mk
+include mk_files/io/decl.mk
 
 #------------------------------ Include MK Libraries ---------------------------------
 include mk_files/lib/decl.mk
@@ -39,22 +42,24 @@ MAIN_OBJ = obj/main.o
 
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE) $(CODE_32_DISASM) $(CI_FILES)
+all: $(OS_IMAGE) $(KERNEL_DISASM) $(CI_FILES)
 
-#------------------------ Source MK Files ---------------------------------
+#------------------------  MK Rules ---------------------------------
 include mk_files/apps/rules.mk
 include mk_files/assembly/rules.mk
 include mk_files/drivers/rules.mk
 include mk_files/kernel/rules.mk
-include mk_files/utilities/rules.mk
 include mk_files/stack_calculator/rules.mk
+include mk_files/terminal/rules.mk
+include mk_files/cpu/rules.mk
+include mk_files/io/rules.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
 include mk_files/lib/rules.mk
 
 #--------------------------------------Kernel Main Rules------------------------------------------------------------
 $(MAIN_OBJ): $(MAIN_CPP) $(MAIN_H)
-	$(CC) $(COMPILE_FLAGS) $(INCLUDE_DRIVERS_FOLDER) $(INCLUDE_KERNEL_FOLDER) $(INCLUDE_UTILITIES_FOLDER) $(INCLUDE_APP_FOLDER) -c $(MAIN_CPP) -o $(MAIN_OBJ)
+	$(CC) $(COMPILE_FLAGS) -c $(MAIN_CPP) -o $(MAIN_OBJ)
 
 # Rest
 .PHONY: run clean
@@ -67,9 +72,9 @@ clean:
 	rm -f obj/boot/*
 	rm -f obj/drivers/*
 	rm -f obj/exception_stubs/*
-	rm -f obj/hardware_exceptions/*
 	rm -f obj/kernel/*
-	rm -f obj/utilities/*
+	rm -f obj/terminal/*
+	rm -f obj/io/*
 	rm -f obj/*.o
 	rm -f bin/*
 	rm -f elf/*

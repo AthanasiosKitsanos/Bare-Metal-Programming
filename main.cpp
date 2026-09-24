@@ -5,14 +5,7 @@ constexpr uint32_t timer_frequency_hz{100};
 extern "C" uint32_t _kernel_start;
 extern "C" uint32_t _kernel_end;
 
-enum class e820_memory_type: uint32_t
-    {
-        usable = 1,
-        reserved = 2,
-        acpi_reclaimable = 3,
-        acpi_nvs = 4,
-        bad_memory = 5
-    };
+extern "C" uint32_t kernel_call;
 
 constexpr const char* types[] =
 {
@@ -55,7 +48,6 @@ extern "C" [[noreturn]] void kernel_main()
     
     kernel::initialize_exceptions();
     drivers::initialize();
-
 
     // struct something
     // {

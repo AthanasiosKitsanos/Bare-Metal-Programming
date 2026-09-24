@@ -1,9 +1,9 @@
-#include "shell.h"
-#include "io/output/terminal_output.h"
-#include "internal/shell_commands_list.h"
 #include <stdint.h>
+
+#include "shell.h"
+#include "internal/shell_commands_list.h"
 #include "cpu/features.h"
-#include "timer/kernel_timer.h"
+#include "kernel/timer.h"
 
 extern "C" uint32_t _kernel_stack_top;
 extern "C" uint32_t _kernel_stack_bottom;

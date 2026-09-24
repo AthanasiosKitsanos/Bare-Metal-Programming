@@ -1,10 +1,10 @@
-#include "pic/kernel_pic.h"
+#include "kernel/pic.h"
 #include "keyboard.h"
-#include "internals/terminal_io_registers.h"
-#include "internal/keyboard_key_list_n_map.h"
-#include "internal/kernel_interrupt_frame.h"
-#include "internal/kernel_interrupt_guard.h"
-#include "logger/kernel_logger.h"
+#include "io/io_registers.h"
+#include "../internal/keyboard_key_list_n_map.h"
+#include "kernel/internal/interrupt_frame.h"
+#include "kernel/internal/interrupt_guard.h"
+#include "kernel/logger.h"
 
 namespace
 {
@@ -103,7 +103,7 @@ namespace
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
         {
-            if((terminal::inb(status_port) & input_buffer_full) == 0) return true;
+            if((io::inb(status_port) & input_buffer_full) == 0) return true;
             kernel::io_wait();
         }
         return false;
@@ -113,7 +113,7 @@ namespace
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
         {
-            if((terminal::inb(status_port) & output_buffer_full) != 0) return true;
+            if((io::inb(status_port) & output_buffer_full) != 0) return true;
             kernel::io_wait();
         }
         return false;
@@ -122,14 +122,14 @@ namespace
     bool read_keyboard_ack() noexcept
     {
         if(!wait_output_buffer_full()) return false;
-        const uint8_t response{terminal::inb(data_port)};
+        const uint8_t response{io::inb(data_port)};
         return response == keyboard_ack;
     }
 
     bool send_keyboard_byte_and_wait_ack(const uint8_t byte) noexcept
     {
         if(!wait_input_buffer_clear()) return false;
-        terminal::outb(data_port, byte);
+        io::outb(data_port, byte);
         return read_keyboard_ack();
     }
 
@@ -137,8 +137,8 @@ namespace
     {
         for(uint32_t attempt{0}; attempt < keyboard_timeout; ++attempt)
         {
-            if((terminal::inb(status_port) & output_buffer_full) == 0) return;
-            static_cast<void>(terminal::inb(data_port));
+            if((io::inb(status_port) & output_buffer_full) == 0) return;
+            static_cast<void>(io::inb(data_port));
             kernel::io_wait();
         }
     }
@@ -282,10 +282,10 @@ namespace driver::keyboard
     void handle_keyboard_interrupt(kernel::interrupt_frame* frame) noexcept
     {
         static_cast<void>(frame);
-        const uint8_t status{terminal::inb(status_port)};
+        const uint8_t status{io::inb(status_port)};
         if((status & output_buffer_full) == 0) return;
 
-        const uint8_t scancode{terminal::inb(data_port)};
+        const uint8_t scancode{io::inb(data_port)};
         if(scancode == extended_prefix)
         {
             g_extended_pending = true;
