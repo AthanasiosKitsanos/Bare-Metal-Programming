@@ -38,7 +38,7 @@ extern "C" [[noreturn]] void kernel_main()
             << " entry_end: " << entry_size
             << " type: " << types[static_cast<uint8_t>(entry->type)]
             << "\nstorage: " << terminal::dec << entry->length << "\n\n";
-            if(kernel_start >= entry->base & kernel_start < entry_size)
+            if(kernel_start >= entry->base && kernel_start < entry_size)
             {
                 out << "Kernel is here\n";
             }
