@@ -215,6 +215,14 @@ namespace
         g_used_frames -= frames;
     }
 
+    struct reserved_frames
+    {
+        size_t base{0};
+        size_t length{0};
+    };
+
+    alignas(sizeof(reserved_frames))
+
     // SIMD Methods
     #include "internal/pmm_templates.tpp"
 

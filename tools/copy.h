@@ -31,7 +31,7 @@ namespace tools
     }
     
     [[gnu::noinline]] [[gnu::target("sse2")]] [[gnu::regparm(3)]]
-    void copy_sse2(const __m128i* source, __m128i* destination, const size_t length) noexcept
+    inline void copy_sse2(const __m128i* source, __m128i* destination, const size_t length) noexcept
     {
         __m128i value{_mm_setzero_si128()};
         const __m128i* const end{source +length};
@@ -57,7 +57,7 @@ namespace tools
     }
 
     [[gnu::noinline]] [[gnu::target("avx2")]] [[gnu::regparm(3)]]
-    void copy_avx2(const __m256i* source, __m256i* destination, const size_t length) noexcept
+    inline void copy_avx2(const __m256i* source, __m256i* destination, const size_t length) noexcept
     {
         __m256i value{_mm256_setzero_si256()};
         const __m256i* const end{source +length};

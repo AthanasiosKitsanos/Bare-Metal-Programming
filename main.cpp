@@ -19,6 +19,8 @@ constexpr const char* types[] =
 
 extern "C" [[noreturn]] void kernel_main()
 {
+    cpu::gdt::initialize();
+    
     kernel::initialize_pit(timer_frequency_hz);
     kernel::set_timer_frequency(timer_frequency_hz);
     terminal::output::initialize();

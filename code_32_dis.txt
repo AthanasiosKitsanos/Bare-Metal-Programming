@@ -115,7 +115,7 @@ Disassembly of section .text:
     7edd:	fc                   	cld
     7ede:	be 00 80 00 00       	mov    $0x8000,%esi
     7ee3:	bf 00 00 10 00       	mov    $0x100000,%edi
-    7ee8:	b9 80 40 00 00       	mov    $0x4080,%ecx
+    7ee8:	b9 c0 40 00 00       	mov    $0x40c0,%ecx
     7eed:	ff 24 9d 3c 7f 00 00 	jmp    *0x7f3c(,%ebx,4)
 
 00007ef4 <.copy_32>:

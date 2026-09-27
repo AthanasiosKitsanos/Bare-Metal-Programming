@@ -13,4 +13,5 @@
 #include "kernel/pmm.h"
 #include "apps/shell/shell.h"
 #include "cpu/features.h"
+#include "cpu/gdt.h"
 #include "tools/stopwatch.h"
