@@ -86,71 +86,99 @@ Disassembly of section .text:
 
 00007e99 <.set_leaf_1>:
     7e99:	0f 20 c0             	mov    %cr0,%eax
-    7e9c:	83 e0 fb             	and    $0xfffffffb,%eax
+    7e9c:	83 e0 f3             	and    $0xfffffff3,%eax
     7e9f:	83 c8 02             	or     $0x2,%eax
     7ea2:	0f 22 c0             	mov    %eax,%cr0
-    7ea5:	0f 20 e0             	mov    %cr4,%eax
-    7ea8:	0d 00 06 00 00       	or     $0x600,%eax
-    7ead:	0f 22 e0             	mov    %eax,%cr4
 
-00007eb0 <.leaf_1>:
-    7eb0:	b8 01 00 00 00       	mov    $0x1,%eax
-    7eb5:	0f a2                	cpuid
-    7eb7:	31 db                	xor    %ebx,%ebx
-    7eb9:	81 e2 00 00 00 04    	and    $0x4000000,%edx
-    7ebf:	74 1c                	je     7edd <.copy_kernel_setup>
-    7ec1:	c1 ea 1a             	shr    $0x1a,%edx
-    7ec4:	52                   	push   %edx
-    7ec5:	81 e1 00 00 00 14    	and    $0x14000000,%ecx
-    7ecb:	81 f9 00 00 00 14    	cmp    $0x14000000,%ecx
-    7ed1:	75 00                	jne    7ed3 <.compute_mm_flag>
+00007ea5 <.leaf_0>:
+    7ea5:	31 c0                	xor    %eax,%eax
+    7ea7:	0f a2                	cpuid
+    7ea9:	89 c6                	mov    %eax,%esi
 
-00007ed3 <.compute_mm_flag>:
-    7ed3:	5a                   	pop    %edx
-    7ed4:	c1 eb 05             	shr    $0x5,%ebx
-    7ed7:	83 c3 01             	add    $0x1,%ebx
-    7eda:	0f af da             	imul   %edx,%ebx
+00007eab <.leaf_1>:
+    7eab:	b8 01 00 00 00       	mov    $0x1,%eax
+    7eb0:	0f a2                	cpuid
+    7eb2:	31 db                	xor    %ebx,%ebx
+    7eb4:	81 e2 00 00 00 04    	and    $0x4000000,%edx
+    7eba:	74 5d                	je     7f19 <.copy_kernel_setup>
+    7ebc:	c1 ea 1a             	shr    $0x1a,%edx
+    7ebf:	52                   	push   %edx
+    7ec0:	0f 20 e0             	mov    %cr4,%eax
+    7ec3:	0d 00 06 00 00       	or     $0x600,%eax
+    7ec8:	0f 22 e0             	mov    %eax,%cr4
+    7ecb:	81 e1 00 00 00 14    	and    $0x14000000,%ecx
+    7ed1:	81 f9 00 00 00 14    	cmp    $0x14000000,%ecx
+    7ed7:	75 36                	jne    7f0f <.compute_mm_flag>
+    7ed9:	83 fe 07             	cmp    $0x7,%esi
+    7edc:	72 31                	jb     7f0f <.compute_mm_flag>
 
-00007edd <.copy_kernel_setup>:
-    7edd:	fc                   	cld
-    7ede:	be 00 80 00 00       	mov    $0x8000,%esi
-    7ee3:	bf 00 00 10 00       	mov    $0x100000,%edi
-    7ee8:	b9 c0 40 00 00       	mov    $0x40c0,%ecx
-    7eed:	ff 24 9d 3c 7f 00 00 	jmp    *0x7f3c(,%ebx,4)
+00007ede <.set_leaf_7>:
+    7ede:	0f 20 e0             	mov    %cr4,%eax
+    7ee1:	0d 00 00 04 00       	or     $0x40000,%eax
+    7ee6:	0f 22 e0             	mov    %eax,%cr4
 
-00007ef4 <.copy_32>:
-    7ef4:	c1 e9 02             	shr    $0x2,%ecx
-    7ef7:	f3 a5                	rep movsl %ds:(%esi),%es:(%edi)
-    7ef9:	e9 02 81 0f 00       	jmp    100000 <_kernel_start>
+00007ee9 <.leaf_7>:
+    7ee9:	31 c9                	xor    %ecx,%ecx
+    7eeb:	b8 07 00 00 00       	mov    $0x7,%eax
+    7ef0:	0f a2                	cpuid
+    7ef2:	31 d2                	xor    %edx,%edx
+    7ef4:	83 e3 20             	and    $0x20,%ebx
+    7ef7:	74 16                	je     7f0f <.compute_mm_flag>
+    7ef9:	31 c9                	xor    %ecx,%ecx
+    7efb:	b8 07 00 00 00       	mov    $0x7,%eax
+    7f00:	0f 01 d1             	xsetbv
+    7f03:	31 c9                	xor    %ecx,%ecx
+    7f05:	0f 01 d0             	xgetbv
+    7f08:	83 e0 04             	and    $0x4,%eax
+    7f0b:	75 02                	jne    7f0f <.compute_mm_flag>
+    7f0d:	31 db                	xor    %ebx,%ebx
 
-00007efe <.copy_sse2>:
-    7efe:	89 ca                	mov    %ecx,%edx
-    7f00:	01 ce                	add    %ecx,%esi
-    7f02:	01 cf                	add    %ecx,%edi
-    7f04:	f7 da                	neg    %edx
+00007f0f <.compute_mm_flag>:
+    7f0f:	5a                   	pop    %edx
+    7f10:	c1 eb 05             	shr    $0x5,%ebx
+    7f13:	83 c3 01             	add    $0x1,%ebx
+    7f16:	0f af da             	imul   %edx,%ebx
 
-00007f06 <.start_copy_sse_2>:
-    7f06:	66 0f 6f 04 16       	movdqa (%esi,%edx,1),%xmm0
-    7f0b:	0f 29 04 17          	movaps %xmm0,(%edi,%edx,1)
-    7f0f:	83 c2 10             	add    $0x10,%edx
-    7f12:	75 f2                	jne    7f06 <.start_copy_sse_2>
-    7f14:	e9 e7 80 0f 00       	jmp    100000 <_kernel_start>
+00007f19 <.copy_kernel_setup>:
+    7f19:	fc                   	cld
+    7f1a:	be 00 80 00 00       	mov    $0x8000,%esi
+    7f1f:	bf 00 00 10 00       	mov    $0x100000,%edi
+    7f24:	b9 80 3c 00 00       	mov    $0x3c80,%ecx
+    7f29:	ff 24 9d 78 7f 00 00 	jmp    *0x7f78(,%ebx,4)
 
-00007f19 <.copy_avx2>:
-    7f19:	89 ca                	mov    %ecx,%edx
-    7f1b:	01 ce                	add    %ecx,%esi
-    7f1d:	01 cf                	add    %ecx,%edi
-    7f1f:	f7 da                	neg    %edx
+00007f30 <.copy_32>:
+    7f30:	c1 e9 02             	shr    $0x2,%ecx
+    7f33:	f3 a5                	rep movsl %ds:(%esi),%es:(%edi)
+    7f35:	e9 c6 80 0f 00       	jmp    100000 <_kernel_start>
 
-00007f21 <.start_copy_avx_2>:
-    7f21:	c5 fd 6f 04 16       	vmovdqa (%esi,%edx,1),%ymm0
-    7f26:	c5 fc 29 04 17       	vmovaps %ymm0,(%edi,%edx,1)
-    7f2b:	83 c2 20             	add    $0x20,%edx
-    7f2e:	75 f1                	jne    7f21 <.start_copy_avx_2>
-    7f30:	c5 f8 77             	vzeroupper
-    7f33:	e9 c8 80 0f 00       	jmp    100000 <_kernel_start>
+00007f3a <.copy_sse2>:
+    7f3a:	89 ca                	mov    %ecx,%edx
+    7f3c:	01 ce                	add    %ecx,%esi
+    7f3e:	01 cf                	add    %ecx,%edi
+    7f40:	f7 da                	neg    %edx
 
-00007f38 <hang>:
-    7f38:	fa                   	cli
-    7f39:	f4                   	hlt
-    7f3a:	eb fc                	jmp    7f38 <hang>
+00007f42 <.start_copy_sse_2>:
+    7f42:	66 0f 6f 04 16       	movdqa (%esi,%edx,1),%xmm0
+    7f47:	0f 29 04 17          	movaps %xmm0,(%edi,%edx,1)
+    7f4b:	83 c2 10             	add    $0x10,%edx
+    7f4e:	75 f2                	jne    7f42 <.start_copy_sse_2>
+    7f50:	e9 ab 80 0f 00       	jmp    100000 <_kernel_start>
+
+00007f55 <.copy_avx2>:
+    7f55:	89 ca                	mov    %ecx,%edx
+    7f57:	01 ce                	add    %ecx,%esi
+    7f59:	01 cf                	add    %ecx,%edi
+    7f5b:	f7 da                	neg    %edx
+
+00007f5d <.start_copy_avx_2>:
+    7f5d:	c5 fd 6f 04 16       	vmovdqa (%esi,%edx,1),%ymm0
+    7f62:	c5 fc 29 04 17       	vmovaps %ymm0,(%edi,%edx,1)
+    7f67:	83 c2 20             	add    $0x20,%edx
+    7f6a:	75 f1                	jne    7f5d <.start_copy_avx_2>
+    7f6c:	c5 f8 77             	vzeroupper
+    7f6f:	e9 8c 80 0f 00       	jmp    100000 <_kernel_start>
+
+00007f74 <hang>:
+    7f74:	fa                   	cli
+    7f75:	f4                   	hlt
+    7f76:	eb fc                	jmp    7f74 <hang>

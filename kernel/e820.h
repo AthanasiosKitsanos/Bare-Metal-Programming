@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 
 namespace kernel::memory
 {
@@ -28,4 +29,10 @@ namespace kernel::memory
     };
 
     e820_memory_map get_e820_memory_map() noexcept;
+
+    struct reserved_entry
+    {
+        size_t base;
+        size_t length;
+    };
 }

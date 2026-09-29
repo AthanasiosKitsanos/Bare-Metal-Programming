@@ -221,8 +221,6 @@ namespace
         size_t length{0};
     };
 
-    alignas(sizeof(reserved_frames))
-
     // SIMD Methods
     #include "internal/pmm_templates.tpp"
 
@@ -242,7 +240,7 @@ namespace
     [[gnu::always_inline]]
     inline uint8_t safe_leading_zeros(const uint8_t value) noexcept { return (value != 0) ? leading_zeros(value) : bit_size_byte; }
 
-    [[gnu::always_inline]] [[gnu::regparm(3)]]
+    [[gnu::always_inline]]
     inline void contiguous_8_core_inline(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
     {
         const uint8_t* current{*start};
@@ -282,46 +280,93 @@ namespace
         *start = current;
     }
 
-    // IMPORTANT keep is sync with contiguous_8_core_inline right above
     [[gnu::noinline]] [[gnu::regparm(3)]]
     void contiguous_8_core(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
     {
         const uint8_t* current{*start};
         uint8_t current_value{0};
+        size_t length{run->length};
+        uint8_t bit_index{run->start_index.bit_index};
+        uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
+        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
         bool is_first_run{false};
 
         for(; current < end; ++current)
         {
+            is_first_run = (length == 0);
+            current_address = (current_address * !is_first_run) + (reinterpret_cast<uintptr_t>(current) * is_first_run);
             current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>(current - g_bitmap.start) * is_first_run);
-            run->start_index.bit_index *= !is_first_run;
+            bit_index *= !is_first_run;
 
             if(current_value == 0x00)
             {
-                run->length += 8;
-                if(run->length >= frames) break;
+                length += 8;
+                if(length >= frames) break;
             }
-            else if(current_value == 0xFF) run->length ^= run->length;
+            else if(current_value == 0xFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) break;
+                length += trailing_zeros(current_value);
+                if(length >= frames) break;
 
                 const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
 
-                run->start_index.byte_index = static_cast<size_t>(current - g_bitmap.start);
-                run->start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                run->length = (pos_n_length & 0x0F);
-                if(run->length >= frames) break;
+                current_address = reinterpret_cast<uintptr_t>(current);
+                bit_index = static_cast<uint8_t>(pos_n_length >> 4);
+                length = (pos_n_length & 0x0F);
+                if(length >= frames) break;
 
-                run->length = leading_zeros(current_value);
-                run->start_index.bit_index = (bit_size_byte - run->length);
-                if(run->length >= frames) break;
+                length = leading_zeros(current_value);
+                bit_index = (bit_size_byte - length);
+                if(length >= frames) break;
             }
         }
+        run->start_index.byte_index = static_cast<size_t>(current_address - bitmap_start_address);
+        run->start_index.bit_index = bit_index;
+        run->length = length;
         *start = current;
     }
+
+    // IMPORTANT keep is sync with contiguous_8_core_inline right above
+    // [[gnu::noinline]] [[gnu::regparm(3)]]
+    // void contiguous_8_core(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
+    // {
+    //     const uint8_t* current{*start};
+    //     uint8_t current_value{0};
+    //     bool is_first_run{false};
+
+    //     for(; current < end; ++current)
+    //     {
+    //         current_value = *current;
+    //         is_first_run = (run->length == 0);
+    //         run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>(current - g_bitmap.start) * is_first_run);
+    //         run->start_index.bit_index *= !is_first_run;
+
+    //         if(current_value == 0x00)
+    //         {
+    //             run->length += 8;
+    //             if(run->length >= frames) break;
+    //         }
+    //         else if(current_value == 0xFF) run->length ^= run->length;
+    //         else
+    //         {
+    //             run->length += trailing_zeros(current_value);
+    //             if(run->length >= frames) break;
+
+    //             const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
+
+    //             run->start_index.byte_index = static_cast<size_t>(current - g_bitmap.start);
+    //             run->start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
+    //             run->length = (pos_n_length & 0x0F);
+    //             if(run->length >= frames) break;
+
+    //             run->length = leading_zeros(current_value);
+    //             run->start_index.bit_index = (bit_size_byte - run->length);
+    //             if(run->length >= frames) break;
+    //         }
+    //     }
+    //     *start = current;
+    // }
 
     [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_16_core_inline(allocation_run* const run, const size_t frames, const uint16_t* const end, const uint16_t** start) noexcept
@@ -1224,7 +1269,7 @@ namespace
     constexpr simd_set_lut<set_bits::all_ones> set_used_lut{};
     constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
 
-    
+    constexpr kernel::memory::reserved_entry g_reserved_map{};
 }
 
 namespace kernel::memory
@@ -1429,5 +1474,15 @@ namespace kernel::memory
         g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
         g_used_frames -= frames;
         return pmm_result::success;
+    }
+
+    namespace test
+    {
+        size_t core_8(const size_t frames, const uint8_t* end, const uint8_t** const start) noexcept
+        {
+            allocation_run run{};
+            contiguous_8_core(&run, frames, end, start);
+            return run.length;
+        }
     }
 }

@@ -23,17 +23,19 @@ pm_entry:
 
 .set_leaf_1:
     movl %cr0, %eax
-    andl $0xFFFFFFFB, %eax
+    andl $0xFFFFFFF3, %eax
     orl $0x00000002, %eax
-    movl %eax, %cr0
+    movl %eax, %cr0 
 
-    movl %cr4, %eax
-    orl $0x00000600, %eax
-    movl %eax, %cr4 
+.leaf_0:
+    xorl %eax, %eax
+    cpuid
+    movl %eax, %esi
 
 .leaf_1:
     movl $1, %eax
     cpuid
+
 
     xorl %ebx, %ebx # Set EBX to zero
     andl $0x04000000, %edx
@@ -42,33 +44,43 @@ pm_entry:
     shrl $26, %edx
     pushl %edx
 
+    movl %cr4, %eax
+    orl $0x00000600, %eax
+    movl %eax, %cr4
+
+
     andl $0x14000000, %ecx
     cmpl $0x14000000, %ecx
     jne .compute_mm_flag
 
-# .set_leaf_7:
-#     movl %cr4, %eax
-#     orl $0x00040000, %eax
-#     movl %eax, %cr4
+    cmpl $0x7, %esi
+    
 
-# .leaf_7:
-#     xorl %ecx, %ecx
-#     movl $0x7, %eax
+    jb .compute_mm_flag
 
-#     cpuid
-#     xorl %edx, %edx
-#     andl $0x00000020, %ebx
-#     jz .compute_mm_flag
+.set_leaf_7:
+    movl %cr4, %eax
+    orl $0x00040000, %eax
+    movl %eax, %cr4
 
-#     xorl %ecx, %ecx
-#     movl $0x7, %eax
-#     xsetbv
+.leaf_7:
+    xorl %ecx, %ecx
+    movl $0x7, %eax
 
-#     xorl %ecx, %ecx
-#     xgetbv
-#     andl  $0x04, %eax
-#     jnz .compute_mm_flag
-#     xorl %ebx, %ebx
+    cpuid
+    xorl %edx, %edx
+    andl $0x00000020, %ebx
+    jz .compute_mm_flag
+
+    xorl %ecx, %ecx
+    movl $0x7, %eax
+    xsetbv
+
+    xorl %ecx, %ecx
+    xgetbv
+    andl  $0x04, %eax
+    jnz .compute_mm_flag
+    xorl %ebx, %ebx
 
 .compute_mm_flag:
     popl %edx
@@ -76,7 +88,7 @@ pm_entry:
     shrl $5, %ebx
     addl $1, %ebx
     imull %edx, %ebx 
-
+    
 # DO NOT USE THE REGISTER EBX, IT HOLDS THE SIMD AND AVX FLAG
 
 .copy_kernel_setup:

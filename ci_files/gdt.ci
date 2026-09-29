@@ -1,3 +1,0 @@
-graph: { title: "cpu/gdt.cpp"
-node: { title: "_ZN3cpu3gdt10initializeEv" label: "void cpu::gdt::initialize()\ncpu/gdt.cpp:55:10\n4 bytes (static)" }
-}

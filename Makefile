@@ -1,4 +1,5 @@
 # ----------------Compiling Configuration--------------------
+C = i686-elf-gcc
 CC = i686-elf-g++
 
 AS = i686-elf-as
@@ -10,7 +11,16 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 -D_MM_MALLOC_H_INCLUDED -ffreestanding -O3 -Wall -Wextra -fno-exceptions -fno-rtti -ffunction-sections -fdata-sections -fno-stack-protector -fcallgraph-info=su -mgeneral-regs-only
+COMPILE_FLAGS = -std=gnu++17 \
+				-D_MM_MALLOC_H_INCLUDED \
+				-O3 \
+				-Wall \
+				-Wextra \
+				-ffreestanding -fno-exceptions -fno-rtti \
+				-ffunction-sections -fdata-sections \
+				-fno-stack-protector -fcallgraph-info=su \
+				-mgeneral-regs-only
+
 LINKING_FLAGS = --gc-sections
 
 SECTOR_SIZE = 512
@@ -65,7 +75,7 @@ $(MAIN_OBJ): $(MAIN_CPP) $(MAIN_H)
 .PHONY: run clean
 
 run:
-	$(QEMU) -drive format=raw,file=$(OS_IMAGE)
+	$(QEMU) -cpu max -monitor stdio -drive format=raw,file=$(OS_IMAGE)
 
 clean:
 	rm -f obj/apps/shell/*
