@@ -35,6 +35,7 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
 
+    volatile uint8_t* ptr{reinterpret_cast<volatile uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(20))};
     // app::shell shell{};
     
     asm volatile("sti");
