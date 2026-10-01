@@ -2,6 +2,7 @@
 #include "e820.h"
 #include "cpu/features.h"
 #include <immintrin.h>
+#include "tools/cmp.h"
 
 namespace
 {
@@ -64,7 +65,7 @@ namespace
     }
 
     [[gnu::always_inline]]
-    inline uintptr_t max(const kernel::memory::e820_entry* entry) noexcept
+    inline uintptr_t end_address(const kernel::memory::e820_entry* entry) noexcept
     {
         return static_cast<uintptr_t>(entry->base + entry->length);
     }
@@ -250,11 +251,10 @@ namespace
         uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
         uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
         bool is_first_run{false};
-
         for(; current < end; ++current)
         {
             is_first_run = (length == 0);
-            current_address = (current_address * !is_first_run) + (reinterpret_cast<uintptr_t>(current) * is_first_run);
+            current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
             current_value = *current;
             bit_index *= !is_first_run;
 
@@ -295,14 +295,15 @@ namespace
         uint8_t current_value{0};
         size_t length{run->length};
         uint8_t bit_index{run->start_index.bit_index};
+        
         uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
-        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
+        uintptr_t current_address{bitmap_start_address + reinterpret_cast<uintptr_t>(run->start_index.byte_index)};
         bool is_first_run{false};
 
         for(; current < end; ++current)
         {
             is_first_run = (length == 0);
-            current_address = (current_address * !is_first_run) + (reinterpret_cast<uintptr_t>(current) * is_first_run);
+            current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
             current_value = *current;
             bit_index *= !is_first_run;
 
@@ -318,8 +319,8 @@ namespace
                 if(length >= frames) break;
 
                 const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
-
                 current_address = reinterpret_cast<uintptr_t>(current);
+
                 bit_index = static_cast<uint8_t>(pos_n_length >> 4);
                 length = (pos_n_length & 0x0F);
                 if(length >= frames) break;
@@ -342,19 +343,16 @@ namespace
 
         uint16_t current_value{0};
         size_t length{run->length};
-        size_t byte_index{run->start_index.byte_index};
         uint8_t bit_index{run->start_index.bit_index};
         uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
-        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(byte_index)};
+        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
         bool is_first_run{false};
-        bool greater_equal{false};
-
+        
         for(; current < end; ++current)
         {
             current_value = *current;
             is_first_run = (length == 0);
-            current_address = (current_address * !is_first_run) + (reinterpret_cast<uintptr_t>(current) - bitmap_start_address);
-            byte_index = (byte_index * !is_first_run) + ((current_address - bitmap_start_address) * is_first_run);
+            current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
             bit_index *= !is_first_run;
 
             if(current_value == 0x0000)
@@ -367,32 +365,27 @@ namespace
             {
                 length += trailing_zeros(current_value);
                 if(length >= frames) break;
+                
+                bool greater_equal{false};
+                {   
+                    const uint8_t temp_pos_n_length{buried_zeros_lut.entries[static_cast<uint8_t>(current_value)]};
+                    uint8_t pos_n_length{buried_zeros_lut.entries[static_cast<uint8_t>(current_value >> 8)]};
 
-                uint8_t byte_n_bit_pos{0};
-                byte_index = reinterpret_cast<size_t>(reinterpret_cast<uintptr_t>(current) - bitmap_start_address);
-                {
-                    uint8_t pos_n_length{0};
-                    uint8_t temp_lut_value{0};
-                    for(uint8_t right_shift{0}; right_shift < 16; right_shift += 8)
-                    {
-                        temp_lut_value = *(buried_zeros_lut.entries + static_cast<uint8_t>(current_value >> right_shift)) ;
-                        greater_equal = ((pos_n_length & 0x0F) >= ((temp_lut_value & 0x0F)));
-                        pos_n_length = (pos_n_length * greater_equal) + (temp_lut_value * !greater_equal);
-                        byte_n_bit_pos = static_cast<uint8_t>((byte_n_bit_pos * greater_equal) + (((right_shift << 1) | (pos_n_length >> 4)) * !greater_equal));
-                    }
+                    greater_equal = (pos_n_length & 0x0F) >= (temp_pos_n_length & 0x0F); 
+                    pos_n_length = greater_equal ? pos_n_length : temp_pos_n_length;
+                    length = static_cast<size_t>(pos_n_length & 0x0F);
+                    size_t byte_offset{static_cast<size_t>(greater_equal ? 0x01 : 0x00)};
 
                     const uint8_t byte0_leading{safe_leading_zeros(static_cast<uint8_t>(current_value))};
                     const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + safe_trailing_zeros(static_cast<uint8_t>(current_value >> 8)))};
+                    
+                    greater_equal = (length >= length_sum);
+                    length = greater_equal ? length : length_sum;
+                    byte_offset = greater_equal ? byte_offset : static_cast<size_t>(0x00);
+                    bit_index = static_cast<uint8_t>(pos_n_length >> 4);
+                    bit_index = greater_equal ? (pos_n_length >> 4) : (bit_size_byte - byte0_leading);
 
-                    uint8_t temp_length{static_cast<uint8_t>(pos_n_length & 0x0F)};
-
-                    greater_equal = (temp_length >= length_sum);
-                    temp_length = (temp_length * greater_equal) + (length_sum * !greater_equal);
-                    byte_n_bit_pos = (byte_n_bit_pos * greater_equal) + (static_cast<uint8_t>(0x00 | (bit_size_byte - byte0_leading)) * !greater_equal);
-
-                    length = temp_length;
-                    byte_index += static_cast<size_t>(byte_n_bit_pos >> 4);
-                    bit_index = static_cast<uint8_t>(byte_n_bit_pos & 0x0F);
+                    current_address = reinterpret_cast<uintptr_t>(current) + byte_offset;
                     if(length >= frames) break;
                 }
 
@@ -400,15 +393,15 @@ namespace
                 constexpr uint8_t word_bits{16};
                 const uint8_t l_zeros{leading_zeros(current_value)};
                 greater_equal = (length >= l_zeros);
-                length = (length * greater_equal) + (l_zeros * !greater_equal);
+                length = greater_equal ? length : static_cast<size_t>(l_zeros);
 
                 const uint8_t word_bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
-                byte_index = (byte_index * greater_equal) + (byte_index + static_cast<size_t>(word_bit_index >> bit_size_byte_mask));
-                bit_index = (bit_index * greater_equal) + ((word_bit_index & bit_mask) * !greater_equal);
+                current_address = greater_equal ? current_address : reinterpret_cast<uintptr_t>(current) + (word_bit_index >> bit_size_byte_mask);
+                bit_index = greater_equal ? bit_index : word_bit_index & bit_mask;
                 if(length >= frames) break;
             }
         }
-        run->start_index.byte_index = byte_index;
+        run->start_index.byte_index = static_cast<size_t>(current_address - bitmap_start_address);
         run->start_index.bit_index = bit_index;
         run->length = length;
         *start = current;
@@ -422,19 +415,16 @@ namespace
 
         uint16_t current_value{0};
         size_t length{run->length};
-        size_t byte_index{run->start_index.byte_index};
         uint8_t bit_index{run->start_index.bit_index};
         uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
-        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(byte_index)};
+        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
         bool is_first_run{false};
-        bool greater_equal{false};
-
+        
         for(; current < end; ++current)
         {
             current_value = *current;
             is_first_run = (length == 0);
-            current_address = (current_address * !is_first_run) + (reinterpret_cast<uintptr_t>(current) - bitmap_start_address);
-            byte_index = (byte_index * !is_first_run) + ((current_address - bitmap_start_address) * is_first_run);
+            current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
             bit_index *= !is_first_run;
 
             if(current_value == 0x0000)
@@ -447,48 +437,42 @@ namespace
             {
                 length += trailing_zeros(current_value);
                 if(length >= frames) break;
+                
+                bool greater_equal{false};
+                uint16_t byte_bit_length{0x00};
+                constexpr uint8_t word_bits{16};
+                {   
+                    const uint8_t temp_pos_n_length{buried_zeros_lut.entries[static_cast<uint8_t>(current_value)]};
+                    uint8_t pos_n_length{buried_zeros_lut.entries[static_cast<uint8_t>(current_value >> 8)]};
 
-                uint8_t byte_n_bit_pos{0};
-                byte_index = reinterpret_cast<size_t>(reinterpret_cast<uintptr_t>(current) - bitmap_start_address);
-                {
-                    uint8_t pos_n_length{0};
-                    uint8_t temp_lut_value{0};
-                    for(uint8_t right_shift{0}; right_shift < 16; right_shift += 8)
-                    {
-                        temp_lut_value = *(buried_zeros_lut.entries + static_cast<uint8_t>(current_value >> right_shift)) ;
-                        greater_equal = ((pos_n_length & 0x0F) >= ((temp_lut_value & 0x0F)));
-                        pos_n_length = (pos_n_length * greater_equal) + (temp_lut_value * !greater_equal);
-                        byte_n_bit_pos = static_cast<uint8_t>((byte_n_bit_pos * greater_equal) + (((right_shift << 1) | (pos_n_length >> 4)) * !greater_equal));
-                    }
+                    greater_equal = (temp_pos_n_length & 0x0F) >= ( pos_n_length& 0x0F); 
+                    byte_bit_length = static_cast<uint16_t>(greater_equal ? temp_pos_n_length : (0x100 | pos_n_length));
 
                     const uint8_t byte0_leading{safe_leading_zeros(static_cast<uint8_t>(current_value))};
                     const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + safe_trailing_zeros(static_cast<uint8_t>(current_value >> 8)))};
+                    const uint8_t bits{word_bits - byte0_leading};
+                    const uint16_t temp_bbl{static_cast<uint16_t>(((bits >> 3) << bit_size_byte) | static_cast<uint16_t>(bits & bit_mask) << 4 | length_sum)};
 
-                    uint8_t temp_length{static_cast<uint8_t>(pos_n_length & 0x0F)};
+                    byte_bit_length = (static_cast<uint8_t>(byte_bit_length & 0x000F) >= length_sum) ? byte_bit_length : temp_bbl;
 
-                    greater_equal = (temp_length >= length_sum);
-                    temp_length = (temp_length * greater_equal) + (length_sum * !greater_equal);
-                    byte_n_bit_pos = (byte_n_bit_pos * greater_equal) + (static_cast<uint8_t>(0x00 | (bit_size_byte - byte0_leading)) * !greater_equal);
-
-                    length = temp_length;
-                    byte_index += static_cast<size_t>(byte_n_bit_pos >> 4);
-                    bit_index = static_cast<uint8_t>(byte_n_bit_pos & 0x0F);
+                    current_address = reinterpret_cast<uintptr_t>(current) + static_cast<uintptr_t>(byte_bit_length >> 8);
+                    bit_index = static_cast<uint8_t>((byte_bit_length >> 4) & 0x0F);
+                    length = static_cast<uint8_t>(byte_bit_length & 0x0F);
                     if(length >= frames) break;
                 }
 
 
-                constexpr uint8_t word_bits{16};
                 const uint8_t l_zeros{leading_zeros(current_value)};
                 greater_equal = (length >= l_zeros);
-                length = (length * greater_equal) + (l_zeros * !greater_equal);
+                length = greater_equal ? length : static_cast<size_t>(l_zeros);
 
                 const uint8_t word_bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
-                byte_index = (byte_index * greater_equal) + (byte_index + static_cast<size_t>(word_bit_index >> bit_size_byte_mask));
-                bit_index = (bit_index * greater_equal) + ((word_bit_index & bit_mask) * !greater_equal);
+                current_address = greater_equal ? current_address : reinterpret_cast<uintptr_t>(current) + (word_bit_index >> bit_size_byte_mask);
+                bit_index = greater_equal ? bit_index : word_bit_index & bit_mask;
                 if(length >= frames) break;
             }
         }
-        run->start_index.byte_index = byte_index;
+        run->start_index.byte_index = static_cast<size_t>(current_address - bitmap_start_address);
         run->start_index.bit_index = bit_index;
         run->length = length;
         *start = current;
@@ -1343,7 +1327,7 @@ namespace kernel::memory
                 bool greater{false};
                 for(const e820_entry* start{map->entries}; start < entries_end; ++start)
                 {
-                    current = max(start);
+                    current = end_address(start);
                     greater = (highest_address > current);
                     highest_address = (highest_address * greater) + (current * !greater);
                 } 
@@ -1376,7 +1360,7 @@ namespace kernel::memory
             if(current->type == e820_memory_type::usable)
             {
                 entry_start_index = frame_index(current->base + frame_aligned_mask);
-                entry_end_index = frame_index(max(current));
+                entry_end_index = frame_index(end_address(current));
 
                 if(entry_start_index >= entry_end_index) continue;
                 g_used_frames -= (entry_end_index - entry_start_index);
