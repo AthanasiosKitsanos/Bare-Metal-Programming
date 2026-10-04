@@ -3,6 +3,8 @@
 #include "cpu/features.h"
 #include <immintrin.h>
 #include "tools/cmp.h"
+#include "tools/builtin.h"
+#include "tools/math.h"
 
 namespace
 {
@@ -31,28 +33,16 @@ namespace
     size_t g_total_frames{0};
     bitmap g_bitmap{};
 
-    constexpr size_t get_power_of_two(const size_t size) noexcept
-    {
-        size_t power_of_two{0};
-        size_t entries{2};
-        while(entries <= size)
-        {
-            entries <<= 1;
-            ++power_of_two;
-        }
-        return power_of_two;
-    }
-
-    constexpr size_t frame_size_bit_mask{get_power_of_two(kernel::memory::frame_size)};
+    constexpr int8_t frame_shift{power::of_2(kernel::memory::frame_size)};
 
     [[gnu::always_inline]]
-    inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_size_bit_mask; }
+    inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_shift; }
 
     [[gnu::always_inline]]
-    inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_size_bit_mask; }
+    inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_shift; }
 
     constexpr uint8_t bit_size_byte{8};
-    constexpr uint8_t bit_size_byte_mask{get_power_of_two(bit_size_byte)};
+    constexpr uint8_t bit_size_byte_mask{power::of_2(bit_size_byte)};
     constexpr uint8_t bit_mask{bit_size_byte - 1};
 
     [[gnu::always_inline]]
@@ -90,31 +80,19 @@ namespace
         uint8_t length{0};
     };
 
-    // This is for finding one free bit without the need to use loops
-    constexpr uint8_t dedicated_1_frame_lut(const uint8_t value) noexcept
-    {
-        uint8_t position{0};
-        for(uint8_t i{0}; i < bit_size_byte; ++i)
-        {
-            if((value & (1 << i)) == 0)
-            {
-                position = i;
-                break;
-            }
-        }
-        return position;
-    }
-
     constexpr size_t dedicated_1_frame_lut_size{255};
+    // This is used for faster allocation while looking for 1 frame only
+    // Don't use 0xFF as an index, it reads out of bounds
+    // The Caller must guaranty index != 0xFF
     struct dedicated_lut_frame
     {
         uint8_t entries[dedicated_1_frame_lut_size];
-
+        
         constexpr dedicated_lut_frame(): entries{}
         {
             for(uint8_t i{0}; i < dedicated_1_frame_lut_size; ++i)
             {
-                entries[i] = dedicated_1_frame_lut(i);
+                entries[i] = builtin::trailing_zeros(~i);
             }
         }
     };
@@ -236,12 +214,6 @@ namespace
     };
 
     [[gnu::always_inline]]
-    inline uint8_t safe_trailing_zeros(const uint8_t value) noexcept { return (value !=0) ? trailing_zeros (value) : bit_size_byte; }
-
-    [[gnu::always_inline]]
-    inline uint8_t safe_leading_zeros(const uint8_t value) noexcept { return (value != 0) ? leading_zeros(value) : bit_size_byte; }
-
-    [[gnu::always_inline]]
     inline void contiguous_8_core_inline(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
     {
         const uint8_t* current{*start};
@@ -266,7 +238,7 @@ namespace
             else if(current_value == 0xFF) length ^= length;
             else
             {
-                length += trailing_zeros(current_value);
+                length += builtin::trailing_zeros(current_value);
                 if(length >= frames) break;
 
                 const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
@@ -276,7 +248,7 @@ namespace
                 length = (pos_n_length & 0x0F);
                 if(length >= frames) break;
 
-                length = leading_zeros(current_value);
+                length = builtin::leading_zeros(current_value);
                 bit_index = (bit_size_byte - length);
                 if(length >= frames) break;
             }
@@ -315,7 +287,7 @@ namespace
             else if(current_value == 0xFF) length ^= length;
             else
             {
-                length += trailing_zeros(current_value);
+                length += builtin::trailing_zeros(current_value);
                 if(length >= frames) break;
 
                 const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
@@ -325,7 +297,7 @@ namespace
                 length = (pos_n_length & 0x0F);
                 if(length >= frames) break;
 
-                length = leading_zeros(current_value);
+                length = builtin::leading_zeros(current_value);
                 bit_index = (bit_size_byte - length);
                 if(length >= frames) break;
             }
@@ -363,7 +335,7 @@ namespace
             else if(current_value == 0xFFFF) length ^= length;
             else
             {
-                length += trailing_zeros(current_value);
+                length += builtin::trailing_zeros(current_value);
                 if(length >= frames) break;
                 
                 bool greater_equal{false};
@@ -376,8 +348,8 @@ namespace
                     length = static_cast<size_t>(pos_n_length & 0x0F);
                     size_t byte_offset{static_cast<size_t>(greater_equal ? 0x01 : 0x00)};
 
-                    const uint8_t byte0_leading{safe_leading_zeros(static_cast<uint8_t>(current_value))};
-                    const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + safe_trailing_zeros(static_cast<uint8_t>(current_value >> 8)))};
+                    const uint8_t byte0_leading{builtin::bit_guard_lz(static_cast<uint8_t>(current_value))};
+                    const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + builtin::bit_guard_tz(static_cast<uint8_t>(current_value >> 8)))};
                     
                     greater_equal = (length >= length_sum);
                     length = greater_equal ? length : length_sum;
@@ -391,7 +363,7 @@ namespace
 
 
                 constexpr uint8_t word_bits{16};
-                const uint8_t l_zeros{leading_zeros(current_value)};
+                const uint8_t l_zeros{builtin::leading_zeros(current_value)};
                 greater_equal = (length >= l_zeros);
                 length = greater_equal ? length : static_cast<size_t>(l_zeros);
 
@@ -435,38 +407,32 @@ namespace
             else if(current_value == 0xFFFF) length ^= length;
             else
             {
-                length += trailing_zeros(current_value);
+                length += builtin::trailing_zeros(current_value);
                 if(length >= frames) break;
                 
-                bool greater_equal{false};
-                uint16_t byte_bit_length{0x00};
-                constexpr uint8_t word_bits{16};
-                {   
-                    const uint8_t temp_pos_n_length{buried_zeros_lut.entries[static_cast<uint8_t>(current_value)]};
-                    uint8_t pos_n_length{buried_zeros_lut.entries[static_cast<uint8_t>(current_value >> 8)]};
+                uint16_t byte_bit_length{static_cast<uint16_t>(buried_zeros_lut.entries[static_cast<uint8_t>(current_value)])};
+                uint16_t bbl_next{static_cast<uint16_t>(0x100 | buried_zeros_lut.entries[static_cast<uint8_t>(current_value >> 8)])};
+                byte_bit_length = (byte_bit_length & 0x00F) >= (bbl_next & 0x00F) ? byte_bit_length : bbl_next;
+                
+                uint8_t l_zeros{builtin::bit_guard_lz(static_cast<uint8_t>(current_value))};
+                const uint8_t length_sum{static_cast<uint8_t>(l_zeros + builtin::bit_guard_tz(static_cast<uint8_t>(current_value >> 8)))};
+                
+                uint8_t word_bit_index{static_cast<uint8_t>(bit_size_byte - l_zeros)};
+                bbl_next = static_cast<uint16_t>(((word_bit_index >> bit_size_byte_mask) << bit_size_byte) | static_cast<uint16_t>(word_bit_index & bit_mask) << 4 | length_sum);
 
-                    greater_equal = (temp_pos_n_length & 0x0F) >= ( pos_n_length& 0x0F); 
-                    byte_bit_length = static_cast<uint16_t>(greater_equal ? temp_pos_n_length : (0x100 | pos_n_length));
+                byte_bit_length = (static_cast<uint8_t>(byte_bit_length & 0x000F) >= length_sum) ? byte_bit_length : bbl_next;
 
-                    const uint8_t byte0_leading{safe_leading_zeros(static_cast<uint8_t>(current_value))};
-                    const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + safe_trailing_zeros(static_cast<uint8_t>(current_value >> 8)))};
-                    const uint8_t bits{word_bits - byte0_leading};
-                    const uint16_t temp_bbl{static_cast<uint16_t>(((bits >> 3) << bit_size_byte) | static_cast<uint16_t>(bits & bit_mask) << 4 | length_sum)};
-
-                    byte_bit_length = (static_cast<uint8_t>(byte_bit_length & 0x000F) >= length_sum) ? byte_bit_length : temp_bbl;
-
-                    current_address = reinterpret_cast<uintptr_t>(current) + static_cast<uintptr_t>(byte_bit_length >> 8);
-                    bit_index = static_cast<uint8_t>((byte_bit_length >> 4) & 0x0F);
-                    length = static_cast<uint8_t>(byte_bit_length & 0x0F);
-                    if(length >= frames) break;
-                }
-
-
-                const uint8_t l_zeros{leading_zeros(current_value)};
-                greater_equal = (length >= l_zeros);
+                current_address = reinterpret_cast<uintptr_t>(current) + static_cast<uintptr_t>(byte_bit_length >> 8);
+                bit_index = static_cast<uint8_t>((byte_bit_length >> 4) & 0x0F);
+                length = static_cast<uint8_t>(byte_bit_length & 0x0F);
+                if(length >= frames) break;
+                
+                l_zeros = builtin::leading_zeros(current_value);
+                const bool greater_equal{(length >= l_zeros)};
                 length = greater_equal ? length : static_cast<size_t>(l_zeros);
-
-                const uint8_t word_bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
+                
+                constexpr uint8_t word_bits{16};
+                word_bit_index = static_cast<uint8_t>(word_bits - l_zeros);
                 current_address = greater_equal ? current_address : reinterpret_cast<uintptr_t>(current) + (word_bit_index >> bit_size_byte_mask);
                 bit_index = greater_equal ? bit_index : word_bit_index & bit_mask;
                 if(length >= frames) break;
@@ -573,7 +539,7 @@ namespace
             else if(current_value == 0xFFFFFFFF) run->length ^= run->length;
             else
             {
-                run->length += trailing_zeros(current_value);
+                run->length += builtin::trailing_zeros(current_value);
                 if(run->length >= frames) return;
 
                 uint8_t byte_n_bit_pos{0};
@@ -600,18 +566,18 @@ namespace
                         uint8_t byte3_trailing{0};
 
                         uint8_t value{static_cast<uint8_t>(current_value)};
-                        byte0_leading = safe_leading_zeros(value);
+                        byte0_leading = builtin::bit_guard_lz(value);
 
                         value = static_cast<uint8_t>(current_value >> 8);
-                        byte1_trailing = safe_trailing_zeros(value);
-                        byte1_leading = safe_leading_zeros(value);
+                        byte1_trailing = builtin::bit_guard_tz(value);
+                        byte1_leading = builtin::bit_guard_lz(value);
 
                         value = static_cast<uint8_t>(current_value >> 16);
-                        byte2_trailing = safe_trailing_zeros(value);
-                        byte2_leading = safe_leading_zeros(value);
+                        byte2_trailing = builtin::bit_guard_tz(value);
+                        byte2_leading = builtin::bit_guard_lz(value);
 
                         value = static_cast<uint8_t>(current_value >> 24);
-                        byte3_trailing = safe_trailing_zeros(value);
+                        byte3_trailing = builtin::bit_guard_tz(value);
 
                         const uint8_t length_sums[] =
                         {
@@ -647,7 +613,7 @@ namespace
 
 
                 constexpr uint8_t word_bits{32};
-                const uint8_t l_zeros{leading_zeros(current_value)};
+                const uint8_t l_zeros{builtin::leading_zeros(current_value)};
                 greater_equal = (run->length >= l_zeros);
                 run->length = (run->length * greater_equal) + (l_zeros * !greater_equal);
 
@@ -688,7 +654,7 @@ namespace
             else if(current_value == 0xFFFFFFFF) run->length ^= run->length;
             else
             {
-                run->length += trailing_zeros(current_value);
+                run->length += builtin::trailing_zeros(current_value);
                 if(run->length >= frames) return;
 
                 uint8_t byte_n_bit_pos{0};
@@ -715,18 +681,18 @@ namespace
                         uint8_t byte3_trailing{0};
 
                         uint8_t value{static_cast<uint8_t>(current_value)};
-                        byte0_leading = safe_leading_zeros(value);
+                        byte0_leading = builtin::bit_guard_lz(value);
 
                         value = static_cast<uint8_t>(current_value >> 8);
-                        byte1_trailing = safe_trailing_zeros(value);
-                        byte1_leading = safe_leading_zeros(value);
+                        byte1_trailing = builtin::bit_guard_tz(value);
+                        byte1_leading = builtin::bit_guard_lz(value);
 
                         value = static_cast<uint8_t>(current_value >> 16);
-                        byte2_trailing = safe_trailing_zeros(value);
-                        byte2_leading = safe_leading_zeros(value);
+                        byte2_trailing = builtin::bit_guard_tz(value);
+                        byte2_leading = builtin::bit_guard_lz(value);
 
                         value = static_cast<uint8_t>(current_value >> 24);
-                        byte3_trailing = safe_trailing_zeros(value);
+                        byte3_trailing = builtin::bit_guard_tz(value);
 
                         const uint8_t length_sums[] =
                         {
@@ -762,7 +728,7 @@ namespace
 
 
                 constexpr uint8_t word_bits{32};
-                const uint8_t l_zeros{leading_zeros(current_value)};
+                const uint8_t l_zeros{builtin::leading_zeros(current_value)};
                 greater_equal = (run->length >= l_zeros);
                 run->length = (run->length * greater_equal) + (l_zeros * !greater_equal);
 
@@ -1332,7 +1298,7 @@ namespace kernel::memory
                     highest_address = (highest_address * greater) + (current * !greater);
                 } 
             }
-            g_total_frames = (highest_address >> frame_size_bit_mask);
+            g_total_frames = (highest_address >> frame_shift);
         }
 
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);

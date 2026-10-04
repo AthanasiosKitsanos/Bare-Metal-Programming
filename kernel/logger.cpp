@@ -1,5 +1,13 @@
 #include "logger.h"
 
+namespace
+{
+    [[noreturn]] void halt_forever() noexcept
+    {
+        while(true) asm volatile("cli; hlt");
+    }
+}
+
 namespace kernel
 {
     // Private Methods
@@ -9,11 +17,6 @@ namespace kernel
         m_terminal.set_color(foreground, background);
         m_terminal << error_type;
         m_terminal.set_color_code(temp);
-    }
-
-    [[noreturn]] void logger::halt_forever() const noexcept
-    {
-        while(true) asm volatile("cli; hlt");
     }
 
     // Public Methods

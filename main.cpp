@@ -24,8 +24,8 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_pit(timer_frequency_hz);
     kernel::set_timer_frequency(timer_frequency_hz);
     terminal::output::initialize();
-    terminal::output out{};
-    out << cpu::features::get();
+    // terminal::output out{};
+    // out << cpu::features::get();
     
     {
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};
