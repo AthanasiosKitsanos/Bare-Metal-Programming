@@ -143,7 +143,7 @@ Disassembly of section .text:
     7f19:	fc                   	cld
     7f1a:	be 00 80 00 00       	mov    $0x8000,%esi
     7f1f:	bf 00 00 10 00       	mov    $0x100000,%edi
-    7f24:	b9 80 87 00 00       	mov    $0x8780,%ecx
+    7f24:	b9 40 87 00 00       	mov    $0x8740,%ecx
     7f29:	ff 24 9d 78 7f 00 00 	jmp    *0x7f78(,%ebx,4)
 
 00007f30 <.copy_32>:
