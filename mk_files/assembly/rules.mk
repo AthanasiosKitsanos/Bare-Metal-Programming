@@ -38,7 +38,7 @@ $(CODE_16_BIN): $(CODE_16_ELF)
 	$(OBJC) -O binary $(CODE_16_ELF) $(CODE_16_BIN)
 
 # Code 32
-$(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER) $(LIBRARIES) $(MAIN_OBJ)
+$(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER) $(LIBRARIES) $(MAIN_OBJ) $()
 	kernel_stack=$$(grep -v '^#' $(CALC_RESULT_FILE) | head -n 1) &&	\
 	interrupt_stack=$$(grep -v '^#' $(CALC_RESULT_FILE) | tail -n 1);	\
 	$(LD) $(LINKING_FLAGS) -T $(KERNEL_LINKING_FLAG) $(DEF_KERNEL_STACK)=$$kernel_stack $(DEF_INTERRUPT_STACK)=$$interrupt_stack -o $(KERNEL_ELF) \
