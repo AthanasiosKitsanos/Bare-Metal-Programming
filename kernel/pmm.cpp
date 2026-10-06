@@ -223,7 +223,7 @@ namespace
         uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
         uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
         bool is_first_run{false};
-        for(; current < end; ++current)
+        for(; current < end; ++current) 
         {
             is_first_run = (length == 0);
             current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
