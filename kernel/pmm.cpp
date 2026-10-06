@@ -258,7 +258,7 @@ namespace
         run->length = length;
         *start = current;
     }
-
+    
     // IMPORTANT keep is sync with contiguous_8_core_inline right above
     [[gnu::noinline]] [[gnu::regparm(3)]]
     void contiguous_8_core(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
@@ -279,27 +279,17 @@ namespace
             current_value = *current;
             bit_index *= !is_first_run;
 
-            if(current_value == 0x00)
+            // This part is based on changing the interpretation of what value means free or used byte
+            // Meaning reversing from 0 meaning free to 1 meaning free and vice versa
+            if(current_value == 0xFF)
             {
                 length += 8;
                 if(length >= frames) break;
             }
-            else if(current_value == 0xFF) length ^= length;
+            else if(current_value == 0x00) length ^= length;
             else
             {
-                length += builtin::trailing_zeros(current_value);
-                if(length >= frames) break;
-
-                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
-                current_address = reinterpret_cast<uintptr_t>(current);
-
-                bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                length = (pos_n_length & 0x0F);
-                if(length >= frames) break;
-
-                length = builtin::leading_zeros(current_value);
-                bit_index = (bit_size_byte - length);
-                if(length >= frames) break;
+                
             }
         }
         run->start_index.byte_index = static_cast<size_t>(current_address - bitmap_start_address);
@@ -307,6 +297,54 @@ namespace
         run->length = length;
         *start = current;
     }
+
+    // [[gnu::noinline]] [[gnu::regparm(3)]]
+    // void contiguous_8_core(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
+    // {
+    //     const uint8_t* current{*start};
+    //     uint8_t current_value{0};
+    //     size_t length{run->length};
+    //     uint8_t bit_index{run->start_index.bit_index};
+        
+    //     uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
+    //     uintptr_t current_address{bitmap_start_address + reinterpret_cast<uintptr_t>(run->start_index.byte_index)};
+    //     bool is_first_run{false};
+
+    //     for(; current < end; ++current)
+    //     {
+    //         is_first_run = (length == 0);
+    //         current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
+    //         current_value = *current;
+    //         bit_index *= !is_first_run;
+
+    //         if(current_value == 0x00)
+    //         {
+    //             length += 8;
+    //             if(length >= frames) break;
+    //         }
+    //         else if(current_value == 0xFF) length ^= length;
+    //         else
+    //         {
+    //             length += builtin::trailing_zeros(current_value);
+    //             if(length >= frames) break;
+
+    //             const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
+    //             current_address = reinterpret_cast<uintptr_t>(current);
+
+    //             bit_index = static_cast<uint8_t>(pos_n_length >> 4);
+    //             length = (pos_n_length & 0x0F);
+    //             if(length >= frames) break;
+
+    //             length = builtin::leading_zeros(current_value);
+    //             bit_index = (bit_size_byte - length);
+    //             if(length >= frames) break;
+    //         }
+    //     }
+    //     run->start_index.byte_index = static_cast<size_t>(current_address - bitmap_start_address);
+    //     run->start_index.bit_index = bit_index;
+    //     run->length = length;
+    //     *start = current;
+    // }
 
     [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_16_core_inline(allocation_run* const run, const size_t frames, const uint16_t* const end, const uint16_t** start) noexcept
