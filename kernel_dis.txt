@@ -11,21 +11,9 @@ Disassembly of section .text:
   100008:	8e e0                	mov    %eax,%fs
   10000a:	8e e8                	mov    %eax,%gs
   10000c:	8e d0                	mov    %eax,%ss
-<<<<<<< HEAD
   10000e:	bc f3 93 10 00       	mov    $0x1093f3,%esp
   100013:	bf 00 87 10 00       	mov    $0x108700,%edi
   100018:	b9 c3 91 10 00       	mov    $0x1091c3,%ecx
-=======
-<<<<<<< HEAD
-  10000e:	bc 17 9e 10 00       	mov    $0x109e17,%esp
-  100013:	bf 00 91 10 00       	mov    $0x109100,%edi
-  100018:	b9 c3 9b 10 00       	mov    $0x109bc3,%ecx
-=======
-  10000e:	bc 3f 94 10 00       	mov    $0x10943f,%esp
-  100013:	bf 40 87 10 00       	mov    $0x108740,%edi
-  100018:	b9 03 92 10 00       	mov    $0x109203,%ecx
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
 
 0010001d <.init_bss>:
   10001d:	39 f9                	cmp    %edi,%ecx
@@ -35,15 +23,7 @@ Disassembly of section .text:
   100025:	eb f6                	jmp    10001d <.init_bss>
 
 00100027 <.kernel_call>:
-<<<<<<< HEAD
   100027:	88 1d c2 91 10 00    	mov    %bl,0x1091c2
-=======
-<<<<<<< HEAD
-  100027:	88 1d c2 9b 10 00    	mov    %bl,0x109bc2
-=======
-  100027:	88 1d 02 92 10 00    	mov    %bl,0x109202
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10002d:	89 e5                	mov    %esp,%ebp
   10002f:	e8 9c 05 00 00       	call   1005d0 <kernel_main>
 
@@ -53,1001 +33,425 @@ Disassembly of section .text:
   100036:	eb fc                	jmp    100034 <hang>
 
 00100038 <isr_0>:
-<<<<<<< HEAD
   100038:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10003f:	0f 83 7c 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100045:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100038:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10003f:	0f 83 7c 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100045:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100038:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10003f:	0f 83 7c 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100045:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10004b:	6a 00                	push   $0x0
   10004d:	6a 00                	push   $0x0
   10004f:	60                   	pusha
   100050:	e9 27 05 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100055 <isr_1>:
-<<<<<<< HEAD
   100055:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10005c:	0f 83 5f 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100062:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100055:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10005c:	0f 83 5f 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100062:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100055:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10005c:	0f 83 5f 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100062:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100068:	6a 00                	push   $0x0
   10006a:	6a 01                	push   $0x1
   10006c:	60                   	pusha
   10006d:	e9 0a 05 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100072 <isr_2>:
-<<<<<<< HEAD
   100072:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100079:	0f 83 42 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10007f:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100072:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100079:	0f 83 42 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10007f:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100072:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100079:	0f 83 42 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10007f:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100085:	6a 00                	push   $0x0
   100087:	6a 02                	push   $0x2
   100089:	60                   	pusha
   10008a:	e9 ed 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010008f <isr_3>:
-<<<<<<< HEAD
   10008f:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100096:	0f 83 25 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10009c:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  10008f:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100096:	0f 83 25 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10009c:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  10008f:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100096:	0f 83 25 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10009c:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1000a2:	6a 00                	push   $0x0
   1000a4:	6a 03                	push   $0x3
   1000a6:	60                   	pusha
   1000a7:	e9 d0 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 001000ac <isr_4>:
-<<<<<<< HEAD
   1000ac:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1000b3:	0f 83 08 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1000b9:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1000ac:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1000b3:	0f 83 08 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1000b9:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1000ac:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1000b3:	0f 83 08 05 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1000b9:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1000bf:	6a 00                	push   $0x0
   1000c1:	6a 04                	push   $0x4
   1000c3:	60                   	pusha
   1000c4:	e9 b3 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 001000c9 <isr_5>:
-<<<<<<< HEAD
   1000c9:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1000d0:	0f 83 eb 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1000d6:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1000c9:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1000d0:	0f 83 eb 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1000d6:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1000c9:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1000d0:	0f 83 eb 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1000d6:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1000dc:	6a 00                	push   $0x0
   1000de:	6a 05                	push   $0x5
   1000e0:	60                   	pusha
   1000e1:	e9 96 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 001000e6 <isr_6>:
-<<<<<<< HEAD
   1000e6:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1000ed:	0f 83 ce 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1000f3:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1000e6:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1000ed:	0f 83 ce 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1000f3:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1000e6:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1000ed:	0f 83 ce 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1000f3:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1000f9:	6a 00                	push   $0x0
   1000fb:	6a 06                	push   $0x6
   1000fd:	60                   	pusha
   1000fe:	e9 79 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100103 <isr_7>:
-<<<<<<< HEAD
   100103:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10010a:	0f 83 b1 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100110:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100103:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10010a:	0f 83 b1 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100110:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100103:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10010a:	0f 83 b1 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100110:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100116:	6a 00                	push   $0x0
   100118:	6a 07                	push   $0x7
   10011a:	60                   	pusha
   10011b:	e9 5c 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100120 <isr_9>:
-<<<<<<< HEAD
   100120:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100127:	0f 83 94 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10012d:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100120:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100127:	0f 83 94 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10012d:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100120:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100127:	0f 83 94 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10012d:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100133:	6a 00                	push   $0x0
   100135:	6a 09                	push   $0x9
   100137:	60                   	pusha
   100138:	e9 3f 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010013d <isr_15>:
-<<<<<<< HEAD
   10013d:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100144:	0f 83 77 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10014a:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  10013d:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100144:	0f 83 77 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10014a:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  10013d:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100144:	0f 83 77 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10014a:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100150:	6a 00                	push   $0x0
   100152:	6a 0f                	push   $0xf
   100154:	60                   	pusha
   100155:	e9 22 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010015a <isr_16>:
-<<<<<<< HEAD
   10015a:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100161:	0f 83 5a 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100167:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  10015a:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100161:	0f 83 5a 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100167:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  10015a:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100161:	0f 83 5a 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100167:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10016d:	6a 00                	push   $0x0
   10016f:	6a 10                	push   $0x10
   100171:	60                   	pusha
   100172:	e9 05 04 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100177 <isr_8>:
-<<<<<<< HEAD
   100177:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10017e:	0f 83 3d 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100184:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100177:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10017e:	0f 83 3d 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100184:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100177:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10017e:	0f 83 3d 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100184:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10018a:	6a 08                	push   $0x8
   10018c:	60                   	pusha
   10018d:	e9 ea 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100192 <isr_10>:
-<<<<<<< HEAD
   100192:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100199:	0f 83 22 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10019f:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100192:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100199:	0f 83 22 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10019f:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100192:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100199:	0f 83 22 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10019f:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1001a5:	6a 0a                	push   $0xa
   1001a7:	60                   	pusha
   1001a8:	e9 cf 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 001001ad <isr_11>:
-<<<<<<< HEAD
   1001ad:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1001b4:	0f 83 07 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1001ba:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1001ad:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1001b4:	0f 83 07 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1001ba:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1001ad:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1001b4:	0f 83 07 04 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1001ba:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1001c0:	6a 0b                	push   $0xb
   1001c2:	60                   	pusha
   1001c3:	e9 b4 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 001001c8 <isr_12>:
-<<<<<<< HEAD
   1001c8:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1001cf:	0f 83 ec 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1001d5:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1001c8:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1001cf:	0f 83 ec 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1001d5:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1001c8:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1001cf:	0f 83 ec 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1001d5:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1001db:	6a 0c                	push   $0xc
   1001dd:	60                   	pusha
   1001de:	e9 99 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 001001e3 <isr_13>:
-<<<<<<< HEAD
   1001e3:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1001ea:	0f 83 d1 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1001f0:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1001e3:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1001ea:	0f 83 d1 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1001f0:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1001e3:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1001ea:	0f 83 d1 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1001f0:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1001f6:	6a 0d                	push   $0xd
   1001f8:	60                   	pusha
   1001f9:	e9 7e 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 001001fe <isr_14>:
-<<<<<<< HEAD
   1001fe:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100205:	0f 83 b6 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10020b:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1001fe:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100205:	0f 83 b6 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10020b:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1001fe:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100205:	0f 83 b6 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10020b:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100211:	6a 0e                	push   $0xe
   100213:	60                   	pusha
   100214:	e9 63 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100219 <isr_17>:
-<<<<<<< HEAD
   100219:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100220:	0f 83 9b 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100226:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100219:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100220:	0f 83 9b 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100226:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100219:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100220:	0f 83 9b 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100226:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10022c:	6a 11                	push   $0x11
   10022e:	60                   	pusha
   10022f:	e9 48 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100234 <isr_18>:
-<<<<<<< HEAD
   100234:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10023b:	0f 83 80 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100241:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100234:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10023b:	0f 83 80 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100241:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100234:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10023b:	0f 83 80 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100241:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100247:	6a 00                	push   $0x0
   100249:	6a 12                	push   $0x12
   10024b:	60                   	pusha
   10024c:	e9 2b 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100251 <isr_19>:
-<<<<<<< HEAD
   100251:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100258:	0f 83 63 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10025e:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100251:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100258:	0f 83 63 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10025e:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100251:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100258:	0f 83 63 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10025e:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100264:	6a 00                	push   $0x0
   100266:	6a 13                	push   $0x13
   100268:	60                   	pusha
   100269:	e9 0e 03 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010026e <isr_20>:
-<<<<<<< HEAD
   10026e:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100275:	0f 83 46 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10027b:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  10026e:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100275:	0f 83 46 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10027b:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  10026e:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100275:	0f 83 46 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10027b:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100281:	6a 00                	push   $0x0
   100283:	6a 14                	push   $0x14
   100285:	60                   	pusha
   100286:	e9 f1 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010028b <isr_21>:
-<<<<<<< HEAD
   10028b:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100292:	0f 83 29 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100298:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  10028b:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100292:	0f 83 29 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100298:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  10028b:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100292:	0f 83 29 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100298:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10029e:	6a 00                	push   $0x0
   1002a0:	6a 15                	push   $0x15
   1002a2:	60                   	pusha
   1002a3:	e9 d4 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 001002a8 <isr_22>:
-<<<<<<< HEAD
   1002a8:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1002af:	0f 83 0c 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1002b5:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1002a8:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1002af:	0f 83 0c 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1002b5:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1002a8:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1002af:	0f 83 0c 03 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1002b5:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1002bb:	6a 00                	push   $0x0
   1002bd:	6a 16                	push   $0x16
   1002bf:	60                   	pusha
   1002c0:	e9 b7 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 001002c5 <isr_23>:
-<<<<<<< HEAD
   1002c5:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1002cc:	0f 83 ef 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1002d2:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1002c5:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1002cc:	0f 83 ef 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1002d2:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1002c5:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1002cc:	0f 83 ef 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1002d2:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1002d8:	6a 00                	push   $0x0
   1002da:	6a 17                	push   $0x17
   1002dc:	60                   	pusha
   1002dd:	e9 9a 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 001002e2 <isr_24>:
-<<<<<<< HEAD
   1002e2:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1002e9:	0f 83 d2 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1002ef:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1002e2:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1002e9:	0f 83 d2 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1002ef:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1002e2:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1002e9:	0f 83 d2 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1002ef:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1002f5:	6a 00                	push   $0x0
   1002f7:	6a 18                	push   $0x18
   1002f9:	60                   	pusha
   1002fa:	e9 7d 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 001002ff <isr_25>:
-<<<<<<< HEAD
   1002ff:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100306:	0f 83 b5 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10030c:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1002ff:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100306:	0f 83 b5 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10030c:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1002ff:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100306:	0f 83 b5 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10030c:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100312:	6a 00                	push   $0x0
   100314:	6a 19                	push   $0x19
   100316:	60                   	pusha
   100317:	e9 60 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010031c <isr_26>:
-<<<<<<< HEAD
   10031c:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100323:	0f 83 98 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100329:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  10031c:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100323:	0f 83 98 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100329:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  10031c:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100323:	0f 83 98 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100329:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10032f:	6a 00                	push   $0x0
   100331:	6a 1a                	push   $0x1a
   100333:	60                   	pusha
   100334:	e9 43 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100339 <isr_27>:
-<<<<<<< HEAD
   100339:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100340:	0f 83 7b 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100346:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100339:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100340:	0f 83 7b 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100346:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100339:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100340:	0f 83 7b 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100346:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10034c:	6a 00                	push   $0x0
   10034e:	6a 1b                	push   $0x1b
   100350:	60                   	pusha
   100351:	e9 26 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100356 <isr_28>:
-<<<<<<< HEAD
   100356:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10035d:	0f 83 5e 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100363:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100356:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10035d:	0f 83 5e 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100363:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100356:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10035d:	0f 83 5e 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100363:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100369:	6a 00                	push   $0x0
   10036b:	6a 1c                	push   $0x1c
   10036d:	60                   	pusha
   10036e:	e9 09 02 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100373 <isr_29>:
-<<<<<<< HEAD
   100373:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   10037a:	0f 83 41 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100380:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100373:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  10037a:	0f 83 41 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100380:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100373:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  10037a:	0f 83 41 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100380:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100386:	6a 00                	push   $0x0
   100388:	6a 1d                	push   $0x1d
   10038a:	60                   	pusha
   10038b:	e9 ec 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100390 <isr_30>:
-<<<<<<< HEAD
   100390:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   100397:	0f 83 24 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10039d:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  100390:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  100397:	0f 83 24 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10039d:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  100390:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  100397:	0f 83 24 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10039d:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1003a3:	6a 00                	push   $0x0
   1003a5:	6a 1e                	push   $0x1e
   1003a7:	60                   	pusha
   1003a8:	e9 cf 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 001003ad <isr_31>:
-<<<<<<< HEAD
   1003ad:	80 3d 01 87 10 00 03 	cmpb   $0x3,0x108701
   1003b4:	0f 83 07 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1003ba:	fe 05 01 87 10 00    	incb   0x108701
-=======
-<<<<<<< HEAD
-  1003ad:	80 3d 01 91 10 00 03 	cmpb   $0x3,0x109101
-  1003b4:	0f 83 07 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1003ba:	fe 05 01 91 10 00    	incb   0x109101
-=======
-  1003ad:	80 3d 41 87 10 00 03 	cmpb   $0x3,0x108741
-  1003b4:	0f 83 07 02 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1003ba:	fe 05 41 87 10 00    	incb   0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1003c0:	6a 00                	push   $0x0
   1003c2:	6a 1f                	push   $0x1f
   1003c4:	60                   	pusha
   1003c5:	e9 b2 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 001003ca <irq_32>:
-<<<<<<< HEAD
   1003ca:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   1003d1:	0f 83 ea 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1003d7:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  1003ca:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  1003d1:	0f 83 ea 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1003d7:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  1003ca:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  1003d1:	0f 83 ea 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1003d7:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1003dd:	6a 00                	push   $0x0
   1003df:	6a 20                	push   $0x20
   1003e1:	60                   	pusha
   1003e2:	e9 95 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 001003e7 <irq_33>:
-<<<<<<< HEAD
   1003e7:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   1003ee:	0f 83 cd 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1003f4:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  1003e7:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  1003ee:	0f 83 cd 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1003f4:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  1003e7:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  1003ee:	0f 83 cd 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1003f4:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1003fa:	6a 00                	push   $0x0
   1003fc:	6a 21                	push   $0x21
   1003fe:	60                   	pusha
   1003ff:	e9 78 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100404 <irq_34>:
-<<<<<<< HEAD
   100404:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   10040b:	0f 83 b0 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100411:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100404:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  10040b:	0f 83 b0 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100411:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100404:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  10040b:	0f 83 b0 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100411:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100417:	6a 00                	push   $0x0
   100419:	6a 22                	push   $0x22
   10041b:	60                   	pusha
   10041c:	e9 5b 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100421 <irq_35>:
-<<<<<<< HEAD
   100421:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   100428:	0f 83 93 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10042e:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100421:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  100428:	0f 83 93 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10042e:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100421:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  100428:	0f 83 93 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10042e:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100434:	6a 00                	push   $0x0
   100436:	6a 23                	push   $0x23
   100438:	60                   	pusha
   100439:	e9 3e 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010043e <irq_36>:
-<<<<<<< HEAD
   10043e:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   100445:	0f 83 76 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10044b:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  10043e:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  100445:	0f 83 76 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10044b:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  10043e:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  100445:	0f 83 76 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10044b:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100451:	6a 00                	push   $0x0
   100453:	6a 24                	push   $0x24
   100455:	60                   	pusha
   100456:	e9 21 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 0010045b <irq_37>:
-<<<<<<< HEAD
   10045b:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   100462:	0f 83 59 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100468:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  10045b:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  100462:	0f 83 59 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100468:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  10045b:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  100462:	0f 83 59 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100468:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10046e:	6a 00                	push   $0x0
   100470:	6a 25                	push   $0x25
   100472:	60                   	pusha
   100473:	e9 04 01 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100478 <irq_38>:
-<<<<<<< HEAD
   100478:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   10047f:	0f 83 3c 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100485:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100478:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  10047f:	0f 83 3c 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100485:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100478:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  10047f:	0f 83 3c 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100485:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10048b:	6a 00                	push   $0x0
   10048d:	6a 26                	push   $0x26
   10048f:	60                   	pusha
   100490:	e9 e7 00 00 00       	jmp    10057c <common_interrupt_entry>
 
 00100495 <irq_39>:
-<<<<<<< HEAD
   100495:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   10049c:	0f 83 1f 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1004a2:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100495:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  10049c:	0f 83 1f 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004a2:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100495:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  10049c:	0f 83 1f 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004a2:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1004a8:	6a 00                	push   $0x0
   1004aa:	6a 27                	push   $0x27
   1004ac:	60                   	pusha
   1004ad:	e9 ca 00 00 00       	jmp    10057c <common_interrupt_entry>
 
 001004b2 <irq_40>:
-<<<<<<< HEAD
   1004b2:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   1004b9:	0f 83 02 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1004bf:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  1004b2:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  1004b9:	0f 83 02 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004bf:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  1004b2:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  1004b9:	0f 83 02 01 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004bf:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1004c5:	6a 00                	push   $0x0
   1004c7:	6a 28                	push   $0x28
   1004c9:	60                   	pusha
   1004ca:	e9 ad 00 00 00       	jmp    10057c <common_interrupt_entry>
 
 001004cf <irq_41>:
-<<<<<<< HEAD
   1004cf:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   1004d6:	0f 83 e5 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1004dc:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  1004cf:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  1004d6:	0f 83 e5 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004dc:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  1004cf:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  1004d6:	0f 83 e5 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004dc:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1004e2:	6a 00                	push   $0x0
   1004e4:	6a 29                	push   $0x29
   1004e6:	60                   	pusha
   1004e7:	e9 90 00 00 00       	jmp    10057c <common_interrupt_entry>
 
 001004ec <irq_42>:
-<<<<<<< HEAD
   1004ec:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   1004f3:	0f 83 c8 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
   1004f9:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  1004ec:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  1004f3:	0f 83 c8 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004f9:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  1004ec:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  1004f3:	0f 83 c8 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  1004f9:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1004ff:	6a 00                	push   $0x0
   100501:	6a 2a                	push   $0x2a
   100503:	60                   	pusha
   100504:	eb 76                	jmp    10057c <common_interrupt_entry>
 
 00100506 <irq_43>:
-<<<<<<< HEAD
   100506:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   10050d:	0f 83 ae 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
   100513:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100506:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  10050d:	0f 83 ae 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100513:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100506:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  10050d:	0f 83 ae 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  100513:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100519:	6a 00                	push   $0x0
   10051b:	6a 2b                	push   $0x2b
   10051d:	60                   	pusha
   10051e:	eb 5c                	jmp    10057c <common_interrupt_entry>
 
 00100520 <irq_44>:
-<<<<<<< HEAD
   100520:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   100527:	0f 83 94 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
   10052d:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100520:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  100527:	0f 83 94 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10052d:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100520:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  100527:	0f 83 94 00 00 00    	jae    1005c1 <nesting_overflow_hlt>
-  10052d:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100533:	6a 00                	push   $0x0
   100535:	6a 2c                	push   $0x2c
   100537:	60                   	pusha
   100538:	eb 42                	jmp    10057c <common_interrupt_entry>
 
 0010053a <irq_45>:
-<<<<<<< HEAD
   10053a:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   100541:	73 7e                	jae    1005c1 <nesting_overflow_hlt>
   100543:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  10053a:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  100541:	73 7e                	jae    1005c1 <nesting_overflow_hlt>
-  100543:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  10053a:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  100541:	73 7e                	jae    1005c1 <nesting_overflow_hlt>
-  100543:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100549:	6a 00                	push   $0x0
   10054b:	6a 2d                	push   $0x2d
   10054d:	60                   	pusha
   10054e:	eb 2c                	jmp    10057c <common_interrupt_entry>
 
 00100550 <irq_46>:
-<<<<<<< HEAD
   100550:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   100557:	73 68                	jae    1005c1 <nesting_overflow_hlt>
   100559:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100550:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  100557:	73 68                	jae    1005c1 <nesting_overflow_hlt>
-  100559:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100550:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  100557:	73 68                	jae    1005c1 <nesting_overflow_hlt>
-  100559:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   10055f:	6a 00                	push   $0x0
   100561:	6a 2e                	push   $0x2e
   100563:	60                   	pusha
   100564:	eb 16                	jmp    10057c <common_interrupt_entry>
 
 00100566 <irq_47>:
-<<<<<<< HEAD
   100566:	80 3d 00 87 10 00 0f 	cmpb   $0xf,0x108700
   10056d:	73 52                	jae    1005c1 <nesting_overflow_hlt>
   10056f:	fe 05 00 87 10 00    	incb   0x108700
-=======
-<<<<<<< HEAD
-  100566:	80 3d 00 91 10 00 0f 	cmpb   $0xf,0x109100
-  10056d:	73 52                	jae    1005c1 <nesting_overflow_hlt>
-  10056f:	fe 05 00 91 10 00    	incb   0x109100
-=======
-  100566:	80 3d 40 87 10 00 0f 	cmpb   $0xf,0x108740
-  10056d:	73 52                	jae    1005c1 <nesting_overflow_hlt>
-  10056f:	fe 05 40 87 10 00    	incb   0x108740
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100575:	6a 00                	push   $0x0
   100577:	6a 2f                	push   $0x2f
   100579:	60                   	pusha
@@ -1055,18 +459,8 @@ Disassembly of section .text:
 
 0010057c <common_interrupt_entry>:
   10057c:	89 e2                	mov    %esp,%edx
-<<<<<<< HEAD
   10057e:	bb f3 93 10 00       	mov    $0x1093f3,%ebx
   100583:	b9 bf ae 10 00       	mov    $0x10aebf,%ecx
-=======
-<<<<<<< HEAD
-  10057e:	bb 17 9e 10 00       	mov    $0x109e17,%ebx
-  100583:	b9 6b bb 10 00       	mov    $0x10bb6b,%ecx
-=======
-  10057e:	bb 3f 94 10 00       	mov    $0x10943f,%ebx
-  100583:	b9 e3 af 10 00       	mov    $0x10afe3,%ecx
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   100588:	39 da                	cmp    %ebx,%edx
   10058a:	0f 46 e1             	cmovbe %ecx,%esp
   10058d:	39 ca                	cmp    %ecx,%edx
@@ -1084,18 +478,8 @@ Disassembly of section .text:
   1005a5:	83 7c 24 20 20       	cmpl   $0x20,0x20(%esp)
   1005aa:	0f 93 c0             	setae  %al
   1005ad:	0f 92 c3             	setb   %bl
-<<<<<<< HEAD
   1005b0:	28 05 00 87 10 00    	sub    %al,0x108700
   1005b6:	28 1d 01 87 10 00    	sub    %bl,0x108701
-=======
-<<<<<<< HEAD
-  1005b0:	28 05 00 91 10 00    	sub    %al,0x109100
-  1005b6:	28 1d 01 91 10 00    	sub    %bl,0x109101
-=======
-  1005b0:	28 05 40 87 10 00    	sub    %al,0x108740
-  1005b6:	28 1d 41 87 10 00    	sub    %bl,0x108741
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1005bc:	61                   	popa
   1005bd:	83 c4 08             	add    $0x8,%esp
   1005c0:	cf                   	iret
@@ -1119,276 +503,11 @@ Disassembly of section .text:
   1005d3:	53                   	push   %ebx
   1005d4:	8d 5d f0             	lea    -0x10(%ebp),%ebx
   1005d7:	83 ec 14             	sub    $0x14,%esp
-<<<<<<< HEAD
   1005da:	e8 11 77 00 00       	call   107cf0 <_ZN3cpu3gdt10initializeEv>
-=======
-<<<<<<< HEAD
-  1005da:	e8 11 81 00 00       	call   1086f0 <_ZN3cpu3gdt10initializeEv>
-=======
-  1005da:	e8 51 77 00 00       	call   107d30 <_ZN3cpu3gdt10initializeEv>
->>>>>>> origin/temp
->>>>>>> origin/refactoring/pmm
   1005df:	83 ec 0c             	sub    $0xc,%esp
   1005e2:	6a 64                	push   $0x64
   1005e4:	e8 87 05 00 00       	call   100b70 <_ZN6kernel14initialize_pitEm>
   1005e9:	c7 04 24 64 00 00 00 	movl   $0x64,(%esp)
-<<<<<<< HEAD
-  1005f0:	e8 eb 05 00 00       	call   100be0 <_ZN6kernel19set_timer_frequencyEm>
-  1005f5:	e8 26 78 00 00       	call   107e20 <_ZN8terminal6output10initializeEv>
-  1005fa:	0f b6 15 c2 9b 10 00 	movzbl 0x109bc2,%edx
-  100601:	31 c0                	xor    %eax,%eax
-  100603:	66 89 45 ee          	mov    %ax,-0x12(%ebp)
-  100607:	8d 45 ee             	lea    -0x12(%ebp),%eax
-  10060a:	e8 71 79 00 00       	call   107f80 <_ZN8terminal6outputlsEh>
-  10060f:	89 1c 24             	mov    %ebx,(%esp)
-  100612:	e8 d9 05 00 00       	call   100bf0 <_ZN6kernel6memory19get_e820_memory_mapEv>
-  100617:	ba 6b bb 10 00       	mov    $0x10bb6b,%edx
-  10061c:	89 d8                	mov    %ebx,%eax
-  10061e:	83 c4 0c             	add    $0xc,%esp
-  100621:	e8 1a 70 00 00       	call   107640 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>
-  100626:	e8 05 03 00 00       	call   100930 <_ZN6kernel21initialize_exceptionsEv>
-  10062b:	e8 40 73 00 00       	call   107970 <_ZN6driver19initialize_keyboardEv>
-  100630:	b8 14 00 00 00       	mov    $0x14,%eax
-  100635:	e8 16 72 00 00       	call   107850 <_ZN6kernel6memory30pmm_allocate_contiguous_framesEm>
-  10063a:	fb                   	sti
-  10063b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  100640:	f4                   	hlt
-  100641:	eb fd                	jmp    100640 <kernel_main+0x70>
-  100643:	66 90                	xchg   %ax,%ax
-  100645:	66 90                	xchg   %ax,%ax
-  100647:	66 90                	xchg   %ax,%ax
-  100649:	66 90                	xchg   %ax,%ax
-  10064b:	66 90                	xchg   %ax,%ax
-  10064d:	66 90                	xchg   %ax,%ax
-  10064f:	90                   	nop
-
-00100650 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>:
-  100650:	55                   	push   %ebp
-  100651:	89 e5                	mov    %esp,%ebp
-  100653:	56                   	push   %esi
-  100654:	89 c6                	mov    %eax,%esi
-  100656:	53                   	push   %ebx
-  100657:	8b 5d 0c             	mov    0xc(%ebp),%ebx
-  10065a:	6a 00                	push   $0x0
-  10065c:	6a 0c                	push   $0xc
-  10065e:	68 20 87 10 00       	push   $0x108720
-  100663:	68 02 91 10 00       	push   $0x109102
-  100668:	e8 c3 03 00 00       	call   100a30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  10066d:	ba 2a 87 10 00       	mov    $0x10872a,%edx
-  100672:	b8 02 91 10 00       	mov    $0x109102,%eax
-  100677:	e8 74 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  10067c:	89 f2                	mov    %esi,%edx
-  10067e:	e8 6d 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100683:	ba 20 00 00 00       	mov    $0x20,%edx
-  100688:	e8 e3 77 00 00       	call   107e70 <_ZN8terminal6outputlsEc>
-  10068d:	8b 55 08             	mov    0x8(%ebp),%edx
-  100690:	e8 5b 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100695:	ba 90 81 10 00       	mov    $0x108190,%edx
-  10069a:	e8 d1 7a 00 00       	call   108170 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  10069f:	ba 3a 87 10 00       	mov    $0x10873a,%edx
-  1006a4:	e8 47 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  1006a9:	8b 53 28             	mov    0x28(%ebx),%edx
-  1006ac:	e8 cf 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  1006b1:	ba 40 87 10 00       	mov    $0x108740,%edx
-  1006b6:	e8 35 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  1006bb:	8b 53 30             	mov    0x30(%ebx),%edx
-  1006be:	e8 bd 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  1006c3:	ba 49 87 10 00       	mov    $0x108749,%edx
-  1006c8:	e8 23 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  1006cd:	8b 53 24             	mov    0x24(%ebx),%edx
-  1006d0:	e8 ab 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  1006d5:	ba 56 87 10 00       	mov    $0x108756,%edx
-  1006da:	e8 11 78 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  1006df:	8b 53 1c             	mov    0x1c(%ebx),%edx
-  1006e2:	e8 99 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  1006e7:	ba 5c 87 10 00       	mov    $0x10875c,%edx
-  1006ec:	e8 ff 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  1006f1:	8b 53 18             	mov    0x18(%ebx),%edx
-  1006f4:	e8 87 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  1006f9:	ba 66 87 10 00       	mov    $0x108766,%edx
-  1006fe:	e8 ed 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100703:	8b 53 14             	mov    0x14(%ebx),%edx
-  100706:	e8 75 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  10070b:	ba 6c 87 10 00       	mov    $0x10876c,%edx
-  100710:	e8 db 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100715:	8b 53 10             	mov    0x10(%ebx),%edx
-  100718:	e8 63 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  10071d:	ba 72 87 10 00       	mov    $0x108772,%edx
-  100722:	e8 c9 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100727:	8b 53 0c             	mov    0xc(%ebx),%edx
-  10072a:	e8 51 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  10072f:	ba 78 87 10 00       	mov    $0x108778,%edx
-  100734:	e8 b7 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100739:	8b 53 08             	mov    0x8(%ebx),%edx
-  10073c:	e8 3f 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  100741:	ba 7e 87 10 00       	mov    $0x10877e,%edx
-  100746:	e8 a5 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  10074b:	8b 53 04             	mov    0x4(%ebx),%edx
-  10074e:	e8 2d 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  100753:	ba 84 87 10 00       	mov    $0x108784,%edx
-  100758:	e8 93 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  10075d:	8b 13                	mov    (%ebx),%edx
-  10075f:	e8 1c 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  100764:	ba 8b 87 10 00       	mov    $0x10878b,%edx
-  100769:	e8 82 77 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  10076e:	8b 53 20             	mov    0x20(%ebx),%edx
-  100771:	e8 0a 79 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  100776:	ba 0a 00 00 00       	mov    $0xa,%edx
-  10077b:	e8 f0 76 00 00       	call   107e70 <_ZN8terminal6outputlsEc>
-  100780:	58                   	pop    %eax
-  100781:	5a                   	pop    %edx
-  100782:	68 94 87 10 00       	push   $0x108794
-  100787:	68 02 91 10 00       	push   $0x109102
-  10078c:	e8 df 02 00 00       	call   100a70 <_ZN6kernel6logger5panicEPKc>
-  100791:	66 90                	xchg   %ax,%ax
-  100793:	66 90                	xchg   %ax,%ax
-  100795:	66 90                	xchg   %ax,%ax
-  100797:	66 90                	xchg   %ax,%ax
-  100799:	66 90                	xchg   %ax,%ax
-  10079b:	66 90                	xchg   %ax,%ax
-  10079d:	66 90                	xchg   %ax,%ax
-  10079f:	90                   	nop
-
-001007a0 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE>:
-  1007a0:	55                   	push   %ebp
-  1007a1:	89 c1                	mov    %eax,%ecx
-  1007a3:	89 e5                	mov    %esp,%ebp
-  1007a5:	83 ec 18             	sub    $0x18,%esp
-  1007a8:	8b 40 20             	mov    0x20(%eax),%eax
-  1007ab:	83 f8 0d             	cmp    $0xd,%eax
-  1007ae:	74 74                	je     100824 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x84>
-  1007b0:	77 1f                	ja     1007d1 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x31>
-  1007b2:	85 c0                	test   %eax,%eax
-  1007b4:	0f 84 7c 00 00 00    	je     100836 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x96>
-  1007ba:	83 f8 06             	cmp    $0x6,%eax
-  1007bd:	75 29                	jne    1007e8 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x48>
-  1007bf:	50                   	push   %eax
-  1007c0:	50                   	push   %eax
-  1007c1:	b8 bd 87 10 00       	mov    $0x1087bd,%eax
-  1007c6:	51                   	push   %ecx
-  1007c7:	68 cc 87 10 00       	push   $0x1087cc
-  1007cc:	e8 7f fe ff ff       	call   100650 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  1007d1:	83 f8 0e             	cmp    $0xe,%eax
-  1007d4:	75 12                	jne    1007e8 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x48>
-  1007d6:	50                   	push   %eax
-  1007d7:	50                   	push   %eax
-  1007d8:	b8 ed 87 10 00       	mov    $0x1087ed,%eax
-  1007dd:	51                   	push   %ecx
-  1007de:	68 f8 87 10 00       	push   $0x1087f8
-  1007e3:	e8 68 fe ff ff       	call   100650 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  1007e8:	6a 00                	push   $0x0
-  1007ea:	6a 0e                	push   $0xe
-  1007ec:	68 fc 87 10 00       	push   $0x1087fc
-  1007f1:	68 02 91 10 00       	push   $0x109102
-  1007f6:	89 4d f4             	mov    %ecx,-0xc(%ebp)
-  1007f9:	e8 32 02 00 00       	call   100a30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  1007fe:	ba 60 88 10 00       	mov    $0x108860,%edx
-  100803:	b8 02 91 10 00       	mov    $0x109102,%eax
-  100808:	e8 e3 76 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  10080d:	8b 4d f4             	mov    -0xc(%ebp),%ecx
-  100810:	8b 51 20             	mov    0x20(%ecx),%edx
-  100813:	e8 68 78 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  100818:	83 c4 10             	add    $0x10,%esp
-  10081b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  100820:	fa                   	cli
-  100821:	f4                   	hlt
-  100822:	eb fc                	jmp    100820 <_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE+0x80>
-  100824:	52                   	push   %edx
-  100825:	b8 d0 87 10 00       	mov    $0x1087d0,%eax
-  10082a:	52                   	push   %edx
-  10082b:	51                   	push   %ecx
-  10082c:	68 e9 87 10 00       	push   $0x1087e9
-  100831:	e8 1a fe ff ff       	call   100650 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  100836:	50                   	push   %eax
-  100837:	50                   	push   %eax
-  100838:	b8 ac 87 10 00       	mov    $0x1087ac,%eax
-  10083d:	51                   	push   %ecx
-  10083e:	68 b9 87 10 00       	push   $0x1087b9
-  100843:	e8 08 fe ff ff       	call   100650 <_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE>
-  100848:	66 90                	xchg   %ax,%ax
-  10084a:	66 90                	xchg   %ax,%ax
-  10084c:	66 90                	xchg   %ax,%ax
-  10084e:	66 90                	xchg   %ax,%ax
-
-00100850 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE>:
-  100850:	85 c0                	test   %eax,%eax
-  100852:	0f 84 88 00 00 00    	je     1008e0 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x90>
-  100858:	55                   	push   %ebp
-  100859:	89 e5                	mov    %esp,%ebp
-  10085b:	56                   	push   %esi
-  10085c:	53                   	push   %ebx
-  10085d:	8b 70 20             	mov    0x20(%eax),%esi
-  100860:	89 c3                	mov    %eax,%ebx
-  100862:	6a 00                	push   $0x0
-  100864:	6a 0c                	push   $0xc
-  100866:	68 20 87 10 00       	push   $0x108720
-  10086b:	68 02 91 10 00       	push   $0x109102
-  100870:	e8 bb 01 00 00       	call   100a30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  100875:	ba 08 88 10 00       	mov    $0x108808,%edx
-  10087a:	b8 02 91 10 00       	mov    $0x109102,%eax
-  10087f:	e8 6c 76 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100884:	89 f2                	mov    %esi,%edx
-  100886:	e8 f5 77 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  10088b:	ba 25 88 10 00       	mov    $0x108825,%edx
-  100890:	e8 5b 76 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100895:	8b 53 24             	mov    0x24(%ebx),%edx
-  100898:	e8 e3 77 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  10089d:	ba 33 88 10 00       	mov    $0x108833,%edx
-  1008a2:	e8 49 76 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  1008a7:	ba 90 81 10 00       	mov    $0x108190,%edx
-  1008ac:	e8 bf 78 00 00       	call   108170 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1008b1:	8b 53 28             	mov    0x28(%ebx),%edx
-  1008b4:	e8 c7 77 00 00       	call   108080 <_ZN8terminal6outputlsEm>
-  1008b9:	ba 0a 00 00 00       	mov    $0xa,%edx
-  1008be:	e8 ad 75 00 00       	call   107e70 <_ZN8terminal6outputlsEc>
-  1008c3:	ba 80 81 10 00       	mov    $0x108180,%edx
-  1008c8:	e8 a3 78 00 00       	call   108170 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1008cd:	8d 46 e0             	lea    -0x20(%esi),%eax
-  1008d0:	83 c4 10             	add    $0x10,%esp
-  1008d3:	83 f8 0f             	cmp    $0xf,%eax
-  1008d6:	77 10                	ja     1008e8 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x98>
-  1008d8:	8d 65 f8             	lea    -0x8(%ebp),%esp
-  1008db:	5b                   	pop    %ebx
-  1008dc:	5e                   	pop    %esi
-  1008dd:	5d                   	pop    %ebp
-  1008de:	c3                   	ret
-  1008df:	90                   	nop
-  1008e0:	fa                   	cli
-  1008e1:	f4                   	hlt
-  1008e2:	eb fc                	jmp    1008e0 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x90>
-  1008e4:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  1008e8:	fa                   	cli
-  1008e9:	f4                   	hlt
-  1008ea:	eb fc                	jmp    1008e8 <_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE+0x98>
-  1008ec:	66 90                	xchg   %ax,%ax
-  1008ee:	66 90                	xchg   %ax,%ax
-
-001008f0 <interrupt_dispatcher>:
-  1008f0:	55                   	push   %ebp
-  1008f1:	89 e5                	mov    %esp,%ebp
-  1008f3:	53                   	push   %ebx
-  1008f4:	83 ec 04             	sub    $0x4,%esp
-  1008f7:	8b 45 08             	mov    0x8(%ebp),%eax
-  1008fa:	8b 58 20             	mov    0x20(%eax),%ebx
-  1008fd:	ff 14 9d c0 88 10 00 	call   *0x1088c0(,%ebx,4)
-  100904:	8d 43 e0             	lea    -0x20(%ebx),%eax
-  100907:	83 f8 0f             	cmp    $0xf,%eax
-  10090a:	76 0c                	jbe    100918 <interrupt_dispatcher+0x28>
-  10090c:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  10090f:	c9                   	leave
-  100910:	c3                   	ret
-  100911:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  100918:	8d 43 e0             	lea    -0x20(%ebx),%eax
-  10091b:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  10091e:	c9                   	leave
-  10091f:	0f b6 c0             	movzbl %al,%eax
-  100922:	e9 19 02 00 00       	jmp    100b40 <_ZN6kernel8send_eoiEh>
-  100927:	66 90                	xchg   %ax,%ax
-  100929:	66 90                	xchg   %ax,%ax
-  10092b:	66 90                	xchg   %ax,%ax
-  10092d:	66 90                	xchg   %ax,%ax
-  10092f:	90                   	nop
-=======
   1005f0:	e8 db 05 00 00       	call   100bd0 <_ZN6kernel19set_timer_frequencyEm>
   1005f5:	e8 06 6f 00 00       	call   107500 <_ZN8terminal6output10initializeEv>
   1005fa:	89 1c 24             	mov    %ebx,(%esp)
@@ -1641,7 +760,6 @@ Disassembly of section .text:
   10091b:	66 90                	xchg   %ax,%ax
   10091d:	66 90                	xchg   %ax,%ax
   10091f:	90                   	nop
->>>>>>> origin/temp
 
 00100920 <_ZN6kernel21initialize_exceptionsEv>:
   100920:	55                   	push   %ebp
@@ -1692,93 +810,6 @@ Disassembly of section .text:
   1009bc:	66 90                	xchg   %ax,%ax
   1009be:	66 90                	xchg   %ax,%ax
 
-<<<<<<< HEAD
-001009d0 <_ZN6kernel18set_interrupt_gateEhmth>:
-  1009d0:	55                   	push   %ebp
-  1009d1:	89 e5                	mov    %esp,%ebp
-  1009d3:	56                   	push   %esi
-  1009d4:	0f b6 4d 08          	movzbl 0x8(%ebp),%ecx
-  1009d8:	8b 45 0c             	mov    0xc(%ebp),%eax
-  1009db:	53                   	push   %ebx
-  1009dc:	8b 75 10             	mov    0x10(%ebp),%esi
-  1009df:	8b 5d 14             	mov    0x14(%ebp),%ebx
-  1009e2:	8d 14 cd 20 91 10 00 	lea    0x109120(,%ecx,8),%edx
-  1009e9:	66 89 04 cd 20 91 10 	mov    %ax,0x109120(,%ecx,8)
-  1009f0:	00 
-  1009f1:	0f b7 0d c0 8c 10 00 	movzwl 0x108cc0,%ecx
-  1009f8:	c1 e8 10             	shr    $0x10,%eax
-  1009fb:	66 89 72 02          	mov    %si,0x2(%edx)
-  1009ff:	88 dd                	mov    %bl,%ch
-  100a01:	66 89 42 06          	mov    %ax,0x6(%edx)
-  100a05:	66 89 4a 04          	mov    %cx,0x4(%edx)
-  100a09:	5b                   	pop    %ebx
-  100a0a:	5e                   	pop    %esi
-  100a0b:	5d                   	pop    %ebp
-  100a0c:	c3                   	ret
-  100a0d:	66 90                	xchg   %ax,%ax
-  100a0f:	90                   	nop
-
-00100a10 <_ZN6kernel8load_idtEv>:
-  100a10:	55                   	push   %ebp
-  100a11:	b8 ff 07 00 00       	mov    $0x7ff,%eax
-  100a16:	89 e5                	mov    %esp,%ebp
-  100a18:	83 ec 10             	sub    $0x10,%esp
-  100a1b:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
-  100a1f:	c7 45 fc 20 91 10 00 	movl   $0x109120,-0x4(%ebp)
-  100a26:	0f 01 5d fa          	lidtl  -0x6(%ebp)
-  100a2a:	c9                   	leave
-  100a2b:	c3                   	ret
-  100a2c:	66 90                	xchg   %ax,%ax
-  100a2e:	66 90                	xchg   %ax,%ax
-
-00100a30 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>:
-  100a30:	55                   	push   %ebp
-  100a31:	89 e5                	mov    %esp,%ebp
-  100a33:	53                   	push   %ebx
-  100a34:	83 ec 04             	sub    $0x4,%esp
-  100a37:	0f b6 45 14          	movzbl 0x14(%ebp),%eax
-  100a3b:	0f b6 1d cb 90 10 00 	movzbl 0x1090cb,%ebx
-  100a42:	8b 55 0c             	mov    0xc(%ebp),%edx
-  100a45:	c1 e0 04             	shl    $0x4,%eax
-  100a48:	0a 45 10             	or     0x10(%ebp),%al
-  100a4b:	a2 cb 90 10 00       	mov    %al,0x1090cb
-  100a50:	8b 45 08             	mov    0x8(%ebp),%eax
-  100a53:	e8 98 74 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100a58:	88 1d cb 90 10 00    	mov    %bl,0x1090cb
-  100a5e:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  100a61:	c9                   	leave
-  100a62:	c3                   	ret
-  100a63:	66 90                	xchg   %ax,%ax
-  100a65:	66 90                	xchg   %ax,%ax
-  100a67:	66 90                	xchg   %ax,%ax
-  100a69:	66 90                	xchg   %ax,%ax
-  100a6b:	66 90                	xchg   %ax,%ax
-  100a6d:	66 90                	xchg   %ax,%ax
-  100a6f:	90                   	nop
-
-00100a70 <_ZN6kernel6logger5panicEPKc>:
-  100a70:	55                   	push   %ebp
-  100a71:	ba 3a 88 10 00       	mov    $0x10883a,%edx
-  100a76:	89 e5                	mov    %esp,%ebp
-  100a78:	83 ec 08             	sub    $0x8,%esp
-  100a7b:	c6 05 cb 90 10 00 4f 	movb   $0x4f,0x1090cb
-  100a82:	8b 45 08             	mov    0x8(%ebp),%eax
-  100a85:	e8 66 74 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100a8a:	8b 55 0c             	mov    0xc(%ebp),%edx
-  100a8d:	e8 5e 74 00 00       	call   107ef0 <_ZN8terminal6outputlsEPKc>
-  100a92:	ba 0a 00 00 00       	mov    $0xa,%edx
-  100a97:	e8 d4 73 00 00       	call   107e70 <_ZN8terminal6outputlsEc>
-  100a9c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  100aa0:	fa                   	cli
-  100aa1:	f4                   	hlt
-  100aa2:	eb fc                	jmp    100aa0 <_ZN6kernel6logger5panicEPKc+0x30>
-  100aa4:	66 90                	xchg   %ax,%ax
-  100aa6:	66 90                	xchg   %ax,%ax
-  100aa8:	66 90                	xchg   %ax,%ax
-  100aaa:	66 90                	xchg   %ax,%ax
-  100aac:	66 90                	xchg   %ax,%ax
-  100aae:	66 90                	xchg   %ax,%ax
-=======
 001009c0 <_ZN6kernel18set_interrupt_gateEhmth>:
   1009c0:	55                   	push   %ebp
   1009c1:	89 e5                	mov    %esp,%ebp
@@ -1864,7 +895,6 @@ Disassembly of section .text:
   100a9a:	66 90                	xchg   %ax,%ax
   100a9c:	66 90                	xchg   %ax,%ax
   100a9e:	66 90                	xchg   %ax,%ax
->>>>>>> origin/temp
 
 00100aa0 <_ZN6kernel9pic_remapEhh>:
   100aa0:	55                   	push   %ebp
@@ -1958,48 +988,6 @@ Disassembly of section .text:
   100b6d:	66 90                	xchg   %ax,%ax
   100b6f:	90                   	nop
 
-<<<<<<< HEAD
-00100b80 <_ZN6kernel14initialize_pitEm>:
-  100b80:	55                   	push   %ebp
-  100b81:	89 e5                	mov    %esp,%ebp
-  100b83:	83 ec 18             	sub    $0x18,%esp
-  100b86:	8b 4d 08             	mov    0x8(%ebp),%ecx
-  100b89:	8d 41 ec             	lea    -0x14(%ecx),%eax
-  100b8c:	83 f8 50             	cmp    $0x50,%eax
-  100b8f:	77 24                	ja     100bb5 <_ZN6kernel14initialize_pitEm+0x35>
-  100b91:	89 c8                	mov    %ecx,%eax
-  100b93:	31 d2                	xor    %edx,%edx
-  100b95:	d1 e8                	shr    $1,%eax
-  100b97:	05 de 34 12 00       	add    $0x1234de,%eax
-  100b9c:	f7 f1                	div    %ecx
-  100b9e:	89 c1                	mov    %eax,%ecx
-  100ba0:	b8 36 00 00 00       	mov    $0x36,%eax
-  100ba5:	e6 43                	out    %al,$0x43
-  100ba7:	89 c8                	mov    %ecx,%eax
-  100ba9:	e6 40                	out    %al,$0x40
-  100bab:	89 c8                	mov    %ecx,%eax
-  100bad:	66 c1 e8 08          	shr    $0x8,%ax
-  100bb1:	e6 40                	out    %al,$0x40
-  100bb3:	c9                   	leave
-  100bb4:	c3                   	ret
-  100bb5:	50                   	push   %eax
-  100bb6:	50                   	push   %eax
-  100bb7:	8d 45 f6             	lea    -0xa(%ebp),%eax
-  100bba:	68 44 88 10 00       	push   $0x108844
-  100bbf:	50                   	push   %eax
-  100bc0:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
-  100bc6:	e8 a5 fe ff ff       	call   100a70 <_ZN6kernel6logger5panicEPKc>
-  100bcb:	66 90                	xchg   %ax,%ax
-  100bcd:	66 90                	xchg   %ax,%ax
-  100bcf:	90                   	nop
-
-00100bd0 <_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE>:
-  100bd0:	a1 24 99 10 00       	mov    0x109924,%eax
-  100bd5:	83 c0 01             	add    $0x1,%eax
-  100bd8:	a3 24 99 10 00       	mov    %eax,0x109924
-  100bdd:	c3                   	ret
-  100bde:	66 90                	xchg   %ax,%ax
-=======
 00100b70 <_ZN6kernel14initialize_pitEm>:
   100b70:	55                   	push   %ebp
   100b71:	89 e5                	mov    %esp,%ebp
@@ -2040,7 +1028,6 @@ Disassembly of section .text:
   100bc8:	a3 24 8f 10 00       	mov    %eax,0x108f24
   100bcd:	c3                   	ret
   100bce:	66 90                	xchg   %ax,%ax
->>>>>>> origin/temp
 
 00100bd0 <_ZN6kernel19set_timer_frequencyEm>:
   100bd0:	55                   	push   %ebp
@@ -2054,27 +1041,6 @@ Disassembly of section .text:
 
 00100be0 <_ZN6kernel6memory19get_e820_memory_mapEv>:
   100be0:	55                   	push   %ebp
-<<<<<<< HEAD
-  100be1:	89 e5                	mov    %esp,%ebp
-  100be3:	8b 45 08             	mov    0x8(%ebp),%eax
-  100be6:	5d                   	pop    %ebp
-  100be7:	a3 20 99 10 00       	mov    %eax,0x109920
-  100bec:	c3                   	ret
-  100bed:	66 90                	xchg   %ax,%ax
-  100bef:	90                   	nop
-
-00100bf0 <_ZN6kernel6memory19get_e820_memory_mapEv>:
-  100bf0:	55                   	push   %ebp
-  100bf1:	0f b7 15 00 05 00 00 	movzwl 0x500,%edx
-  100bf8:	31 c9                	xor    %ecx,%ecx
-  100bfa:	89 e5                	mov    %esp,%ebp
-  100bfc:	8b 45 08             	mov    0x8(%ebp),%eax
-  100bff:	66 89 48 06          	mov    %cx,0x6(%eax)
-  100c03:	c7 00 02 05 00 00    	movl   $0x502,(%eax)
-  100c09:	66 89 50 04          	mov    %dx,0x4(%eax)
-  100c0d:	5d                   	pop    %ebp
-  100c0e:	c2 04 00             	ret    $0x4
-=======
   100be1:	0f b7 15 00 05 00 00 	movzwl 0x500,%edx
   100be8:	31 c9                	xor    %ecx,%ecx
   100bea:	89 e5                	mov    %esp,%ebp
@@ -2091,20 +1057,7 @@ Disassembly of section .text:
   100c09:	66 90                	xchg   %ax,%ax
   100c0b:	66 90                	xchg   %ax,%ax
   100c0d:	66 90                	xchg   %ax,%ax
-<<<<<<< HEAD
   100c0f:	90                   	nop
-=======
-  100c0f:	66 90                	xchg   %ax,%ax
->>>>>>> origin/temp
-  100c11:	66 90                	xchg   %ax,%ax
-  100c13:	66 90                	xchg   %ax,%ax
-  100c15:	66 90                	xchg   %ax,%ax
-  100c17:	66 90                	xchg   %ax,%ax
-  100c19:	66 90                	xchg   %ax,%ax
-  100c1b:	66 90                	xchg   %ax,%ax
-  100c1d:	66 90                	xchg   %ax,%ax
-  100c1f:	90                   	nop
->>>>>>> origin/refactoring/pmm
 
 00100c10 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_>:
   100c10:	55                   	push   %ebp
@@ -2616,7 +1569,6 @@ Disassembly of section .text:
   10116d:	66 90                	xchg   %ax,%ax
   10116f:	90                   	nop
 
-<<<<<<< HEAD
 00101170 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh>:
   101170:	55                   	push   %ebp
   101171:	57                   	push   %edi
@@ -2871,266 +1823,6 @@ Disassembly of section .text:
   10145a:	66 90                	xchg   %ax,%ax
   10145c:	66 90                	xchg   %ax,%ax
   10145e:	66 90                	xchg   %ax,%ax
-=======
-001010b0 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh>:
-  1010b0:	55                   	push   %ebp
-  1010b1:	57                   	push   %edi
-  1010b2:	89 c7                	mov    %eax,%edi
-  1010b4:	89 d0                	mov    %edx,%eax
-  1010b6:	56                   	push   %esi
-  1010b7:	83 e0 fe             	and    $0xfffffffe,%eax
-  1010ba:	53                   	push   %ebx
-  1010bb:	83 ec 18             	sub    $0x18,%esp
-  1010be:	89 14 24             	mov    %edx,(%esp)
-  1010c1:	8d 57 01             	lea    0x1(%edi),%edx
-  1010c4:	83 e2 fe             	and    $0xfffffffe,%edx
-  1010c7:	89 44 24 04          	mov    %eax,0x4(%esp)
-  1010cb:	39 c2                	cmp    %eax,%edx
-  1010cd:	0f 47 d0             	cmova  %eax,%edx
-  1010d0:	39 d7                	cmp    %edx,%edi
-  1010d2:	0f 83 a8 02 00 00    	jae    101380 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x2d0>
-  1010d8:	89 d6                	mov    %edx,%esi
-  1010da:	89 d0                	mov    %edx,%eax
-  1010dc:	29 fe                	sub    %edi,%esi
-  1010de:	8d 5e ff             	lea    -0x1(%esi),%ebx
-  1010e1:	83 fb 0e             	cmp    $0xe,%ebx
-  1010e4:	0f 86 9f 02 00 00    	jbe    101389 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x2d9>
-  1010ea:	89 f5                	mov    %esi,%ebp
-  1010ec:	89 f9                	mov    %edi,%ecx
-  1010ee:	66 0f 76 c0          	pcmpeqd %xmm0,%xmm0
-  1010f2:	83 e5 f0             	and    $0xfffffff0,%ebp
-  1010f5:	8d 1c 2f             	lea    (%edi,%ebp,1),%ebx
-  1010f8:	f7 c5 10 00 00 00    	test   $0x10,%ebp
-  1010fe:	74 10                	je     101110 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x60>
-  101100:	8d 4f 10             	lea    0x10(%edi),%ecx
-  101103:	0f 11 07             	movups %xmm0,(%edi)
-  101106:	39 d9                	cmp    %ebx,%ecx
-  101108:	74 14                	je     10111e <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x6e>
-  10110a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  101110:	0f 11 01             	movups %xmm0,(%ecx)
-  101113:	83 c1 20             	add    $0x20,%ecx
-  101116:	0f 11 41 f0          	movups %xmm0,-0x10(%ecx)
-  10111a:	39 d9                	cmp    %ebx,%ecx
-  10111c:	75 f2                	jne    101110 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x60>
-  10111e:	39 ee                	cmp    %ebp,%esi
-  101120:	74 50                	je     101172 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xc2>
-  101122:	29 ee                	sub    %ebp,%esi
-  101124:	8d 4e ff             	lea    -0x1(%esi),%ecx
-  101127:	83 f9 02             	cmp    $0x2,%ecx
-  10112a:	76 2d                	jbe    101159 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xa9>
-  10112c:	01 fd                	add    %edi,%ebp
-  10112e:	89 f1                	mov    %esi,%ecx
-<<<<<<< HEAD
-  101130:	8b 3d 00 8e 10 00    	mov    0x108e00,%edi
-=======
-  101130:	8b 3d 40 84 10 00    	mov    0x108440,%edi
->>>>>>> origin/temp
-  101136:	c1 e9 02             	shr    $0x2,%ecx
-  101139:	89 7d 00             	mov    %edi,0x0(%ebp)
-  10113c:	83 f9 01             	cmp    $0x1,%ecx
-  10113f:	74 0b                	je     10114c <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x9c>
-  101141:	89 7d 04             	mov    %edi,0x4(%ebp)
-  101144:	83 f9 02             	cmp    $0x2,%ecx
-  101147:	74 03                	je     10114c <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x9c>
-  101149:	89 7d 08             	mov    %edi,0x8(%ebp)
-  10114c:	f7 c6 03 00 00 00    	test   $0x3,%esi
-  101152:	74 1e                	je     101172 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xc2>
-  101154:	83 e6 fc             	and    $0xfffffffc,%esi
-  101157:	01 f3                	add    %esi,%ebx
-  101159:	8d 4b 01             	lea    0x1(%ebx),%ecx
-  10115c:	c6 03 ff             	movb   $0xff,(%ebx)
-  10115f:	39 d1                	cmp    %edx,%ecx
-  101161:	73 0f                	jae    101172 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xc2>
-  101163:	8d 4b 02             	lea    0x2(%ebx),%ecx
-  101166:	c6 43 01 ff          	movb   $0xff,0x1(%ebx)
-  10116a:	39 d1                	cmp    %edx,%ecx
-  10116c:	73 04                	jae    101172 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xc2>
-  10116e:	c6 43 02 ff          	movb   $0xff,0x2(%ebx)
-  101172:	8b 3c 24             	mov    (%esp),%edi
-  101175:	8d 4a 03             	lea    0x3(%edx),%ecx
-  101178:	83 e1 fc             	and    $0xfffffffc,%ecx
-  10117b:	83 e7 fc             	and    $0xfffffffc,%edi
-  10117e:	39 f9                	cmp    %edi,%ecx
-  101180:	89 7c 24 08          	mov    %edi,0x8(%esp)
-  101184:	0f 47 cf             	cmova  %edi,%ecx
-  101187:	39 c8                	cmp    %ecx,%eax
-  101189:	0f 83 cc 00 00 00    	jae    10125b <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1ab>
-  10118f:	89 ca                	mov    %ecx,%edx
-  101191:	89 44 24 0c          	mov    %eax,0xc(%esp)
-  101195:	29 c2                	sub    %eax,%edx
-  101197:	83 ea 01             	sub    $0x1,%edx
-  10119a:	89 d5                	mov    %edx,%ebp
-  10119c:	d1 ed                	shr    $1,%ebp
-  10119e:	83 fa 0d             	cmp    $0xd,%edx
-  1011a1:	76 46                	jbe    1011e9 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x139>
-  1011a3:	8d 5d 01             	lea    0x1(%ebp),%ebx
-  1011a6:	89 c2                	mov    %eax,%edx
-  1011a8:	66 0f 76 c0          	pcmpeqd %xmm0,%xmm0
-  1011ac:	89 df                	mov    %ebx,%edi
-  1011ae:	c1 ef 03             	shr    $0x3,%edi
-  1011b1:	c1 e7 04             	shl    $0x4,%edi
-  1011b4:	8d 34 07             	lea    (%edi,%eax,1),%esi
-  1011b7:	83 e7 10             	and    $0x10,%edi
-  1011ba:	74 14                	je     1011d0 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x120>
-  1011bc:	8d 50 10             	lea    0x10(%eax),%edx
-  1011bf:	0f 11 00             	movups %xmm0,(%eax)
-  1011c2:	39 d6                	cmp    %edx,%esi
-  1011c4:	74 18                	je     1011de <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x12e>
-  1011c6:	66 90                	xchg   %ax,%ax
-  1011c8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1011cf:	00 
-  1011d0:	0f 11 02             	movups %xmm0,(%edx)
-  1011d3:	83 c2 20             	add    $0x20,%edx
-  1011d6:	0f 11 42 f0          	movups %xmm0,-0x10(%edx)
-  1011da:	39 d6                	cmp    %edx,%esi
-  1011dc:	75 f2                	jne    1011d0 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x120>
-  1011de:	f6 c3 07             	test   $0x7,%bl
-  1011e1:	74 6e                	je     101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  1011e3:	83 e3 f8             	and    $0xfffffff8,%ebx
-  1011e6:	8d 04 58             	lea    (%eax,%ebx,2),%eax
-  1011e9:	be ff ff ff ff       	mov    $0xffffffff,%esi
-  1011ee:	8d 50 02             	lea    0x2(%eax),%edx
-  1011f1:	66 89 30             	mov    %si,(%eax)
-  1011f4:	39 ca                	cmp    %ecx,%edx
-  1011f6:	73 59                	jae    101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  1011f8:	bb ff ff ff ff       	mov    $0xffffffff,%ebx
-  1011fd:	8d 50 04             	lea    0x4(%eax),%edx
-  101200:	66 89 58 02          	mov    %bx,0x2(%eax)
-  101204:	39 ca                	cmp    %ecx,%edx
-  101206:	73 49                	jae    101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  101208:	ba ff ff ff ff       	mov    $0xffffffff,%edx
-  10120d:	66 89 50 04          	mov    %dx,0x4(%eax)
-  101211:	8d 50 06             	lea    0x6(%eax),%edx
-  101214:	39 ca                	cmp    %ecx,%edx
-  101216:	73 39                	jae    101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  101218:	bf ff ff ff ff       	mov    $0xffffffff,%edi
-  10121d:	8d 50 08             	lea    0x8(%eax),%edx
-  101220:	66 89 78 06          	mov    %di,0x6(%eax)
-  101224:	39 ca                	cmp    %ecx,%edx
-  101226:	73 29                	jae    101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  101228:	be ff ff ff ff       	mov    $0xffffffff,%esi
-  10122d:	8d 50 0a             	lea    0xa(%eax),%edx
-  101230:	66 89 70 08          	mov    %si,0x8(%eax)
-  101234:	39 ca                	cmp    %ecx,%edx
-  101236:	73 19                	jae    101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  101238:	bb ff ff ff ff       	mov    $0xffffffff,%ebx
-  10123d:	8d 50 0c             	lea    0xc(%eax),%edx
-  101240:	66 89 58 0a          	mov    %bx,0xa(%eax)
-  101244:	39 ca                	cmp    %ecx,%edx
-  101246:	73 09                	jae    101251 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x1a1>
-  101248:	ba ff ff ff ff       	mov    $0xffffffff,%edx
-  10124d:	66 89 50 0c          	mov    %dx,0xc(%eax)
-  101251:	8b 44 24 0c          	mov    0xc(%esp),%eax
-  101255:	8d 54 68 02          	lea    0x2(%eax,%ebp,2),%edx
-  101259:	89 d0                	mov    %edx,%eax
-  10125b:	8b 1c 24             	mov    (%esp),%ebx
-  10125e:	83 c2 0f             	add    $0xf,%edx
-  101261:	83 e2 f0             	and    $0xfffffff0,%edx
-  101264:	83 e3 f0             	and    $0xfffffff0,%ebx
-  101267:	39 da                	cmp    %ebx,%edx
-  101269:	0f 47 d3             	cmova  %ebx,%edx
-  10126c:	39 d0                	cmp    %edx,%eax
-  10126e:	0f 83 96 00 00 00    	jae    10130a <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x25a>
-  101274:	89 d1                	mov    %edx,%ecx
-  101276:	89 44 24 10          	mov    %eax,0x10(%esp)
-  10127a:	29 c1                	sub    %eax,%ecx
-  10127c:	83 e9 01             	sub    $0x1,%ecx
-  10127f:	89 ce                	mov    %ecx,%esi
-  101281:	c1 ee 02             	shr    $0x2,%esi
-  101284:	89 74 24 0c          	mov    %esi,0xc(%esp)
-  101288:	83 f9 0b             	cmp    $0xb,%ecx
-  10128b:	76 4f                	jbe    1012dc <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x22c>
-  10128d:	8d 7e 01             	lea    0x1(%esi),%edi
-  101290:	89 c1                	mov    %eax,%ecx
-  101292:	66 0f 76 c0          	pcmpeqd %xmm0,%xmm0
-  101296:	89 fd                	mov    %edi,%ebp
-  101298:	c1 ed 02             	shr    $0x2,%ebp
-  10129b:	c1 e5 04             	shl    $0x4,%ebp
-  10129e:	8d 74 05 00          	lea    0x0(%ebp,%eax,1),%esi
-  1012a2:	83 e5 10             	and    $0x10,%ebp
-  1012a5:	74 19                	je     1012c0 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x210>
-  1012a7:	8d 48 10             	lea    0x10(%eax),%ecx
-  1012aa:	0f 11 00             	movups %xmm0,(%eax)
-  1012ad:	39 ce                	cmp    %ecx,%esi
-  1012af:	74 1d                	je     1012ce <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x21e>
-  1012b1:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  1012b8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1012bf:	00 
-  1012c0:	0f 11 01             	movups %xmm0,(%ecx)
-  1012c3:	83 c1 20             	add    $0x20,%ecx
-  1012c6:	0f 11 41 f0          	movups %xmm0,-0x10(%ecx)
-  1012ca:	39 ce                	cmp    %ecx,%esi
-  1012cc:	75 f2                	jne    1012c0 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x210>
-  1012ce:	f7 c7 03 00 00 00    	test   $0x3,%edi
-  1012d4:	74 28                	je     1012fe <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x24e>
-  1012d6:	83 e7 fc             	and    $0xfffffffc,%edi
-  1012d9:	8d 04 b8             	lea    (%eax,%edi,4),%eax
-  1012dc:	8d 48 04             	lea    0x4(%eax),%ecx
-  1012df:	c7 00 ff ff ff ff    	movl   $0xffffffff,(%eax)
-  1012e5:	39 d1                	cmp    %edx,%ecx
-  1012e7:	73 15                	jae    1012fe <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x24e>
-  1012e9:	8d 48 08             	lea    0x8(%eax),%ecx
-  1012ec:	c7 40 04 ff ff ff ff 	movl   $0xffffffff,0x4(%eax)
-  1012f3:	39 d1                	cmp    %edx,%ecx
-  1012f5:	73 07                	jae    1012fe <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x24e>
-  1012f7:	c7 40 08 ff ff ff ff 	movl   $0xffffffff,0x8(%eax)
-  1012fe:	8b 44 24 10          	mov    0x10(%esp),%eax
-  101302:	8b 74 24 0c          	mov    0xc(%esp),%esi
-  101306:	8d 44 b0 04          	lea    0x4(%eax,%esi,4),%eax
-  10130a:	89 44 24 14          	mov    %eax,0x14(%esp)
-  10130e:	39 d8                	cmp    %ebx,%eax
-  101310:	73 3c                	jae    10134e <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x29e>
-  101312:	89 c2                	mov    %eax,%edx
-  101314:	66 0f 76 c0          	pcmpeqd %xmm0,%xmm0
-  101318:	83 c0 10             	add    $0x10,%eax
-  10131b:	f7 d2                	not    %edx
-  10131d:	0f 29 40 f0          	movaps %xmm0,-0x10(%eax)
-  101321:	01 da                	add    %ebx,%edx
-  101323:	c1 ea 04             	shr    $0x4,%edx
-  101326:	39 d8                	cmp    %ebx,%eax
-  101328:	73 24                	jae    10134e <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x29e>
-  10132a:	83 e2 01             	and    $0x1,%edx
-  10132d:	74 11                	je     101340 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x290>
-  10132f:	0f 29 00             	movaps %xmm0,(%eax)
-  101332:	83 c0 10             	add    $0x10,%eax
-  101335:	39 d8                	cmp    %ebx,%eax
-  101337:	73 15                	jae    10134e <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x29e>
-  101339:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  101340:	0f 29 00             	movaps %xmm0,(%eax)
-  101343:	83 c0 20             	add    $0x20,%eax
-  101346:	0f 29 40 f0          	movaps %xmm0,-0x10(%eax)
-  10134a:	39 d8                	cmp    %ebx,%eax
-  10134c:	72 f2                	jb     101340 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x290>
-  10134e:	8b 54 24 08          	mov    0x8(%esp),%edx
-  101352:	8d 44 24 14          	lea    0x14(%esp),%eax
-  101356:	e8 e5 fc ff ff       	call   101040 <_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_>
-  10135b:	8b 54 24 04          	mov    0x4(%esp),%edx
-  10135f:	8d 44 24 14          	lea    0x14(%esp),%eax
-  101363:	e8 b8 f8 ff ff       	call   100c20 <_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_>
-  101368:	8b 14 24             	mov    (%esp),%edx
-  10136b:	8d 44 24 14          	lea    0x14(%esp),%eax
-  10136f:	e8 ac f9 ff ff       	call   100d20 <_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_>
-  101374:	83 c4 18             	add    $0x18,%esp
-  101377:	5b                   	pop    %ebx
-  101378:	5e                   	pop    %esi
-  101379:	5f                   	pop    %edi
-  10137a:	5d                   	pop    %ebp
-  10137b:	c3                   	ret
-  10137c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  101380:	89 fa                	mov    %edi,%edx
-  101382:	89 f8                	mov    %edi,%eax
-  101384:	e9 e9 fd ff ff       	jmp    101172 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0xc2>
-  101389:	89 fb                	mov    %edi,%ebx
-  10138b:	31 ed                	xor    %ebp,%ebp
-  10138d:	e9 90 fd ff ff       	jmp    101122 <_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh+0x72>
-  101392:	66 90                	xchg   %ax,%ax
-  101394:	66 90                	xchg   %ax,%ax
-  101396:	66 90                	xchg   %ax,%ax
-  101398:	66 90                	xchg   %ax,%ax
-  10139a:	66 90                	xchg   %ax,%ax
-  10139c:	66 90                	xchg   %ax,%ax
-  10139e:	66 90                	xchg   %ax,%ax
->>>>>>> origin/refactoring/pmm
 
 00101460 <_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE1EEEvPPDv2_xPKS2_>:
   101460:	56                   	push   %esi
@@ -3173,7 +1865,6 @@ Disassembly of section .text:
   1014be:	c3                   	ret
   1014bf:	90                   	nop
 
-<<<<<<< HEAD
 001014c0 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh>:
   1014c0:	55                   	push   %ebp
   1014c1:	89 e5                	mov    %esp,%ebp
@@ -3521,359 +2212,6 @@ Disassembly of section .text:
   1018da:	66 90                	xchg   %ax,%ax
   1018dc:	66 90                	xchg   %ax,%ax
   1018de:	66 90                	xchg   %ax,%ax
-=======
-00101400 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh>:
-  101400:	55                   	push   %ebp
-  101401:	89 e5                	mov    %esp,%ebp
-  101403:	57                   	push   %edi
-  101404:	56                   	push   %esi
-  101405:	53                   	push   %ebx
-  101406:	89 c3                	mov    %eax,%ebx
-  101408:	89 d0                	mov    %edx,%eax
-  10140a:	83 e0 fe             	and    $0xfffffffe,%eax
-  10140d:	83 ec 1c             	sub    $0x1c,%esp
-  101410:	89 54 24 14          	mov    %edx,0x14(%esp)
-  101414:	8d 53 01             	lea    0x1(%ebx),%edx
-  101417:	83 e2 fe             	and    $0xfffffffe,%edx
-  10141a:	89 44 24 08          	mov    %eax,0x8(%esp)
-  10141e:	39 c2                	cmp    %eax,%edx
-  101420:	0f 47 d0             	cmova  %eax,%edx
-  101423:	39 d3                	cmp    %edx,%ebx
-  101425:	0f 83 b5 03 00 00    	jae    1017e0 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x3e0>
-  10142b:	89 d1                	mov    %edx,%ecx
-  10142d:	89 d0                	mov    %edx,%eax
-  10142f:	29 d9                	sub    %ebx,%ecx
-  101431:	8d 79 ff             	lea    -0x1(%ecx),%edi
-  101434:	83 ff 1e             	cmp    $0x1e,%edi
-  101437:	0f 86 b5 03 00 00    	jbe    1017f2 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x3f2>
-  10143d:	89 cf                	mov    %ecx,%edi
-  10143f:	89 de                	mov    %ebx,%esi
-  101441:	c5 fd 76 c0          	vpcmpeqd %ymm0,%ymm0,%ymm0
-  101445:	83 e7 e0             	and    $0xffffffe0,%edi
-  101448:	89 7c 24 10          	mov    %edi,0x10(%esp)
-  10144c:	01 df                	add    %ebx,%edi
-  10144e:	f6 44 24 10 20       	testb  $0x20,0x10(%esp)
-  101453:	74 0b                	je     101460 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x60>
-  101455:	8d 73 20             	lea    0x20(%ebx),%esi
-  101458:	c5 fe 7f 03          	vmovdqu %ymm0,(%ebx)
-  10145c:	39 f7                	cmp    %esi,%edi
-  10145e:	74 10                	je     101470 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x70>
-  101460:	c5 fe 7f 06          	vmovdqu %ymm0,(%esi)
-  101464:	83 c6 40             	add    $0x40,%esi
-  101467:	c5 fe 7f 46 e0       	vmovdqu %ymm0,-0x20(%esi)
-  10146c:	39 f7                	cmp    %esi,%edi
-  10146e:	75 f0                	jne    101460 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x60>
-  101470:	39 4c 24 10          	cmp    %ecx,0x10(%esp)
-  101474:	0f 84 8b 00 00 00    	je     101505 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x105>
-  10147a:	89 7c 24 0c          	mov    %edi,0xc(%esp)
-  10147e:	8b 7c 24 10          	mov    0x10(%esp),%edi
-  101482:	29 f9                	sub    %edi,%ecx
-  101484:	8d 71 ff             	lea    -0x1(%ecx),%esi
-  101487:	83 fe 0e             	cmp    $0xe,%esi
-  10148a:	0f 86 73 03 00 00    	jbe    101803 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x403>
-  101490:	c5 f9 76 c0          	vpcmpeqd %xmm0,%xmm0,%xmm0
-  101494:	c5 fa 7f 04 3b       	vmovdqu %xmm0,(%ebx,%edi,1)
-  101499:	f6 c1 0f             	test   $0xf,%cl
-  10149c:	74 67                	je     101505 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x105>
-  10149e:	89 ce                	mov    %ecx,%esi
-  1014a0:	83 e6 f0             	and    $0xfffffff0,%esi
-  1014a3:	01 74 24 0c          	add    %esi,0xc(%esp)
-  1014a7:	29 f1                	sub    %esi,%ecx
-  1014a9:	8d 79 ff             	lea    -0x1(%ecx),%edi
-  1014ac:	83 ff 02             	cmp    $0x2,%edi
-  1014af:	76 37                	jbe    1014e8 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0xe8>
-  1014b1:	89 cf                	mov    %ecx,%edi
-  1014b3:	03 74 24 10          	add    0x10(%esp),%esi
-  1014b7:	c1 ef 02             	shr    $0x2,%edi
-  1014ba:	01 de                	add    %ebx,%esi
-<<<<<<< HEAD
-  1014bc:	8b 1d 00 8e 10 00    	mov    0x108e00,%ebx
-=======
-  1014bc:	8b 1d 40 84 10 00    	mov    0x108440,%ebx
->>>>>>> origin/temp
-  1014c2:	89 7c 24 04          	mov    %edi,0x4(%esp)
-  1014c6:	8b 7c 24 04          	mov    0x4(%esp),%edi
-  1014ca:	89 1e                	mov    %ebx,(%esi)
-  1014cc:	83 ff 01             	cmp    $0x1,%edi
-  1014cf:	74 0b                	je     1014dc <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0xdc>
-  1014d1:	89 5e 04             	mov    %ebx,0x4(%esi)
-  1014d4:	83 ff 02             	cmp    $0x2,%edi
-  1014d7:	74 03                	je     1014dc <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0xdc>
-  1014d9:	89 5e 08             	mov    %ebx,0x8(%esi)
-  1014dc:	f6 c1 03             	test   $0x3,%cl
-  1014df:	74 24                	je     101505 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x105>
-  1014e1:	83 e1 fc             	and    $0xfffffffc,%ecx
-  1014e4:	01 4c 24 0c          	add    %ecx,0xc(%esp)
-  1014e8:	8b 5c 24 0c          	mov    0xc(%esp),%ebx
-  1014ec:	8d 4b 01             	lea    0x1(%ebx),%ecx
-  1014ef:	c6 03 ff             	movb   $0xff,(%ebx)
-  1014f2:	39 d1                	cmp    %edx,%ecx
-  1014f4:	73 0f                	jae    101505 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x105>
-  1014f6:	8d 4b 02             	lea    0x2(%ebx),%ecx
-  1014f9:	c6 43 01 ff          	movb   $0xff,0x1(%ebx)
-  1014fd:	39 d1                	cmp    %edx,%ecx
-  1014ff:	73 04                	jae    101505 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x105>
-  101501:	c6 43 02 ff          	movb   $0xff,0x2(%ebx)
-  101505:	8b 7c 24 14          	mov    0x14(%esp),%edi
-  101509:	8d 4a 03             	lea    0x3(%edx),%ecx
-  10150c:	83 e1 fc             	and    $0xfffffffc,%ecx
-  10150f:	83 e7 fc             	and    $0xfffffffc,%edi
-  101512:	39 f9                	cmp    %edi,%ecx
-  101514:	89 7c 24 0c          	mov    %edi,0xc(%esp)
-  101518:	0f 47 cf             	cmova  %edi,%ecx
-  10151b:	39 c8                	cmp    %ecx,%eax
-  10151d:	0f 83 f3 00 00 00    	jae    101616 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x216>
-  101523:	89 ca                	mov    %ecx,%edx
-  101525:	29 c2                	sub    %eax,%edx
-  101527:	83 ea 01             	sub    $0x1,%edx
-  10152a:	89 d6                	mov    %edx,%esi
-  10152c:	d1 ee                	shr    $1,%esi
-  10152e:	89 74 24 10          	mov    %esi,0x10(%esp)
-  101532:	83 fa 1d             	cmp    $0x1d,%edx
-  101535:	0f 86 ae 02 00 00    	jbe    1017e9 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x3e9>
-  10153b:	8d 5e 01             	lea    0x1(%esi),%ebx
-  10153e:	89 c2                	mov    %eax,%edx
-  101540:	c5 fd 76 c0          	vpcmpeqd %ymm0,%ymm0,%ymm0
-  101544:	89 df                	mov    %ebx,%edi
-  101546:	c1 ef 04             	shr    $0x4,%edi
-  101549:	c1 e7 05             	shl    $0x5,%edi
-  10154c:	8d 34 07             	lea    (%edi,%eax,1),%esi
-  10154f:	83 e7 20             	and    $0x20,%edi
-  101552:	74 0c                	je     101560 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x160>
-  101554:	8d 50 20             	lea    0x20(%eax),%edx
-  101557:	c5 fe 7f 00          	vmovdqu %ymm0,(%eax)
-  10155b:	39 d6                	cmp    %edx,%esi
-  10155d:	74 11                	je     101570 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x170>
-  10155f:	90                   	nop
-  101560:	c5 fe 7f 02          	vmovdqu %ymm0,(%edx)
-  101564:	83 c2 40             	add    $0x40,%edx
-  101567:	c5 fe 7f 42 e0       	vmovdqu %ymm0,-0x20(%edx)
-  10156c:	39 d6                	cmp    %edx,%esi
-  10156e:	75 f0                	jne    101560 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x160>
-  101570:	f6 c3 0f             	test   $0xf,%bl
-  101573:	0f 84 93 00 00 00    	je     10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  101579:	83 e3 f0             	and    $0xfffffff0,%ebx
-  10157c:	8d 14 58             	lea    (%eax,%ebx,2),%edx
-  10157f:	8b 74 24 10          	mov    0x10(%esp),%esi
-  101583:	29 de                	sub    %ebx,%esi
-  101585:	83 fe 06             	cmp    $0x6,%esi
-  101588:	76 1a                	jbe    1015a4 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x1a4>
-  10158a:	c5 f9 76 c0          	vpcmpeqd %xmm0,%xmm0,%xmm0
-  10158e:	83 c6 01             	add    $0x1,%esi
-  101591:	c5 fa 7f 04 58       	vmovdqu %xmm0,(%eax,%ebx,2)
-  101596:	f7 c6 07 00 00 00    	test   $0x7,%esi
-  10159c:	74 6e                	je     10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  10159e:	83 e6 f8             	and    $0xfffffff8,%esi
-  1015a1:	8d 14 72             	lea    (%edx,%esi,2),%edx
-  1015a4:	bf ff ff ff ff       	mov    $0xffffffff,%edi
-  1015a9:	8d 5a 02             	lea    0x2(%edx),%ebx
-  1015ac:	66 89 3a             	mov    %di,(%edx)
-  1015af:	39 cb                	cmp    %ecx,%ebx
-  1015b1:	73 59                	jae    10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  1015b3:	be ff ff ff ff       	mov    $0xffffffff,%esi
-  1015b8:	8d 5a 04             	lea    0x4(%edx),%ebx
-  1015bb:	66 89 72 02          	mov    %si,0x2(%edx)
-  1015bf:	39 cb                	cmp    %ecx,%ebx
-  1015c1:	73 49                	jae    10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  1015c3:	bb ff ff ff ff       	mov    $0xffffffff,%ebx
-  1015c8:	66 89 5a 04          	mov    %bx,0x4(%edx)
-  1015cc:	8d 5a 06             	lea    0x6(%edx),%ebx
-  1015cf:	39 cb                	cmp    %ecx,%ebx
-  1015d1:	73 39                	jae    10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  1015d3:	bf ff ff ff ff       	mov    $0xffffffff,%edi
-  1015d8:	8d 5a 08             	lea    0x8(%edx),%ebx
-  1015db:	66 89 7a 06          	mov    %di,0x6(%edx)
-  1015df:	39 cb                	cmp    %ecx,%ebx
-  1015e1:	73 29                	jae    10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  1015e3:	be ff ff ff ff       	mov    $0xffffffff,%esi
-  1015e8:	8d 5a 0a             	lea    0xa(%edx),%ebx
-  1015eb:	66 89 72 08          	mov    %si,0x8(%edx)
-  1015ef:	39 cb                	cmp    %ecx,%ebx
-  1015f1:	73 19                	jae    10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  1015f3:	bb ff ff ff ff       	mov    $0xffffffff,%ebx
-  1015f8:	66 89 5a 0a          	mov    %bx,0xa(%edx)
-  1015fc:	8d 5a 0c             	lea    0xc(%edx),%ebx
-  1015ff:	39 cb                	cmp    %ecx,%ebx
-  101601:	73 09                	jae    10160c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x20c>
-  101603:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
-  101608:	66 89 4a 0c          	mov    %cx,0xc(%edx)
-  10160c:	8b 5c 24 10          	mov    0x10(%esp),%ebx
-  101610:	8d 54 58 02          	lea    0x2(%eax,%ebx,2),%edx
-  101614:	89 d0                	mov    %edx,%eax
-  101616:	8b 7c 24 14          	mov    0x14(%esp),%edi
-  10161a:	8d 4a 0f             	lea    0xf(%edx),%ecx
-  10161d:	83 e1 f0             	and    $0xfffffff0,%ecx
-  101620:	83 e7 f0             	and    $0xfffffff0,%edi
-  101623:	39 f9                	cmp    %edi,%ecx
-  101625:	89 7c 24 10          	mov    %edi,0x10(%esp)
-  101629:	0f 47 cf             	cmova  %edi,%ecx
-  10162c:	39 c8                	cmp    %ecx,%eax
-  10162e:	0f 83 be 00 00 00    	jae    1016f2 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2f2>
-  101634:	89 ca                	mov    %ecx,%edx
-  101636:	89 04 24             	mov    %eax,(%esp)
-  101639:	29 c2                	sub    %eax,%edx
-  10163b:	83 ea 01             	sub    $0x1,%edx
-  10163e:	89 d6                	mov    %edx,%esi
-  101640:	c1 ee 02             	shr    $0x2,%esi
-  101643:	89 74 24 04          	mov    %esi,0x4(%esp)
-  101647:	83 fa 1b             	cmp    $0x1b,%edx
-  10164a:	76 3f                	jbe    10168b <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x28b>
-  10164c:	8d 5e 01             	lea    0x1(%esi),%ebx
-  10164f:	89 c2                	mov    %eax,%edx
-  101651:	c5 fd 76 c0          	vpcmpeqd %ymm0,%ymm0,%ymm0
-  101655:	89 df                	mov    %ebx,%edi
-  101657:	c1 ef 03             	shr    $0x3,%edi
-  10165a:	c1 e7 05             	shl    $0x5,%edi
-  10165d:	8d 34 07             	lea    (%edi,%eax,1),%esi
-  101660:	83 e7 20             	and    $0x20,%edi
-  101663:	74 0b                	je     101670 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x270>
-  101665:	8d 50 20             	lea    0x20(%eax),%edx
-  101668:	c5 fe 7f 00          	vmovdqu %ymm0,(%eax)
-  10166c:	39 f2                	cmp    %esi,%edx
-  10166e:	74 10                	je     101680 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x280>
-  101670:	c5 fe 7f 02          	vmovdqu %ymm0,(%edx)
-  101674:	83 c2 40             	add    $0x40,%edx
-  101677:	c5 fe 7f 42 e0       	vmovdqu %ymm0,-0x20(%edx)
-  10167c:	39 f2                	cmp    %esi,%edx
-  10167e:	75 f0                	jne    101670 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x270>
-  101680:	f6 c3 07             	test   $0x7,%bl
-  101683:	74 60                	je     1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  101685:	83 e3 f8             	and    $0xfffffff8,%ebx
-  101688:	8d 04 98             	lea    (%eax,%ebx,4),%eax
-  10168b:	8d 50 04             	lea    0x4(%eax),%edx
-  10168e:	c7 00 ff ff ff ff    	movl   $0xffffffff,(%eax)
-  101694:	39 ca                	cmp    %ecx,%edx
-  101696:	73 4d                	jae    1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  101698:	8d 50 08             	lea    0x8(%eax),%edx
-  10169b:	c7 40 04 ff ff ff ff 	movl   $0xffffffff,0x4(%eax)
-  1016a2:	39 ca                	cmp    %ecx,%edx
-  1016a4:	73 3f                	jae    1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  1016a6:	8d 50 0c             	lea    0xc(%eax),%edx
-  1016a9:	c7 40 08 ff ff ff ff 	movl   $0xffffffff,0x8(%eax)
-  1016b0:	39 ca                	cmp    %ecx,%edx
-  1016b2:	73 31                	jae    1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  1016b4:	8d 50 10             	lea    0x10(%eax),%edx
-  1016b7:	c7 40 0c ff ff ff ff 	movl   $0xffffffff,0xc(%eax)
-  1016be:	39 ca                	cmp    %ecx,%edx
-  1016c0:	73 23                	jae    1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  1016c2:	8d 50 14             	lea    0x14(%eax),%edx
-  1016c5:	c7 40 10 ff ff ff ff 	movl   $0xffffffff,0x10(%eax)
-  1016cc:	39 ca                	cmp    %ecx,%edx
-  1016ce:	73 15                	jae    1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  1016d0:	8d 50 18             	lea    0x18(%eax),%edx
-  1016d3:	c7 40 14 ff ff ff ff 	movl   $0xffffffff,0x14(%eax)
-  1016da:	39 ca                	cmp    %ecx,%edx
-  1016dc:	73 07                	jae    1016e5 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x2e5>
-  1016de:	c7 40 18 ff ff ff ff 	movl   $0xffffffff,0x18(%eax)
-  1016e5:	8b 04 24             	mov    (%esp),%eax
-  1016e8:	8b 5c 24 04          	mov    0x4(%esp),%ebx
-  1016ec:	8d 54 98 04          	lea    0x4(%eax,%ebx,4),%edx
-  1016f0:	89 d0                	mov    %edx,%eax
-  1016f2:	8b 5c 24 14          	mov    0x14(%esp),%ebx
-  1016f6:	83 c2 1f             	add    $0x1f,%edx
-  1016f9:	83 e2 e0             	and    $0xffffffe0,%edx
-  1016fc:	83 e3 e0             	and    $0xffffffe0,%ebx
-  1016ff:	39 da                	cmp    %ebx,%edx
-  101701:	0f 47 d3             	cmova  %ebx,%edx
-  101704:	39 d0                	cmp    %edx,%eax
-  101706:	73 44                	jae    10174c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x34c>
-  101708:	89 c6                	mov    %eax,%esi
-  10170a:	c5 f9 76 c0          	vpcmpeqd %xmm0,%xmm0,%xmm0
-  10170e:	8d 48 10             	lea    0x10(%eax),%ecx
-  101711:	f7 d6                	not    %esi
-  101713:	c5 f9 7f 00          	vmovdqa %xmm0,(%eax)
-  101717:	c1 ee 04             	shr    $0x4,%esi
-  10171a:	39 d1                	cmp    %edx,%ecx
-  10171c:	73 22                	jae    101740 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x340>
-  10171e:	83 e6 01             	and    $0x1,%esi
-  101721:	74 0d                	je     101730 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x330>
-  101723:	c5 f9 7f 01          	vmovdqa %xmm0,(%ecx)
-  101727:	8d 48 20             	lea    0x20(%eax),%ecx
-  10172a:	39 d1                	cmp    %edx,%ecx
-  10172c:	73 12                	jae    101740 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x340>
-  10172e:	66 90                	xchg   %ax,%ax
-  101730:	c5 f9 7f 01          	vmovdqa %xmm0,(%ecx)
-  101734:	83 c1 20             	add    $0x20,%ecx
-  101737:	c5 f9 7f 41 f0       	vmovdqa %xmm0,-0x10(%ecx)
-  10173c:	39 d1                	cmp    %edx,%ecx
-  10173e:	72 f0                	jb     101730 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x330>
-  101740:	29 c2                	sub    %eax,%edx
-  101742:	83 ea 01             	sub    $0x1,%edx
-  101745:	83 e2 f0             	and    $0xfffffff0,%edx
-  101748:	8d 44 10 10          	lea    0x10(%eax,%edx,1),%eax
-  10174c:	39 d8                	cmp    %ebx,%eax
-  10174e:	73 4c                	jae    10179c <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x39c>
-  101750:	89 c1                	mov    %eax,%ecx
-  101752:	c5 fd 76 c0          	vpcmpeqd %ymm0,%ymm0,%ymm0
-  101756:	8d 50 20             	lea    0x20(%eax),%edx
-  101759:	f7 d1                	not    %ecx
-  10175b:	c5 fd 7f 00          	vmovdqa %ymm0,(%eax)
-  10175f:	01 d9                	add    %ebx,%ecx
-  101761:	c1 e9 05             	shr    $0x5,%ecx
-  101764:	39 da                	cmp    %ebx,%edx
-  101766:	73 28                	jae    101790 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x390>
-  101768:	83 e1 01             	and    $0x1,%ecx
-  10176b:	74 13                	je     101780 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x380>
-  10176d:	c5 fd 7f 02          	vmovdqa %ymm0,(%edx)
-  101771:	8d 50 40             	lea    0x40(%eax),%edx
-  101774:	39 da                	cmp    %ebx,%edx
-  101776:	73 18                	jae    101790 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x390>
-  101778:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  10177f:	00 
-  101780:	c5 fd 7f 02          	vmovdqa %ymm0,(%edx)
-  101784:	83 c2 40             	add    $0x40,%edx
-  101787:	c5 fd 7f 42 e0       	vmovdqa %ymm0,-0x20(%edx)
-  10178c:	39 da                	cmp    %ebx,%edx
-  10178e:	72 f0                	jb     101780 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x380>
-  101790:	83 eb 01             	sub    $0x1,%ebx
-  101793:	29 c3                	sub    %eax,%ebx
-  101795:	83 e3 e0             	and    $0xffffffe0,%ebx
-  101798:	8d 44 18 20          	lea    0x20(%eax,%ebx,1),%eax
-  10179c:	8b 54 24 10          	mov    0x10(%esp),%edx
-  1017a0:	89 44 24 18          	mov    %eax,0x18(%esp)
-  1017a4:	8d 44 24 18          	lea    0x18(%esp),%eax
-  1017a8:	e8 f3 fb ff ff       	call   1013a0 <_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE1EEEvPPDv2_xPKS2_>
-  1017ad:	8b 54 24 0c          	mov    0xc(%esp),%edx
-  1017b1:	8d 44 24 18          	lea    0x18(%esp),%eax
-  1017b5:	c5 f8 77             	vzeroupper
-  1017b8:	e8 83 f8 ff ff       	call   101040 <_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_>
-  1017bd:	8b 54 24 08          	mov    0x8(%esp),%edx
-  1017c1:	8d 44 24 18          	lea    0x18(%esp),%eax
-  1017c5:	e8 56 f4 ff ff       	call   100c20 <_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_>
-  1017ca:	8b 54 24 14          	mov    0x14(%esp),%edx
-  1017ce:	8d 44 24 18          	lea    0x18(%esp),%eax
-  1017d2:	e8 49 f5 ff ff       	call   100d20 <_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_>
-  1017d7:	83 c4 1c             	add    $0x1c,%esp
-  1017da:	5b                   	pop    %ebx
-  1017db:	5e                   	pop    %esi
-  1017dc:	5f                   	pop    %edi
-  1017dd:	5d                   	pop    %ebp
-  1017de:	c3                   	ret
-  1017df:	90                   	nop
-  1017e0:	89 da                	mov    %ebx,%edx
-  1017e2:	89 d8                	mov    %ebx,%eax
-  1017e4:	e9 1c fd ff ff       	jmp    101505 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x105>
-  1017e9:	89 c2                	mov    %eax,%edx
-  1017eb:	31 db                	xor    %ebx,%ebx
-  1017ed:	e9 8d fd ff ff       	jmp    10157f <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x17f>
-  1017f2:	89 5c 24 0c          	mov    %ebx,0xc(%esp)
-  1017f6:	c7 44 24 10 00 00 00 	movl   $0x0,0x10(%esp)
-  1017fd:	00 
-  1017fe:	e9 7b fc ff ff       	jmp    10147e <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0x7e>
-  101803:	31 f6                	xor    %esi,%esi
-  101805:	e9 9d fc ff ff       	jmp    1014a7 <_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh+0xa7>
-  10180a:	66 90                	xchg   %ax,%ax
-  10180c:	66 90                	xchg   %ax,%ax
-  10180e:	66 90                	xchg   %ax,%ax
-  101810:	66 90                	xchg   %ax,%ax
-  101812:	66 90                	xchg   %ax,%ax
-  101814:	66 90                	xchg   %ax,%ax
-  101816:	66 90                	xchg   %ax,%ax
-  101818:	66 90                	xchg   %ax,%ax
-  10181a:	66 90                	xchg   %ax,%ax
-  10181c:	66 90                	xchg   %ax,%ax
-  10181e:	66 90                	xchg   %ax,%ax
->>>>>>> origin/refactoring/pmm
 
 001018e0 <_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_>:
   1018e0:	55                   	push   %ebp
