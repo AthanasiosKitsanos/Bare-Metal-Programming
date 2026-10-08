@@ -24,7 +24,7 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_pit(timer_frequency_hz);
     kernel::set_timer_frequency(timer_frequency_hz);
     terminal::output::initialize();
-    // terminal::output out{};
+    terminal::output out{};
     // out << cpu::features::get();
     
     {
@@ -35,16 +35,10 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
 
-    volatile uint8_t* ptr{reinterpret_cast<volatile uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(20))};
-    // app::shell shell{};
-    
+    // volatile uint8_t* ptr{reinterpret_cast<volatile uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(20))};
+    // app::shell shell{}; 
+
     asm volatile("sti");
-
-    // using namespace kernel::memory;
-    // test::test_map<test::set::all_zero>(4096);
-    // test::test_map<test::set::all_ones>(4096);
-    // test::test_map<test::set::all_random>(4096);
-
 
     // shell.run();
 

@@ -15,3 +15,4 @@
 #include "cpu/features.h"
 #include "cpu/gdt.h"
 #include "tools/stopwatch.h"
+#include "tools/builtin.h"

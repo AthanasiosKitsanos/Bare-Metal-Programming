@@ -222,48 +222,61 @@ namespace
     }
 
     [[gnu::always_inline]]
+    inline bit_n_byte run_finished(const uint8_t* const ptr, const size_t length) noexcept
+    {
+        const size_t end_frame_index{(static_cast<size_t>(ptr - g_bitmap.start) << bits_per_byte_shift)};
+        const size_t start_frame_index{end_frame_index - length};
+        return get_bit_n_byte(start_frame_index);
+    }
+
+    [[gnu::always_inline]]
     inline void contiguous_8_core_inline(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
     {
         const uint8_t* current{*start};
-        uint8_t current_value{0};
         size_t length{run->length};
-        uint8_t bit_index{run->start_index.bit_index};
-        uintptr_t bitmap_start_address{reinterpret_cast<uintptr_t>(g_bitmap.start)};
-        uintptr_t current_address{bitmap_start_address + static_cast<uintptr_t>(run->start_index.byte_index)};
-        bool is_first_run{false};
-        for(; current < end; ++current) 
+        
+        for(; current < end; ++current)
         {
-            is_first_run = (length == 0);
-            current_address = is_first_run ? reinterpret_cast<uintptr_t>(current) : current_address;
-            current_value = *current;
-            bit_index *= !is_first_run;
+            const uint8_t current_value{*current};
 
             if(current_value == 0x00)
             {
-                length += 8;
-                if(length >= frames) break;
+                const size_t plus_length{length + byte_size};
+                if(plus_length >= frames) break;
+                length = plus_length;
             }
             else if(current_value == 0xFF) length ^= length;
             else
             {
-                length += builtin::trailing_zeros(current_value);
-                if(length >= frames) break;
-
-                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
-
-                current_address = reinterpret_cast<uintptr_t>(current);
-                bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                length = (pos_n_length & 0x0F);
-                if(length >= frames) break;
-
-                length = builtin::leading_zeros(current_value);
-                bit_index = (byte_size - length);
-                if(length >= frames) break;
+                const size_t plus_length{length + static_cast<size_t>(builtin::trailing_zeros(current_value))};
+                if(plus_length >= frames) break;
+                length = plus_length;
+                
+                if(frames <= 7)
+                {
+                    uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
+                    for(size_t count{frames - 1}; count > 0; --count)
+                    {
+                        inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> 1));
+                    }
+                    
+                    // -builtin::trailing_zeros(inverted_value) wraps around, giving a huge number
+                    // The point is that if inverted_value != 0, that means a run was found
+                    // we do not care how much, but that there is room that satisfies the frames needed
+                    // It is used for the common formula (Bx8 - L == Bx8 + tz) => (-L == tz) or (L == -tz)
+                    // Where Bx8 is byte_index * 8 == frame_index
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        break;
+                    }
+                }
+                
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->start_index.byte_index = static_cast<size_t>(current_address - bitmap_start_address);
-        run->start_index.bit_index = bit_index;
-        run->length = length;
+        run->start_index = run_finished(current, length);
+        run->length = (current == end) ? length: frames;
         *start = current;
     }
     
@@ -280,25 +293,18 @@ namespace
 
             if(current_value == 0x00)
             {
-                length += byte_size;
-                if(length >= frames)
-                {
-                    run->start_index = run_finished(current, length, byte_size);
-                    break;
-                }
+                const size_t plus_length{length + byte_size};
+                if(plus_length >= frames) break;
+                length = plus_length;
             }
             else if(current_value == 0xFF) length ^= length;
             else
             {
-                const uint8_t tr_zeros{builtin::trailing_zeros(current_value)};
-                length += tr_zeros;
-                if(length >= frames)
-                {
-                    run->start_index = run_finished(current, length, tr_zeros);
-                    break;
-                }
+                const size_t plus_length{length + static_cast<size_t>(builtin::trailing_zeros(current_value))};
+                if(plus_length >= frames) break;
+                length = plus_length;
                 
-                if(frames <= 6)
+                if(frames <= 7)
                 {
                     uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
                     for(size_t count{frames - 1}; count > 0; --count)
@@ -306,32 +312,24 @@ namespace
                         inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> 1));
                     }
                     
-                    length = (inverted_value != 0) ? frames : length;
-                    if(length >= frames)
+                    /*
+                        Since we get here only if frames <= 7 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    if(inverted_value != 0)
                     {
-                        run->start_index = get_bit_n_byte(((current - g_bitmap.start) << bits_per_byte_shift) + static_cast<size_t>(builtin::trailing_zeros(inverted_value)));
+                        length = -builtin::trailing_zeros(inverted_value);
                         break;
                     }
                 }
-
-                // TODO: FINISH LEADING_ZEROS
                 
-                // length += builtin::trailing_zeros(current_value);
-                // if(length >= frames) break;
-                
-                // const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
-                // current_address = reinterpret_cast<uintptr_t>(current);
-                
-                // bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                // length = (pos_n_length & 0x0F);
-                // if(length >= frames) break;
-                
-                // length = builtin::leading_zeros(current_value);
-                // bit_index = (byte_size - length);
-                // if(length >= frames) break;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = length;
+        run->start_index = run_finished(current, length);
+        run->length = (current == end) ? length : frames;
         *start = current;
     }
 
@@ -1429,15 +1427,5 @@ namespace kernel::memory
         g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
         g_used_frames -= frames;
         return pmm_result::success;
-    }
-
-    namespace test
-    {
-        size_t core_8(const size_t frames, const uint8_t* end, const uint8_t** const start) noexcept
-        {
-            allocation_run run{};
-            contiguous_8_core(&run, frames, end, start);
-            return run.length;
-        }
     }
 }
