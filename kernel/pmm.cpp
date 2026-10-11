@@ -5,6 +5,7 @@
 #include "tools/cmp.h"
 #include "tools/builtin.h"
 #include "tools/math.h"
+#include "terminal/output.h"
 
 namespace
 {
@@ -235,48 +236,49 @@ namespace
         const uint8_t* current{*start};
         size_t length{run->length};
         
+        const uint8_t shift_1{static_cast<uint8_t>(frames >= 2)};
+        const uint8_t shift_2{static_cast<uint8_t>((frames >= 4) << 1)};
+        const uint8_t shift_3{static_cast<uint8_t>(frames - static_cast<size_t>(shift_1 + shift_2 + 1))};
+        
         for(; current < end; ++current)
         {
             const uint8_t current_value{*current};
-
+            
             if(current_value == 0x00)
             {
-                const size_t plus_length{length + byte_size};
-                if(plus_length >= frames) break;
-                length = plus_length;
+                length += byte_size;
+                if(length >= frames)
+                {
+                    length -= byte_size;
+                    break;
+                }
             }
             else if(current_value == 0xFF) length ^= length;
             else
             {
-                const size_t plus_length{length + static_cast<size_t>(builtin::trailing_zeros(current_value))};
-                if(plus_length >= frames) break;
-                length = plus_length;
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames) break;
                 
-                if(frames <= 7)
+                uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
+                inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> shift_1));
+                inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> shift_2));
+                inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> shift_3));
+                /*
+                    Since we get here only if frames <= 7 (maximum amount of free frames in the middle)
+                    and the inverted byte is not 0, means that the run here is completed.
+                    So we don't really care if the length suddenly becomes huge (wrap around)
+                    since we only care about the frames
+                */
+                if(inverted_value != 0)
                 {
-                    uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
-                    for(size_t count{frames - 1}; count > 0; --count)
-                    {
-                        inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> 1));
-                    }
-                    
-                    // -builtin::trailing_zeros(inverted_value) wraps around, giving a huge number
-                    // The point is that if inverted_value != 0, that means a run was found
-                    // we do not care how much, but that there is room that satisfies the frames needed
-                    // It is used for the common formula (Bx8 - L == Bx8 + tz) => (-L == tz) or (L == -tz)
-                    // Where Bx8 is byte_index * 8 == frame_index
-                    if(inverted_value != 0)
-                    {
-                        length = -builtin::trailing_zeros(inverted_value);
-                        break;
-                    }
+                    length = -builtin::trailing_zeros(inverted_value);
+                    break;
                 }
                 
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
         run->start_index = run_finished(current, length);
-        run->length = (current == end) ? length: frames;
+        run->length = (current == end) ? length : frames;
         *start = current;
     }
     
@@ -287,10 +289,14 @@ namespace
         const uint8_t* current{*start};
         size_t length{run->length};
         
+        const uint8_t shift_1{static_cast<uint8_t>(frames >= 2)};
+        const uint8_t shift_2{static_cast<uint8_t>((frames >= 4) << 1)};
+        const uint8_t shift_3{static_cast<uint8_t>(frames - static_cast<size_t>(shift_1 + shift_2 + 1))};
+        
         for(; current < end; ++current)
         {
             const uint8_t current_value{*current};
-
+            
             if(current_value == 0x00)
             {
                 const size_t plus_length{length + byte_size};
@@ -300,29 +306,22 @@ namespace
             else if(current_value == 0xFF) length ^= length;
             else
             {
-                const size_t plus_length{length + static_cast<size_t>(builtin::trailing_zeros(current_value))};
-                if(plus_length >= frames) break;
-                length = plus_length;
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames) break;
                 
-                if(frames <= 7)
+                uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
+                inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> shift_1));
+                inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> shift_2));
+                inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> shift_3));
+                /*
+                    Since we get here only if frames <= 7 (maximum amount of free frames in the middle)
+                    and the inverted byte is not 0, means that the run here is completed.
+                    So we don't really care if the length suddenly becomes huge (wrap around)
+                    since we only care about the frames
+                */
+                if(inverted_value != 0)
                 {
-                    uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
-                    for(size_t count{frames - 1}; count > 0; --count)
-                    {
-                        inverted_value = static_cast<uint8_t>(inverted_value & (inverted_value >> 1));
-                    }
-                    
-                    /*
-                        Since we get here only if frames <= 7 (maximum amount of free frames in the middle)
-                        and the inverted byte is not 0, means that the run here is completed.
-                        So we don't really care if the length suddenly becomes huge (wrap around)
-                        since we only care about the frames
-                    */
-                    if(inverted_value != 0)
-                    {
-                        length = -builtin::trailing_zeros(inverted_value);
-                        break;
-                    }
+                    length = -builtin::trailing_zeros(inverted_value);
+                    break;
                 }
                 
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
@@ -1427,5 +1426,36 @@ namespace kernel::memory
         g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
         g_used_frames -= frames;
         return pmm_result::success;
+    }
+
+    namespace test
+    {
+        // Changes bitmap values without restoring them
+        void allocate_8_frames(const size_t frames) noexcept
+        {
+            *g_bitmap.start = 0x0F;
+            g_bitmap.start[1] = 0xF0;
+            const uint8_t* curr{g_bitmap.start};
+
+            allocation_run run{};
+            contiguous_8_core(&run, frames, (curr + 2), &curr);
+            terminal::output out{};
+
+            if(run.length >= frames)
+            {
+                out << "Frames: " << frames
+                << "\nStart value: " << terminal::hex << *g_bitmap.start << terminal::dec
+                << "\nByte index: " << run.start_index.byte_index
+                << "\nBit index: " << run.start_index.bit_index;
+
+                const size_t end_frame{(run.start_index.byte_index << 3) + run.start_index.bit_index + frames - 1};
+                const size_t end_byte{(end_frame >> 3)};
+                const uint8_t end_bit{static_cast<uint8_t>(end_frame & 7)};
+                out << "\n\nEnd value: " << terminal::hex << g_bitmap.start[1] << terminal::dec
+                << "\nByte end: " << end_byte
+                << "\nBit end: " << end_bit << '\n';
+            }   
+            else out << "Not found\n";
+        }
     }
 }

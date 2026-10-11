@@ -35,4 +35,9 @@ namespace kernel::memory
     size_t pmm_total_frames() noexcept;
     size_t pmm_used_frames() noexcept;
     size_t pmm_free_frames() noexcept;
+
+    namespace test
+    {
+        void allocate_8_frames(const size_t) noexcept;
+    }
 }

@@ -7,16 +7,6 @@ extern "C" uint32_t _kernel_end;
 
 extern "C" uint32_t kernel_call;
 
-constexpr const char* types[] =
-{
-    "Nothing",
-    "Usable",
-    "Reserved",
-    "acpi_reclaimable",
-    "acpi_nvs",
-    "bad_memory"
-};
-
 extern "C" [[noreturn]] void kernel_main()
 {
     cpu::gdt::initialize();
@@ -35,12 +25,9 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
 
-    // volatile uint8_t* ptr{reinterpret_cast<volatile uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(20))};
-    // app::shell shell{}; 
+    kernel::memory::test::allocate_8_frames(6);
 
     asm volatile("sti");
-
-    // shell.run();
 
     for(;;) 
     {
