@@ -5,8 +5,6 @@
 
 namespace kernel::memory
 {
-    constexpr size_t frame_size{4096};
-
     struct e820_memory_map;
 
     enum class pmm_result: uint8_t
@@ -38,6 +36,6 @@ namespace kernel::memory
 
     namespace test
     {
-        void allocate_8_frames(const size_t) noexcept;
+        void allocate_8_frames() noexcept;
     }
 }

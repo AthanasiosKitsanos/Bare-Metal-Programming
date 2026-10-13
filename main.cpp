@@ -25,7 +25,7 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
 
-    kernel::memory::test::allocate_8_frames(6);
+    kernel::memory::test::allocate_8_frames();
 
     asm volatile("sti");
 

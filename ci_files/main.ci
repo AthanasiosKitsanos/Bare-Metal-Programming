@@ -16,6 +16,6 @@ node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initia
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:25:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
-node: { title: "_ZN6kernel6memory4test17allocate_8_framesEm" label: "void kernel::memory::test::allocate_8_frames(size_t)\nkernel/pmm.h:41:14" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory4test17allocate_8_framesEm" label: "main.cpp:28:44" }
+node: { title: "_ZN6kernel6memory4test17allocate_8_framesEv" label: "void kernel::memory::test::allocate_8_frames()\nkernel/pmm.h:41:14" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory4test17allocate_8_framesEv" label: "main.cpp:28:44" }
 }
