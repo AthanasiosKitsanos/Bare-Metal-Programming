@@ -3,6 +3,8 @@
 #include <stdint.h>
 #include <immintrin.h>
 #include "tools/math.h"
+#include "tools/builtin.h"
+#include "tools/sequence.h"
 
 namespace
 {
@@ -18,91 +20,45 @@ namespace
         all_zeros = 0x00,
         all_ones = 0x01
     };
-
+    
     template<typename T>
-    struct shifts_array
+    class array_of_shifts
     {
-        static constexpr size_t size{static_cast<size_t>(power::of_2(sizeof(T) << ::bits_per_byte_shift))};
+        private:
+        // D = (sizeof(size_t)) x 8 - 1) - leading_zeros
+        static constexpr size_t array_size{static_cast<size_t>(power::of_2(sizeof(T) << bits_per_byte_shift))};
+        static constexpr size_t total_bits{static_cast<size_t>(sizeof(size_t) << bits_per_byte_shift)};
+        static constexpr size_t total_bits_m1{total_bits - 1};
         
         template<size_t N>
         [[gnu::always_inline]]
-        static constexpr size_t degree_before(const size_t frames) noexcept
+        static constexpr uint8_t compute_step(const size_t frames, const size_t d) noexcept
         {
-            if constexpr(N == 0) return 1;
+            if constexpr(N == array_size - 1) return static_cast<uint8_t>(frames - d);
             else
             {
-                return static_cast<size_t>(degree_before<N - 1>(frames) + compute_step<N - 1>(frames));
+                return static_cast<uint8_t>((d - 1) & (static_cast<size_t>(1) << N));
             }
         }
         
-        template<size_t N>
+        template<size_t ...I>
         [[gnu::always_inline]]
-        static constexpr uint8_t compute_step(const size_t frames) noexcept
+        constexpr array_of_shifts(const size_t frames, const size_t d, sequence::index_list<I...>) noexcept: step{compute_step<I>(frames, d)...}
+        {}
+
+        [[gnu::always_inline]]
+        static constexpr size_t highest_power_of_2(const size_t frames) noexcept
         {
-            if constexpr(N == (size - 1))
-            {           
-                return static_cast<uint8_t>(frames - degree_before<N>(frames));
-            }
-            else
-            {
-                constexpr size_t limit{static_cast<size_t>(0x02 << N)};
-                return static_cast<uint8_t>((frames >= limit) << N);
-            }
+            return static_cast<size_t>(static_cast<size_t>(1) << (total_bits_m1 - builtin::leading_zeros(frames)));
         }
-        
-        
-        uint8_t step[size];
-        
-        constexpr shifts_array(const size_t frames): step{}
-        {
-            if constexpr(size == power::of_2(sizeof(uint8_t) << ::bits_per_byte_shift))
-            {
-                step[0] = static_cast<uint8_t>(frames >= 2);
-                step[1] = static_cast<uint8_t>((frames >= 4) << 1);
-                step[2] = static_cast<uint8_t>(frames - (step[0] + step[1] + 1));
-            }
-            else if constexpr(size == power::of_2(sizeof(uint16_t) << ::bits_per_byte_shift))
-            {
-                step[0] = static_cast<uint8_t>(frames >= 2);
-                step[1] = static_cast<uint8_t>((frames >= 4) << 1);
-                step[2] = static_cast<uint8_t>((frames >= 8) << 2);
-                step[3] = static_cast<uint8_t>(frames - (step[0] + step[1] + step[2] + 1));
-            }
-            else if constexpr(size == power::of_2(sizeof(uint32_t) << ::bits_per_byte_shift))
-            {
-                step[0] = static_cast<uint8_t>(frames >= 2);
-                step[1] = static_cast<uint8_t>((frames >= 4) << 1);
-                step[2] = static_cast<uint8_t>((frames >= 8) << 2);
-                step[3] = static_cast<uint8_t>((frames >= 16) << 3);
-                step[4] = static_cast<uint8_t>(frames - (step[0] + step[1] + step[2] + step[3] + 1));
-            }
-            else if constexpr(size == power::of_2(sizeof(uint64_t) << ::bits_per_byte_shift))
-            {
-                step[0] = static_cast<uint8_t>(frames >= 2);
-                step[1] = static_cast<uint8_t>((frames >= 4) << 1);
-                step[2] = static_cast<uint8_t>((frames >= 8) << 2);
-                step[3] = static_cast<uint8_t>((frames >= 16) << 3);
-                step[4] = static_cast<uint8_t>((frames >= 32) << 4);
-                step[5] = static_cast<uint8_t>(frames - (step[0] + step[1] + step[2] + step[3] + step[4] + 1));
-            }
-        }
+
+        public:
+        uint8_t step[array_size];
+
+        [[gnu::always_inline]]
+        constexpr array_of_shifts(const size_t frames) noexcept: array_of_shifts(frames, highest_power_of_2(frames), sequence::make_index_list<array_size>{})
+        {}
     };
-
-    template<typename T>
-    [[gnu::always_inline]]
-    inline ::shifts_array<T> calculate_shifts(const size_t frames) noexcept
-    {
-        if constexpr(N == sizeof(uint8_t) << 3)
-        {
-            return shift_array<N>
-            {
-                (frames >= 2),
-                ((frames >= 4)),
-                frames + 
-            };
-        }
-    } 
-
 
     // General Purpose Registers
     template<typename T, ::set_bits Set>
@@ -147,7 +103,7 @@ namespace
         for(; current < end; ++current) _mm_store_si128(current, value);
         *start = current;
     }
-
+    
     template<::set_bits Set>
     [[gnu::noinline]] [[gnu::target("sse2")]] [[gnu::regparm(2)]]
     void set_sse2(__m128i** start, const __m128i* const end) noexcept

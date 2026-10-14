@@ -278,7 +278,7 @@ namespace
         const uint8_t* current{*start};
         size_t length{run->length};
         
-        const shifts_array<uint8_t> shifts{frames};
+        const array_of_shifts<uint8_t> shifts{frames};
         
         for(; current < end; ++current)
         {
@@ -305,6 +305,7 @@ namespace
                 
                 if(frames <= 7)
                 {
+                    // Make a function that does uses the below lines
                     uint8_t inverted_value{static_cast<uint8_t>(~current_value)};
                     inverted_value &= (inverted_value >> shifts.step[0]);
                     inverted_value &= (inverted_value >> shifts.step[1]);
