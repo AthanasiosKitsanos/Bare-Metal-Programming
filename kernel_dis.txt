@@ -509,16 +509,16 @@ Disassembly of section .text:
   1005e4:	e8 87 05 00 00       	call   100b70 <_ZN6kernel14initialize_pitEm>
   1005e9:	c7 04 24 64 00 00 00 	movl   $0x64,(%esp)
   1005f0:	e8 db 05 00 00       	call   100bd0 <_ZN6kernel19set_timer_frequencyEm>
-  1005f5:	e8 36 28 00 00       	call   102e30 <_ZN8terminal6output10initializeEv>
+  1005f5:	e8 46 28 00 00       	call   102e40 <_ZN8terminal6output10initializeEv>
   1005fa:	89 1c 24             	mov    %ebx,(%esp)
   1005fd:	e8 de 05 00 00       	call   100be0 <_ZN6kernel6memory19get_e820_memory_mapEv>
   100602:	ba 8b 68 10 00       	mov    $0x10688b,%edx
   100607:	89 d8                	mov    %ebx,%eax
   100609:	83 c4 0c             	add    $0xc,%esp
-  10060c:	e8 cf 1f 00 00       	call   1025e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>
+  10060c:	e8 ef 1f 00 00       	call   102600 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>
   100611:	e8 0a 03 00 00       	call   100920 <_ZN6kernel21initialize_exceptionsEv>
-  100616:	e8 65 23 00 00       	call   102980 <_ZN6driver19initialize_keyboardEv>
-  10061b:	e8 d0 21 00 00       	call   1027f0 <_ZN6kernel6memory4test17allocate_8_framesEv>
+  100616:	e8 75 23 00 00       	call   102990 <_ZN6driver19initialize_keyboardEv>
+  10061b:	e8 f0 21 00 00       	call   102810 <_ZN6kernel6memory4test17allocate_8_framesEv>
   100620:	fb                   	sti
   100621:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
   100628:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
@@ -547,65 +547,65 @@ Disassembly of section .text:
   100658:	e8 c3 03 00 00       	call   100a20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
   10065d:	ba 6a 37 10 00       	mov    $0x10376a,%edx
   100662:	b8 82 40 10 00       	mov    $0x104082,%eax
-  100667:	e8 94 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100667:	e8 a4 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   10066c:	89 f2                	mov    %esi,%edx
-  10066e:	e8 8d 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  10066e:	e8 9d 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100673:	ba 20 00 00 00       	mov    $0x20,%edx
-  100678:	e8 03 28 00 00       	call   102e80 <_ZN8terminal6outputlsEc>
+  100678:	e8 13 28 00 00       	call   102e90 <_ZN8terminal6outputlsEc>
   10067d:	8b 55 08             	mov    0x8(%ebp),%edx
-  100680:	e8 7b 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100680:	e8 8b 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100685:	ba d0 31 10 00       	mov    $0x1031d0,%edx
   10068a:	e8 21 2b 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
   10068f:	ba 7a 37 10 00       	mov    $0x10377a,%edx
-  100694:	e8 67 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100694:	e8 77 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100699:	8b 53 28             	mov    0x28(%ebx),%edx
   10069c:	e8 1f 2a 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1006a1:	ba 80 37 10 00       	mov    $0x103780,%edx
-  1006a6:	e8 55 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  1006a6:	e8 65 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   1006ab:	8b 53 30             	mov    0x30(%ebx),%edx
   1006ae:	e8 0d 2a 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1006b3:	ba 89 37 10 00       	mov    $0x103789,%edx
-  1006b8:	e8 43 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  1006b8:	e8 53 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   1006bd:	8b 53 24             	mov    0x24(%ebx),%edx
   1006c0:	e8 fb 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1006c5:	ba 96 37 10 00       	mov    $0x103796,%edx
-  1006ca:	e8 31 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  1006ca:	e8 41 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   1006cf:	8b 53 1c             	mov    0x1c(%ebx),%edx
   1006d2:	e8 e9 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1006d7:	ba 9c 37 10 00       	mov    $0x10379c,%edx
-  1006dc:	e8 1f 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  1006dc:	e8 2f 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   1006e1:	8b 53 18             	mov    0x18(%ebx),%edx
   1006e4:	e8 d7 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1006e9:	ba a6 37 10 00       	mov    $0x1037a6,%edx
-  1006ee:	e8 0d 28 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  1006ee:	e8 1d 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   1006f3:	8b 53 14             	mov    0x14(%ebx),%edx
   1006f6:	e8 c5 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1006fb:	ba ac 37 10 00       	mov    $0x1037ac,%edx
-  100700:	e8 fb 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100700:	e8 0b 28 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100705:	8b 53 10             	mov    0x10(%ebx),%edx
   100708:	e8 b3 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   10070d:	ba b2 37 10 00       	mov    $0x1037b2,%edx
-  100712:	e8 e9 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100712:	e8 f9 27 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100717:	8b 53 0c             	mov    0xc(%ebx),%edx
   10071a:	e8 a1 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   10071f:	ba b8 37 10 00       	mov    $0x1037b8,%edx
-  100724:	e8 d7 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100724:	e8 e7 27 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100729:	8b 53 08             	mov    0x8(%ebx),%edx
   10072c:	e8 8f 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   100731:	ba be 37 10 00       	mov    $0x1037be,%edx
-  100736:	e8 c5 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100736:	e8 d5 27 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   10073b:	8b 53 04             	mov    0x4(%ebx),%edx
   10073e:	e8 7d 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   100743:	ba c4 37 10 00       	mov    $0x1037c4,%edx
-  100748:	e8 b3 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100748:	e8 c3 27 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   10074d:	8b 13                	mov    (%ebx),%edx
   10074f:	e8 6c 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   100754:	ba cb 37 10 00       	mov    $0x1037cb,%edx
-  100759:	e8 a2 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100759:	e8 b2 27 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   10075e:	8b 53 20             	mov    0x20(%ebx),%edx
   100761:	e8 5a 29 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   100766:	ba 0a 00 00 00       	mov    $0xa,%edx
-  10076b:	e8 10 27 00 00       	call   102e80 <_ZN8terminal6outputlsEc>
+  10076b:	e8 20 27 00 00       	call   102e90 <_ZN8terminal6outputlsEc>
   100770:	58                   	pop    %eax
   100771:	5a                   	pop    %edx
   100772:	68 d4 37 10 00       	push   $0x1037d4
@@ -655,7 +655,7 @@ Disassembly of section .text:
   1007e9:	e8 32 02 00 00       	call   100a20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
   1007ee:	ba 20 39 10 00       	mov    $0x103920,%edx
   1007f3:	b8 82 40 10 00       	mov    $0x104082,%eax
-  1007f8:	e8 03 27 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  1007f8:	e8 13 27 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   1007fd:	8b 4d f4             	mov    -0xc(%ebp),%ecx
   100800:	8b 51 20             	mov    0x20(%ecx),%edx
   100803:	e8 b8 28 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
@@ -697,21 +697,21 @@ Disassembly of section .text:
   100860:	e8 bb 01 00 00       	call   100a20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
   100865:	ba 48 38 10 00       	mov    $0x103848,%edx
   10086a:	b8 82 40 10 00       	mov    $0x104082,%eax
-  10086f:	e8 8c 26 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  10086f:	e8 9c 26 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100874:	89 f2                	mov    %esi,%edx
   100876:	e8 45 28 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   10087b:	ba 65 38 10 00       	mov    $0x103865,%edx
-  100880:	e8 7b 26 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100880:	e8 8b 26 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100885:	8b 53 24             	mov    0x24(%ebx),%edx
   100888:	e8 33 28 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   10088d:	ba 73 38 10 00       	mov    $0x103873,%edx
-  100892:	e8 69 26 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100892:	e8 79 26 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100897:	ba d0 31 10 00       	mov    $0x1031d0,%edx
   10089c:	e8 0f 29 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
   1008a1:	8b 53 28             	mov    0x28(%ebx),%edx
   1008a4:	e8 17 28 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
   1008a9:	ba 0a 00 00 00       	mov    $0xa,%edx
-  1008ae:	e8 cd 25 00 00       	call   102e80 <_ZN8terminal6outputlsEc>
+  1008ae:	e8 dd 25 00 00       	call   102e90 <_ZN8terminal6outputlsEc>
   1008b3:	ba c0 31 10 00       	mov    $0x1031c0,%edx
   1008b8:	e8 f3 28 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
   1008bd:	8d 46 e0             	lea    -0x20(%esi),%eax
@@ -859,7 +859,7 @@ Disassembly of section .text:
   100a38:	0a 45 10             	or     0x10(%ebp),%al
   100a3b:	a2 6b 40 10 00       	mov    %al,0x10406b
   100a40:	8b 45 08             	mov    0x8(%ebp),%eax
-  100a43:	e8 b8 24 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100a43:	e8 c8 24 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100a48:	88 1d 6b 40 10 00    	mov    %bl,0x10406b
   100a4e:	8b 5d fc             	mov    -0x4(%ebp),%ebx
   100a51:	c9                   	leave
@@ -879,11 +879,11 @@ Disassembly of section .text:
   100a68:	83 ec 08             	sub    $0x8,%esp
   100a6b:	c6 05 6b 40 10 00 4f 	movb   $0x4f,0x10406b
   100a72:	8b 45 08             	mov    0x8(%ebp),%eax
-  100a75:	e8 86 24 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100a75:	e8 96 24 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100a7a:	8b 55 0c             	mov    0xc(%ebp),%edx
-  100a7d:	e8 7e 24 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
+  100a7d:	e8 8e 24 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
   100a82:	ba 0a 00 00 00       	mov    $0xa,%edx
-  100a87:	e8 f4 23 00 00       	call   102e80 <_ZN8terminal6outputlsEc>
+  100a87:	e8 04 24 00 00       	call   102e90 <_ZN8terminal6outputlsEc>
   100a8c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   100a90:	fa                   	cli
   100a91:	f4                   	hlt
@@ -3216,946 +3216,947 @@ Disassembly of section .text:
 
 001023f0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_>:
   1023f0:	55                   	push   %ebp
-  1023f1:	57                   	push   %edi
-  1023f2:	89 cf                	mov    %ecx,%edi
-  1023f4:	56                   	push   %esi
-  1023f5:	89 d6                	mov    %edx,%esi
-  1023f7:	53                   	push   %ebx
-  1023f8:	89 c3                	mov    %eax,%ebx
-  1023fa:	83 ec 08             	sub    $0x8,%esp
-  1023fd:	8b 5b 08             	mov    0x8(%ebx),%ebx
-  102400:	89 44 24 04          	mov    %eax,0x4(%esp)
-  102404:	8b 44 24 1c          	mov    0x1c(%esp),%eax
+  1023f1:	89 cd                	mov    %ecx,%ebp
+  1023f3:	57                   	push   %edi
+  1023f4:	89 d7                	mov    %edx,%edi
+  1023f6:	56                   	push   %esi
+  1023f7:	89 c6                	mov    %eax,%esi
+  1023f9:	53                   	push   %ebx
+  1023fa:	83 ec 0c             	sub    $0xc,%esp
+  1023fd:	8b 4e 04             	mov    0x4(%esi),%ecx
+  102400:	89 44 24 08          	mov    %eax,0x8(%esp)
+  102404:	8b 44 24 20          	mov    0x20(%esp),%eax
   102408:	8b 00                	mov    (%eax),%eax
-  10240a:	39 c8                	cmp    %ecx,%eax
-  10240c:	0f 83 c2 01 00 00    	jae    1025d4 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1e4>
+  10240a:	39 e8                	cmp    %ebp,%eax
+  10240c:	0f 83 cf 01 00 00    	jae    1025e1 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1f1>
   102412:	83 fa 07             	cmp    $0x7,%edx
-  102415:	0f 87 94 00 00 00    	ja     1024af <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xbf>
-  10241b:	0f b6 08             	movzbl (%eax),%ecx
-  10241e:	84 c9                	test   %cl,%cl
-  102420:	0f 85 b2 00 00 00    	jne    1024d8 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xe8>
-  102426:	8d 53 08             	lea    0x8(%ebx),%edx
-  102429:	39 f2                	cmp    %esi,%edx
-  10242b:	0f 83 4f 01 00 00    	jae    102580 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x190>
-  102431:	83 c0 01             	add    $0x1,%eax
-  102434:	39 c7                	cmp    %eax,%edi
-  102436:	0f 84 54 01 00 00    	je     102590 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1a0>
-  10243c:	0f b6 08             	movzbl (%eax),%ecx
-  10243f:	84 c9                	test   %cl,%cl
-  102441:	0f 85 99 00 00 00    	jne    1024e0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xf0>
-  102447:	89 c1                	mov    %eax,%ecx
-  102449:	2b 0d a8 48 10 00    	sub    0x1048a8,%ecx
-  10244f:	31 db                	xor    %ebx,%ebx
-  102451:	c1 e1 03             	shl    $0x3,%ecx
-  102454:	29 d1                	sub    %edx,%ecx
-  102456:	89 cd                	mov    %ecx,%ebp
-  102458:	88 cb                	mov    %cl,%bl
-  10245a:	8b 4c 24 04          	mov    0x4(%esp),%ecx
-  10245e:	c1 ed 03             	shr    $0x3,%ebp
-  102461:	80 e3 07             	and    $0x7,%bl
-  102464:	89 29                	mov    %ebp,(%ecx)
-  102466:	89 59 04             	mov    %ebx,0x4(%ecx)
-  102469:	39 f8                	cmp    %edi,%eax
-  10246b:	0f 44 f2             	cmove  %edx,%esi
-  10246e:	8b 7c 24 04          	mov    0x4(%esp),%edi
-  102472:	89 77 08             	mov    %esi,0x8(%edi)
-  102475:	8b 74 24 1c          	mov    0x1c(%esp),%esi
-  102479:	89 06                	mov    %eax,(%esi)
-  10247b:	83 c4 08             	add    $0x8,%esp
-  10247e:	5b                   	pop    %ebx
-  10247f:	5e                   	pop    %esi
-  102480:	5f                   	pop    %edi
-  102481:	5d                   	pop    %ebp
-  102482:	c3                   	ret
-  102483:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102488:	80 fa ff             	cmp    $0xff,%dl
-  10248b:	74 43                	je     1024d0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xe0>
-  10248d:	31 c9                	xor    %ecx,%ecx
-  10248f:	f3 0f bc ca          	tzcnt  %edx,%ecx
-  102493:	01 d9                	add    %ebx,%ecx
-  102495:	39 f1                	cmp    %esi,%ecx
-  102497:	0f 83 e3 00 00 00    	jae    102580 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x190>
-  10249d:	c1 e2 18             	shl    $0x18,%edx
-  1024a0:	0f bd d2             	bsr    %edx,%edx
-  1024a3:	89 d3                	mov    %edx,%ebx
-  1024a5:	83 f3 1f             	xor    $0x1f,%ebx
-  1024a8:	83 c0 01             	add    $0x1,%eax
-  1024ab:	39 c7                	cmp    %eax,%edi
-  1024ad:	74 1b                	je     1024ca <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xda>
-  1024af:	0f b6 10             	movzbl (%eax),%edx
-  1024b2:	84 d2                	test   %dl,%dl
-  1024b4:	75 d2                	jne    102488 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x98>
-  1024b6:	8d 53 08             	lea    0x8(%ebx),%edx
-  1024b9:	39 f2                	cmp    %esi,%edx
-  1024bb:	0f 83 bf 00 00 00    	jae    102580 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x190>
-  1024c1:	83 c0 01             	add    $0x1,%eax
-  1024c4:	89 d3                	mov    %edx,%ebx
-  1024c6:	39 c7                	cmp    %eax,%edi
-  1024c8:	75 e5                	jne    1024af <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xbf>
-  1024ca:	89 de                	mov    %ebx,%esi
-  1024cc:	89 f8                	mov    %edi,%eax
-  1024ce:	eb 9e                	jmp    10246e <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x7e>
-  1024d0:	31 db                	xor    %ebx,%ebx
-  1024d2:	eb d4                	jmp    1024a8 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xb8>
+  102415:	0f 87 8c 00 00 00    	ja     1024a7 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xb7>
+  10241b:	0f b6 30             	movzbl (%eax),%esi
+  10241e:	89 f3                	mov    %esi,%ebx
+  102420:	84 db                	test   %bl,%bl
+  102422:	0f 85 b0 00 00 00    	jne    1024d8 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xe8>
+  102428:	8d 71 08             	lea    0x8(%ecx),%esi
+  10242b:	89 34 24             	mov    %esi,(%esp)
+  10242e:	39 d6                	cmp    %edx,%esi
+  102430:	0f 83 62 01 00 00    	jae    102598 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1a8>
+  102436:	83 c0 01             	add    $0x1,%eax
+  102439:	39 c5                	cmp    %eax,%ebp
+  10243b:	0f 84 5f 01 00 00    	je     1025a0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1b0>
+  102441:	0f b6 30             	movzbl (%eax),%esi
+  102444:	89 f3                	mov    %esi,%ebx
+  102446:	84 db                	test   %bl,%bl
+  102448:	0f 85 92 00 00 00    	jne    1024e0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xf0>
+  10244e:	8b 74 24 08          	mov    0x8(%esp),%esi
+  102452:	89 c1                	mov    %eax,%ecx
+  102454:	2b 0d a8 48 10 00    	sub    0x1048a8,%ecx
+  10245a:	c1 e1 03             	shl    $0x3,%ecx
+  10245d:	2b 0c 24             	sub    (%esp),%ecx
+  102460:	89 0e                	mov    %ecx,(%esi)
+  102462:	39 c5                	cmp    %eax,%ebp
+  102464:	0f 44 3c 24          	cmove  (%esp),%edi
+  102468:	8b 74 24 08          	mov    0x8(%esp),%esi
+  10246c:	89 7e 04             	mov    %edi,0x4(%esi)
+  10246f:	8b 7c 24 20          	mov    0x20(%esp),%edi
+  102473:	89 07                	mov    %eax,(%edi)
+  102475:	83 c4 0c             	add    $0xc,%esp
+  102478:	5b                   	pop    %ebx
+  102479:	5e                   	pop    %esi
+  10247a:	5f                   	pop    %edi
+  10247b:	5d                   	pop    %ebp
+  10247c:	c3                   	ret
+  10247d:	8d 76 00             	lea    0x0(%esi),%esi
+  102480:	80 fa ff             	cmp    $0xff,%dl
+  102483:	74 4b                	je     1024d0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xe0>
+  102485:	31 db                	xor    %ebx,%ebx
+  102487:	f3 0f bc da          	tzcnt  %edx,%ebx
+  10248b:	01 cb                	add    %ecx,%ebx
+  10248d:	39 fb                	cmp    %edi,%ebx
+  10248f:	0f 83 03 01 00 00    	jae    102598 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1a8>
+  102495:	c1 e2 18             	shl    $0x18,%edx
+  102498:	0f bd d2             	bsr    %edx,%edx
+  10249b:	89 d1                	mov    %edx,%ecx
+  10249d:	83 f1 1f             	xor    $0x1f,%ecx
+  1024a0:	83 c0 01             	add    $0x1,%eax
+  1024a3:	39 c5                	cmp    %eax,%ebp
+  1024a5:	74 1b                	je     1024c2 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xd2>
+  1024a7:	0f b6 10             	movzbl (%eax),%edx
+  1024aa:	84 d2                	test   %dl,%dl
+  1024ac:	75 d2                	jne    102480 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x90>
+  1024ae:	8d 51 08             	lea    0x8(%ecx),%edx
+  1024b1:	39 fa                	cmp    %edi,%edx
+  1024b3:	0f 83 df 00 00 00    	jae    102598 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1a8>
+  1024b9:	83 c0 01             	add    $0x1,%eax
+  1024bc:	89 d1                	mov    %edx,%ecx
+  1024be:	39 c5                	cmp    %eax,%ebp
+  1024c0:	75 e5                	jne    1024a7 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xb7>
+  1024c2:	89 cf                	mov    %ecx,%edi
+  1024c4:	89 e8                	mov    %ebp,%eax
+  1024c6:	eb a0                	jmp    102468 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x78>
+  1024c8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  1024cf:	00 
+  1024d0:	31 c9                	xor    %ecx,%ecx
+  1024d2:	eb cc                	jmp    1024a0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0xb0>
   1024d4:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  1024d8:	89 da                	mov    %ebx,%edx
-  1024da:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  1024e0:	83 fe 01             	cmp    $0x1,%esi
-  1024e3:	0f 97 44 24 01       	seta   0x1(%esp)
-  1024e8:	83 fe 03             	cmp    $0x3,%esi
-  1024eb:	0f 97 c3             	seta   %bl
-  1024ee:	01 db                	add    %ebx,%ebx
-  1024f0:	88 5c 24 02          	mov    %bl,0x2(%esp)
-  1024f4:	8d 5e ff             	lea    -0x1(%esi),%ebx
-  1024f7:	2a 5c 24 01          	sub    0x1(%esp),%bl
-  1024fb:	2a 5c 24 02          	sub    0x2(%esp),%bl
-  1024ff:	88 5c 24 03          	mov    %bl,0x3(%esp)
-  102503:	80 f9 ff             	cmp    $0xff,%cl
-  102506:	74 5f                	je     102567 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x177>
-  102508:	0f b6 e9             	movzbl %cl,%ebp
-  10250b:	31 db                	xor    %ebx,%ebx
-  10250d:	f3 0f bc dd          	tzcnt  %ebp,%ebx
-  102511:	01 d3                	add    %edx,%ebx
-  102513:	39 f3                	cmp    %esi,%ebx
-  102515:	0f 83 2c ff ff ff    	jae    102447 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x57>
-  10251b:	f7 d1                	not    %ecx
-  10251d:	0f b6 d1             	movzbl %cl,%edx
-  102520:	0f b6 4c 24 01       	movzbl 0x1(%esp),%ecx
-  102525:	89 d3                	mov    %edx,%ebx
-  102527:	d3 fa                	sar    %cl,%edx
-  102529:	0f b6 4c 24 02       	movzbl 0x2(%esp),%ecx
-  10252e:	21 d3                	and    %edx,%ebx
-  102530:	0f b6 d3             	movzbl %bl,%edx
-  102533:	d3 fa                	sar    %cl,%edx
-  102535:	0f b6 4c 24 03       	movzbl 0x3(%esp),%ecx
-  10253a:	21 d3                	and    %edx,%ebx
-  10253c:	0f b6 d3             	movzbl %bl,%edx
-  10253f:	d3 fa                	sar    %cl,%edx
-  102541:	20 d3                	and    %dl,%bl
-  102543:	75 54                	jne    102599 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1a9>
-  102545:	89 ea                	mov    %ebp,%edx
-  102547:	c1 e2 18             	shl    $0x18,%edx
-  10254a:	0f bd d2             	bsr    %edx,%edx
-  10254d:	83 c0 01             	add    $0x1,%eax
-  102550:	83 f2 1f             	xor    $0x1f,%edx
-  102553:	39 c7                	cmp    %eax,%edi
-  102555:	74 39                	je     102590 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1a0>
-  102557:	0f b6 08             	movzbl (%eax),%ecx
-  10255a:	84 c9                	test   %cl,%cl
-  10255c:	0f 84 e5 fe ff ff    	je     102447 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x57>
-  102562:	80 f9 ff             	cmp    $0xff,%cl
-  102565:	75 a1                	jne    102508 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x118>
-  102567:	83 c0 01             	add    $0x1,%eax
-  10256a:	39 c7                	cmp    %eax,%edi
-  10256c:	74 5d                	je     1025cb <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1db>
-  10256e:	0f b6 08             	movzbl (%eax),%ecx
-  102571:	31 d2                	xor    %edx,%edx
-  102573:	84 c9                	test   %cl,%cl
-  102575:	0f 84 cc fe ff ff    	je     102447 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x57>
-  10257b:	eb 86                	jmp    102503 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x113>
-  10257d:	8d 76 00             	lea    0x0(%esi),%esi
-  102580:	89 da                	mov    %ebx,%edx
-  102582:	e9 c0 fe ff ff       	jmp    102447 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x57>
-  102587:	90                   	nop
-  102588:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  10258f:	00 
-  102590:	89 d6                	mov    %edx,%esi
-  102592:	89 f8                	mov    %edi,%eax
-  102594:	e9 d5 fe ff ff       	jmp    10246e <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x7e>
-  102599:	0f b6 d3             	movzbl %bl,%edx
-  10259c:	31 c9                	xor    %ecx,%ecx
-  10259e:	89 c3                	mov    %eax,%ebx
-  1025a0:	2b 1d a8 48 10 00    	sub    0x1048a8,%ebx
-  1025a6:	f3 0f bc ca          	tzcnt  %edx,%ecx
-  1025aa:	8d 1c d9             	lea    (%ecx,%ebx,8),%ebx
-  1025ad:	89 ca                	mov    %ecx,%edx
-  1025af:	31 c9                	xor    %ecx,%ecx
-  1025b1:	89 dd                	mov    %ebx,%ebp
-  1025b3:	88 d9                	mov    %bl,%cl
-  1025b5:	8b 5c 24 04          	mov    0x4(%esp),%ebx
-  1025b9:	f7 da                	neg    %edx
-  1025bb:	c1 ed 03             	shr    $0x3,%ebp
-  1025be:	80 e1 07             	and    $0x7,%cl
-  1025c1:	89 2b                	mov    %ebp,(%ebx)
-  1025c3:	89 4b 04             	mov    %ecx,0x4(%ebx)
-  1025c6:	e9 9e fe ff ff       	jmp    102469 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x79>
-  1025cb:	31 f6                	xor    %esi,%esi
-  1025cd:	89 f8                	mov    %edi,%eax
-  1025cf:	e9 9a fe ff ff       	jmp    10246e <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x7e>
-  1025d4:	89 da                	mov    %ebx,%edx
-  1025d6:	e9 8e fe ff ff       	jmp    102469 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x79>
-  1025db:	66 90                	xchg   %ax,%ax
-  1025dd:	66 90                	xchg   %ax,%ax
-  1025df:	90                   	nop
+  1024d8:	89 0c 24             	mov    %ecx,(%esp)
+  1024db:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  1024e0:	0f bd cf             	bsr    %edi,%ecx
+  1024e3:	bb 00 00 00 80       	mov    $0x80000000,%ebx
+  1024e8:	83 f1 1f             	xor    $0x1f,%ecx
+  1024eb:	d3 eb                	shr    %cl,%ebx
+  1024ed:	89 d9                	mov    %ebx,%ecx
+  1024ef:	8d 5b ff             	lea    -0x1(%ebx),%ebx
+  1024f2:	89 da                	mov    %ebx,%edx
+  1024f4:	83 e3 02             	and    $0x2,%ebx
+  1024f7:	88 5c 24 06          	mov    %bl,0x6(%esp)
+  1024fb:	89 fb                	mov    %edi,%ebx
+  1024fd:	83 e2 01             	and    $0x1,%edx
+  102500:	29 cb                	sub    %ecx,%ebx
+  102502:	88 54 24 05          	mov    %dl,0x5(%esp)
+  102506:	8b 14 24             	mov    (%esp),%edx
+  102509:	89 f1                	mov    %esi,%ecx
+  10250b:	88 5c 24 07          	mov    %bl,0x7(%esp)
+  10250f:	80 f9 ff             	cmp    $0xff,%cl
+  102512:	74 5c                	je     102570 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x180>
+  102514:	0f b6 f1             	movzbl %cl,%esi
+  102517:	31 db                	xor    %ebx,%ebx
+  102519:	f3 0f bc de          	tzcnt  %esi,%ebx
+  10251d:	01 d3                	add    %edx,%ebx
+  10251f:	39 fb                	cmp    %edi,%ebx
+  102521:	73 41                	jae    102564 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x174>
+  102523:	f7 d1                	not    %ecx
+  102525:	0f b6 d1             	movzbl %cl,%edx
+  102528:	0f b6 4c 24 05       	movzbl 0x5(%esp),%ecx
+  10252d:	89 d3                	mov    %edx,%ebx
+  10252f:	d3 fa                	sar    %cl,%edx
+  102531:	0f b6 4c 24 06       	movzbl 0x6(%esp),%ecx
+  102536:	21 d3                	and    %edx,%ebx
+  102538:	0f b6 d3             	movzbl %bl,%edx
+  10253b:	d3 fa                	sar    %cl,%edx
+  10253d:	0f b6 4c 24 07       	movzbl 0x7(%esp),%ecx
+  102542:	21 d3                	and    %edx,%ebx
+  102544:	0f b6 d3             	movzbl %bl,%edx
+  102547:	d3 fa                	sar    %cl,%edx
+  102549:	20 d3                	and    %dl,%bl
+  10254b:	75 5c                	jne    1025a9 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1b9>
+  10254d:	c1 e6 18             	shl    $0x18,%esi
+  102550:	0f bd d6             	bsr    %esi,%edx
+  102553:	83 c0 01             	add    $0x1,%eax
+  102556:	83 f2 1f             	xor    $0x1f,%edx
+  102559:	39 c5                	cmp    %eax,%ebp
+  10255b:	74 72                	je     1025cf <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1df>
+  10255d:	0f b6 08             	movzbl (%eax),%ecx
+  102560:	84 c9                	test   %cl,%cl
+  102562:	75 ab                	jne    10250f <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x11f>
+  102564:	89 14 24             	mov    %edx,(%esp)
+  102567:	e9 e2 fe ff ff       	jmp    10244e <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x5e>
+  10256c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102570:	83 c0 01             	add    $0x1,%eax
+  102573:	39 c5                	cmp    %eax,%ebp
+  102575:	74 61                	je     1025d8 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x1e8>
+  102577:	0f b6 08             	movzbl (%eax),%ecx
+  10257a:	84 c9                	test   %cl,%cl
+  10257c:	74 0a                	je     102588 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x198>
+  10257e:	31 d2                	xor    %edx,%edx
+  102580:	eb 8d                	jmp    10250f <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x11f>
+  102582:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  102588:	c7 04 24 00 00 00 00 	movl   $0x0,(%esp)
+  10258f:	e9 ba fe ff ff       	jmp    10244e <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x5e>
+  102594:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102598:	89 0c 24             	mov    %ecx,(%esp)
+  10259b:	e9 ae fe ff ff       	jmp    10244e <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x5e>
+  1025a0:	89 f7                	mov    %esi,%edi
+  1025a2:	89 e8                	mov    %ebp,%eax
+  1025a4:	e9 bf fe ff ff       	jmp    102468 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x78>
+  1025a9:	0f b6 d3             	movzbl %bl,%edx
+  1025ac:	31 c9                	xor    %ecx,%ecx
+  1025ae:	8b 74 24 08          	mov    0x8(%esp),%esi
+  1025b2:	89 c3                	mov    %eax,%ebx
+  1025b4:	f3 0f bc ca          	tzcnt  %edx,%ecx
+  1025b8:	2b 1d a8 48 10 00    	sub    0x1048a8,%ebx
+  1025be:	89 ca                	mov    %ecx,%edx
+  1025c0:	8d 0c d9             	lea    (%ecx,%ebx,8),%ecx
+  1025c3:	f7 da                	neg    %edx
+  1025c5:	89 0e                	mov    %ecx,(%esi)
+  1025c7:	89 14 24             	mov    %edx,(%esp)
+  1025ca:	e9 93 fe ff ff       	jmp    102462 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x72>
+  1025cf:	89 d7                	mov    %edx,%edi
+  1025d1:	89 e8                	mov    %ebp,%eax
+  1025d3:	e9 90 fe ff ff       	jmp    102468 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x78>
+  1025d8:	31 ff                	xor    %edi,%edi
+  1025da:	89 e8                	mov    %ebp,%eax
+  1025dc:	e9 87 fe ff ff       	jmp    102468 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x78>
+  1025e1:	89 0c 24             	mov    %ecx,(%esp)
+  1025e4:	e9 79 fe ff ff       	jmp    102462 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_+0x72>
+  1025e9:	66 90                	xchg   %ax,%ax
+  1025eb:	66 90                	xchg   %ax,%ax
+  1025ed:	66 90                	xchg   %ax,%ax
+  1025ef:	66 90                	xchg   %ax,%ax
+  1025f1:	66 90                	xchg   %ax,%ax
+  1025f3:	66 90                	xchg   %ax,%ax
+  1025f5:	66 90                	xchg   %ax,%ax
+  1025f7:	66 90                	xchg   %ax,%ax
+  1025f9:	66 90                	xchg   %ax,%ax
+  1025fb:	66 90                	xchg   %ax,%ax
+  1025fd:	66 90                	xchg   %ax,%ax
+  1025ff:	90                   	nop
 
-001025e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>:
-  1025e0:	55                   	push   %ebp
-  1025e1:	89 d1                	mov    %edx,%ecx
-  1025e3:	57                   	push   %edi
-  1025e4:	56                   	push   %esi
-  1025e5:	53                   	push   %ebx
-  1025e6:	89 c3                	mov    %eax,%ebx
-  1025e8:	83 ec 1c             	sub    $0x1c,%esp
-  1025eb:	0f b7 53 04          	movzwl 0x4(%ebx),%edx
-  1025ef:	8b 00                	mov    (%eax),%eax
-  1025f1:	8d 14 92             	lea    (%edx,%edx,4),%edx
-  1025f4:	8d 2c 90             	lea    (%eax,%edx,4),%ebp
-  1025f7:	39 e8                	cmp    %ebp,%eax
-  1025f9:	0f 83 e1 01 00 00    	jae    1027e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x200>
-  1025ff:	31 f6                	xor    %esi,%esi
-  102601:	eb 1d                	jmp    102620 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x40>
-  102603:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102608:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  10260f:	00 
-  102610:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102617:	00 
-  102618:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  10261f:	00 
-  102620:	8b 10                	mov    (%eax),%edx
-  102622:	03 50 08             	add    0x8(%eax),%edx
-  102625:	39 d6                	cmp    %edx,%esi
-  102627:	0f 42 f2             	cmovb  %edx,%esi
-  10262a:	83 c0 14             	add    $0x14,%eax
-  10262d:	39 e8                	cmp    %ebp,%eax
-  10262f:	72 ef                	jb     102620 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x40>
-  102631:	c1 ee 0c             	shr    $0xc,%esi
-  102634:	8d 56 07             	lea    0x7(%esi),%edx
-  102637:	c1 ea 03             	shr    $0x3,%edx
-  10263a:	0f b6 05 42 4b 10 00 	movzbl 0x104b42,%eax
-  102641:	01 ca                	add    %ecx,%edx
-  102643:	89 35 c0 48 10 00    	mov    %esi,0x1048c0
-  102649:	89 0d a8 48 10 00    	mov    %ecx,0x1048a8
-  10264f:	8b 3c 85 90 3d 10 00 	mov    0x103d90(,%eax,4),%edi
-  102656:	89 15 ac 48 10 00    	mov    %edx,0x1048ac
-  10265c:	89 15 b4 48 10 00    	mov    %edx,0x1048b4
-  102662:	89 44 24 08          	mov    %eax,0x8(%esp)
-  102666:	89 c8                	mov    %ecx,%eax
-  102668:	89 7c 24 0c          	mov    %edi,0xc(%esp)
-  10266c:	ff d7                	call   *%edi
-  10266e:	a1 c0 48 10 00       	mov    0x1048c0,%eax
-  102673:	8b 3d a8 48 10 00    	mov    0x1048a8,%edi
-  102679:	31 d2                	xor    %edx,%edx
-  10267b:	a3 c4 48 10 00       	mov    %eax,0x1048c4
-  102680:	a1 ac 48 10 00       	mov    0x1048ac,%eax
-  102685:	89 3c 24             	mov    %edi,(%esp)
-  102688:	89 c1                	mov    %eax,%ecx
-  10268a:	c1 e8 0c             	shr    $0xc,%eax
-  10268d:	c1 e9 0f             	shr    $0xf,%ecx
-  102690:	88 c2                	mov    %al,%dl
-  102692:	8d 34 0f             	lea    (%edi,%ecx,1),%esi
-  102695:	8b 3b                	mov    (%ebx),%edi
-  102697:	80 e2 07             	and    $0x7,%dl
-  10269a:	89 0d b8 48 10 00    	mov    %ecx,0x1048b8
-  1026a0:	89 35 b0 48 10 00    	mov    %esi,0x1048b0
-  1026a6:	89 15 bc 48 10 00    	mov    %edx,0x1048bc
-  1026ac:	39 ef                	cmp    %ebp,%edi
-  1026ae:	72 1b                	jb     1026cb <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xeb>
-  1026b0:	e9 b9 00 00 00       	jmp    10276e <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18e>
-  1026b5:	8d 76 00             	lea    0x0(%esi),%esi
-  1026b8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1026bf:	00 
-  1026c0:	83 c7 14             	add    $0x14,%edi
-  1026c3:	39 ef                	cmp    %ebp,%edi
-  1026c5:	0f 83 a3 00 00 00    	jae    10276e <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18e>
-  1026cb:	83 7f 10 01          	cmpl   $0x1,0x10(%edi)
-  1026cf:	75 ef                	jne    1026c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
-  1026d1:	8b 17                	mov    (%edi),%edx
-  1026d3:	8d 9a ff 0f 00 00    	lea    0xfff(%edx),%ebx
-  1026d9:	03 57 08             	add    0x8(%edi),%edx
-  1026dc:	89 de                	mov    %ebx,%esi
-  1026de:	89 d0                	mov    %edx,%eax
-  1026e0:	c1 ee 0c             	shr    $0xc,%esi
-  1026e3:	c1 e8 0c             	shr    $0xc,%eax
-  1026e6:	39 c6                	cmp    %eax,%esi
-  1026e8:	73 d6                	jae    1026c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
-  1026ea:	c1 eb 0f             	shr    $0xf,%ebx
-  1026ed:	89 f1                	mov    %esi,%ecx
-  1026ef:	83 e6 07             	and    $0x7,%esi
-  1026f2:	c1 ea 0f             	shr    $0xf,%edx
-  1026f5:	29 c1                	sub    %eax,%ecx
-  1026f7:	83 e0 07             	and    $0x7,%eax
-  1026fa:	01 0d c4 48 10 00    	add    %ecx,0x1048c4
-  102700:	88 44 24 06          	mov    %al,0x6(%esp)
-  102704:	8b 04 24             	mov    (%esp),%eax
-  102707:	01 d8                	add    %ebx,%eax
-  102709:	0f b6 08             	movzbl (%eax),%ecx
-  10270c:	88 4c 24 07          	mov    %cl,0x7(%esp)
-  102710:	b9 08 00 00 00       	mov    $0x8,%ecx
-  102715:	29 f1                	sub    %esi,%ecx
-  102717:	be ff 00 00 00       	mov    $0xff,%esi
-  10271c:	d3 fe                	sar    %cl,%esi
-  10271e:	39 da                	cmp    %ebx,%edx
-  102720:	0f 84 9a 00 00 00    	je     1027c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x1e0>
-  102726:	8b 1c 24             	mov    (%esp),%ebx
-  102729:	8b 4c 24 08          	mov    0x8(%esp),%ecx
-  10272d:	83 c0 01             	add    $0x1,%eax
-  102730:	01 d3                	add    %edx,%ebx
-  102732:	0f b6 54 24 07       	movzbl 0x7(%esp),%edx
-  102737:	21 f2                	and    %esi,%edx
-  102739:	88 50 ff             	mov    %dl,-0x1(%eax)
-  10273c:	89 da                	mov    %ebx,%edx
-  10273e:	ff 14 8d 84 3d 10 00 	call   *0x103d84(,%ecx,4)
-  102745:	a1 a8 48 10 00       	mov    0x1048a8,%eax
-  10274a:	0f b6 4c 24 06       	movzbl 0x6(%esp),%ecx
-  10274f:	89 04 24             	mov    %eax,(%esp)
-  102752:	84 c9                	test   %cl,%cl
-  102754:	0f 84 66 ff ff ff    	je     1026c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
-  10275a:	b8 ff 00 00 00       	mov    $0xff,%eax
-  10275f:	83 c7 14             	add    $0x14,%edi
-  102762:	d3 e0                	shl    %cl,%eax
-  102764:	20 03                	and    %al,(%ebx)
-  102766:	39 ef                	cmp    %ebp,%edi
-  102768:	0f 82 5d ff ff ff    	jb     1026cb <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xeb>
-  10276e:	8b 04 24             	mov    (%esp),%eax
-  102771:	8b 1d b8 48 10 00    	mov    0x1048b8,%ebx
-  102777:	8b 7c 24 0c          	mov    0xc(%esp),%edi
-  10277b:	01 c3                	add    %eax,%ebx
-  10277d:	89 da                	mov    %ebx,%edx
-  10277f:	ff d7                	call   *%edi
-  102781:	0f b6 15 bc 48 10 00 	movzbl 0x1048bc,%edx
-  102788:	b9 07 00 00 00       	mov    $0x7,%ecx
-  10278d:	b8 ff 00 00 00       	mov    $0xff,%eax
-  102792:	29 d1                	sub    %edx,%ecx
-  102794:	d3 f8                	sar    %cl,%eax
-  102796:	8b 0d b8 48 10 00    	mov    0x1048b8,%ecx
-  10279c:	08 03                	or     %al,(%ebx)
-  10279e:	a1 c4 48 10 00       	mov    0x1048c4,%eax
-  1027a3:	8d 44 c8 01          	lea    0x1(%eax,%ecx,8),%eax
-  1027a7:	01 d0                	add    %edx,%eax
-  1027a9:	a3 c4 48 10 00       	mov    %eax,0x1048c4
-  1027ae:	83 c4 1c             	add    $0x1c,%esp
-  1027b1:	5b                   	pop    %ebx
-  1027b2:	5e                   	pop    %esi
-  1027b3:	5f                   	pop    %edi
-  1027b4:	5d                   	pop    %ebp
-  1027b5:	c3                   	ret
-  1027b6:	66 90                	xchg   %ax,%ax
-  1027b8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1027bf:	00 
-  1027c0:	0f b6 4c 24 06       	movzbl 0x6(%esp),%ecx
-  1027c5:	ba ff 00 00 00       	mov    $0xff,%edx
-  1027ca:	d3 e2                	shl    %cl,%edx
-  1027cc:	09 f2                	or     %esi,%edx
-  1027ce:	22 54 24 07          	and    0x7(%esp),%dl
-  1027d2:	88 10                	mov    %dl,(%eax)
-  1027d4:	e9 e7 fe ff ff       	jmp    1026c0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
-  1027d9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  1027e0:	31 d2                	xor    %edx,%edx
-  1027e2:	31 f6                	xor    %esi,%esi
-  1027e4:	e9 51 fe ff ff       	jmp    10263a <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x5a>
-  1027e9:	66 90                	xchg   %ax,%ax
-  1027eb:	66 90                	xchg   %ax,%ax
-  1027ed:	66 90                	xchg   %ax,%ax
-  1027ef:	90                   	nop
+00102600 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm>:
+  102600:	55                   	push   %ebp
+  102601:	89 d1                	mov    %edx,%ecx
+  102603:	57                   	push   %edi
+  102604:	56                   	push   %esi
+  102605:	53                   	push   %ebx
+  102606:	89 c3                	mov    %eax,%ebx
+  102608:	83 ec 1c             	sub    $0x1c,%esp
+  10260b:	0f b7 53 04          	movzwl 0x4(%ebx),%edx
+  10260f:	8b 00                	mov    (%eax),%eax
+  102611:	8d 14 92             	lea    (%edx,%edx,4),%edx
+  102614:	8d 2c 90             	lea    (%eax,%edx,4),%ebp
+  102617:	39 e8                	cmp    %ebp,%eax
+  102619:	0f 83 e1 01 00 00    	jae    102800 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x200>
+  10261f:	31 f6                	xor    %esi,%esi
+  102621:	eb 1d                	jmp    102640 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x40>
+  102623:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102628:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  10262f:	00 
+  102630:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102637:	00 
+  102638:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  10263f:	00 
+  102640:	8b 10                	mov    (%eax),%edx
+  102642:	03 50 08             	add    0x8(%eax),%edx
+  102645:	39 d6                	cmp    %edx,%esi
+  102647:	0f 42 f2             	cmovb  %edx,%esi
+  10264a:	83 c0 14             	add    $0x14,%eax
+  10264d:	39 e8                	cmp    %ebp,%eax
+  10264f:	72 ef                	jb     102640 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x40>
+  102651:	c1 ee 0c             	shr    $0xc,%esi
+  102654:	8d 56 07             	lea    0x7(%esi),%edx
+  102657:	c1 ea 03             	shr    $0x3,%edx
+  10265a:	0f b6 05 42 4b 10 00 	movzbl 0x104b42,%eax
+  102661:	01 ca                	add    %ecx,%edx
+  102663:	89 35 c0 48 10 00    	mov    %esi,0x1048c0
+  102669:	89 0d a8 48 10 00    	mov    %ecx,0x1048a8
+  10266f:	8b 3c 85 90 3d 10 00 	mov    0x103d90(,%eax,4),%edi
+  102676:	89 15 ac 48 10 00    	mov    %edx,0x1048ac
+  10267c:	89 15 b4 48 10 00    	mov    %edx,0x1048b4
+  102682:	89 44 24 08          	mov    %eax,0x8(%esp)
+  102686:	89 c8                	mov    %ecx,%eax
+  102688:	89 7c 24 0c          	mov    %edi,0xc(%esp)
+  10268c:	ff d7                	call   *%edi
+  10268e:	a1 c0 48 10 00       	mov    0x1048c0,%eax
+  102693:	8b 3d a8 48 10 00    	mov    0x1048a8,%edi
+  102699:	31 d2                	xor    %edx,%edx
+  10269b:	a3 c4 48 10 00       	mov    %eax,0x1048c4
+  1026a0:	a1 ac 48 10 00       	mov    0x1048ac,%eax
+  1026a5:	89 3c 24             	mov    %edi,(%esp)
+  1026a8:	89 c1                	mov    %eax,%ecx
+  1026aa:	c1 e8 0c             	shr    $0xc,%eax
+  1026ad:	c1 e9 0f             	shr    $0xf,%ecx
+  1026b0:	88 c2                	mov    %al,%dl
+  1026b2:	8d 34 0f             	lea    (%edi,%ecx,1),%esi
+  1026b5:	8b 3b                	mov    (%ebx),%edi
+  1026b7:	80 e2 07             	and    $0x7,%dl
+  1026ba:	89 0d b8 48 10 00    	mov    %ecx,0x1048b8
+  1026c0:	89 35 b0 48 10 00    	mov    %esi,0x1048b0
+  1026c6:	89 15 bc 48 10 00    	mov    %edx,0x1048bc
+  1026cc:	39 ef                	cmp    %ebp,%edi
+  1026ce:	72 1b                	jb     1026eb <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xeb>
+  1026d0:	e9 b9 00 00 00       	jmp    10278e <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18e>
+  1026d5:	8d 76 00             	lea    0x0(%esi),%esi
+  1026d8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  1026df:	00 
+  1026e0:	83 c7 14             	add    $0x14,%edi
+  1026e3:	39 ef                	cmp    %ebp,%edi
+  1026e5:	0f 83 a3 00 00 00    	jae    10278e <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x18e>
+  1026eb:	83 7f 10 01          	cmpl   $0x1,0x10(%edi)
+  1026ef:	75 ef                	jne    1026e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
+  1026f1:	8b 17                	mov    (%edi),%edx
+  1026f3:	8d 9a ff 0f 00 00    	lea    0xfff(%edx),%ebx
+  1026f9:	03 57 08             	add    0x8(%edi),%edx
+  1026fc:	89 de                	mov    %ebx,%esi
+  1026fe:	89 d0                	mov    %edx,%eax
+  102700:	c1 ee 0c             	shr    $0xc,%esi
+  102703:	c1 e8 0c             	shr    $0xc,%eax
+  102706:	39 c6                	cmp    %eax,%esi
+  102708:	73 d6                	jae    1026e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
+  10270a:	c1 eb 0f             	shr    $0xf,%ebx
+  10270d:	89 f1                	mov    %esi,%ecx
+  10270f:	83 e6 07             	and    $0x7,%esi
+  102712:	c1 ea 0f             	shr    $0xf,%edx
+  102715:	29 c1                	sub    %eax,%ecx
+  102717:	83 e0 07             	and    $0x7,%eax
+  10271a:	01 0d c4 48 10 00    	add    %ecx,0x1048c4
+  102720:	88 44 24 06          	mov    %al,0x6(%esp)
+  102724:	8b 04 24             	mov    (%esp),%eax
+  102727:	01 d8                	add    %ebx,%eax
+  102729:	0f b6 08             	movzbl (%eax),%ecx
+  10272c:	88 4c 24 07          	mov    %cl,0x7(%esp)
+  102730:	b9 08 00 00 00       	mov    $0x8,%ecx
+  102735:	29 f1                	sub    %esi,%ecx
+  102737:	be ff 00 00 00       	mov    $0xff,%esi
+  10273c:	d3 fe                	sar    %cl,%esi
+  10273e:	39 da                	cmp    %ebx,%edx
+  102740:	0f 84 9a 00 00 00    	je     1027e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x1e0>
+  102746:	8b 1c 24             	mov    (%esp),%ebx
+  102749:	8b 4c 24 08          	mov    0x8(%esp),%ecx
+  10274d:	83 c0 01             	add    $0x1,%eax
+  102750:	01 d3                	add    %edx,%ebx
+  102752:	0f b6 54 24 07       	movzbl 0x7(%esp),%edx
+  102757:	21 f2                	and    %esi,%edx
+  102759:	88 50 ff             	mov    %dl,-0x1(%eax)
+  10275c:	89 da                	mov    %ebx,%edx
+  10275e:	ff 14 8d 84 3d 10 00 	call   *0x103d84(,%ecx,4)
+  102765:	a1 a8 48 10 00       	mov    0x1048a8,%eax
+  10276a:	0f b6 4c 24 06       	movzbl 0x6(%esp),%ecx
+  10276f:	89 04 24             	mov    %eax,(%esp)
+  102772:	84 c9                	test   %cl,%cl
+  102774:	0f 84 66 ff ff ff    	je     1026e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
+  10277a:	b8 ff 00 00 00       	mov    $0xff,%eax
+  10277f:	83 c7 14             	add    $0x14,%edi
+  102782:	d3 e0                	shl    %cl,%eax
+  102784:	20 03                	and    %al,(%ebx)
+  102786:	39 ef                	cmp    %ebp,%edi
+  102788:	0f 82 5d ff ff ff    	jb     1026eb <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xeb>
+  10278e:	8b 04 24             	mov    (%esp),%eax
+  102791:	8b 1d b8 48 10 00    	mov    0x1048b8,%ebx
+  102797:	8b 7c 24 0c          	mov    0xc(%esp),%edi
+  10279b:	01 c3                	add    %eax,%ebx
+  10279d:	89 da                	mov    %ebx,%edx
+  10279f:	ff d7                	call   *%edi
+  1027a1:	0f b6 15 bc 48 10 00 	movzbl 0x1048bc,%edx
+  1027a8:	b9 07 00 00 00       	mov    $0x7,%ecx
+  1027ad:	b8 ff 00 00 00       	mov    $0xff,%eax
+  1027b2:	29 d1                	sub    %edx,%ecx
+  1027b4:	d3 f8                	sar    %cl,%eax
+  1027b6:	8b 0d b8 48 10 00    	mov    0x1048b8,%ecx
+  1027bc:	08 03                	or     %al,(%ebx)
+  1027be:	a1 c4 48 10 00       	mov    0x1048c4,%eax
+  1027c3:	8d 44 c8 01          	lea    0x1(%eax,%ecx,8),%eax
+  1027c7:	01 d0                	add    %edx,%eax
+  1027c9:	a3 c4 48 10 00       	mov    %eax,0x1048c4
+  1027ce:	83 c4 1c             	add    $0x1c,%esp
+  1027d1:	5b                   	pop    %ebx
+  1027d2:	5e                   	pop    %esi
+  1027d3:	5f                   	pop    %edi
+  1027d4:	5d                   	pop    %ebp
+  1027d5:	c3                   	ret
+  1027d6:	66 90                	xchg   %ax,%ax
+  1027d8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  1027df:	00 
+  1027e0:	0f b6 4c 24 06       	movzbl 0x6(%esp),%ecx
+  1027e5:	ba ff 00 00 00       	mov    $0xff,%edx
+  1027ea:	d3 e2                	shl    %cl,%edx
+  1027ec:	09 f2                	or     %esi,%edx
+  1027ee:	22 54 24 07          	and    0x7(%esp),%dl
+  1027f2:	88 10                	mov    %dl,(%eax)
+  1027f4:	e9 e7 fe ff ff       	jmp    1026e0 <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0xe0>
+  1027f9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102800:	31 d2                	xor    %edx,%edx
+  102802:	31 f6                	xor    %esi,%esi
+  102804:	e9 51 fe ff ff       	jmp    10265a <_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm+0x5a>
+  102809:	66 90                	xchg   %ax,%ax
+  10280b:	66 90                	xchg   %ax,%ax
+  10280d:	66 90                	xchg   %ax,%ax
+  10280f:	90                   	nop
 
-001027f0 <_ZN6kernel6memory4test17allocate_8_framesEv>:
-  1027f0:	55                   	push   %ebp
-  1027f1:	b8 ff 0f 00 00       	mov    $0xfff,%eax
-  1027f6:	57                   	push   %edi
-  1027f7:	56                   	push   %esi
-  1027f8:	53                   	push   %ebx
-  1027f9:	83 ec 2c             	sub    $0x2c,%esp
-  1027fc:	8b 0d a8 48 10 00    	mov    0x1048a8,%ecx
-  102802:	8d 54 24 10          	lea    0x10(%esp),%edx
-  102806:	c7 44 24 14 00 00 00 	movl   $0x0,0x14(%esp)
-  10280d:	00 
-  10280e:	66 89 01             	mov    %ax,(%ecx)
-  102811:	8d 44 24 14          	lea    0x14(%esp),%eax
-  102815:	89 4c 24 10          	mov    %ecx,0x10(%esp)
-  102819:	83 c1 02             	add    $0x2,%ecx
-  10281c:	c7 44 24 18 00 00 00 	movl   $0x0,0x18(%esp)
-  102823:	00 
-  102824:	c7 44 24 1c 00 00 00 	movl   $0x0,0x1c(%esp)
-  10282b:	00 
-  10282c:	52                   	push   %edx
-  10282d:	ba 08 00 00 00       	mov    $0x8,%edx
-  102832:	e8 b9 fb ff ff       	call   1023f0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_>
-  102837:	8b 6c 24 20          	mov    0x20(%esp),%ebp
-  10283b:	31 d2                	xor    %edx,%edx
-  10283d:	8b 7c 24 18          	mov    0x18(%esp),%edi
-  102841:	66 89 54 24 12       	mov    %dx,0x12(%esp)
-  102846:	0f b6 5c 24 1c       	movzbl 0x1c(%esp),%ebx
-  10284b:	59                   	pop    %ecx
-  10284c:	8d 74 24 0e          	lea    0xe(%esp),%esi
-  102850:	83 fd 07             	cmp    $0x7,%ebp
-  102853:	0f 86 07 01 00 00    	jbe    102960 <_ZN6kernel6memory4test17allocate_8_framesEv+0x170>
-  102859:	ba a1 38 10 00       	mov    $0x1038a1,%edx
-  10285e:	89 f0                	mov    %esi,%eax
-  102860:	e8 9b 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  102865:	ba a8 38 10 00       	mov    $0x1038a8,%edx
-  10286a:	89 f0                	mov    %esi,%eax
-  10286c:	e8 8f 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  102871:	ba 08 00 00 00       	mov    $0x8,%edx
-  102876:	e8 45 08 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
-  10287b:	ba b1 38 10 00       	mov    $0x1038b1,%edx
-  102880:	e8 7b 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  102885:	89 ea                	mov    %ebp,%edx
-  102887:	e8 34 08 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
-  10288c:	ba bb 38 10 00       	mov    $0x1038bb,%edx
-  102891:	e8 6a 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  102896:	ba d0 31 10 00       	mov    $0x1031d0,%edx
-  10289b:	e8 10 09 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1028a0:	8b 15 a8 48 10 00    	mov    0x1048a8,%edx
-  1028a6:	0f b6 12             	movzbl (%edx),%edx
-  1028a9:	e8 12 07 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
-  1028ae:	ba c0 31 10 00       	mov    $0x1031c0,%edx
-  1028b3:	e8 f8 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1028b8:	ba ca 38 10 00       	mov    $0x1038ca,%edx
-  1028bd:	e8 3e 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  1028c2:	89 fa                	mov    %edi,%edx
-  1028c4:	e8 f7 07 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
-  1028c9:	ba d8 38 10 00       	mov    $0x1038d8,%edx
-  1028ce:	e8 2d 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  1028d3:	89 da                	mov    %ebx,%edx
-  1028d5:	8d 5c fb 07          	lea    0x7(%ebx,%edi,8),%ebx
-  1028d9:	e8 e2 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
-  1028de:	ba e5 38 10 00       	mov    $0x1038e5,%edx
-  1028e3:	89 f0                	mov    %esi,%eax
-  1028e5:	e8 16 06 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  1028ea:	ba d0 31 10 00       	mov    $0x1031d0,%edx
-  1028ef:	e8 bc 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  1028f4:	8b 15 a8 48 10 00    	mov    0x1048a8,%edx
-  1028fa:	0f b6 52 01          	movzbl 0x1(%edx),%edx
-  1028fe:	e8 bd 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
-  102903:	ba c0 31 10 00       	mov    $0x1031c0,%edx
-  102908:	e8 a3 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
-  10290d:	ba f3 38 10 00       	mov    $0x1038f3,%edx
-  102912:	e8 e9 05 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  102917:	89 da                	mov    %ebx,%edx
-  102919:	83 e3 07             	and    $0x7,%ebx
-  10291c:	c1 ea 03             	shr    $0x3,%edx
-  10291f:	e8 9c 07 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
-  102924:	ba ff 38 10 00       	mov    $0x1038ff,%edx
-  102929:	e8 d2 05 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  10292e:	89 da                	mov    %ebx,%edx
-  102930:	e8 8b 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
-  102935:	ba 0a 39 10 00       	mov    $0x10390a,%edx
-  10293a:	e8 c1 05 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  10293f:	8b 54 24 10          	mov    0x10(%esp),%edx
-  102943:	2b 15 a8 48 10 00    	sub    0x1048a8,%edx
-  102949:	e8 72 07 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
-  10294e:	83 c4 2c             	add    $0x2c,%esp
-  102951:	5b                   	pop    %ebx
-  102952:	5e                   	pop    %esi
-  102953:	5f                   	pop    %edi
-  102954:	5d                   	pop    %ebp
-  102955:	c3                   	ret
-  102956:	66 90                	xchg   %ax,%ax
-  102958:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  10295f:	00 
-  102960:	ba 9d 38 10 00       	mov    $0x10389d,%edx
-  102965:	89 f0                	mov    %esi,%eax
-  102967:	e8 94 05 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  10296c:	e9 f4 fe ff ff       	jmp    102865 <_ZN6kernel6memory4test17allocate_8_framesEv+0x75>
-  102971:	66 90                	xchg   %ax,%ax
-  102973:	66 90                	xchg   %ax,%ax
-  102975:	66 90                	xchg   %ax,%ax
-  102977:	66 90                	xchg   %ax,%ax
-  102979:	66 90                	xchg   %ax,%ax
-  10297b:	66 90                	xchg   %ax,%ax
-  10297d:	66 90                	xchg   %ax,%ax
-  10297f:	90                   	nop
+00102810 <_ZN6kernel6memory4test17allocate_8_framesEv>:
+  102810:	55                   	push   %ebp
+  102811:	b8 0f f0 ff ff       	mov    $0xfffff00f,%eax
+  102816:	57                   	push   %edi
+  102817:	56                   	push   %esi
+  102818:	53                   	push   %ebx
+  102819:	83 ec 1c             	sub    $0x1c,%esp
+  10281c:	8b 0d a8 48 10 00    	mov    0x1048a8,%ecx
+  102822:	8d 54 24 04          	lea    0x4(%esp),%edx
+  102826:	c7 44 24 08 00 00 00 	movl   $0x0,0x8(%esp)
+  10282d:	00 
+  10282e:	66 89 01             	mov    %ax,(%ecx)
+  102831:	8d 44 24 08          	lea    0x8(%esp),%eax
+  102835:	89 4c 24 04          	mov    %ecx,0x4(%esp)
+  102839:	83 c1 02             	add    $0x2,%ecx
+  10283c:	c7 44 24 0c 00 00 00 	movl   $0x0,0xc(%esp)
+  102843:	00 
+  102844:	52                   	push   %edx
+  102845:	ba 08 00 00 00       	mov    $0x8,%edx
+  10284a:	e8 a1 fb ff ff       	call   1023f0 <_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_>
+  10284f:	8b 6c 24 10          	mov    0x10(%esp),%ebp
+  102853:	31 d2                	xor    %edx,%edx
+  102855:	8b 5c 24 0c          	mov    0xc(%esp),%ebx
+  102859:	66 89 54 24 06       	mov    %dx,0x6(%esp)
+  10285e:	59                   	pop    %ecx
+  10285f:	8d 7c 24 02          	lea    0x2(%esp),%edi
+  102863:	83 fd 07             	cmp    $0x7,%ebp
+  102866:	0f 86 04 01 00 00    	jbe    102970 <_ZN6kernel6memory4test17allocate_8_framesEv+0x160>
+  10286c:	ba a1 38 10 00       	mov    $0x1038a1,%edx
+  102871:	89 f8                	mov    %edi,%eax
+  102873:	e8 98 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  102878:	ba a8 38 10 00       	mov    $0x1038a8,%edx
+  10287d:	89 f8                	mov    %edi,%eax
+  10287f:	8d 73 07             	lea    0x7(%ebx),%esi
+  102882:	e8 89 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  102887:	ba 08 00 00 00       	mov    $0x8,%edx
+  10288c:	e8 2f 08 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
+  102891:	ba b1 38 10 00       	mov    $0x1038b1,%edx
+  102896:	e8 75 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  10289b:	89 ea                	mov    %ebp,%edx
+  10289d:	e8 1e 08 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
+  1028a2:	ba bb 38 10 00       	mov    $0x1038bb,%edx
+  1028a7:	e8 64 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  1028ac:	ba d0 31 10 00       	mov    $0x1031d0,%edx
+  1028b1:	e8 fa 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  1028b6:	8b 15 a8 48 10 00    	mov    0x1048a8,%edx
+  1028bc:	0f b6 12             	movzbl (%edx),%edx
+  1028bf:	e8 fc 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
+  1028c4:	ba c0 31 10 00       	mov    $0x1031c0,%edx
+  1028c9:	e8 e2 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  1028ce:	ba ca 38 10 00       	mov    $0x1038ca,%edx
+  1028d3:	e8 38 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  1028d8:	89 da                	mov    %ebx,%edx
+  1028da:	83 e3 07             	and    $0x7,%ebx
+  1028dd:	c1 ea 03             	shr    $0x3,%edx
+  1028e0:	e8 db 07 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
+  1028e5:	ba d8 38 10 00       	mov    $0x1038d8,%edx
+  1028ea:	e8 21 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  1028ef:	89 da                	mov    %ebx,%edx
+  1028f1:	e8 ca 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
+  1028f6:	ba e5 38 10 00       	mov    $0x1038e5,%edx
+  1028fb:	89 f8                	mov    %edi,%eax
+  1028fd:	e8 0e 06 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  102902:	ba d0 31 10 00       	mov    $0x1031d0,%edx
+  102907:	e8 a4 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  10290c:	8b 15 a8 48 10 00    	mov    0x1048a8,%edx
+  102912:	0f b6 52 01          	movzbl 0x1(%edx),%edx
+  102916:	e8 a5 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
+  10291b:	ba c0 31 10 00       	mov    $0x1031c0,%edx
+  102920:	e8 8b 08 00 00       	call   1031b0 <_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E>
+  102925:	ba f3 38 10 00       	mov    $0x1038f3,%edx
+  10292a:	e8 e1 05 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  10292f:	89 f2                	mov    %esi,%edx
+  102931:	83 e6 07             	and    $0x7,%esi
+  102934:	c1 ea 03             	shr    $0x3,%edx
+  102937:	e8 84 07 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
+  10293c:	ba ff 38 10 00       	mov    $0x1038ff,%edx
+  102941:	e8 ca 05 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  102946:	89 f2                	mov    %esi,%edx
+  102948:	e8 73 06 00 00       	call   102fc0 <_ZN8terminal6outputlsEh>
+  10294d:	ba 0a 39 10 00       	mov    $0x10390a,%edx
+  102952:	e8 b9 05 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  102957:	8b 54 24 04          	mov    0x4(%esp),%edx
+  10295b:	2b 15 a8 48 10 00    	sub    0x1048a8,%edx
+  102961:	e8 5a 07 00 00       	call   1030c0 <_ZN8terminal6outputlsEm>
+  102966:	83 c4 1c             	add    $0x1c,%esp
+  102969:	5b                   	pop    %ebx
+  10296a:	5e                   	pop    %esi
+  10296b:	5f                   	pop    %edi
+  10296c:	5d                   	pop    %ebp
+  10296d:	c3                   	ret
+  10296e:	66 90                	xchg   %ax,%ax
+  102970:	ba 9d 38 10 00       	mov    $0x10389d,%edx
+  102975:	89 f8                	mov    %edi,%eax
+  102977:	e8 94 05 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  10297c:	e9 f7 fe ff ff       	jmp    102878 <_ZN6kernel6memory4test17allocate_8_framesEv+0x68>
+  102981:	66 90                	xchg   %ax,%ax
+  102983:	66 90                	xchg   %ax,%ax
+  102985:	66 90                	xchg   %ax,%ax
+  102987:	66 90                	xchg   %ax,%ax
+  102989:	66 90                	xchg   %ax,%ax
+  10298b:	66 90                	xchg   %ax,%ax
+  10298d:	66 90                	xchg   %ax,%ax
+  10298f:	90                   	nop
 
-00102980 <_ZN6driver19initialize_keyboardEv>:
-  102980:	c6 05 40 4b 10 00 00 	movb   $0x0,0x104b40
-  102987:	ba a0 86 01 00       	mov    $0x186a0,%edx
-  10298c:	eb 0d                	jmp    10299b <_ZN6driver19initialize_keyboardEv+0x1b>
-  10298e:	66 90                	xchg   %ax,%ax
-  102990:	e4 60                	in     $0x60,%al
-  102992:	31 c0                	xor    %eax,%eax
-  102994:	e6 80                	out    %al,$0x80
-  102996:	83 ea 01             	sub    $0x1,%edx
-  102999:	74 06                	je     1029a1 <_ZN6driver19initialize_keyboardEv+0x21>
-  10299b:	e4 64                	in     $0x64,%al
-  10299d:	a8 01                	test   $0x1,%al
-  10299f:	75 ef                	jne    102990 <_ZN6driver19initialize_keyboardEv+0x10>
-  1029a1:	ba a0 86 01 00       	mov    $0x186a0,%edx
-  1029a6:	eb 11                	jmp    1029b9 <_ZN6driver19initialize_keyboardEv+0x39>
-  1029a8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1029af:	00 
-  1029b0:	31 c0                	xor    %eax,%eax
-  1029b2:	e6 80                	out    %al,$0x80
-  1029b4:	83 ea 01             	sub    $0x1,%edx
-  1029b7:	74 6f                	je     102a28 <_ZN6driver19initialize_keyboardEv+0xa8>
-  1029b9:	e4 64                	in     $0x64,%al
-  1029bb:	a8 02                	test   $0x2,%al
-  1029bd:	75 f1                	jne    1029b0 <_ZN6driver19initialize_keyboardEv+0x30>
-  1029bf:	b8 ed ff ff ff       	mov    $0xffffffed,%eax
-  1029c4:	e6 60                	out    %al,$0x60
-  1029c6:	ba a0 86 01 00       	mov    $0x186a0,%edx
-  1029cb:	eb 0a                	jmp    1029d7 <_ZN6driver19initialize_keyboardEv+0x57>
-  1029cd:	8d 76 00             	lea    0x0(%esi),%esi
-  1029d0:	e6 80                	out    %al,$0x80
-  1029d2:	83 ea 01             	sub    $0x1,%edx
-  1029d5:	74 51                	je     102a28 <_ZN6driver19initialize_keyboardEv+0xa8>
-  1029d7:	e4 64                	in     $0x64,%al
-  1029d9:	83 e0 01             	and    $0x1,%eax
-  1029dc:	74 f2                	je     1029d0 <_ZN6driver19initialize_keyboardEv+0x50>
-  1029de:	e4 60                	in     $0x60,%al
-  1029e0:	ba a0 86 01 00       	mov    $0x186a0,%edx
-  1029e5:	3c fa                	cmp    $0xfa,%al
-  1029e7:	74 10                	je     1029f9 <_ZN6driver19initialize_keyboardEv+0x79>
-  1029e9:	eb 3d                	jmp    102a28 <_ZN6driver19initialize_keyboardEv+0xa8>
-  1029eb:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  1029f0:	31 c0                	xor    %eax,%eax
-  1029f2:	e6 80                	out    %al,$0x80
-  1029f4:	83 ea 01             	sub    $0x1,%edx
-  1029f7:	74 2f                	je     102a28 <_ZN6driver19initialize_keyboardEv+0xa8>
-  1029f9:	e4 64                	in     $0x64,%al
-  1029fb:	83 e0 02             	and    $0x2,%eax
-  1029fe:	75 f0                	jne    1029f0 <_ZN6driver19initialize_keyboardEv+0x70>
-  102a00:	e6 60                	out    %al,$0x60
-  102a02:	ba a0 86 01 00       	mov    $0x186a0,%edx
-  102a07:	eb 0e                	jmp    102a17 <_ZN6driver19initialize_keyboardEv+0x97>
-  102a09:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102a10:	e6 80                	out    %al,$0x80
-  102a12:	83 ea 01             	sub    $0x1,%edx
-  102a15:	74 11                	je     102a28 <_ZN6driver19initialize_keyboardEv+0xa8>
-  102a17:	e4 64                	in     $0x64,%al
-  102a19:	83 e0 01             	and    $0x1,%eax
-  102a1c:	74 f2                	je     102a10 <_ZN6driver19initialize_keyboardEv+0x90>
-  102a1e:	e4 60                	in     $0x60,%al
-  102a20:	3c fa                	cmp    $0xfa,%al
-  102a22:	75 04                	jne    102a28 <_ZN6driver19initialize_keyboardEv+0xa8>
-  102a24:	c3                   	ret
-  102a25:	8d 76 00             	lea    0x0(%esi),%esi
-  102a28:	55                   	push   %ebp
-  102a29:	31 c0                	xor    %eax,%eax
-  102a2b:	89 e5                	mov    %esp,%ebp
-  102a2d:	53                   	push   %ebx
-  102a2e:	8d 5d f6             	lea    -0xa(%ebp),%ebx
-  102a31:	83 ec 14             	sub    $0x14,%esp
-  102a34:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
-  102a38:	6a 00                	push   $0x0
-  102a3a:	6a 0e                	push   $0xe
-  102a3c:	68 3c 38 10 00       	push   $0x10383c
-  102a41:	53                   	push   %ebx
-  102a42:	e8 d9 df ff ff       	call   100a20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
-  102a47:	89 d8                	mov    %ebx,%eax
-  102a49:	ba 44 39 10 00       	mov    $0x103944,%edx
-  102a4e:	e8 ad 04 00 00       	call   102f00 <_ZN8terminal6outputlsEPKc>
-  102a53:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  102a56:	83 c4 10             	add    $0x10,%esp
-  102a59:	c9                   	leave
-  102a5a:	c3                   	ret
-  102a5b:	66 90                	xchg   %ax,%ax
-  102a5d:	66 90                	xchg   %ax,%ax
-  102a5f:	90                   	nop
+00102990 <_ZN6driver19initialize_keyboardEv>:
+  102990:	c6 05 40 4b 10 00 00 	movb   $0x0,0x104b40
+  102997:	ba a0 86 01 00       	mov    $0x186a0,%edx
+  10299c:	eb 0d                	jmp    1029ab <_ZN6driver19initialize_keyboardEv+0x1b>
+  10299e:	66 90                	xchg   %ax,%ax
+  1029a0:	e4 60                	in     $0x60,%al
+  1029a2:	31 c0                	xor    %eax,%eax
+  1029a4:	e6 80                	out    %al,$0x80
+  1029a6:	83 ea 01             	sub    $0x1,%edx
+  1029a9:	74 06                	je     1029b1 <_ZN6driver19initialize_keyboardEv+0x21>
+  1029ab:	e4 64                	in     $0x64,%al
+  1029ad:	a8 01                	test   $0x1,%al
+  1029af:	75 ef                	jne    1029a0 <_ZN6driver19initialize_keyboardEv+0x10>
+  1029b1:	ba a0 86 01 00       	mov    $0x186a0,%edx
+  1029b6:	eb 11                	jmp    1029c9 <_ZN6driver19initialize_keyboardEv+0x39>
+  1029b8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  1029bf:	00 
+  1029c0:	31 c0                	xor    %eax,%eax
+  1029c2:	e6 80                	out    %al,$0x80
+  1029c4:	83 ea 01             	sub    $0x1,%edx
+  1029c7:	74 6f                	je     102a38 <_ZN6driver19initialize_keyboardEv+0xa8>
+  1029c9:	e4 64                	in     $0x64,%al
+  1029cb:	a8 02                	test   $0x2,%al
+  1029cd:	75 f1                	jne    1029c0 <_ZN6driver19initialize_keyboardEv+0x30>
+  1029cf:	b8 ed ff ff ff       	mov    $0xffffffed,%eax
+  1029d4:	e6 60                	out    %al,$0x60
+  1029d6:	ba a0 86 01 00       	mov    $0x186a0,%edx
+  1029db:	eb 0a                	jmp    1029e7 <_ZN6driver19initialize_keyboardEv+0x57>
+  1029dd:	8d 76 00             	lea    0x0(%esi),%esi
+  1029e0:	e6 80                	out    %al,$0x80
+  1029e2:	83 ea 01             	sub    $0x1,%edx
+  1029e5:	74 51                	je     102a38 <_ZN6driver19initialize_keyboardEv+0xa8>
+  1029e7:	e4 64                	in     $0x64,%al
+  1029e9:	83 e0 01             	and    $0x1,%eax
+  1029ec:	74 f2                	je     1029e0 <_ZN6driver19initialize_keyboardEv+0x50>
+  1029ee:	e4 60                	in     $0x60,%al
+  1029f0:	ba a0 86 01 00       	mov    $0x186a0,%edx
+  1029f5:	3c fa                	cmp    $0xfa,%al
+  1029f7:	74 10                	je     102a09 <_ZN6driver19initialize_keyboardEv+0x79>
+  1029f9:	eb 3d                	jmp    102a38 <_ZN6driver19initialize_keyboardEv+0xa8>
+  1029fb:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102a00:	31 c0                	xor    %eax,%eax
+  102a02:	e6 80                	out    %al,$0x80
+  102a04:	83 ea 01             	sub    $0x1,%edx
+  102a07:	74 2f                	je     102a38 <_ZN6driver19initialize_keyboardEv+0xa8>
+  102a09:	e4 64                	in     $0x64,%al
+  102a0b:	83 e0 02             	and    $0x2,%eax
+  102a0e:	75 f0                	jne    102a00 <_ZN6driver19initialize_keyboardEv+0x70>
+  102a10:	e6 60                	out    %al,$0x60
+  102a12:	ba a0 86 01 00       	mov    $0x186a0,%edx
+  102a17:	eb 0e                	jmp    102a27 <_ZN6driver19initialize_keyboardEv+0x97>
+  102a19:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102a20:	e6 80                	out    %al,$0x80
+  102a22:	83 ea 01             	sub    $0x1,%edx
+  102a25:	74 11                	je     102a38 <_ZN6driver19initialize_keyboardEv+0xa8>
+  102a27:	e4 64                	in     $0x64,%al
+  102a29:	83 e0 01             	and    $0x1,%eax
+  102a2c:	74 f2                	je     102a20 <_ZN6driver19initialize_keyboardEv+0x90>
+  102a2e:	e4 60                	in     $0x60,%al
+  102a30:	3c fa                	cmp    $0xfa,%al
+  102a32:	75 04                	jne    102a38 <_ZN6driver19initialize_keyboardEv+0xa8>
+  102a34:	c3                   	ret
+  102a35:	8d 76 00             	lea    0x0(%esi),%esi
+  102a38:	55                   	push   %ebp
+  102a39:	31 c0                	xor    %eax,%eax
+  102a3b:	89 e5                	mov    %esp,%ebp
+  102a3d:	53                   	push   %ebx
+  102a3e:	8d 5d f6             	lea    -0xa(%ebp),%ebx
+  102a41:	83 ec 14             	sub    $0x14,%esp
+  102a44:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
+  102a48:	6a 00                	push   $0x0
+  102a4a:	6a 0e                	push   $0xe
+  102a4c:	68 3c 38 10 00       	push   $0x10383c
+  102a51:	53                   	push   %ebx
+  102a52:	e8 c9 df ff ff       	call   100a20 <_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_>
+  102a57:	89 d8                	mov    %ebx,%eax
+  102a59:	ba 44 39 10 00       	mov    $0x103944,%edx
+  102a5e:	e8 ad 04 00 00       	call   102f10 <_ZN8terminal6outputlsEPKc>
+  102a63:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  102a66:	83 c4 10             	add    $0x10,%esp
+  102a69:	c9                   	leave
+  102a6a:	c3                   	ret
+  102a6b:	66 90                	xchg   %ax,%ax
+  102a6d:	66 90                	xchg   %ax,%ax
+  102a6f:	90                   	nop
 
-00102a60 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE>:
-  102a60:	e4 64                	in     $0x64,%al
-  102a62:	a8 01                	test   $0x1,%al
-  102a64:	74 7a                	je     102ae0 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x80>
-  102a66:	e4 60                	in     $0x60,%al
-  102a68:	3c e0                	cmp    $0xe0,%al
-  102a6a:	0f 84 e0 00 00 00    	je     102b50 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0xf0>
-  102a70:	0f b6 15 02 4b 10 00 	movzbl 0x104b02,%edx
-  102a77:	80 fa 3f             	cmp    $0x3f,%dl
-  102a7a:	77 64                	ja     102ae0 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x80>
-  102a7c:	55                   	push   %ebp
-  102a7d:	89 c1                	mov    %eax,%ecx
-  102a7f:	83 e1 7f             	and    $0x7f,%ecx
-  102a82:	89 e5                	mov    %esp,%ebp
-  102a84:	57                   	push   %edi
-  102a85:	56                   	push   %esi
-  102a86:	53                   	push   %ebx
-  102a87:	83 ec 04             	sub    $0x4,%esp
-  102a8a:	0f b6 1d 41 4b 10 00 	movzbl 0x104b41,%ebx
-  102a91:	88 4d f3             	mov    %cl,-0xd(%ebp)
-  102a94:	89 c1                	mov    %eax,%ecx
-  102a96:	83 e1 7f             	and    $0x7f,%ecx
-  102a99:	89 df                	mov    %ebx,%edi
-  102a9b:	84 db                	test   %bl,%bl
-  102a9d:	0f 85 bd 00 00 00    	jne    102b60 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x100>
-  102aa3:	0f b7 8c 09 20 3f 10 	movzwl 0x103f20(%ecx,%ecx,1),%ecx
-  102aaa:	00 
-  102aab:	89 c3                	mov    %eax,%ebx
-  102aad:	f7 d3                	not    %ebx
-  102aaf:	c0 eb 07             	shr    $0x7,%bl
-  102ab2:	88 5d f2             	mov    %bl,-0xe(%ebp)
-  102ab5:	0f b6 1d 40 4b 10 00 	movzbl 0x104b40,%ebx
-  102abc:	66 83 f9 3a          	cmp    $0x3a,%cx
-  102ac0:	0f 87 aa 00 00 00    	ja     102b70 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x110>
-  102ac6:	66 83 f9 1c          	cmp    $0x1c,%cx
-  102aca:	76 26                	jbe    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102acc:	8d 71 e3             	lea    -0x1d(%ecx),%esi
-  102acf:	66 83 fe 1d          	cmp    $0x1d,%si
-  102ad3:	77 1d                	ja     102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102ad5:	0f b7 f6             	movzwl %si,%esi
-  102ad8:	ff 24 b5 a0 3d 10 00 	jmp    *0x103da0(,%esi,4)
-  102adf:	90                   	nop
-  102ae0:	c3                   	ret
-  102ae1:	84 c0                	test   %al,%al
-  102ae3:	0f 89 77 01 00 00    	jns    102c60 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x200>
-  102ae9:	83 e3 fe             	and    $0xfffffffe,%ebx
-  102aec:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102af2:	0f b6 35 01 4b 10 00 	movzbl 0x104b01,%esi
-  102af9:	83 c2 01             	add    $0x1,%edx
-  102afc:	c6 05 41 4b 10 00 00 	movb   $0x0,0x104b41
-  102b03:	88 15 02 4b 10 00    	mov    %dl,0x104b02
-  102b09:	66 89 0c f5 00 49 10 	mov    %cx,0x104900(,%esi,8)
-  102b10:	00 
-  102b11:	0f b6 4d f3          	movzbl -0xd(%ebp),%ecx
-  102b15:	89 f0                	mov    %esi,%eax
-  102b17:	83 c0 01             	add    $0x1,%eax
-  102b1a:	88 1c f5 05 49 10 00 	mov    %bl,0x104905(,%esi,8)
-  102b21:	88 0c f5 02 49 10 00 	mov    %cl,0x104902(,%esi,8)
-  102b28:	0f b6 4d f2          	movzbl -0xe(%ebp),%ecx
-  102b2c:	83 e0 3f             	and    $0x3f,%eax
-  102b2f:	a2 01 4b 10 00       	mov    %al,0x104b01
-  102b34:	88 0c f5 03 49 10 00 	mov    %cl,0x104903(,%esi,8)
-  102b3b:	89 f9                	mov    %edi,%ecx
-  102b3d:	88 0c f5 04 49 10 00 	mov    %cl,0x104904(,%esi,8)
-  102b44:	83 c4 04             	add    $0x4,%esp
-  102b47:	5b                   	pop    %ebx
-  102b48:	5e                   	pop    %esi
-  102b49:	5f                   	pop    %edi
-  102b4a:	5d                   	pop    %ebp
-  102b4b:	c3                   	ret
-  102b4c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102b50:	c6 05 41 4b 10 00 01 	movb   $0x1,0x104b41
-  102b57:	c3                   	ret
-  102b58:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102b5f:	00 
-  102b60:	0f b7 8c 09 20 3e 10 	movzwl 0x103e20(%ecx,%ecx,1),%ecx
-  102b67:	00 
-  102b68:	e9 3e ff ff ff       	jmp    102aab <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x4b>
-  102b6d:	8d 76 00             	lea    0x0(%esi),%esi
-  102b70:	66 81 f9 1d e0       	cmp    $0xe01d,%cx
-  102b75:	74 79                	je     102bf0 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x190>
-  102b77:	66 81 f9 38 e0       	cmp    $0xe038,%cx
-  102b7c:	0f 85 70 ff ff ff    	jne    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102b82:	84 c0                	test   %al,%al
-  102b84:	0f 89 7e 00 00 00    	jns    102c08 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1a8>
-  102b8a:	83 e3 df             	and    $0xffffffdf,%ebx
-  102b8d:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102b93:	e9 5a ff ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102b98:	84 c0                	test   %al,%al
-  102b9a:	0f 89 a0 00 00 00    	jns    102c40 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1e0>
-  102ba0:	83 e3 bf             	and    $0xffffffbf,%ebx
-  102ba3:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102ba9:	e9 44 ff ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102bae:	84 c0                	test   %al,%al
-  102bb0:	0f 89 ba 00 00 00    	jns    102c70 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x210>
-  102bb6:	83 e3 ef             	and    $0xffffffef,%ebx
-  102bb9:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102bbf:	e9 2e ff ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102bc4:	84 c0                	test   %al,%al
-  102bc6:	0f 89 b4 00 00 00    	jns    102c80 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x220>
-  102bcc:	83 e3 fd             	and    $0xfffffffd,%ebx
-  102bcf:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102bd5:	e9 18 ff ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102bda:	84 c0                	test   %al,%al
-  102bdc:	79 42                	jns    102c20 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1c0>
-  102bde:	83 e3 fb             	and    $0xfffffffb,%ebx
-  102be1:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102be7:	e9 06 ff ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102bec:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102bf0:	84 c0                	test   %al,%al
-  102bf2:	79 3c                	jns    102c30 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1d0>
-  102bf4:	83 e3 f7             	and    $0xfffffff7,%ebx
-  102bf7:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102bfd:	e9 f0 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c02:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  102c08:	83 cb 20             	or     $0x20,%ebx
-  102c0b:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c11:	e9 dc fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c16:	66 90                	xchg   %ax,%ax
-  102c18:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c1f:	00 
-  102c20:	83 cb 04             	or     $0x4,%ebx
-  102c23:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c29:	e9 c4 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c2e:	66 90                	xchg   %ax,%ax
-  102c30:	83 cb 08             	or     $0x8,%ebx
+00102a70 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE>:
+  102a70:	e4 64                	in     $0x64,%al
+  102a72:	a8 01                	test   $0x1,%al
+  102a74:	74 7a                	je     102af0 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x80>
+  102a76:	e4 60                	in     $0x60,%al
+  102a78:	3c e0                	cmp    $0xe0,%al
+  102a7a:	0f 84 e0 00 00 00    	je     102b60 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0xf0>
+  102a80:	0f b6 15 02 4b 10 00 	movzbl 0x104b02,%edx
+  102a87:	80 fa 3f             	cmp    $0x3f,%dl
+  102a8a:	77 64                	ja     102af0 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x80>
+  102a8c:	55                   	push   %ebp
+  102a8d:	89 c1                	mov    %eax,%ecx
+  102a8f:	83 e1 7f             	and    $0x7f,%ecx
+  102a92:	89 e5                	mov    %esp,%ebp
+  102a94:	57                   	push   %edi
+  102a95:	56                   	push   %esi
+  102a96:	53                   	push   %ebx
+  102a97:	83 ec 04             	sub    $0x4,%esp
+  102a9a:	0f b6 1d 41 4b 10 00 	movzbl 0x104b41,%ebx
+  102aa1:	88 4d f3             	mov    %cl,-0xd(%ebp)
+  102aa4:	89 c1                	mov    %eax,%ecx
+  102aa6:	83 e1 7f             	and    $0x7f,%ecx
+  102aa9:	89 df                	mov    %ebx,%edi
+  102aab:	84 db                	test   %bl,%bl
+  102aad:	0f 85 bd 00 00 00    	jne    102b70 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x100>
+  102ab3:	0f b7 8c 09 20 3f 10 	movzwl 0x103f20(%ecx,%ecx,1),%ecx
+  102aba:	00 
+  102abb:	89 c3                	mov    %eax,%ebx
+  102abd:	f7 d3                	not    %ebx
+  102abf:	c0 eb 07             	shr    $0x7,%bl
+  102ac2:	88 5d f2             	mov    %bl,-0xe(%ebp)
+  102ac5:	0f b6 1d 40 4b 10 00 	movzbl 0x104b40,%ebx
+  102acc:	66 83 f9 3a          	cmp    $0x3a,%cx
+  102ad0:	0f 87 aa 00 00 00    	ja     102b80 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x110>
+  102ad6:	66 83 f9 1c          	cmp    $0x1c,%cx
+  102ada:	76 26                	jbe    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102adc:	8d 71 e3             	lea    -0x1d(%ecx),%esi
+  102adf:	66 83 fe 1d          	cmp    $0x1d,%si
+  102ae3:	77 1d                	ja     102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102ae5:	0f b7 f6             	movzwl %si,%esi
+  102ae8:	ff 24 b5 a0 3d 10 00 	jmp    *0x103da0(,%esi,4)
+  102aef:	90                   	nop
+  102af0:	c3                   	ret
+  102af1:	84 c0                	test   %al,%al
+  102af3:	0f 89 77 01 00 00    	jns    102c70 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x200>
+  102af9:	83 e3 fe             	and    $0xfffffffe,%ebx
+  102afc:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102b02:	0f b6 35 01 4b 10 00 	movzbl 0x104b01,%esi
+  102b09:	83 c2 01             	add    $0x1,%edx
+  102b0c:	c6 05 41 4b 10 00 00 	movb   $0x0,0x104b41
+  102b13:	88 15 02 4b 10 00    	mov    %dl,0x104b02
+  102b19:	66 89 0c f5 00 49 10 	mov    %cx,0x104900(,%esi,8)
+  102b20:	00 
+  102b21:	0f b6 4d f3          	movzbl -0xd(%ebp),%ecx
+  102b25:	89 f0                	mov    %esi,%eax
+  102b27:	83 c0 01             	add    $0x1,%eax
+  102b2a:	88 1c f5 05 49 10 00 	mov    %bl,0x104905(,%esi,8)
+  102b31:	88 0c f5 02 49 10 00 	mov    %cl,0x104902(,%esi,8)
+  102b38:	0f b6 4d f2          	movzbl -0xe(%ebp),%ecx
+  102b3c:	83 e0 3f             	and    $0x3f,%eax
+  102b3f:	a2 01 4b 10 00       	mov    %al,0x104b01
+  102b44:	88 0c f5 03 49 10 00 	mov    %cl,0x104903(,%esi,8)
+  102b4b:	89 f9                	mov    %edi,%ecx
+  102b4d:	88 0c f5 04 49 10 00 	mov    %cl,0x104904(,%esi,8)
+  102b54:	83 c4 04             	add    $0x4,%esp
+  102b57:	5b                   	pop    %ebx
+  102b58:	5e                   	pop    %esi
+  102b59:	5f                   	pop    %edi
+  102b5a:	5d                   	pop    %ebp
+  102b5b:	c3                   	ret
+  102b5c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102b60:	c6 05 41 4b 10 00 01 	movb   $0x1,0x104b41
+  102b67:	c3                   	ret
+  102b68:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102b6f:	00 
+  102b70:	0f b7 8c 09 20 3e 10 	movzwl 0x103e20(%ecx,%ecx,1),%ecx
+  102b77:	00 
+  102b78:	e9 3e ff ff ff       	jmp    102abb <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x4b>
+  102b7d:	8d 76 00             	lea    0x0(%esi),%esi
+  102b80:	66 81 f9 1d e0       	cmp    $0xe01d,%cx
+  102b85:	74 79                	je     102c00 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x190>
+  102b87:	66 81 f9 38 e0       	cmp    $0xe038,%cx
+  102b8c:	0f 85 70 ff ff ff    	jne    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102b92:	84 c0                	test   %al,%al
+  102b94:	0f 89 7e 00 00 00    	jns    102c18 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1a8>
+  102b9a:	83 e3 df             	and    $0xffffffdf,%ebx
+  102b9d:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102ba3:	e9 5a ff ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102ba8:	84 c0                	test   %al,%al
+  102baa:	0f 89 a0 00 00 00    	jns    102c50 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1e0>
+  102bb0:	83 e3 bf             	and    $0xffffffbf,%ebx
+  102bb3:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102bb9:	e9 44 ff ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102bbe:	84 c0                	test   %al,%al
+  102bc0:	0f 89 ba 00 00 00    	jns    102c80 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x210>
+  102bc6:	83 e3 ef             	and    $0xffffffef,%ebx
+  102bc9:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102bcf:	e9 2e ff ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102bd4:	84 c0                	test   %al,%al
+  102bd6:	0f 89 b4 00 00 00    	jns    102c90 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x220>
+  102bdc:	83 e3 fd             	and    $0xfffffffd,%ebx
+  102bdf:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102be5:	e9 18 ff ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102bea:	84 c0                	test   %al,%al
+  102bec:	79 42                	jns    102c30 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1c0>
+  102bee:	83 e3 fb             	and    $0xfffffffb,%ebx
+  102bf1:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102bf7:	e9 06 ff ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102bfc:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102c00:	84 c0                	test   %al,%al
+  102c02:	79 3c                	jns    102c40 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x1d0>
+  102c04:	83 e3 f7             	and    $0xfffffff7,%ebx
+  102c07:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102c0d:	e9 f0 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c12:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  102c18:	83 cb 20             	or     $0x20,%ebx
+  102c1b:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102c21:	e9 dc fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c26:	66 90                	xchg   %ax,%ax
+  102c28:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102c2f:	00 
+  102c30:	83 cb 04             	or     $0x4,%ebx
   102c33:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c39:	e9 b4 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c39:	e9 c4 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102c3e:	66 90                	xchg   %ax,%ax
-  102c40:	f6 c3 40             	test   $0x40,%bl
-  102c43:	0f 85 a9 fe ff ff    	jne    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c49:	84 db                	test   %bl,%bl
-  102c4b:	78 41                	js     102c8e <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x22e>
-  102c4d:	83 cb c0             	or     $0xffffffc0,%ebx
-  102c50:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c56:	e9 97 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c5b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c60:	83 cb 01             	or     $0x1,%ebx
-  102c63:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c69:	e9 84 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c6e:	66 90                	xchg   %ax,%ax
-  102c70:	83 cb 10             	or     $0x10,%ebx
+  102c40:	83 cb 08             	or     $0x8,%ebx
+  102c43:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102c49:	e9 b4 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c4e:	66 90                	xchg   %ax,%ax
+  102c50:	f6 c3 40             	test   $0x40,%bl
+  102c53:	0f 85 a9 fe ff ff    	jne    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c59:	84 db                	test   %bl,%bl
+  102c5b:	78 41                	js     102c9e <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x22e>
+  102c5d:	83 cb c0             	or     $0xffffffc0,%ebx
+  102c60:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102c66:	e9 97 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c6b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102c70:	83 cb 01             	or     $0x1,%ebx
   102c73:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c79:	e9 74 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c79:	e9 84 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
   102c7e:	66 90                	xchg   %ax,%ax
-  102c80:	83 cb 02             	or     $0x2,%ebx
+  102c80:	83 cb 10             	or     $0x10,%ebx
   102c83:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c89:	e9 64 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c8e:	83 e3 7f             	and    $0x7f,%ebx
-  102c91:	83 cb 40             	or     $0x40,%ebx
-  102c94:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
-  102c9a:	e9 53 fe ff ff       	jmp    102af2 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
-  102c9f:	90                   	nop
+  102c89:	e9 74 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c8e:	66 90                	xchg   %ax,%ax
+  102c90:	83 cb 02             	or     $0x2,%ebx
+  102c93:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102c99:	e9 64 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102c9e:	83 e3 7f             	and    $0x7f,%ebx
+  102ca1:	83 cb 40             	or     $0x40,%ebx
+  102ca4:	88 1d 40 4b 10 00    	mov    %bl,0x104b40
+  102caa:	e9 53 fe ff ff       	jmp    102b02 <_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE+0x92>
+  102caf:	90                   	nop
 
-00102ca0 <_ZN8terminal6output19write_hex_8_no_syncEh>:
-  102ca0:	55                   	push   %ebp
-  102ca1:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102ca6:	89 e5                	mov    %esp,%ebp
-  102ca8:	56                   	push   %esi
-  102ca9:	89 d6                	mov    %edx,%esi
-  102cab:	ba 30 00 00 00       	mov    $0x30,%edx
-  102cb0:	53                   	push   %ebx
-  102cb1:	e8 8a 07 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102cb6:	ba 78 00 00 00       	mov    $0x78,%edx
-  102cbb:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102cc0:	e8 7b 07 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102cc5:	89 f0                	mov    %esi,%eax
-  102cc7:	ba 30 00 00 00       	mov    $0x30,%edx
-  102ccc:	84 c0                	test   %al,%al
-  102cce:	74 4c                	je     102d1c <_ZN8terminal6output19write_hex_8_no_syncEh+0x7c>
-  102cd0:	0f b6 c0             	movzbl %al,%eax
-  102cd3:	0f bd d8             	bsr    %eax,%ebx
-  102cd6:	83 f3 1f             	xor    $0x1f,%ebx
-  102cd9:	c1 fb 02             	sar    $0x2,%ebx
-  102cdc:	8d 0c 9d e8 ff ff ff 	lea    -0x18(,%ebx,4),%ecx
-  102ce3:	83 f1 04             	xor    $0x4,%ecx
-  102ce6:	d3 f8                	sar    %cl,%eax
-  102ce8:	83 e0 0f             	and    $0xf,%eax
-  102ceb:	0f be 90 20 40 10 00 	movsbl 0x104020(%eax),%edx
-  102cf2:	80 fa 0a             	cmp    $0xa,%dl
-  102cf5:	74 51                	je     102d48 <_ZN8terminal6output19write_hex_8_no_syncEh+0xa8>
-  102cf7:	80 fa 0d             	cmp    $0xd,%dl
-  102cfa:	75 34                	jne    102d30 <_ZN8terminal6output19write_hex_8_no_syncEh+0x90>
-  102cfc:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
-  102d03:	83 fb 07             	cmp    $0x7,%ebx
-  102d06:	74 37                	je     102d3f <_ZN8terminal6output19write_hex_8_no_syncEh+0x9f>
-  102d08:	83 e6 0f             	and    $0xf,%esi
-  102d0b:	0f be 96 20 40 10 00 	movsbl 0x104020(%esi),%edx
-  102d12:	80 fa 0a             	cmp    $0xa,%dl
-  102d15:	74 51                	je     102d68 <_ZN8terminal6output19write_hex_8_no_syncEh+0xc8>
-  102d17:	80 fa 0d             	cmp    $0xd,%dl
-  102d1a:	74 3c                	je     102d58 <_ZN8terminal6output19write_hex_8_no_syncEh+0xb8>
-  102d1c:	5b                   	pop    %ebx
-  102d1d:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102d22:	5e                   	pop    %esi
-  102d23:	5d                   	pop    %ebp
-  102d24:	e9 17 07 00 00       	jmp    103440 <_ZN2io15vga_text_buffer3putEc>
-  102d29:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102d30:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102d35:	e8 06 07 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102d3a:	83 fb 07             	cmp    $0x7,%ebx
-  102d3d:	75 c9                	jne    102d08 <_ZN8terminal6output19write_hex_8_no_syncEh+0x68>
-  102d3f:	5b                   	pop    %ebx
-  102d40:	5e                   	pop    %esi
-  102d41:	5d                   	pop    %ebp
-  102d42:	c3                   	ret
-  102d43:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102d48:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102d4d:	e8 1e 08 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
-  102d52:	eb af                	jmp    102d03 <_ZN8terminal6output19write_hex_8_no_syncEh+0x63>
-  102d54:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102d58:	5b                   	pop    %ebx
-  102d59:	5e                   	pop    %esi
-  102d5a:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
-  102d61:	5d                   	pop    %ebp
-  102d62:	c3                   	ret
-  102d63:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+00102cb0 <_ZN8terminal6output19write_hex_8_no_syncEh>:
+  102cb0:	55                   	push   %ebp
+  102cb1:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102cb6:	89 e5                	mov    %esp,%ebp
+  102cb8:	56                   	push   %esi
+  102cb9:	89 d6                	mov    %edx,%esi
+  102cbb:	ba 30 00 00 00       	mov    $0x30,%edx
+  102cc0:	53                   	push   %ebx
+  102cc1:	e8 7a 07 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102cc6:	ba 78 00 00 00       	mov    $0x78,%edx
+  102ccb:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102cd0:	e8 6b 07 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102cd5:	89 f0                	mov    %esi,%eax
+  102cd7:	ba 30 00 00 00       	mov    $0x30,%edx
+  102cdc:	84 c0                	test   %al,%al
+  102cde:	74 4c                	je     102d2c <_ZN8terminal6output19write_hex_8_no_syncEh+0x7c>
+  102ce0:	0f b6 c0             	movzbl %al,%eax
+  102ce3:	0f bd d8             	bsr    %eax,%ebx
+  102ce6:	83 f3 1f             	xor    $0x1f,%ebx
+  102ce9:	c1 fb 02             	sar    $0x2,%ebx
+  102cec:	8d 0c 9d e8 ff ff ff 	lea    -0x18(,%ebx,4),%ecx
+  102cf3:	83 f1 04             	xor    $0x4,%ecx
+  102cf6:	d3 f8                	sar    %cl,%eax
+  102cf8:	83 e0 0f             	and    $0xf,%eax
+  102cfb:	0f be 90 20 40 10 00 	movsbl 0x104020(%eax),%edx
+  102d02:	80 fa 0a             	cmp    $0xa,%dl
+  102d05:	74 51                	je     102d58 <_ZN8terminal6output19write_hex_8_no_syncEh+0xa8>
+  102d07:	80 fa 0d             	cmp    $0xd,%dl
+  102d0a:	75 34                	jne    102d40 <_ZN8terminal6output19write_hex_8_no_syncEh+0x90>
+  102d0c:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
+  102d13:	83 fb 07             	cmp    $0x7,%ebx
+  102d16:	74 37                	je     102d4f <_ZN8terminal6output19write_hex_8_no_syncEh+0x9f>
+  102d18:	83 e6 0f             	and    $0xf,%esi
+  102d1b:	0f be 96 20 40 10 00 	movsbl 0x104020(%esi),%edx
+  102d22:	80 fa 0a             	cmp    $0xa,%dl
+  102d25:	74 51                	je     102d78 <_ZN8terminal6output19write_hex_8_no_syncEh+0xc8>
+  102d27:	80 fa 0d             	cmp    $0xd,%dl
+  102d2a:	74 3c                	je     102d68 <_ZN8terminal6output19write_hex_8_no_syncEh+0xb8>
+  102d2c:	5b                   	pop    %ebx
+  102d2d:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102d32:	5e                   	pop    %esi
+  102d33:	5d                   	pop    %ebp
+  102d34:	e9 07 07 00 00       	jmp    103440 <_ZN2io15vga_text_buffer3putEc>
+  102d39:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102d40:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102d45:	e8 f6 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102d4a:	83 fb 07             	cmp    $0x7,%ebx
+  102d4d:	75 c9                	jne    102d18 <_ZN8terminal6output19write_hex_8_no_syncEh+0x68>
+  102d4f:	5b                   	pop    %ebx
+  102d50:	5e                   	pop    %esi
+  102d51:	5d                   	pop    %ebp
+  102d52:	c3                   	ret
+  102d53:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102d58:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102d5d:	e8 0e 08 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102d62:	eb af                	jmp    102d13 <_ZN8terminal6output19write_hex_8_no_syncEh+0x63>
+  102d64:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   102d68:	5b                   	pop    %ebx
-  102d69:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102d6e:	5e                   	pop    %esi
-  102d6f:	5d                   	pop    %ebp
-  102d70:	e9 fb 07 00 00       	jmp    103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
-  102d75:	66 90                	xchg   %ax,%ax
-  102d77:	66 90                	xchg   %ax,%ax
-  102d79:	66 90                	xchg   %ax,%ax
-  102d7b:	66 90                	xchg   %ax,%ax
-  102d7d:	66 90                	xchg   %ax,%ax
-  102d7f:	90                   	nop
+  102d69:	5e                   	pop    %esi
+  102d6a:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
+  102d71:	5d                   	pop    %ebp
+  102d72:	c3                   	ret
+  102d73:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102d78:	5b                   	pop    %ebx
+  102d79:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102d7e:	5e                   	pop    %esi
+  102d7f:	5d                   	pop    %ebp
+  102d80:	e9 eb 07 00 00       	jmp    103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102d85:	66 90                	xchg   %ax,%ax
+  102d87:	66 90                	xchg   %ax,%ax
+  102d89:	66 90                	xchg   %ax,%ax
+  102d8b:	66 90                	xchg   %ax,%ax
+  102d8d:	66 90                	xchg   %ax,%ax
+  102d8f:	90                   	nop
 
-00102d80 <_ZN8terminal6output20write_hex_32_no_syncEm>:
-  102d80:	55                   	push   %ebp
-  102d81:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102d86:	89 e5                	mov    %esp,%ebp
-  102d88:	56                   	push   %esi
-  102d89:	89 d6                	mov    %edx,%esi
-  102d8b:	ba 30 00 00 00       	mov    $0x30,%edx
-  102d90:	53                   	push   %ebx
-  102d91:	e8 aa 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102d96:	ba 78 00 00 00       	mov    $0x78,%edx
-  102d9b:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102da0:	e8 9b 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102da5:	85 f6                	test   %esi,%esi
-  102da7:	74 67                	je     102e10 <_ZN8terminal6output20write_hex_32_no_syncEm+0x90>
-  102da9:	0f bd c6             	bsr    %esi,%eax
-  102dac:	bb 07 00 00 00       	mov    $0x7,%ebx
-  102db1:	83 f0 1f             	xor    $0x1f,%eax
-  102db4:	c1 f8 02             	sar    $0x2,%eax
-  102db7:	29 c3                	sub    %eax,%ebx
-  102db9:	c1 e3 02             	shl    $0x2,%ebx
-  102dbc:	eb 13                	jmp    102dd1 <_ZN8terminal6output20write_hex_32_no_syncEm+0x51>
-  102dbe:	66 90                	xchg   %ax,%ax
-  102dc0:	80 fa 0d             	cmp    $0xd,%dl
-  102dc3:	75 3b                	jne    102e00 <_ZN8terminal6output20write_hex_32_no_syncEm+0x80>
-  102dc5:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
-  102dcc:	83 eb 04             	sub    $0x4,%ebx
-  102dcf:	78 24                	js     102df5 <_ZN8terminal6output20write_hex_32_no_syncEm+0x75>
-  102dd1:	89 f0                	mov    %esi,%eax
-  102dd3:	89 d9                	mov    %ebx,%ecx
-  102dd5:	d3 e8                	shr    %cl,%eax
-  102dd7:	83 e0 0f             	and    $0xf,%eax
-  102dda:	0f be 90 20 40 10 00 	movsbl 0x104020(%eax),%edx
-  102de1:	80 fa 0a             	cmp    $0xa,%dl
-  102de4:	75 da                	jne    102dc0 <_ZN8terminal6output20write_hex_32_no_syncEm+0x40>
-  102de6:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102deb:	e8 80 07 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
-  102df0:	83 eb 04             	sub    $0x4,%ebx
-  102df3:	79 dc                	jns    102dd1 <_ZN8terminal6output20write_hex_32_no_syncEm+0x51>
-  102df5:	5b                   	pop    %ebx
-  102df6:	5e                   	pop    %esi
-  102df7:	5d                   	pop    %ebp
-  102df8:	c3                   	ret
-  102df9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102e00:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102e05:	e8 36 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102e0a:	eb c0                	jmp    102dcc <_ZN8terminal6output20write_hex_32_no_syncEm+0x4c>
-  102e0c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102e10:	5b                   	pop    %ebx
-  102e11:	ba 30 00 00 00       	mov    $0x30,%edx
-  102e16:	5e                   	pop    %esi
-  102e17:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102e1c:	5d                   	pop    %ebp
-  102e1d:	e9 1e 06 00 00       	jmp    103440 <_ZN2io15vga_text_buffer3putEc>
-  102e22:	66 90                	xchg   %ax,%ax
-  102e24:	66 90                	xchg   %ax,%ax
-  102e26:	66 90                	xchg   %ax,%ax
-  102e28:	66 90                	xchg   %ax,%ax
-  102e2a:	66 90                	xchg   %ax,%ax
-  102e2c:	66 90                	xchg   %ax,%ax
-  102e2e:	66 90                	xchg   %ax,%ax
+00102d90 <_ZN8terminal6output20write_hex_32_no_syncEm>:
+  102d90:	55                   	push   %ebp
+  102d91:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102d96:	89 e5                	mov    %esp,%ebp
+  102d98:	56                   	push   %esi
+  102d99:	89 d6                	mov    %edx,%esi
+  102d9b:	ba 30 00 00 00       	mov    $0x30,%edx
+  102da0:	53                   	push   %ebx
+  102da1:	e8 9a 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102da6:	ba 78 00 00 00       	mov    $0x78,%edx
+  102dab:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102db0:	e8 8b 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102db5:	85 f6                	test   %esi,%esi
+  102db7:	74 67                	je     102e20 <_ZN8terminal6output20write_hex_32_no_syncEm+0x90>
+  102db9:	0f bd c6             	bsr    %esi,%eax
+  102dbc:	bb 07 00 00 00       	mov    $0x7,%ebx
+  102dc1:	83 f0 1f             	xor    $0x1f,%eax
+  102dc4:	c1 f8 02             	sar    $0x2,%eax
+  102dc7:	29 c3                	sub    %eax,%ebx
+  102dc9:	c1 e3 02             	shl    $0x2,%ebx
+  102dcc:	eb 13                	jmp    102de1 <_ZN8terminal6output20write_hex_32_no_syncEm+0x51>
+  102dce:	66 90                	xchg   %ax,%ax
+  102dd0:	80 fa 0d             	cmp    $0xd,%dl
+  102dd3:	75 3b                	jne    102e10 <_ZN8terminal6output20write_hex_32_no_syncEm+0x80>
+  102dd5:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
+  102ddc:	83 eb 04             	sub    $0x4,%ebx
+  102ddf:	78 24                	js     102e05 <_ZN8terminal6output20write_hex_32_no_syncEm+0x75>
+  102de1:	89 f0                	mov    %esi,%eax
+  102de3:	89 d9                	mov    %ebx,%ecx
+  102de5:	d3 e8                	shr    %cl,%eax
+  102de7:	83 e0 0f             	and    $0xf,%eax
+  102dea:	0f be 90 20 40 10 00 	movsbl 0x104020(%eax),%edx
+  102df1:	80 fa 0a             	cmp    $0xa,%dl
+  102df4:	75 da                	jne    102dd0 <_ZN8terminal6output20write_hex_32_no_syncEm+0x40>
+  102df6:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102dfb:	e8 70 07 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102e00:	83 eb 04             	sub    $0x4,%ebx
+  102e03:	79 dc                	jns    102de1 <_ZN8terminal6output20write_hex_32_no_syncEm+0x51>
+  102e05:	5b                   	pop    %ebx
+  102e06:	5e                   	pop    %esi
+  102e07:	5d                   	pop    %ebp
+  102e08:	c3                   	ret
+  102e09:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102e10:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102e15:	e8 26 06 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102e1a:	eb c0                	jmp    102ddc <_ZN8terminal6output20write_hex_32_no_syncEm+0x4c>
+  102e1c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102e20:	5b                   	pop    %ebx
+  102e21:	ba 30 00 00 00       	mov    $0x30,%edx
+  102e26:	5e                   	pop    %esi
+  102e27:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102e2c:	5d                   	pop    %ebp
+  102e2d:	e9 0e 06 00 00       	jmp    103440 <_ZN2io15vga_text_buffer3putEc>
+  102e32:	66 90                	xchg   %ax,%ax
+  102e34:	66 90                	xchg   %ax,%ax
+  102e36:	66 90                	xchg   %ax,%ax
+  102e38:	66 90                	xchg   %ax,%ax
+  102e3a:	66 90                	xchg   %ax,%ax
+  102e3c:	66 90                	xchg   %ax,%ax
+  102e3e:	66 90                	xchg   %ax,%ax
 
-00102e30 <_ZN8terminal6output10initializeEv>:
-  102e30:	55                   	push   %ebp
-  102e31:	89 e5                	mov    %esp,%ebp
-  102e33:	83 ec 14             	sub    $0x14,%esp
-  102e36:	68 68 40 10 00       	push   $0x104068
-  102e3b:	e8 c0 05 00 00       	call   103400 <_ZN2io15vga_text_buffer5clearEv>
-  102e40:	58                   	pop    %eax
-  102e41:	5a                   	pop    %edx
-  102e42:	6a 0f                	push   $0xf
-  102e44:	6a 0e                	push   $0xe
-  102e46:	e8 05 08 00 00       	call   103650 <_ZN2io15hardware_cursor6enableEhh>
-  102e4b:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
-  102e52:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
-  102e59:	83 c4 10             	add    $0x10,%esp
-  102e5c:	01 d0                	add    %edx,%eax
-  102e5e:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
-  102e65:	c9                   	leave
-  102e66:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  102e69:	c1 e0 04             	shl    $0x4,%eax
+00102e40 <_ZN8terminal6output10initializeEv>:
+  102e40:	55                   	push   %ebp
+  102e41:	89 e5                	mov    %esp,%ebp
+  102e43:	83 ec 14             	sub    $0x14,%esp
+  102e46:	68 68 40 10 00       	push   $0x104068
+  102e4b:	e8 b0 05 00 00       	call   103400 <_ZN2io15vga_text_buffer5clearEv>
+  102e50:	58                   	pop    %eax
+  102e51:	5a                   	pop    %edx
+  102e52:	6a 0f                	push   $0xf
+  102e54:	6a 0e                	push   $0xe
+  102e56:	e8 f5 07 00 00       	call   103650 <_ZN2io15hardware_cursor6enableEhh>
+  102e5b:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  102e62:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
+  102e69:	83 c4 10             	add    $0x10,%esp
   102e6c:	01 d0                	add    %edx,%eax
-  102e6e:	0f b7 c0             	movzwl %ax,%eax
-  102e71:	e9 5a 08 00 00       	jmp    1036d0 <_ZN2io15hardware_cursor12set_positionEt>
-  102e76:	66 90                	xchg   %ax,%ax
-  102e78:	66 90                	xchg   %ax,%ax
-  102e7a:	66 90                	xchg   %ax,%ax
-  102e7c:	66 90                	xchg   %ax,%ax
-  102e7e:	66 90                	xchg   %ax,%ax
+  102e6e:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
+  102e75:	c9                   	leave
+  102e76:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  102e79:	c1 e0 04             	shl    $0x4,%eax
+  102e7c:	01 d0                	add    %edx,%eax
+  102e7e:	0f b7 c0             	movzwl %ax,%eax
+  102e81:	e9 4a 08 00 00       	jmp    1036d0 <_ZN2io15hardware_cursor12set_positionEt>
+  102e86:	66 90                	xchg   %ax,%ax
+  102e88:	66 90                	xchg   %ax,%ax
+  102e8a:	66 90                	xchg   %ax,%ax
+  102e8c:	66 90                	xchg   %ax,%ax
+  102e8e:	66 90                	xchg   %ax,%ax
 
-00102e80 <_ZN8terminal6outputlsEc>:
-  102e80:	55                   	push   %ebp
-  102e81:	89 e5                	mov    %esp,%ebp
-  102e83:	53                   	push   %ebx
-  102e84:	89 c3                	mov    %eax,%ebx
-  102e86:	83 ec 04             	sub    $0x4,%esp
-  102e89:	80 fa 0a             	cmp    $0xa,%dl
-  102e8c:	74 52                	je     102ee0 <_ZN8terminal6outputlsEc+0x60>
-  102e8e:	80 fa 0d             	cmp    $0xd,%dl
-  102e91:	75 35                	jne    102ec8 <_ZN8terminal6outputlsEc+0x48>
-  102e93:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
-  102e9a:	31 d2                	xor    %edx,%edx
-  102e9c:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
-  102ea3:	0f b6 0d 69 40 10 00 	movzbl 0x104069,%ecx
-  102eaa:	01 c8                	add    %ecx,%eax
-  102eac:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  102eaf:	c1 e0 04             	shl    $0x4,%eax
-  102eb2:	01 d0                	add    %edx,%eax
-  102eb4:	0f b7 c0             	movzwl %ax,%eax
-  102eb7:	e8 14 08 00 00       	call   1036d0 <_ZN2io15hardware_cursor12set_positionEt>
-  102ebc:	89 d8                	mov    %ebx,%eax
-  102ebe:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  102ec1:	c9                   	leave
-  102ec2:	c3                   	ret
-  102ec3:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102ec8:	0f be d2             	movsbl %dl,%edx
-  102ecb:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102ed0:	e8 6b 05 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102ed5:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
-  102edc:	eb be                	jmp    102e9c <_ZN8terminal6outputlsEc+0x1c>
-  102ede:	66 90                	xchg   %ax,%ax
-  102ee0:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102ee5:	e8 86 06 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
-  102eea:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
-  102ef1:	eb a9                	jmp    102e9c <_ZN8terminal6outputlsEc+0x1c>
-  102ef3:	66 90                	xchg   %ax,%ax
-  102ef5:	66 90                	xchg   %ax,%ax
-  102ef7:	66 90                	xchg   %ax,%ax
-  102ef9:	66 90                	xchg   %ax,%ax
-  102efb:	66 90                	xchg   %ax,%ax
-  102efd:	66 90                	xchg   %ax,%ax
-  102eff:	90                   	nop
+00102e90 <_ZN8terminal6outputlsEc>:
+  102e90:	55                   	push   %ebp
+  102e91:	89 e5                	mov    %esp,%ebp
+  102e93:	53                   	push   %ebx
+  102e94:	89 c3                	mov    %eax,%ebx
+  102e96:	83 ec 04             	sub    $0x4,%esp
+  102e99:	80 fa 0a             	cmp    $0xa,%dl
+  102e9c:	74 52                	je     102ef0 <_ZN8terminal6outputlsEc+0x60>
+  102e9e:	80 fa 0d             	cmp    $0xd,%dl
+  102ea1:	75 35                	jne    102ed8 <_ZN8terminal6outputlsEc+0x48>
+  102ea3:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
+  102eaa:	31 d2                	xor    %edx,%edx
+  102eac:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
+  102eb3:	0f b6 0d 69 40 10 00 	movzbl 0x104069,%ecx
+  102eba:	01 c8                	add    %ecx,%eax
+  102ebc:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  102ebf:	c1 e0 04             	shl    $0x4,%eax
+  102ec2:	01 d0                	add    %edx,%eax
+  102ec4:	0f b7 c0             	movzwl %ax,%eax
+  102ec7:	e8 04 08 00 00       	call   1036d0 <_ZN2io15hardware_cursor12set_positionEt>
+  102ecc:	89 d8                	mov    %ebx,%eax
+  102ece:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  102ed1:	c9                   	leave
+  102ed2:	c3                   	ret
+  102ed3:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102ed8:	0f be d2             	movsbl %dl,%edx
+  102edb:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102ee0:	e8 5b 05 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102ee5:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
+  102eec:	eb be                	jmp    102eac <_ZN8terminal6outputlsEc+0x1c>
+  102eee:	66 90                	xchg   %ax,%ax
+  102ef0:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102ef5:	e8 76 06 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102efa:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
+  102f01:	eb a9                	jmp    102eac <_ZN8terminal6outputlsEc+0x1c>
+  102f03:	66 90                	xchg   %ax,%ax
+  102f05:	66 90                	xchg   %ax,%ax
+  102f07:	66 90                	xchg   %ax,%ax
+  102f09:	66 90                	xchg   %ax,%ax
+  102f0b:	66 90                	xchg   %ax,%ax
+  102f0d:	66 90                	xchg   %ax,%ax
+  102f0f:	90                   	nop
 
-00102f00 <_ZN8terminal6outputlsEPKc>:
-  102f00:	55                   	push   %ebp
-  102f01:	89 e5                	mov    %esp,%ebp
-  102f03:	56                   	push   %esi
-  102f04:	89 d6                	mov    %edx,%esi
-  102f06:	53                   	push   %ebx
-  102f07:	0f be 12             	movsbl (%edx),%edx
-  102f0a:	89 c3                	mov    %eax,%ebx
-  102f0c:	84 d2                	test   %dl,%dl
-  102f0e:	75 1f                	jne    102f2f <_ZN8terminal6outputlsEPKc+0x2f>
-  102f10:	eb 36                	jmp    102f48 <_ZN8terminal6outputlsEPKc+0x48>
-  102f12:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  102f18:	80 fa 0d             	cmp    $0xd,%dl
-  102f1b:	75 5b                	jne    102f78 <_ZN8terminal6outputlsEPKc+0x78>
-  102f1d:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
-  102f24:	0f be 56 01          	movsbl 0x1(%esi),%edx
-  102f28:	83 c6 01             	add    $0x1,%esi
-  102f2b:	84 d2                	test   %dl,%dl
-  102f2d:	74 19                	je     102f48 <_ZN8terminal6outputlsEPKc+0x48>
-  102f2f:	80 fa 0a             	cmp    $0xa,%dl
-  102f32:	75 e4                	jne    102f18 <_ZN8terminal6outputlsEPKc+0x18>
-  102f34:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102f39:	83 c6 01             	add    $0x1,%esi
-  102f3c:	e8 2f 06 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
-  102f41:	0f be 16             	movsbl (%esi),%edx
-  102f44:	84 d2                	test   %dl,%dl
-  102f46:	75 e7                	jne    102f2f <_ZN8terminal6outputlsEPKc+0x2f>
-  102f48:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
-  102f4f:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
-  102f56:	01 d0                	add    %edx,%eax
-  102f58:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
-  102f5f:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  102f62:	c1 e0 04             	shl    $0x4,%eax
-  102f65:	01 d0                	add    %edx,%eax
-  102f67:	0f b7 c0             	movzwl %ax,%eax
-  102f6a:	e8 61 07 00 00       	call   1036d0 <_ZN2io15hardware_cursor12set_positionEt>
-  102f6f:	89 d8                	mov    %ebx,%eax
-  102f71:	5b                   	pop    %ebx
-  102f72:	5e                   	pop    %esi
-  102f73:	5d                   	pop    %ebp
-  102f74:	c3                   	ret
-  102f75:	8d 76 00             	lea    0x0(%esi),%esi
-  102f78:	b8 68 40 10 00       	mov    $0x104068,%eax
-  102f7d:	e8 be 04 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
-  102f82:	eb a0                	jmp    102f24 <_ZN8terminal6outputlsEPKc+0x24>
-  102f84:	66 90                	xchg   %ax,%ax
-  102f86:	66 90                	xchg   %ax,%ax
-  102f88:	66 90                	xchg   %ax,%ax
-  102f8a:	66 90                	xchg   %ax,%ax
-  102f8c:	66 90                	xchg   %ax,%ax
-  102f8e:	66 90                	xchg   %ax,%ax
-  102f90:	66 90                	xchg   %ax,%ax
-  102f92:	66 90                	xchg   %ax,%ax
+00102f10 <_ZN8terminal6outputlsEPKc>:
+  102f10:	55                   	push   %ebp
+  102f11:	89 e5                	mov    %esp,%ebp
+  102f13:	56                   	push   %esi
+  102f14:	89 d6                	mov    %edx,%esi
+  102f16:	53                   	push   %ebx
+  102f17:	0f be 12             	movsbl (%edx),%edx
+  102f1a:	89 c3                	mov    %eax,%ebx
+  102f1c:	84 d2                	test   %dl,%dl
+  102f1e:	75 1f                	jne    102f3f <_ZN8terminal6outputlsEPKc+0x2f>
+  102f20:	eb 36                	jmp    102f58 <_ZN8terminal6outputlsEPKc+0x48>
+  102f22:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  102f28:	80 fa 0d             	cmp    $0xd,%dl
+  102f2b:	75 5b                	jne    102f88 <_ZN8terminal6outputlsEPKc+0x78>
+  102f2d:	c6 05 6a 40 10 00 00 	movb   $0x0,0x10406a
+  102f34:	0f be 56 01          	movsbl 0x1(%esi),%edx
+  102f38:	83 c6 01             	add    $0x1,%esi
+  102f3b:	84 d2                	test   %dl,%dl
+  102f3d:	74 19                	je     102f58 <_ZN8terminal6outputlsEPKc+0x48>
+  102f3f:	80 fa 0a             	cmp    $0xa,%dl
+  102f42:	75 e4                	jne    102f28 <_ZN8terminal6outputlsEPKc+0x18>
+  102f44:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102f49:	83 c6 01             	add    $0x1,%esi
+  102f4c:	e8 1f 06 00 00       	call   103570 <_ZN2io15vga_text_buffer17move_to_next_lineEv>
+  102f51:	0f be 16             	movsbl (%esi),%edx
+  102f54:	84 d2                	test   %dl,%dl
+  102f56:	75 e7                	jne    102f3f <_ZN8terminal6outputlsEPKc+0x2f>
+  102f58:	0f b6 15 69 40 10 00 	movzbl 0x104069,%edx
+  102f5f:	0f b6 05 68 40 10 00 	movzbl 0x104068,%eax
+  102f66:	01 d0                	add    %edx,%eax
+  102f68:	0f b6 15 6a 40 10 00 	movzbl 0x10406a,%edx
+  102f6f:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  102f72:	c1 e0 04             	shl    $0x4,%eax
+  102f75:	01 d0                	add    %edx,%eax
+  102f77:	0f b7 c0             	movzwl %ax,%eax
+  102f7a:	e8 51 07 00 00       	call   1036d0 <_ZN2io15hardware_cursor12set_positionEt>
+  102f7f:	89 d8                	mov    %ebx,%eax
+  102f81:	5b                   	pop    %ebx
+  102f82:	5e                   	pop    %esi
+  102f83:	5d                   	pop    %ebp
+  102f84:	c3                   	ret
+  102f85:	8d 76 00             	lea    0x0(%esi),%esi
+  102f88:	b8 68 40 10 00       	mov    $0x104068,%eax
+  102f8d:	e8 ae 04 00 00       	call   103440 <_ZN2io15vga_text_buffer3putEc>
+  102f92:	eb a0                	jmp    102f34 <_ZN8terminal6outputlsEPKc+0x24>
   102f94:	66 90                	xchg   %ax,%ax
   102f96:	66 90                	xchg   %ax,%ax
   102f98:	66 90                	xchg   %ax,%ax
@@ -4213,7 +4214,7 @@ Disassembly of section .text:
   10300f:	00 
   103010:	0f b6 d2             	movzbl %dl,%edx
   103013:	89 f0                	mov    %esi,%eax
-  103015:	e8 86 fc ff ff       	call   102ca0 <_ZN8terminal6output19write_hex_8_no_syncEh>
+  103015:	e8 96 fc ff ff       	call   102cb0 <_ZN8terminal6output19write_hex_8_no_syncEh>
   10301a:	eb ba                	jmp    102fd6 <_ZN8terminal6outputlsEh+0x16>
   10301c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   103020:	89 d1                	mov    %edx,%ecx
@@ -4297,7 +4298,7 @@ Disassembly of section .text:
   103108:	c3                   	ret
   103109:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
   103110:	89 f0                	mov    %esi,%eax
-  103112:	e8 69 fc ff ff       	call   102d80 <_ZN8terminal6output20write_hex_32_no_syncEm>
+  103112:	e8 79 fc ff ff       	call   102d90 <_ZN8terminal6output20write_hex_32_no_syncEm>
   103117:	eb bf                	jmp    1030d8 <_ZN8terminal6outputlsEm+0x18>
   103119:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
   103120:	8d 5d e8             	lea    -0x18(%ebp),%ebx

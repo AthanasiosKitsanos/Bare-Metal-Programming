@@ -30,6 +30,8 @@ namespace
         static constexpr size_t total_bits{static_cast<size_t>(sizeof(size_t) << bits_per_byte_shift)};
         static constexpr size_t total_bits_m1{total_bits - 1};
         
+        uint8_t step[array_size];
+
         template<size_t N>
         [[gnu::always_inline]]
         static constexpr uint8_t compute_step(const size_t frames, const size_t d) noexcept
@@ -52,13 +54,29 @@ namespace
             return static_cast<size_t>(static_cast<size_t>(1) << (total_bits_m1 - builtin::leading_zeros(frames)));
         }
 
+        template<size_t ...I>
+        [[gnu::always_inline]]
+        constexpr T space_impl(T inv, sequence::index_list<I...>) const noexcept
+        {
+            ((inv &= static_cast<T>(inv >> this->step[I])), ...);
+            return inv;
+        }
+
         public:
-        uint8_t step[array_size];
 
         [[gnu::always_inline]]
         constexpr array_of_shifts(const size_t frames) noexcept: array_of_shifts(frames, highest_power_of_2(frames), sequence::make_index_list<array_size>{})
         {}
+
+        [[gnu::always_inline]]
+        constexpr T space(T inv) const noexcept
+        {
+            return space_impl(inv, sequence::make_index_list<array_size>{});
+        }
     };
+
+
+    // Checking neighboring bits
 
     // General Purpose Registers
     template<typename T, ::set_bits Set>
