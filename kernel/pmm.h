@@ -17,7 +17,7 @@ namespace kernel::memory
     };
 
     [[gnu::regparm(2)]]
-    void pmm_initialize(const e820_memory_map* map, const uintptr_t kenrel_end) noexcept;
+    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kenrel_end) noexcept;
 
     void* pmm_allocate_frame() noexcept;
 

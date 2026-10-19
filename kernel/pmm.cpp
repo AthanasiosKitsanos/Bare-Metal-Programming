@@ -215,7 +215,7 @@ namespace
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
     
@@ -272,7 +272,7 @@ namespace
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -329,7 +329,7 @@ namespace
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -386,7 +386,7 @@ namespace
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -443,7 +443,7 @@ namespace
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -500,7 +500,7 @@ namespace
                 length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -594,7 +594,7 @@ namespace
                 if(length >= frames) break;
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -638,7 +638,7 @@ namespace
                 if(length >= frames) break;
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -736,7 +736,7 @@ namespace
                 if(length >= frames) break;
             }
         }
-        run->length = (current == end) ? length : frames;
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -990,7 +990,7 @@ namespace
     template<::set_bits Set>
     struct simd_set_lut
     {
-        simd_set_methods entries[::set_methods_size];
+        simd_set_methods entries[set_methods_size];
 
         constexpr simd_set_lut(): entries{}
         {
@@ -1007,12 +1007,27 @@ namespace
                 entries[avx2_flag] = set_frames_free_avx2;
             }
         }
+
+        [[gnu::always_inline]]
+        constexpr simd_set_methods operator[](const size_t index) const noexcept
+        {
+            return entries[index];
+        }
     };
 
     constexpr simd_set_lut<set_bits::all_ones> set_used_lut{};
     constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
 
-    constexpr kernel::memory::reserved_entry g_reserved_map{};
+    struct reserved_vector
+    {
+        size_t base;
+        size_t length;
+    };
+
+    constexpr size_t vector_size{2};
+    constexpr size_t total_size_m1{(sizeof(reserved_vector) * vector_size) - 1};
+    constexpr size_t align_at(power::highest_of_2(total_size_m1) << 1);
+    alignas(align_at) reserved_vector g_reserved[vector_size];
 }
 
 namespace kernel::memory
@@ -1022,7 +1037,7 @@ namespace kernel::memory
     size_t pmm_free_frames() noexcept { return g_total_frames - g_used_frames; }
     
     [[gnu::regparm(2)]]
-    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_end) noexcept
+    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
     {
         const e820_entry* const entries_end{map->entries + map->count};
         {
@@ -1048,13 +1063,13 @@ namespace kernel::memory
         const uint8_t* bitmap_end{g_bitmap.end};
         const uint8_t features_flag{cpu::features::get()};
         set_used_lut.entries[features_flag](bitmap_current, bitmap_end);
-        
+
         g_used_frames = g_total_frames;
 
         bit_n_byte pair{get_bit_n_byte(frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end)))};
         g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
         g_bitmap.lower_limit = pair;
-        
+
         bit_n_byte end_byte{};
         uint8_t* entry_end{nullptr};
         size_t entry_start_frame{0x00};

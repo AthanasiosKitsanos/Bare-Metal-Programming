@@ -19,13 +19,24 @@ extern "C" [[noreturn]] void kernel_main()
     
     {
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};
-        kernel::memory::pmm_initialize(&map, reinterpret_cast<uintptr_t>(&_kernel_end));
+        kernel::memory::pmm_initialize(&map, reinterpret_cast<uintptr_t>(&_kernel_start), reinterpret_cast<uintptr_t>(&_kernel_end));
     }
     
     kernel::initialize_exceptions();
     drivers::initialize();
 
-    kernel::memory::test::allocate_8_frames();
+    const size_t free_frames{kernel::memory::pmm_free_frames()};
+    out << "Used Frames: " << kernel::memory::pmm_used_frames()
+    << "\nFree Frames: " << free_frames << '\n';
+    
+    constexpr size_t frames{32371};
+    const uint8_t* ptr{reinterpret_cast<const uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(frames))};
+    if(!ptr) out << "Not enough frames\n";
+    else
+    {
+        out << "Allocated: " << frames
+        << "\nAddress: " << terminal::hex << reinterpret_cast<uintptr_t>(ptr) << '\n';
+    }
 
     asm volatile("sti");
 

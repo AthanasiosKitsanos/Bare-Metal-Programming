@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stddef.h>
-
+#include "builtin.h"
 namespace power
 {
     // returns -1 if parameter is 0 or is not a power of 2
@@ -14,5 +14,13 @@ namespace power
             return static_cast<int8_t>(__builtin_ctzll(static_cast<unsigned long long>(value)));
         }
         else return static_cast<int8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
+    }
+
+    template<typename T>
+    [[gnu::always_inline]]
+    static constexpr uint8_t highest_of_2(const T value) noexcept
+    {
+        constexpr size_t total_bits_m1{(sizeof(size_t) << 3) - 1};
+        return static_cast<uint8_t>(static_cast<size_t>(1) << (total_bits_m1 - builtin::leading_zeros(value)));
     }
 }
