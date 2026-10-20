@@ -140,12 +140,6 @@ namespace
         g_used_frames -= frames;
     }
 
-    struct reserved_frames
-    {
-        size_t base{0};
-        size_t length{0};
-    };
-
     // SIMD Methods
     constexpr uint8_t gpr_flag{0x00};
     constexpr uint8_t simd_flag{0x01};
@@ -1028,6 +1022,9 @@ namespace
     constexpr size_t total_size_m1{(sizeof(reserved_vector) * vector_size) - 1};
     constexpr size_t align_at(power::highest_of_2(total_size_m1) << 1);
     alignas(align_at) reserved_vector g_reserved[vector_size];
+
+    constexpr size_t cache_line_size{64};
+    static_assert(align_at <= cache_line_size, "g_reserved does must fit in one cache line");
 }
 
 namespace kernel::memory
