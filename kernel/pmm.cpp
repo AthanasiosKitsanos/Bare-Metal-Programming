@@ -1054,57 +1054,65 @@ namespace kernel::memory
 
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);
         g_bitmap.end = g_bitmap.start + ((g_total_frames + 7) >> bits_per_byte_shift);
-        g_bitmap.search_end = g_bitmap.end;
+
+        // g_reserved[0].base is 0, because .init_bss(kernel_entry.S), already assigns 0
+        g_reserved[0].length = 1;
+        constexpr size_t frame_size_m1{frame_size - 1};
+        const size_t kernel_start_index{frame_index(kernel_start)};
+        const size_t kernel_end_index{frame_index(static_cast<size_t>((reinterpret_cast<uintptr_t>(g_bitmap.end) + frame_size_m1)))};
+        g_reserved[1].base = kernel_start_index;
+        g_reserved[1].length = kernel_end_index - kernel_start_index;
+        // g_bitmap.search_end = g_bitmap.end;
         
-        uint8_t* bitmap_current{g_bitmap.start};
-        const uint8_t* bitmap_end{g_bitmap.end};
-        const uint8_t features_flag{cpu::features::get()};
-        set_used_lut.entries[features_flag](bitmap_current, bitmap_end);
+        // uint8_t* bitmap_current{g_bitmap.start};
+        // const uint8_t* bitmap_end{g_bitmap.end};
+        // const uint8_t features_flag{cpu::features::get()};
+        // set_used_lut.entries[features_flag](bitmap_current, bitmap_end);
 
-        g_used_frames = g_total_frames;
+        // g_used_frames = g_total_frames;
 
-        bit_n_byte pair{get_bit_n_byte(frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end)))};
-        g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
-        g_bitmap.lower_limit = pair;
+        // bit_n_byte pair{get_bit_n_byte(frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end)))};
+        // g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
+        // g_bitmap.lower_limit = pair;
 
-        bit_n_byte end_byte{};
-        uint8_t* entry_end{nullptr};
-        size_t entry_start_frame{0x00};
-        size_t entry_end_index{0x00};
-        constexpr uintptr_t frame_aligned_mask{frame_size - 1};
-        for(const e820_entry* current{map->entries}; current < entries_end; ++current)
-        {
-            if(current->type == e820_memory_type::usable)
-            {
-                entry_start_frame = frame_index(current->base + frame_aligned_mask);
-                entry_end_index = frame_index(end_address(current));
+        // bit_n_byte end_byte{};
+        // uint8_t* entry_end{nullptr};
+        // size_t entry_start_frame{0x00};
+        // size_t entry_end_index{0x00};
+        // constexpr uintptr_t frame_aligned_mask{frame_size - 1};
+        // for(const e820_entry* current{map->entries}; current < entries_end; ++current)
+        // {
+        //     if(current->type == e820_memory_type::usable)
+        //     {
+        //         entry_start_frame = frame_index(current->base + frame_aligned_mask);
+        //         entry_end_index = frame_index(end_address(current));
 
-                if(entry_start_frame >= entry_end_index) continue;
-                g_used_frames -= (entry_end_index - entry_start_frame);
+        //         if(entry_start_frame >= entry_end_index) continue;
+        //         g_used_frames -= (entry_end_index - entry_start_frame);
 
-                pair = get_bit_n_byte(entry_start_frame);
-                end_byte = get_bit_n_byte(entry_end_index);
-                bitmap_current = (g_bitmap.start + pair.byte_index);
+        //         pair = get_bit_n_byte(entry_start_frame);
+        //         end_byte = get_bit_n_byte(entry_end_index);
+        //         bitmap_current = (g_bitmap.start + pair.byte_index);
 
-                if(pair.byte_index == end_byte.byte_index)
-                {
-                    *bitmap_current &= static_cast<uint8_t>((0xFF >> (byte_size - pair.bit_index)) | (0xFF << (end_byte.bit_index)));
-                    continue;
-                }
+        //         if(pair.byte_index == end_byte.byte_index)
+        //         {
+        //             *bitmap_current &= static_cast<uint8_t>((0xFF >> (byte_size - pair.bit_index)) | (0xFF << (end_byte.bit_index)));
+        //             continue;
+        //         }
                 
-                entry_end = (g_bitmap.start + end_byte.byte_index);
+        //         entry_end = (g_bitmap.start + end_byte.byte_index);
 
-                *bitmap_current &= static_cast<uint8_t>(0xFF >> (byte_size - pair.bit_index));
-                set_free_lut.entries[features_flag](++bitmap_current, entry_end);
-                if(end_byte.bit_index != 0) *entry_end &= static_cast<uint8_t>(0xFF << end_byte.bit_index);
-            }
-        }
+        //         *bitmap_current &= static_cast<uint8_t>(0xFF >> (byte_size - pair.bit_index));
+        //         set_free_lut.entries[features_flag](++bitmap_current, entry_end);
+        //         if(end_byte.bit_index != 0) *entry_end &= static_cast<uint8_t>(0xFF << end_byte.bit_index);
+        //     }
+        // }
         
-        bitmap_current = g_bitmap.start; 
-        entry_end = (bitmap_current + g_bitmap.lower_limit.byte_index);
-        set_used_lut.entries[features_flag](bitmap_current, entry_end);
-        *entry_end |= (static_cast<uint8_t>(0xFF >> (bit_max_pos - g_bitmap.lower_limit.bit_index)));
-        g_used_frames += (g_bitmap.lower_limit.byte_index << bits_per_byte_shift) + (static_cast<size_t>(g_bitmap.lower_limit.bit_index) + 1);
+        // bitmap_current = g_bitmap.start; 
+        // entry_end = (bitmap_current + g_bitmap.lower_limit.byte_index);
+        // set_used_lut.entries[features_flag](bitmap_current, entry_end);
+        // *entry_end |= (static_cast<uint8_t>(0xFF >> (bit_max_pos - g_bitmap.lower_limit.bit_index)));
+        // g_used_frames += (g_bitmap.lower_limit.byte_index << bits_per_byte_shift) + (static_cast<size_t>(g_bitmap.lower_limit.bit_index) + 1);
     }
 
     void* pmm_allocate_frame() noexcept
