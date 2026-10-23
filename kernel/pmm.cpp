@@ -84,61 +84,6 @@ namespace
         uint8_t position{0};
         uint8_t length{0};
     };
-    
-    constexpr uint8_t fill_mask{0xFF};
-    constexpr uint8_t bit_max_pos{0x07};
-    
-    [[gnu::always_inline]]
-    inline uint8_t front_byte_mask_used(const uint8_t bit_pos) noexcept
-    {
-        return fill_mask << bit_pos;
-    }
-    
-    [[gnu::always_inline]]
-    inline uint8_t back_byte_mask_used(const uint8_t bit_end_pos) noexcept
-    {
-        return fill_mask >> (bit_max_pos - bit_end_pos);
-    }
-    
-    [[gnu::always_inline]]
-    inline void set_frames_in_byte_used(const size_t index, const uint8_t mask, const size_t frames) noexcept
-    {
-        *(g_bitmap.start + index) |= mask;
-        g_used_frames += frames;
-    }
-
-    [[gnu::always_inline]]
-    inline void mark_whole_byte_used(const size_t index) noexcept
-    {
-        *(g_bitmap.start + index) = 0xFF;
-        g_used_frames += byte_size;
-    }
-    
-    [[gnu::always_inline]]
-    inline uint8_t front_byte_free_mask(const size_t index) noexcept
-    {
-        return fill_mask >> (byte_size - index);
-    }
-
-    [[gnu::always_inline]]
-    inline uint8_t back_byte_free_mask(const size_t index) noexcept
-    {
-        return fill_mask << (index + 1);
-    }
-    
-    [[gnu::always_inline]]
-    inline void mark_whole_byte_free(const size_t index) noexcept
-    {
-        *(g_bitmap.start + index) = 0x00;
-        g_used_frames -= byte_size;
-    }
-
-    [[gnu::always_inline]]
-    inline void set_frames_in_byte_free(const size_t index, const uint8_t mask, const size_t frames) noexcept
-    {
-        *(g_bitmap.start + index) &= mask;
-        g_used_frames -= frames;
-    }
 
     // SIMD Methods
     constexpr uint8_t gpr_flag{0x00};
@@ -1013,11 +958,22 @@ namespace
     constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
 
     [[gnu::regparm(2)]]
-    void free_frame_range(const size_t start, const size_t end) noexcept
+    void free_frame_range(const size_t start_frame, const size_t end_frame) noexcept
     {
-        const bit_n_byte inclusive_start{get_bit_n_byte(start)};
-        const bit_n_byte exclusive_end{get_bit_n_byte(end)};
-        for()
+        g_used_frames -= (end_frame - start_frame);
+        const bit_n_byte inclusive_start{get_bit_n_byte(start_frame)};
+        const bit_n_byte inclusive_end{get_bit_n_byte(end_frame - 1)};
+        if(inclusive_start.byte_index == (inclusive_end.byte_index))
+        {
+            const uint8_t mask{static_cast<uint8_t>((0xFF >> (byte_size - inclusive_start.bit_index)) | (0xFF << (inclusive_end.bit_index + 1)))};
+            g_bitmap.start[inclusive_start.byte_index] &= mask;
+            return;
+        }
+        uint8_t* start_byte{&g_bitmap.start[inclusive_start.byte_index]};
+        uint8_t* end_byte{&g_bitmap.start[inclusive_end.byte_index]};
+        *start_byte &= static_cast<uint8_t>(0xFF >> (byte_size - inclusive_start.bit_index));
+        set_free_lut[cpu::features::get()](++start_byte, end_byte);
+        *end_byte &= static_cast<uint8_t>(0xFF << (inclusive_end.bit_index + 1));
     }
 
     struct reserved_vector
@@ -1047,17 +1003,12 @@ namespace kernel::memory
         const e820_entry* const entries_end{map->entries + map->count};
         {
             uintptr_t highest_address{0};
-            uintptr_t current{0};
+            for(const e820_entry* start{map->entries}; start < entries_end; ++start)
             {
-                bool greater{false};
-                for(const e820_entry* start{map->entries}; start < entries_end; ++start)
-                {
-                    current = end_address(start);
-                    greater = (highest_address > current);
-                    highest_address = (highest_address * greater) + (current * !greater);
-                } 
-            }
-            g_total_frames = (highest_address >> frame_shift);
+                const uintptr_t current{end_address(start)};
+                highest_address = (highest_address > current) ? highest_address : current;
+            } 
+            g_total_frames = static_cast<size_t>(highest_address >> frame_shift);
         }
 
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);
@@ -1077,7 +1028,9 @@ namespace kernel::memory
         {
             if(current->type == e820_memory_type::usable)
             {
-                
+                const size_t base{static_cast<size_t>(current->base)};
+                const size_t end{base + current->length};
+                free_frame_range(base, end);
             }
         }
         
