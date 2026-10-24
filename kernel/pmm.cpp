@@ -957,6 +957,7 @@ namespace
     constexpr simd_set_lut<set_bits::all_ones> set_used_lut{};
     constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
 
+    // Precondition start < end, must be guarrantied by caller
     [[gnu::regparm(2)]]
     void free_frame_range(const size_t start_frame, const size_t end_frame) noexcept
     {
@@ -1028,9 +1029,22 @@ namespace kernel::memory
         {
             if(current->type == e820_memory_type::usable)
             {
-                const size_t base{static_cast<size_t>(current->base)};
-                const size_t end{base + current->length};
-                free_frame_range(base, end);
+                const uint64_t promoted_total_frames{static_cast<uint64_t>(g_total_frames)};
+                const uint64_t base{current->base};
+                const uint64_t start_frame{cmp::min(((base + frame_size_m1) >> frame_shift), promoted_total_frames)};
+                const uint64_t end_frame{cmp::min(((base + current->length) >> frame_shift), promoted_total_frames)};
+
+                if(start_frame < end_frame)
+                {
+                    size_t runner{static_cast<size_t>(start_frame)};
+                    const size_t u_end{static_cast<size_t>(end_frame)};
+                    for(size_t i{0}; i < reserved_vector_size; ++i)
+                    {
+                        const size_t temp_base{g_reserved[i].base};
+                        runner = cmp::max(runner, temp_base);
+                        runner = cmp::max(runner, temp_base + g_reserved[i].length);
+                    }
+                }
             }
         }
         
