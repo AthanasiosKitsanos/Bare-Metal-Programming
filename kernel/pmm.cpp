@@ -10,7 +10,6 @@
 
 namespace
 {
-
     struct bit_n_byte
     {
         size_t byte_index;
