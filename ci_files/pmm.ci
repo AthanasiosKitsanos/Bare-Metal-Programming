@@ -1,112 +1,107 @@
 graph: { title: "kernel/pmm.cpp"
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = short unsigned int; set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:93:10\n28 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = unsigned char; set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:93:10\n20 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_used_32EPhPKh" label: "void {anonymous}::set_frames_used_32(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:828:10\n36 bytes (static)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_used_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:843:46" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_used_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:845:45" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = long unsigned int; set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:93:10\n12 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" label: "void {anonymous}::set_frames_used_sse2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:849:10\n44 bytes (static)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:868:46" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:869:46" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:870:45" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE1EEEvPPDv2_xPKS2_" label: "void {anonymous}::set_sse2(__m128i**, const __m128i*) [with set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:124:10\n12 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" label: "void {anonymous}::set_frames_used_avx2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:874:10\n48 bytes (static)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE1EEEvPPDv2_xPKS2_" label: "kernel/pmm.cpp:897:37" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:898:46" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:899:46" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:900:45" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = short unsigned int; set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:93:10\n28 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = unsigned char; set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:93:10\n20 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh" label: "void {anonymous}::set_frames_free_32(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:906:10\n36 bytes (static)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:924:47" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:926:46" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE0EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = long unsigned int; set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:93:10\n12 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" label: "void {anonymous}::set_frames_free_sse2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:930:10\n44 bytes (static)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:953:47" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:954:47" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:955:46" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE0EEEvPPDv2_xPKS2_" label: "void {anonymous}::set_sse2(__m128i**, const __m128i*) [with set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:124:10\n12 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" label: "void {anonymous}::set_frames_free_avx2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:959:10\n48 bytes (static)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE0EEEvPPDv2_xPKS2_" label: "kernel/pmm.cpp:982:38" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:983:47" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:984:47" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:985:46" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "void {anonymous}::contiguous_8_core(allocation_run*, size_t, const uint8_t*, const uint8_t**)\nkernel/pmm.cpp:224:10\n32 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "void {anonymous}::contiguous_16_core(allocation_run*, size_t, const uint16_t*, const uint16_t**)\nkernel/pmm.cpp:338:10\n32 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" label: "void {anonymous}::find_contiguous_frames_32(allocation_run*, size_t)\nkernel/pmm.cpp:545:10\n76 bytes (dynamic,bounded)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:537:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:540:26" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:537:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:540:26" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "void {anonymous}::contiguous_32_core(allocation_run*, size_t, const uint32_t*, const uint32_t**)\nkernel/pmm.cpp:452:10\n32 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20contiguous_sse2_coreEPNS_14allocation_runEmPKDv2_xPS4_" label: "void {anonymous}::contiguous_sse2_core(allocation_run*, size_t, const __m128i*, const __m128i**)\nkernel/pmm.cpp:603:10\n64 bytes (static)" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" label: "void {anonymous}::find_contiguous_frames_sse2(allocation_run*, size_t)\nkernel/pmm.cpp:686:10\n116 bytes (dynamic,bounded)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:674:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:677:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:680:26" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:674:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:677:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:680:26" }
-node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" label: "void {anonymous}::find_contiguous_frames_avx2(allocation_run*, size_t)\nkernel/pmm.cpp:792:10\n176 bytes (dynamic,bounded)" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20contiguous_sse2_coreEPNS_14allocation_runEmPKDv2_xPS4_" label: "kernel/pmm.cpp:778:29" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:781:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:784:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:787:26" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20contiguous_sse2_coreEPNS_14allocation_runEmPKDv2_xPS4_" label: "kernel/pmm.cpp:778:29" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:781:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:784:27" }
-edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:787:26" }
-node: { title: "_ZN6kernel6memory16pmm_total_framesEv" label: "size_t kernel::memory::pmm_total_frames()\nkernel/pmm.cpp:1020:12\n4 bytes (static)" }
-node: { title: "_ZN6kernel6memory15pmm_used_framesEv" label: "size_t kernel::memory::pmm_used_frames()\nkernel/pmm.cpp:1021:12\n4 bytes (static)" }
-node: { title: "_ZN6kernel6memory15pmm_free_framesEv" label: "size_t kernel::memory::pmm_free_frames()\nkernel/pmm.cpp:1022:12\n4 bytes (static)" }
-node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t)\nkernel/pmm.cpp:1025:10\n80 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L16free_frame_rangeEmm" label: "void {anonymous}::free_frame_range(size_t, size_t)\nkernel/pmm.cpp:950:10\n48 bytes (static)" }
 node: { title: "__indirect_call" label: "Indirect Call Placeholder" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1050:44" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L16free_frame_rangeEmm" targetname: "__indirect_call" label: "kernel/pmm.cpp:964:43" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = short unsigned int; set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:84:10\n28 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = unsigned char; set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:84:10\n20 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_used_32EPhPKh" label: "void {anonymous}::set_frames_used_32(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:755:10\n36 bytes (static)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_used_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:770:46" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_used_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:772:45" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = long unsigned int; set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:84:10\n12 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" label: "void {anonymous}::set_frames_used_sse2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:776:10\n44 bytes (static)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:795:46" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:796:46" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:797:45" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE1EEEvPPDv2_xPKS2_" label: "void {anonymous}::set_sse2(__m128i**, const __m128i*) [with set_bits Set = <unnamed>::set_bits::all_ones]\nkernel/internal/pmm_templates.h:115:10\n12 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" label: "void {anonymous}::set_frames_used_avx2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:801:10\n48 bytes (static)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE1EEEvPPDv2_xPKS2_" label: "kernel/pmm.cpp:824:37" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:825:46" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:826:46" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_used_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE1EEEvPPT_PKS2_" label: "kernel/pmm.cpp:827:45" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = short unsigned int; set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:84:10\n28 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = unsigned char; set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:84:10\n20 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh" label: "void {anonymous}::set_frames_free_32(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:833:10\n36 bytes (static)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:851:47" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:853:46" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE0EEEvPPT_PKS2_" label: "void {anonymous}::set_gpr(T**, const T*) [with T = long unsigned int; set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:84:10\n12 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" label: "void {anonymous}::set_frames_free_sse2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:857:10\n44 bytes (static)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:880:47" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:881:47" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:882:46" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE0EEEvPPDv2_xPKS2_" label: "void {anonymous}::set_sse2(__m128i**, const __m128i*) [with set_bits Set = <unnamed>::set_bits::all_zeros]\nkernel/internal/pmm_templates.h:115:10\n12 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" label: "void {anonymous}::set_frames_free_avx2(uint8_t*, const uint8_t*)\nkernel/pmm.cpp:886:10\n48 bytes (static)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L8set_sse2ILNS_8set_bitsE0EEEvPPDv2_xPKS2_" label: "kernel/pmm.cpp:909:38" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprImLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:910:47" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprItLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:911:47" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L7set_gprIhLNS_8set_bitsE0EEEvPPT_PKS2_" label: "kernel/pmm.cpp:912:46" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "void {anonymous}::contiguous_8_core(allocation_run*, size_t, const uint8_t*, const uint8_t**)\nkernel/pmm.cpp:151:10\n32 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "void {anonymous}::contiguous_16_core(allocation_run*, size_t, const uint16_t*, const uint16_t**)\nkernel/pmm.cpp:265:10\n32 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" label: "void {anonymous}::find_contiguous_frames_32(allocation_run*, size_t)\nkernel/pmm.cpp:472:10\n76 bytes (dynamic,bounded)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:464:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:467:26" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:464:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:467:26" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "void {anonymous}::contiguous_32_core(allocation_run*, size_t, const uint32_t*, const uint32_t**)\nkernel/pmm.cpp:379:10\n32 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20contiguous_sse2_coreEPNS_14allocation_runEmPKDv2_xPS4_" label: "void {anonymous}::contiguous_sse2_core(allocation_run*, size_t, const __m128i*, const __m128i**)\nkernel/pmm.cpp:530:10\n64 bytes (static)" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" label: "void {anonymous}::find_contiguous_frames_sse2(allocation_run*, size_t)\nkernel/pmm.cpp:613:10\n116 bytes (dynamic,bounded)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:601:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:604:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:607:26" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:601:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:604:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:607:26" }
+node: { title: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" label: "void {anonymous}::find_contiguous_frames_avx2(allocation_run*, size_t)\nkernel/pmm.cpp:719:10\n176 bytes (dynamic,bounded)" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20contiguous_sse2_coreEPNS_14allocation_runEmPKDv2_xPS4_" label: "kernel/pmm.cpp:705:29" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:708:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:711:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:714:26" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20contiguous_sse2_coreEPNS_14allocation_runEmPKDv2_xPS4_" label: "kernel/pmm.cpp:705:29" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_32_coreEPNS_14allocation_runEmPKmPS3_" label: "kernel/pmm.cpp:708:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18contiguous_16_coreEPNS_14allocation_runEmPKtPS3_" label: "kernel/pmm.cpp:711:27" }
+edge: { sourcename: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:714:26" }
+node: { title: "_ZN6kernel6memory16pmm_total_framesEv" label: "size_t kernel::memory::pmm_total_frames()\nkernel/pmm.cpp:985:12\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory15pmm_used_framesEv" label: "size_t kernel::memory::pmm_used_frames()\nkernel/pmm.cpp:986:12\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory15pmm_free_framesEv" label: "size_t kernel::memory::pmm_free_frames()\nkernel/pmm.cpp:987:12\n4 bytes (static)" }
+node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t, uintptr_t)\nkernel/pmm.cpp:990:10\n64 bytes (static)" }
+edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1013:43" }
+edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L16free_frame_rangeEmm" label: "kernel/pmm.cpp:1043:45" }
+edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L16free_frame_rangeEmm" label: "kernel/pmm.cpp:1043:45" }
+edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L16free_frame_rangeEmm" label: "kernel/pmm.cpp:1048:56" }
+node: { title: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "void* kernel::memory::pmm_allocate_frame()\nkernel/pmm.cpp:1054:11\n16 bytes (static)" }
+node: { title: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "kernel::memory::pmm_result kernel::memory::pmm_free_frame(const void*)\nkernel/pmm.cpp:1092:16\n12 bytes (static)" }
+node: { title: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "void* kernel::memory::pmm_allocate_contiguous_frames(size_t)\nkernel/pmm.cpp:1113:11\n64 bytes (static)" }
+edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1118:47" }
+edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1135:55" }
+node: { title: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "kernel::memory::pmm_result kernel::memory::pmm_free_contiguous_frames(const void*, size_t)\nkernel/pmm.cpp:1145:16\n48 bytes (static)" }
+edge: { sourcename: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1168:55" }
+node: { title: "_ZN6kernel6memory4test17allocate_8_framesEv" label: "void kernel::memory::test::allocate_8_frames()\nkernel/pmm.cpp:1181:14\n52 bytes (dynamic,bounded)" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:1189:30" }
 node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\n./terminal/output.h:172:21" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1060:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1192:45" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1193:25" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1197:20" }
 node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\n./terminal/output.h:187:21" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1060:34" }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1061:12" }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1061:36" }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1062:12" }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1062:35" }
-node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\n./terminal/output.h:169:21" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "_ZN8terminal6outputlsEc" label: "kernel/pmm.cpp:1062:52" }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1097:52" }
-edge: { sourcename: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1104:44" }
-node: { title: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "void* kernel::memory::pmm_allocate_frame()\nkernel/pmm.cpp:1109:11\n16 bytes (static)" }
-node: { title: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "kernel::memory::pmm_result kernel::memory::pmm_free_frame(const void*)\nkernel/pmm.cpp:1147:16\n12 bytes (static)" }
-node: { title: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "void* kernel::memory::pmm_allocate_contiguous_frames(size_t)\nkernel/pmm.cpp:1168:11\n64 bytes (static)" }
-edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1173:47" }
-edge: { sourcename: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1190:55" }
-node: { title: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "kernel::memory::pmm_result kernel::memory::pmm_free_contiguous_frames(const void*, size_t)\nkernel/pmm.cpp:1200:16\n48 bytes (static)" }
-edge: { sourcename: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" targetname: "__indirect_call" label: "kernel/pmm.cpp:1223:55" }
-node: { title: "_ZN6kernel6memory4test17allocate_8_framesEv" label: "void kernel::memory::test::allocate_8_frames()\nkernel/pmm.cpp:1236:14\n52 bytes (dynamic,bounded)" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:1244:30" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1247:45" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1248:25" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1252:20" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1252:34" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1253:16" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1253:36" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1254:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1197:34" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1198:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1198:36" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1199:16" }
 node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\n./terminal/output.h:205:21" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1254:47" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1199:47" }
 node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\n./terminal/output.h:175:21" shape : ellipse }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1254:64" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1254:83" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1255:16" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1255:42" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1256:16" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1256:41" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1258:20" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1258:51" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1258:74" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1258:89" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1259:16" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1259:38" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1260:16" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1260:37" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1261:16" }
-edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1261:83" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1199:64" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1199:83" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1200:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1200:42" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1201:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1201:41" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1203:20" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1203:51" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1203:74" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1203:89" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1204:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1204:38" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1205:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1205:37" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1206:16" }
+edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1206:83" }
 }

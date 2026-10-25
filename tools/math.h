@@ -18,9 +18,9 @@ namespace power
 
     template<typename T>
     [[gnu::always_inline]]
-    static constexpr uint8_t highest_of_2(const T value) noexcept
+    static constexpr size_t highest_of_2(const T value) noexcept
     {
         constexpr size_t total_bits_m1{(sizeof(size_t) << 3) - 1};
-        return static_cast<uint8_t>(static_cast<size_t>(1) << (total_bits_m1 - builtin::leading_zeros(value)));
+        return (static_cast<size_t>(1) << (total_bits_m1 - builtin::leading_zeros(value)));
     }
 }

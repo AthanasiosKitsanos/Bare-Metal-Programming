@@ -16,8 +16,10 @@ namespace kernel::memory
         zero_frames = 0x04
     };
 
-    [[gnu::regparm(2)]]
-    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kenrel_end) noexcept;
+    [[gnu::regparm(3)]]
+    void pmm_initialize(const e820_memory_map *map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept;
+
+    void NewFunction(size_t i);
 
     void* pmm_allocate_frame() noexcept;
 

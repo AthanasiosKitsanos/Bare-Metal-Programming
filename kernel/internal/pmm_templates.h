@@ -13,6 +13,7 @@ namespace
     constexpr uint8_t byte_size{8};
     constexpr uint8_t bits_per_byte_shift{power::of_2(::byte_size)};
     constexpr uint8_t bit_mask{::byte_size - 1};
+    constexpr uint8_t bit_max_pos{7};
 
     enum class set_bits: uint8_t
     {

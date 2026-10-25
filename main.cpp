@@ -7,6 +7,37 @@ extern "C" uint32_t _kernel_end;
 
 extern "C" uint32_t kernel_call;
 
+// enum class e820_memory_type: uint32_t
+//     {
+//         usable = 1,
+//         reserved = 2,
+//         acpi_reclaimable = 3,
+//         acpi_nvs = 4,
+//         bad_memory = 5
+//     };
+
+constexpr const char* types[] =
+{
+    " ",
+    "Usable",
+    "Reserved",
+    "Acpi_Reclaimable",
+    "Acpi_nvs",
+    "Bad Memory"
+};
+
+constexpr uint64_t sqr_64() noexcept
+{
+    uint64_t result{2};
+    for(uint8_t i{0}; i < 64; ++i)
+    {
+        result *= 2;
+    }
+    return ((result - 1) >> 12);
+}
+
+constexpr uint64_t result{sqr_64()};
+
 extern "C" [[noreturn]] void kernel_main()
 {
     cpu::gdt::initialize();
@@ -16,27 +47,38 @@ extern "C" [[noreturn]] void kernel_main()
     terminal::output::initialize();
     terminal::output out{};
     // out << cpu::features::get();
+
     
     {
         kernel::memory::e820_memory_map map{kernel::memory::get_e820_memory_map()};
         kernel::memory::pmm_initialize(&map, reinterpret_cast<uintptr_t>(&_kernel_start), reinterpret_cast<uintptr_t>(&_kernel_end));
+        out << "Map Count: " << map.count << '\n';
+        // const uintptr_t kernel_start{reinterpret_cast<uintptr_t>(&_kernel_start)};
+        // const uintptr_t kernel_end{reinterpret_cast<uintptr_t>(&_kernel_end)};
+
+        // for(const kernel::memory::e820_entry* entry{map.entries}; entry < map.entries + map.count; ++entry)
+        // {
+        //     out << terminal::hex
+        //     << "Type: " << types[static_cast<uint32_t>(entry->type)]
+        //     << "\nStart: " << entry->base
+        //     << " End: " << entry->base + entry->length;
+        //     if(kernel_start >= entry->base && kernel_start < (entry->base + entry->length))
+        //     {
+        //         out << "\nKernel Start: " << kernel_start;
+        //     }
+        //     if(kernel_end >= entry->base && kernel_end < (entry->base + entry->length))
+        //     {
+        //         out << "\nKernel End: " << kernel_end;
+        //     }
+        //     out << "\n\n";
+        // }
     }
-    
+ 
+    // out << "Total Frames: " << kernel::memory::pmm_total_frames()
+    // << "\nUsed Frames: " << kernel::memory::pmm_used_frames()
+    // << "\nFree Frames: " << kernel::memory::pmm_free_frames() << '\n';
     kernel::initialize_exceptions();
     drivers::initialize();
-
-    const size_t free_frames{kernel::memory::pmm_free_frames()};
-    out << "Used Frames: " << kernel::memory::pmm_used_frames()
-    << "\nFree Frames: " << free_frames << '\n';
-    
-    constexpr size_t frames{32371};
-    const uint8_t* ptr{reinterpret_cast<const uint8_t*>(kernel::memory::pmm_allocate_contiguous_frames(frames))};
-    if(!ptr) out << "Not enough frames\n";
-    else
-    {
-        out << "Allocated: " << frames
-        << "\nAddress: " << terminal::hex << reinterpret_cast<uintptr_t>(ptr) << '\n';
-    }
 
     asm volatile("sti");
 
