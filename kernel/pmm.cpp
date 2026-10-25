@@ -998,8 +998,9 @@ namespace kernel::memory
                     highest_address = cmp::max(highest_address, current);
                 }
             }
+
+            // accessable_frames == all frames including the frame 0
             constexpr uintptr_t accessable_frames{(UINTPTR_MAX >> frame_shift) + 1};
-            constexpr uint64_t s{UINT64_MAX};
             g_total_frames = static_cast<size_t>(cmp::min((highest_address >> frame_shift), static_cast<uint64_t>(accessable_frames)));
         }
 
