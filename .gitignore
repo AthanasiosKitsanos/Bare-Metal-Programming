@@ -4,3 +4,4 @@ obj
 .zed
 elf
 lib
+.clangd
