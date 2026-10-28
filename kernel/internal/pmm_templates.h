@@ -17,11 +17,11 @@ namespace
 
     enum class set_bits: uint8_t
     {
-        
+
         all_zeros = 0x00,
         all_ones = 0x01
     };
-    
+
     template<typename T>
     class array_of_shifts
     {
@@ -40,7 +40,7 @@ namespace
                 return static_cast<uint8_t>((d - 1) & (static_cast<size_t>(1) << N));
             }
         }
-        
+
         template<size_t ...I>
         [[gnu::always_inline]]
         constexpr array_of_shifts(const size_t frames, const size_t d, sequence::index_list<I...>) noexcept: step{compute_step<I>(frames, d)...}
@@ -73,7 +73,7 @@ namespace
     {
         constexpr uint64_t all_ones{UINT64_MAX};
         constexpr T value{static_cast<T>(all_ones) * static_cast<T>(Set)};
-        
+
         T* current{*start};
         for(; current < end; ++current) *current = value;
         *start = current;
@@ -85,16 +85,16 @@ namespace
     {
         constexpr uint32_t all_ones{UINT32_MAX};
         constexpr T value{static_cast<T>(all_ones) * static_cast<T>(Set)};
-        
+
         T* current{*start};
-        
+
         for(; current < end; ++current) *current = value;
         *start = current;
     }
 
     // SIMD and AVX Templates
     template<::set_bits Set>
-    [[gnu::always_inline]] [[gnu::target("sse2")]]  
+    [[gnu::always_inline]] [[gnu::target("sse2")]]
     inline void set_sse2_inline(__m128i** start, const __m128i* const end) noexcept
     {
         __m128i* current{*start};
@@ -109,7 +109,7 @@ namespace
         for(; current < end; ++current) _mm_store_si128(current, value);
         *start = current;
     }
-    
+
     template<::set_bits Set>
     [[gnu::noinline]] [[gnu::target("sse2")]] [[gnu::regparm(2)]]
     void set_sse2(__m128i** start, const __m128i* const end) noexcept

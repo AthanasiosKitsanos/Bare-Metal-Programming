@@ -16,10 +16,10 @@ namespace
         uint8_t bit_index;
 
         [[gnu::always_inline]]
-        bit_n_byte() noexcept = default;
+        inline bit_n_byte() noexcept = default;
 
         [[gnu::always_inline]]
-        bit_n_byte(const size_t byte, const uint8_t bit) noexcept: byte_index{byte}, bit_index{bit}
+        inline bit_n_byte(const size_t byte, const uint8_t bit) noexcept: byte_index{byte}, bit_index{bit}
         {}
 
         [[gnu::always_inline]]
@@ -41,12 +41,15 @@ namespace
     size_t g_total_frames{0};
     bitmap g_bitmap{};
 
+    // Converts physical address to a frame index
     [[gnu::always_inline]]
     inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_shift; }
 
+    // Converts a frame index to physical address
     [[gnu::always_inline]]
     inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_shift; }
 
+    // Converts a frame index to bit and byte position
     [[gnu::always_inline]]
     inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bits_per_byte_shift), static_cast<uint8_t>(index & bit_mask)}; }
 
@@ -57,16 +60,16 @@ namespace
     }
 
     [[gnu::always_inline]]
-    inline void set_frame_used(const bit_n_byte* const pair) noexcept
+    inline void set_frame_used(const bit_n_byte pair) noexcept
     {
-        *(g_bitmap.start + pair->byte_index) |= (1 << pair->bit_index);
+        *(g_bitmap.start + pair.byte_index) |= (1 << pair.bit_index);
         ++g_used_frames;
     }
 
     [[gnu::always_inline]]
-    inline void set_frame_free(const bit_n_byte* const pair) noexcept
+    inline void set_frame_free(const bit_n_byte pair) noexcept
     {
-        *(g_bitmap.start + pair->byte_index) &= ~(1 << pair->bit_index);
+        *(g_bitmap.start + pair.byte_index) &= ~(1 << pair.bit_index);
         --g_used_frames;
     }
 
@@ -959,6 +962,16 @@ namespace
 
     constexpr size_t cache_line_size{64};
     static_assert(align_at <= cache_line_size, "g_reserved must fit in one cache line");
+
+    [[gnu::always_inline]]
+    inline const uint8_t* find_free_byte(const uint8_t* begin, const uint8_t* const end) noexcept
+    {
+        for(; begin < end; ++begin)
+        {
+            if(*begin != 0xFF) return begin;
+        }
+        return nullptr;
+    }
 }
 
 namespace kernel::memory
@@ -1035,37 +1048,18 @@ namespace kernel::memory
 
     void* pmm_allocate_frame() noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-        for(; current < g_bitmap.end; ++current)
+        const uint8_t* hint{g_bitmap.search_begin};
+        const uint8_t* byte_ptr{find_free_byte(hint, g_bitmap.end)};
+        if(!byte_ptr)
         {
-            const uint8_t current_value{*current};
-            if(current_value != 0xFF)
-            {
-                const size_t frame_index{static_cast<size_t>((current - g_bitmap.start) << bits_per_byte_shift) + builtin::bit_guard_tz(static_cast<uint8_t>(~current_value))};
-                const bit_n_byte pair{get_bit_n_byte(frame_index)};
-                set_frame_used(&pair);
-                g_bitmap.search_begin = current + (current_value == 0xFF);
-                return reinterpret_cast<void*>(frame_address(frame_index));
-            }
+            byte_ptr = find_free_byte(g_bitmap.start, hint);
+            if(!byte_ptr) return nullptr;
         }
 
-        if(current == g_bitmap.end)
-        {
-            current = g_bitmap.start;
-            for(; current < g_bitmap.search_begin; ++current)
-            {
-                const uint8_t current_value{*current};
-                if(current_value != 0xFF)
-                {
-                    const size_t frame_index{static_cast<size_t>((current - g_bitmap.start) << bits_per_byte_shift) + builtin::bit_guard_tz(static_cast<uint8_t>(~current_value))};
-                    const bit_n_byte pair{get_bit_n_byte(frame_index)};
-                    set_frame_used(&pair);
-                    g_bitmap.search_begin = current + (current_value == 0xFF);
-                    return reinterpret_cast<void*>(frame_address(frame_index));
-                }
-            }
-        }
-        return nullptr;
+        const bit_n_byte pair{static_cast<size_t>((byte_ptr - g_bitmap.start)), builtin::trailing_zeros(static_cast<uint8_t>(~(*byte_ptr)))};
+        set_frame_used(pair);
+        g_bitmap.search_begin = byte_ptr + (*byte_ptr == 0xFF);
+        return reinterpret_cast<void*>(frame_address((pair.byte_index << bits_per_byte_shift) + pair.bit_index));
     }
 
     [[gnu::regparm(1)]]

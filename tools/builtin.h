@@ -17,8 +17,8 @@ namespace builtin
         }
     }
 
-    // Returns the leading zeros of a value
-    // Use this if the caller first checks 
+    // Returns the leading zeros of a value.
+    // Precondition is needed, else you you get undefined behavior
     template<typename T>
     [[gnu::always_inline]]
     inline constexpr uint8_t leading_zeros(const T value) noexcept
@@ -38,6 +38,7 @@ namespace builtin
         }
     }
 
+    // Returns the leading zeros of a value.
     template<typename T>
     [[gnu::always_inline]]
     inline constexpr uint8_t bit_guard_lz(const T value) noexcept
@@ -56,12 +57,14 @@ namespace builtin
         else
         {
             constexpr uint8_t shift{32 - (sizeof(T) << 3)};
-        
+
             constexpr unsigned int mask{(1u << shift) - 1};
             return static_cast<uint8_t>(__builtin_clz((static_cast<unsigned int>(value) << shift) | mask));
         }
     }
 
+    // Returns the trailing zeros of a value.
+    // Precondition is needed, else you you get undefined behavior
     template<typename T>
     [[gnu::always_inline]]
     inline constexpr uint8_t trailing_zeros(const T value) noexcept
@@ -76,13 +79,14 @@ namespace builtin
         else return static_cast<uint8_t>(__builtin_ctz(static_cast<unsigned int>(value)));
     }
 
+    // Returns the trailing zeros of a value.
     template<typename T>
     [[gnu::always_inline]]
     inline constexpr uint8_t bit_guard_tz(const T value) noexcept
     {
         constexpr bool is_supported{detail::is_supported_width<T>()};
         static_assert(is_supported, "Type size must be at least 1 byte to 8 bytes and a power of 2\n");
-        
+
         if constexpr(sizeof(T) == sizeof(uint64_t))
         {
             return static_cast<uint8_t>((value != 0) ? __builtin_ctzll(static_cast<unsigned long long>(value)) : (sizeof(uint64_t) << 3));
