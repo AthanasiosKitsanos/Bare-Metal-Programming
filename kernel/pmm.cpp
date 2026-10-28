@@ -34,8 +34,7 @@ namespace
         uint8_t* start{nullptr};
         const uint8_t* end{nullptr};
         const uint8_t* search_begin{nullptr};
-        const uint8_t* search_end{nullptr};
-        bit_n_byte lower_limit;
+        // const uint8_t* search_end{nullptr};
     };
 
     size_t g_used_frames{0};
@@ -432,55 +431,49 @@ namespace
     [[gnu::always_inline]] [[gnu::regparm(2)]]
     inline const void* get_best_aligned_address(const uintptr_t addr_1, const uintptr_t addr_2) noexcept
     {
-        bool addr_1_le{addr_1 <= addr_2};
-        return reinterpret_cast<void*>((addr_1 * addr_1_le) + (addr_2 * !addr_1_le));
+        return reinterpret_cast<void*>((addr_1 <= addr_2) ? addr_1 : addr_2);
     }
 
-    [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline const void* sweep_32(allocation_run* run, const size_t frames) noexcept
+    [[gnu::always_inline]]
+    inline void sweep_32(const uint8_t* begin, const uint8_t* const end, const size_t frames, allocation_run* const run) noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-
         constexpr uintptr_t mask_2_byte{0x01};
         constexpr uintptr_t mask_4_byte{0x03};
-        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(g_bitmap.search_end)};
+        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_address{unaligned_end & ~mask_2_byte};
-        const void* end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
-        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(end), &current);
-        if(run->length >= frames) return current;
+        const void* aligned_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
+        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(aligned_end), &begin);
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_4_address{unaligned_end & ~mask_4_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
-        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(end), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
+        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(aligned_end), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
         // Fallback
-        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_8_core(run, frames, g_bitmap.search_end, reinterpret_cast<const uint8_t**>(&current));
-        return current;
+        contiguous_8_core(run, frames, end, reinterpret_cast<const uint8_t**>(&begin));
     }
 
     [[gnu::regparm(2)]]
     void find_contiguous_frames_32(allocation_run* const run, const size_t frames) noexcept
     {
-        if(sweep_32(run, frames) == g_bitmap.end)
+        sweep_32(g_bitmap.search_begin, g_bitmap.end, frames, run);
+        if(run->length < frames)
         {
-            run->length ^= run->length;
-            g_bitmap.search_end = g_bitmap.search_begin;
-            g_bitmap.search_begin = (g_bitmap.start + g_bitmap.lower_limit.byte_index);
-            sweep_32(run, frames);
-            g_bitmap.search_end = g_bitmap.end;
+            run->length = 0;
+            sweep_32(g_bitmap.start, g_bitmap.search_begin, frames, run);
         }
     }
 
     constexpr size_t width_128{128};
-    [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(3)]]
+    [[gnu::target("sse2")]] [[gnu::always_inline]]
     inline void contiguous_sse2_core_inline(allocation_run* run, const size_t frames, const __m128i* const end, const __m128i** start) noexcept
     {
         size_t length{run->length};
@@ -567,61 +560,56 @@ namespace
         *start = current;
     }
 
-    [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline const uint8_t* sweep_sse_2(allocation_run* const run, const size_t frames) noexcept
+    [[gnu::target("sse2")]] [[gnu::always_inline]]
+    inline void sweep_sse_2(const uint8_t* begin, const uint8_t* const end, const size_t frames, allocation_run* const run) noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-
         constexpr uintptr_t mask_2_byte{0x01};
         constexpr uintptr_t mask_4_byte{0x03};
         constexpr uintptr_t mask_16_byte{0x0F};
-        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(g_bitmap.search_end)};
+        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_address{unaligned_end & ~mask_2_byte};
-        const void* end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
-        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(end), &current);
-        if(run->length >= frames) return current;
+        const void* aligned_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
+        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(aligned_end), &begin);
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_4_address{unaligned_end & ~mask_4_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
-        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(end), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
+        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(aligned_end), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_16_address{unaligned_end & ~mask_16_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
-        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(end), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
+        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&begin));
+        if(run->length >= frames) return;
 
         // Fallback
-        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_8_core(run, frames, g_bitmap.search_end, reinterpret_cast<const uint8_t**>(&current));
-        return current;
+        contiguous_8_core(run, frames, end, reinterpret_cast<const uint8_t**>(&begin));
     }
 
 
     [[gnu::target("sse2")]] [[gnu::regparm(2)]]
     void find_contiguous_frames_sse2(allocation_run* const run, const size_t frames) noexcept
     {
-        if(sweep_sse_2(run, frames) == g_bitmap.end)
+        sweep_sse_2(g_bitmap.search_begin, g_bitmap.end, frames, run);
+        if(run->length < frames)
         {
-            run->length ^= run->length;
-            g_bitmap.search_end = g_bitmap.search_begin;
-            g_bitmap.search_begin = (g_bitmap.start + g_bitmap.lower_limit.byte_index);
-            sweep_sse_2(run, frames);
-            g_bitmap.search_end = g_bitmap.end;
+            run->length = 0;
+            sweep_sse_2(g_bitmap.start, g_bitmap.search_begin, frames, run);
         }
     }
 
     constexpr size_t width_256{256};
-    [[gnu::target("avx2")]] [[gnu::regparm(3)]] [[gnu::always_inline]]
+    [[gnu::target("avx2")]] [[gnu::always_inline]]
     inline void contiguous_avx2_core_inline(allocation_run* run, const size_t frames, const __m256i* const end, const __m256i** start) noexcept
     {
         size_t length{run->length};
@@ -665,64 +653,59 @@ namespace
         *start = current;
     }
 
-    [[gnu::target("avx2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline const uint8_t* sweep_avx_2(allocation_run* const run, const size_t frames) noexcept
+    [[gnu::target("avx2")]] [[gnu::always_inline]]
+    inline void sweep_avx_2(const uint8_t* begin, const uint8_t* const end, const size_t frames, allocation_run* const run) noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-
         constexpr uintptr_t mask_2_byte{0x01};
         constexpr uintptr_t mask_4_byte{0x03};
         constexpr uintptr_t mask_16_byte{0x0F};
         constexpr uintptr_t mask_32_byte{0x1F};
-        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(g_bitmap.search_end)};
+        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_address{unaligned_end & ~mask_2_byte};
-        const void* end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
-        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(end), &current);
-        if(run->length >= frames) return current;
+        const void* aligned_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
+        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(aligned_end), &begin);
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_4_address{unaligned_end & ~mask_4_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
-        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(end), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
+        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(aligned_end), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_16_address{unaligned_end & ~mask_16_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
-        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(end), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
+        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_32_address{unaligned_end & ~mask_32_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_32_byte) & ~mask_32_byte), aligned_end_32_address);
-        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(end), reinterpret_cast<const __m128i**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_32_byte) & ~mask_32_byte), aligned_end_32_address);
+        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(aligned_end), reinterpret_cast<const __m128i**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_avx2_core_inline(run, frames, reinterpret_cast<const __m256i*>(aligned_end_32_address), reinterpret_cast<const __m256i**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_avx2_core_inline(run, frames, reinterpret_cast<const __m256i*>(aligned_end_32_address), reinterpret_cast<const __m256i**>(&begin));
+        if(run->length >= frames) return;
 
         // Fallback
-        contiguous_sse2_core(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_sse2_core(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_8_core(run, frames, g_bitmap.search_end, reinterpret_cast<const uint8_t**>(&current));
-        return current;
+        contiguous_8_core(run, frames, end, reinterpret_cast<const uint8_t**>(&begin));
     }
 
     [[gnu::target("avx2")]] [[gnu::regparm(2)]]
     void find_contiguous_frames_avx2(allocation_run* const run, const size_t frames) noexcept
     {
-        if(sweep_avx_2(run, frames) == g_bitmap.end)
+        sweep_avx_2(g_bitmap.search_begin, g_bitmap.end, frames, run);
+        if(run->length < frames)
         {
-            run->length ^= run->length;
-            g_bitmap.search_end = g_bitmap.search_begin;
-            g_bitmap.search_begin = (g_bitmap.start + g_bitmap.lower_limit.byte_index);
-            sweep_avx_2(run, frames);
-            g_bitmap.search_end = g_bitmap.end;
+            run->length = 0;
+            sweep_avx_2(g_bitmap.start, g_bitmap.search_begin, frames, run);
         }
     }
 
@@ -1007,7 +990,6 @@ namespace kernel::memory
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);
         g_bitmap.end = g_bitmap.start + ((g_total_frames + 7) >> bits_per_byte_shift);
         g_bitmap.search_begin = g_bitmap.start;
-        g_bitmap.search_end = g_bitmap.end;
 
         // Set bit of the bitmap to 1 (used)
         set_used_lut[cpu::features::get()](g_bitmap.start, g_bitmap.end);
@@ -1054,7 +1036,7 @@ namespace kernel::memory
     void* pmm_allocate_frame() noexcept
     {
         const uint8_t* current{g_bitmap.search_begin};
-        for(; current < g_bitmap.search_end; ++current)
+        for(; current < g_bitmap.end; ++current)
         {
             const uint8_t current_value{*current};
             if(current_value != 0xFF)
@@ -1069,9 +1051,8 @@ namespace kernel::memory
 
         if(current == g_bitmap.end)
         {
-            g_bitmap.search_end = g_bitmap.search_begin;
-            current = g_bitmap.start + g_bitmap.lower_limit.byte_index;
-            for(; current < g_bitmap.search_end; ++current)
+            current = g_bitmap.start;
+            for(; current < g_bitmap.search_begin; ++current)
             {
                 const uint8_t current_value{*current};
                 if(current_value != 0xFF)
@@ -1083,7 +1064,6 @@ namespace kernel::memory
                     return reinterpret_cast<void*>(frame_address(frame_index));
                 }
             }
-            g_bitmap.search_end = g_bitmap.end;
         }
         return nullptr;
     }
@@ -1105,7 +1085,7 @@ namespace kernel::memory
         const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
         const bool is_addr_less{addr < g_bitmap.search_end};
         g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_addr_less) + reinterpret_cast<uintptr_t>(addr) * is_addr_less);
-
+        g_bitmap.search_begin = (addr < g_bitmap.search_end) ? addr : g_bitmap.search_begin;
         return pmm_result::success;
     }
 
