@@ -54,9 +54,9 @@ namespace
     inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bits_per_byte_shift), static_cast<uint8_t>(index & bit_mask)}; }
 
     [[gnu::always_inline]]
-    inline bool is_frame_used(const bit_n_byte* const pair) noexcept
+    inline bool is_frame_used(const bit_n_byte pair) noexcept
     {
-        return (*(g_bitmap.start + pair->byte_index) & (1 << pair->bit_index)) != 0;
+        return (*(g_bitmap.start + pair.byte_index) & (1 << pair.bit_index)) != 0;
     }
 
     [[gnu::always_inline]]
@@ -1067,19 +1067,21 @@ namespace kernel::memory
     {
         size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
 
-        if(index >= g_total_frames) return pmm_result::hb_deny;
+        if(index >= g_total_frames) return pmm_result::out_of_range;
+
+        static_assert(reserved_vector_size == 2, "g_reserved uses 2 elements for now");
+        bool on_reserved{(index - g_reserved[0].base < g_reserved[0].length)};
+        on_reserved |= (index - g_reserved[1].base < g_reserved[1].length);
+        if(on_reserved) return pmm_result::reserved;
 
         const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
 
-        if(bitmap_frame_pos < g_bitmap.lower_limit) return pmm_result::lb_deny;
-
-        if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
-        set_frame_free(&bitmap_frame_pos);
+        if(!is_frame_used(bitmap_frame_pos)) return pmm_result::failed;
+        set_frame_free(bitmap_frame_pos);
 
         const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
-        const bool is_addr_less{addr < g_bitmap.search_end};
-        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_addr_less) + reinterpret_cast<uintptr_t>(addr) * is_addr_less);
-        g_bitmap.search_begin = (addr < g_bitmap.search_end) ? addr : g_bitmap.search_begin;
+        const uintptr_t mask{static_cast<uintptr_t>(-(addr < g_bitmap.search_begin))}
+        g_bitmap.search_begin = (addr < g_bitmap.search_begin) ? addr : g_bitmap.search_begin;
         return pmm_result::success;
     }
 
@@ -1121,7 +1123,7 @@ namespace kernel::memory
         if(frames == 0) return pmm_result::zero_frames;
 
         const size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
-        if(index >= g_total_frames) return pmm_result::hb_deny;
+        if(index >= g_total_frames) return pmm_result::out_of_range;
 
         const bit_n_byte start_byte{get_bit_n_byte(index)};
 
