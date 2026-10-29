@@ -11,8 +11,8 @@ namespace kernel::memory
     {
         success = 0x00,
         failed = 0x01,
-        lb_deny = 0x02,
-        hb_deny = 0x03,
+        reserved = 0x02,
+        out_of_range = 0x03,
         zero_frames = 0x04
     };
 
