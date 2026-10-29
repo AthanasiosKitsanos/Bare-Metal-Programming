@@ -1056,9 +1056,10 @@ namespace kernel::memory
             if(!byte_ptr) return nullptr;
         }
 
-        const bit_n_byte pair{static_cast<size_t>((byte_ptr - g_bitmap.start)), builtin::trailing_zeros(static_cast<uint8_t>(~(*byte_ptr)))};
+        const uint8_t value{*byte_ptr};
+        const bit_n_byte pair{static_cast<size_t>((byte_ptr - g_bitmap.start)), builtin::trailing_zeros(static_cast<uint8_t>(~value))};
         set_frame_used(pair);
-        g_bitmap.search_begin = byte_ptr + (*byte_ptr == 0xFF);
+        g_bitmap.search_begin = byte_ptr + (value == 0xFF);
         return reinterpret_cast<void*>(frame_address((pair.byte_index << bits_per_byte_shift) + pair.bit_index));
     }
 
