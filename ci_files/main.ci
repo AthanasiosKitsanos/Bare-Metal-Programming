@@ -28,8 +28,10 @@ edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_free_frame
 edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:54:61" }
 node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nterminal/output.h:169:21" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:54:66" }
+node: { title: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "void* kernel::memory::pmm_allocate_frame()\nkernel/pmm.h:24:11" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "main.cpp:55:79" }
 node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initialize_exceptions()\nkernel/exceptions.h:5:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:55:34" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:58:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
 }

@@ -34,7 +34,6 @@ namespace
         uint8_t* start{nullptr};
         const uint8_t* end{nullptr};
         const uint8_t* search_begin{nullptr};
-        // const uint8_t* search_end{nullptr};
     };
 
     size_t g_used_frames{0};
@@ -53,24 +52,27 @@ namespace
     [[gnu::always_inline]]
     inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bits_per_byte_shift), static_cast<uint8_t>(index & bit_mask)}; }
 
+    // The 2nd parm changes and the new value returns
     [[gnu::always_inline]]
-    inline bool is_frame_used(const bit_n_byte pair) noexcept
+    inline uint8_t set_frame_used(uint8_t* const ptr, uint8_t value, const uint8_t left_shift) noexcept
     {
-        return (*(g_bitmap.start + pair.byte_index) & (1 << pair.bit_index)) != 0;
-    }
-
-    [[gnu::always_inline]]
-    inline void set_frame_used(const bit_n_byte pair) noexcept
-    {
-        *(g_bitmap.start + pair.byte_index) |= (1 << pair.bit_index);
+        value |= (1 << left_shift);
+        *ptr = value;
         ++g_used_frames;
+        return value;
     }
 
     [[gnu::always_inline]]
-    inline void set_frame_free(const bit_n_byte pair) noexcept
+    inline void set_frame_free(uint8_t* const ptr, const uint8_t bit_index) noexcept
     {
-        *(g_bitmap.start + pair.byte_index) &= ~(1 << pair.bit_index);
+        *ptr &= ~(1 << bit_index);
         --g_used_frames;
+    }
+
+    [[gnu::always_inline]]
+    inline bool is_frame_used(const uint8_t* const ptr, const uint8_t bit_index) noexcept
+    {
+        return (*ptr & (1 << bit_index)) != 0;
     }
 
     // SIMD Methods
@@ -725,6 +727,11 @@ namespace
             entries[simd_flag] = find_contiguous_frames_sse2;
             entries[avx2_flag] = find_contiguous_frames_avx2;
         }
+
+        simd_alloc_methods operator[](const size_t index) const noexcept
+        {
+            return entries[index];
+        }
     };
 
     constexpr simd_alloc_lut simd_lut{};
@@ -926,8 +933,18 @@ namespace
         }
     };
 
-    constexpr simd_set_lut<set_bits::all_ones> set_used_lut{};
-    constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
+    constexpr simd_set_lut<set_bits::all_ones> set_range_used{};
+    constexpr simd_set_lut<set_bits::all_zeros> set_range_free{};
+
+    [[gnu::always_inline]]
+    inline const uint8_t* find_free_byte(const uint8_t* begin, const uint8_t* const end) noexcept
+    {
+        for(; begin < end; ++begin)
+        {
+            if(*begin != 0xFF) return begin;
+        }
+        return nullptr;
+    }
 
     // Precondition start < end, must be guarantied by caller
     [[gnu::regparm(2)]]
@@ -938,15 +955,38 @@ namespace
         const bit_n_byte inclusive_end{get_bit_n_byte(end_frame - 1)};
         if(inclusive_start.byte_index == (inclusive_end.byte_index))
         {
-            const uint8_t mask{static_cast<uint8_t>((0xFF >> (byte_size - inclusive_start.bit_index)) | (0xFF << (inclusive_end.bit_index + 1)))};
+            const uint8_t mask{static_cast<uint8_t>((0xFF << inclusive_start.bit_index) | (0xFF >> (inclusive_end.bit_index + 1)))};
             g_bitmap.start[inclusive_start.byte_index] &= mask;
             return;
         }
         uint8_t* start_byte{&g_bitmap.start[inclusive_start.byte_index]};
         uint8_t* end_byte{&g_bitmap.start[inclusive_end.byte_index]};
-        *start_byte &= static_cast<uint8_t>(0xFF >> (byte_size - inclusive_start.bit_index));
-        set_free_lut[cpu::features::get()](++start_byte, end_byte);
+        *start_byte &= static_cast<uint8_t>(~(0xFF << inclusive_start.bit_index));
+        set_range_free[cpu::features::get()](++start_byte, end_byte);
         *end_byte &= static_cast<uint8_t>(0xFF << (inclusive_end.bit_index + 1));
+    }
+
+    // Precondition: start < end
+    [[gnu::regparm(2)]]
+    bool is_frame_range_used(const size_t start_frame, const size_t end_frame) noexcept
+    {
+        const size_t start_byte{start_frame >> bits_per_byte_shift};
+        const size_t inc_end_frame{end_frame - 1};
+        const size_t end_byte{inc_end_frame >> bits_per_byte_shift};
+        if(start_byte  == end_byte)
+        {
+            const uint8_t mask{static_cast<uint8_t>((0xFF << (start_frame & bit_mask)) & (0xFF >> (bit_max_pos - (inc_end_frame & bit_mask))))};
+            return (g_bitmap.start[start_byte] & mask) == mask;
+        }
+
+        const uint8_t front_mask{static_cast<uint8_t>(0xFF << (start_frame & bit_mask))};
+        if((g_bitmap.start[start_byte] & front_mask) != front_mask) return false;
+
+        const uint8_t* const end{&g_bitmap.start[end_byte]};
+        if(find_free_byte(&g_bitmap.start[start_byte + 1], end)) return false;
+
+        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - (inc_end_frame & bit_mask)))};
+        return (*end & end_mask) == end_mask;
     }
 
     struct reserved_vector
@@ -962,16 +1002,6 @@ namespace
 
     constexpr size_t cache_line_size{64};
     static_assert(align_at <= cache_line_size, "g_reserved must fit in one cache line");
-
-    [[gnu::always_inline]]
-    inline const uint8_t* find_free_byte(const uint8_t* begin, const uint8_t* const end) noexcept
-    {
-        for(; begin < end; ++begin)
-        {
-            if(*begin != 0xFF) return begin;
-        }
-        return nullptr;
-    }
 }
 
 namespace kernel::memory
@@ -1005,7 +1035,7 @@ namespace kernel::memory
         g_bitmap.search_begin = g_bitmap.start;
 
         // Set bit of the bitmap to 1 (used)
-        set_used_lut[cpu::features::get()](g_bitmap.start, g_bitmap.end);
+        set_range_used[cpu::features::get()](g_bitmap.start, g_bitmap.end);
         g_used_frames = g_total_frames;
 
         // g_reserved[0].base is 0, because .init_bss(kernel_entry.S), already assigns 0
@@ -1056,33 +1086,39 @@ namespace kernel::memory
             if(!byte_ptr) return nullptr;
         }
 
-        const uint8_t value{*byte_ptr};
-        const bit_n_byte pair{static_cast<size_t>((byte_ptr - g_bitmap.start)), builtin::trailing_zeros(static_cast<uint8_t>(~value))};
-        set_frame_used(pair);
+        uint8_t value{*byte_ptr};
+        const uint8_t bit_index{builtin::trailing_zeros(static_cast<uint8_t>(~(value)))};
+
+        // byte_ptr always points inside g_bitmap, whose storage is writable.
+        // It is const only because search_begin is declared const, so casting it away is safe.
+        value = set_frame_used(const_cast<uint8_t*>(byte_ptr), value, bit_index);
         g_bitmap.search_begin = byte_ptr + (value == 0xFF);
-        return reinterpret_cast<void*>(frame_address((pair.byte_index << bits_per_byte_shift) + pair.bit_index));
+        const size_t frame_pos{static_cast<size_t>((byte_ptr - g_bitmap.start) << bits_per_byte_shift)};
+        return reinterpret_cast<void*>(frame_address(frame_pos + bit_index));
     }
 
     [[gnu::regparm(1)]]
     pmm_result pmm_free_frame(const void* address) noexcept
     {
-        size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
+        const size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
 
         if(index >= g_total_frames) return pmm_result::out_of_range;
 
-        static_assert(reserved_vector_size == 2, "g_reserved uses 2 elements for now");
+        static_assert(reserved_vector_size == 2, "pmm_free_frame: overlap check is unrolled for 2 reserved regions, add a check for each new region");
         bool on_reserved{(index - g_reserved[0].base < g_reserved[0].length)};
         on_reserved |= (index - g_reserved[1].base < g_reserved[1].length);
         if(on_reserved) return pmm_result::reserved;
 
         const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
+        uint8_t* byte_ptr{g_bitmap.start + bitmap_frame_pos.byte_index};
 
-        if(!is_frame_used(bitmap_frame_pos)) return pmm_result::failed;
-        set_frame_free(bitmap_frame_pos);
+        if(!is_frame_used(byte_ptr, bitmap_frame_pos.bit_index)) return pmm_result::failed;
+        set_frame_free(byte_ptr, bitmap_frame_pos.bit_index);
 
-        const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
-        const uintptr_t mask{static_cast<uintptr_t>(-(addr < g_bitmap.search_begin))}
-        g_bitmap.search_begin = (addr < g_bitmap.search_begin) ? addr : g_bitmap.search_begin;
+        const uintptr_t addr{reinterpret_cast<uintptr_t>(g_bitmap.start + bitmap_frame_pos.byte_index)};
+        const uintptr_t sb_hint{reinterpret_cast<uintptr_t>(g_bitmap.search_begin)};
+        const uintptr_t mask{static_cast<uintptr_t>(-(addr < sb_hint))};
+        g_bitmap.search_begin = reinterpret_cast<const uint8_t*>((addr & mask) | (sb_hint & ~mask));
         return pmm_result::success;
     }
 
@@ -1109,7 +1145,7 @@ namespace kernel::memory
         else
         {
             *set_start |= front_mask;
-            set_used_lut.entries[cpu::features::get()](++set_start, set_end);
+            set_range_used[cpu::features::get()](++set_start, set_end);
             *set_end |= end_mask;
         }
 
@@ -1124,31 +1160,28 @@ namespace kernel::memory
         if(frames == 0) return pmm_result::zero_frames;
 
         const size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
-        if(index >= g_total_frames) return pmm_result::out_of_range;
+        const size_t total_frames_cpy{g_total_frames};
+        if((index >= total_frames_cpy) | (frames > (total_frames_cpy - index))) return pmm_result::out_of_range;
 
-        const bit_n_byte start_byte{get_bit_n_byte(index)};
+        static_assert(reserved_vector_size == 2, "pmm_free_contiguous_frames: overlap check is unrolled for 2 reserved regions, add a check for each new region");
 
-        if(start_byte < g_bitmap.lower_limit) return pmm_result::lb_deny;
+        const size_t r1_base{g_reserved[0].base};
+        bool on_reserved{(index - r1_base) < g_reserved[0].length};
+        on_reserved |= ((r1_base - index) < frames);
 
-        const bit_n_byte end_byte{get_bit_n_byte(index + frames - 1)};
+        const size_t r2_base{g_reserved[1].base};
+        on_reserved |= ((index - r2_base) < g_reserved[1].length);
+        on_reserved |= ((r2_base - index) < frames);
+        if(on_reserved) return pmm_result::reserved;
 
-        uint8_t* free_start{g_bitmap.start + start_byte.byte_index};
-        uint8_t* const end{g_bitmap.start + end_byte.byte_index};
+        const size_t excluded_end_frame{index + frames};
+        if(is_frame_range_used(index, excluded_end_frame)) return pmm_result::failed;
+        free_frame_range(index, excluded_end_frame);
 
-        const uint8_t front_mask{static_cast<uint8_t>(0xFF >> (byte_size - start_byte.bit_index))};
-        const uint8_t back_mask{static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1))};
-
-        if(start_byte.byte_index == end_byte.byte_index) *free_start &= (front_mask | back_mask);
-        else
-        {
-            *free_start &= front_mask;
-            set_free_lut.entries[cpu::features::get()](free_start + 1, end);
-            *end &= back_mask;
-        }
-
-        const bool is_free_start_less{free_start < g_bitmap.search_begin};
-        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
-        g_used_frames -= frames;
+        const uintptr_t search_candidate{reinterpret_cast<uintptr_t>(&g_bitmap.start[index >> bits_per_byte_shift])};
+        const uintptr_t sb_hint{reinterpret_cast<uintptr_t>(g_bitmap.search_begin)};
+        const uintptr_t mask{static_cast<uintptr_t>(-(search_candidate < sb_hint))};
+        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((search_candidate & mask) | (sb_hint & ~mask));
         return pmm_result::success;
     }
 

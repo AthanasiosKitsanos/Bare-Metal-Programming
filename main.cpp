@@ -52,6 +52,9 @@ extern "C" [[noreturn]] void kernel_main()
     out << "Total Frames: " << kernel::memory::pmm_total_frames()
     << "\nUsed Frames: " << kernel::memory::pmm_used_frames()
     << "\nFree Frames: " << kernel::memory::pmm_free_frames() << '\n';
+    uint8_t* ptr{reinterpret_cast<uint8_t*>(kernel::memory::pmm_allocate_frame())};
+
+    if(ptr) ++ptr;
     kernel::initialize_exceptions();
     drivers::initialize();
 
