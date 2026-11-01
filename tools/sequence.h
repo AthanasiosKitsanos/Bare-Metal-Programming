@@ -1,6 +1,8 @@
 #pragma once
 
+
 #include <stddef.h>
+#include "sequence.h"
 
 namespace sequence
 {

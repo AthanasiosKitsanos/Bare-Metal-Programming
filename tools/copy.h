@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <stddef.h>
 #include <immintrin.h>
 
 namespace tools
@@ -17,7 +18,7 @@ namespace tools
             ++destination;
         }
     }
-    
+
     template<typename T>
     [[gnu::always_inline]]
     inline void copy_data_inline(const T* source, T* destination, const size_t length) noexcept
@@ -29,7 +30,7 @@ namespace tools
             ++destination;
         }
     }
-    
+
     [[gnu::noinline]] [[gnu::target("sse2")]] [[gnu::regparm(3)]]
     inline void copy_sse2(const __m128i* source, __m128i* destination, const size_t length) noexcept
     {
@@ -42,7 +43,7 @@ namespace tools
             ++destination;
         }
     }
-    
+
     [[gnu::always_inline]] [[gnu::target("sse2")]]
     void copy_sse2_inline(const __m128i* source, __m128i* destination, const size_t length) noexcept
     {
@@ -68,7 +69,7 @@ namespace tools
             ++destination;
         }
     }
-    
+
     [[gnu::always_inline]] [[gnu::target("avx2")]]
     void copy_avx2_inline(const __m256i* source, __m256i* destination, const size_t length) noexcept
     {

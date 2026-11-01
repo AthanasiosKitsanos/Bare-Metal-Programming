@@ -78,7 +78,7 @@ namespace terminal
                     break;
                 default:
                     buffer.put(c);
-                    
+
             }
         }
 
@@ -113,7 +113,7 @@ namespace terminal
             put_char_no_sync('0');
             put_char_no_sync('x');
         }
-        
+
         public:
             // Constructor
             constexpr output() noexcept = default;
@@ -123,7 +123,7 @@ namespace terminal
 
             [[gnu::always_inline]]
             inline void move_cursor_left_n(const uint8_t count) noexcept { buffer.move_cursor_left_n(count); }
-            
+
             [[gnu::always_inline]]
             inline void move_cursor_right_n(const uint8_t count) noexcept { buffer.move_cursor_right_n(count); }
 
@@ -428,3 +428,9 @@ namespace terminal
     [[gnu::regparm(1)]]
     output& bool_no_alpha(output&) noexcept;
 }
+
+// namespace terminal
+// {
+//     template<size_t N>
+
+// }
