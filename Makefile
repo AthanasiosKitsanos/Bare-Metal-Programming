@@ -11,7 +11,7 @@ MAKE_LIB = i686-elf-ar rcs
 
 QEMU = qemu-system-x86_64
 
-COMPILE_FLAGS = -std=gnu++17 \
+COMPILE_FLAGS = -std=gnu++20 \
 				-D_MM_MALLOC_H_INCLUDED \
 				-O3 \
 				-Wall \
