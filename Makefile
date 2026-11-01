@@ -75,7 +75,7 @@ $(MAIN_OBJ): $(MAIN_CPP) $(MAIN_H)
 .PHONY: run clean
 
 run:
-	$(QEMU) -cpu max -monitor stdio -m 6G -drive format=raw,file=$(OS_IMAGE)
+	$(QEMU) -cpu max -monitor stdio -m 128M -drive format=raw,file=$(OS_IMAGE)
 
 clean:
 	rm -f obj/apps/shell/*

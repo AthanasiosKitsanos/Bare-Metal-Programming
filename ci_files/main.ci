@@ -1,37 +1,140 @@
 graph: { title: "main.cpp"
-node: { title: "kernel_main" label: "void kernel_main()\nmain.cpp:28:30\n48 bytes (dynamic,bounded)" }
+node: { title: "kernel_main" label: "void kernel_main()\nmain.cpp:37:30\n64 bytes (dynamic,bounded)" }
 node: { title: "_ZN3cpu3gdt10initializeEv" label: "void cpu::gdt::initialize()\ncpu/gdt.h:5:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3cpu3gdt10initializeEv" label: "main.cpp:30:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN3cpu3gdt10initializeEv" label: "main.cpp:39:25" }
 node: { title: "_ZN6kernel14initialize_pitEm" label: "void kernel::initialize_pit(uint32_t)\nkernel/pit.h:7:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel14initialize_pitEm" label: "main.cpp:32:27" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel14initialize_pitEm" label: "main.cpp:41:27" }
 node: { title: "_ZN6kernel19set_timer_frequencyEm" label: "void kernel::set_timer_frequency(uint32_t)\nkernel/timer.h:13:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel19set_timer_frequencyEm" label: "main.cpp:33:32" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel19set_timer_frequencyEm" label: "main.cpp:42:32" }
 node: { title: "_ZN8terminal6output10initializeEv" label: "static void terminal::output::initialize()\nterminal/output.h:122:25" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6output10initializeEv" label: "main.cpp:34:33" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6output10initializeEv" label: "main.cpp:43:33" }
 node: { title: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "kernel::memory::e820_memory_map kernel::memory::get_e820_memory_map()\nkernel/e820.h:31:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "main.cpp:38:80" }
-node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t, uintptr_t)\nkernel/pmm.h:20:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "main.cpp:39:39" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "main.cpp:47:80" }
+node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\nterminal/output.h:205:21" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:48:26" }
 node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\nterminal/output.h:172:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:52:12" }
-node: { title: "_ZN6kernel6memory16pmm_total_framesEv" label: "size_t kernel::memory::pmm_total_frames()\nkernel/pmm.h:35:12" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory16pmm_total_framesEv" label: "main.cpp:52:65" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:48:33" }
 node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\nterminal/output.h:187:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:52:65" }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:53:8" }
-node: { title: "_ZN6kernel6memory15pmm_used_framesEv" label: "size_t kernel::memory::pmm_used_frames()\nkernel/pmm.h:36:12" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_used_framesEv" label: "main.cpp:53:61" }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:53:61" }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:54:8" }
-node: { title: "_ZN6kernel6memory15pmm_free_framesEv" label: "size_t kernel::memory::pmm_free_frames()\nkernel/pmm.h:37:12" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_free_framesEv" label: "main.cpp:54:61" }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:54:61" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:48:91" }
 node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\nterminal/output.h:169:21" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:54:66" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:48:96" }
+node: { title: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "void kernel::memory::pmm_initialize(const e820_memory_map*, uintptr_t, uintptr_t)\nkernel/pmm.h:20:10" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_initializeEPKNS0_15e820_memory_mapEmm" label: "main.cpp:49:39" }
 node: { title: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "void* kernel::memory::pmm_allocate_frame()\nkernel/pmm.h:24:11" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "main.cpp:55:79" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "main.cpp:64:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:65:21" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:65:46" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:65:85" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:65:90" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:65:120" }
+node: { title: "_ZN6kernel6memory15pmm_used_framesEv" label: "size_t kernel::memory::pmm_used_frames()\nkernel/pmm.h:36:12" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_used_framesEv" label: "main.cpp:65:143" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:65:143" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:65:148" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "main.cpp:67:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:68:21" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:68:46" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:68:85" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:68:90" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:68:120" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_used_framesEv" label: "main.cpp:68:143" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:68:143" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:68:148" }
+node: { title: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "kernel::memory::pmm_result kernel::memory::pmm_free_frame(const void*)\nkernel/pmm.h:33:16" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:70:34" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:71:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:71:67" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:71:72" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:73:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:74:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:74:69" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:74:74" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:76:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:77:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:77:69" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:77:74" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:79:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:80:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:80:66" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:80:71" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:82:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:83:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:83:71" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:83:76" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:85:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:86:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:86:71" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:86:76" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:88:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:89:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:89:71" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:89:76" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory14pmm_free_frameEPKv" label: "main.cpp:91:25" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:92:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:92:73" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:92:78" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory18pmm_allocate_frameEv" label: "main.cpp:94:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:95:21" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:95:47" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:95:86" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:95:91" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:95:121" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_used_framesEv" label: "main.cpp:95:144" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:95:144" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:95:149" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:97:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_used_framesEv" label: "main.cpp:97:61" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:97:61" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:97:66" }
+node: { title: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "void* kernel::memory::pmm_allocate_contiguous_frames(size_t)\nkernel/pmm.h:27:11" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory30pmm_allocate_contiguous_framesEm" label: "main.cpp:98:82" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:99:21" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:99:49" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:99:88" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:99:93" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "main.cpp:99:123" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory15pmm_used_framesEv" label: "main.cpp:99:146" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEm" label: "main.cpp:99:146" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:99:151" }
+node: { title: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "kernel::memory::pmm_result kernel::memory::pmm_free_contiguous_frames(const void*, size_t)\nkernel/pmm.h:30:16" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:101:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:102:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:102:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:102:75" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:104:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:105:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:105:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:105:75" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:107:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:108:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:108:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:108:75" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:110:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:111:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:111:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:111:75" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:113:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:114:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:114:71" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:114:76" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:116:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:117:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:117:71" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:117:76" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:119:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:120:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:120:73" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:120:78" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:122:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:123:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:123:73" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:123:78" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "main.cpp:125:37" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:126:12" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEPKc" label: "main.cpp:126:70" }
+edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6outputlsEc" label: "main.cpp:126:75" }
 node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initialize_exceptions()\nkernel/exceptions.h:5:10" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:58:34" }
+edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:132:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
 }
