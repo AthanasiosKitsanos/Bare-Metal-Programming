@@ -48,6 +48,14 @@ namespace
     [[gnu::always_inline]]
     inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_shift; }
 
+    // Convert a frame index to a bitmap index
+    [[gnu::always_inline]]
+    inline size_t bitmap_index(const size_t frame) noexcept { return frame >> bits_per_byte_shift; }
+
+    // Takes the bit position of a frame inside the bitmap
+    [[gnu::always_inline]]
+    inline uint8_t bit_position(const size_t frame) noexcept { return static_cast<uint8_t>(frame & bit_mask); }
+
     // Converts a frame index to bit and byte position
     [[gnu::always_inline]]
     inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bits_per_byte_shift), static_cast<uint8_t>(index & bit_mask)}; }
@@ -951,41 +959,42 @@ namespace
     void free_frame_range(const size_t start_frame, const size_t end_frame) noexcept
     {
         g_used_frames -= (end_frame - start_frame);
-        const bit_n_byte inclusive_start{get_bit_n_byte(start_frame)};
-        const bit_n_byte inclusive_end{get_bit_n_byte(end_frame - 1)};
-        if(inclusive_start.byte_index == (inclusive_end.byte_index))
+        const size_t byte_start{bitmap_index(start_frame)};
+        const size_t inc_end_frame{end_frame - 1};
+        const size_t byte_end{bitmap_index(inc_end_frame)};
+        if(byte_start == byte_end)
         {
-            const uint8_t mask{static_cast<uint8_t>((0xFF << inclusive_start.bit_index) | (0xFF >> (inclusive_end.bit_index + 1)))};
-            g_bitmap.start[inclusive_start.byte_index] &= mask;
+            const uint8_t mask{static_cast<uint8_t>((0xFF >> (byte_size - bit_position(start_frame))) | (0xFF << (bit_position(inc_end_frame) + 1)))};
+            g_bitmap.start[byte_end] &= mask;
             return;
         }
-        uint8_t* start_byte{&g_bitmap.start[inclusive_start.byte_index]};
-        uint8_t* end_byte{&g_bitmap.start[inclusive_end.byte_index]};
-        *start_byte &= static_cast<uint8_t>(~(0xFF << inclusive_start.bit_index));
-        set_range_free[cpu::features::get()](++start_byte, end_byte);
-        *end_byte &= static_cast<uint8_t>(0xFF << (inclusive_end.bit_index + 1));
+        uint8_t* start{&g_bitmap.start[byte_start]};
+        uint8_t* end{&g_bitmap.start[byte_end]};
+        *start &= static_cast<uint8_t>(0xFF >> (byte_size - bit_position(start_frame)));
+        set_range_free[cpu::features::get()](start + 1, end);
+        *end &= static_cast<uint8_t>(0xFF << (bit_position(inc_end_frame) + 1));
     }
 
     // Precondition: start < end
     [[gnu::regparm(2)]]
     bool is_frame_range_used(const size_t start_frame, const size_t end_frame) noexcept
     {
-        const size_t start_byte{start_frame >> bits_per_byte_shift};
+        const size_t start_byte{bitmap_index(start_frame)};
         const size_t inc_end_frame{end_frame - 1};
-        const size_t end_byte{inc_end_frame >> bits_per_byte_shift};
+        const size_t end_byte{bitmap_index(inc_end_frame)};
         if(start_byte  == end_byte)
         {
-            const uint8_t mask{static_cast<uint8_t>((0xFF << (start_frame & bit_mask)) & (0xFF >> (bit_max_pos - (inc_end_frame & bit_mask))))};
+            const uint8_t mask{static_cast<uint8_t>((0xFF << bit_position(start_frame)) & (0xFF >> (bit_max_pos - bit_position(inc_end_frame))))};
             return (g_bitmap.start[start_byte] & mask) == mask;
         }
 
-        const uint8_t front_mask{static_cast<uint8_t>(0xFF << (start_frame & bit_mask))};
+        const uint8_t front_mask{static_cast<uint8_t>(0xFF << bit_position(start_frame))};
         if((g_bitmap.start[start_byte] & front_mask) != front_mask) return false;
 
         const uint8_t* const end{&g_bitmap.start[end_byte]};
         if(find_free_byte(&g_bitmap.start[start_byte + 1], end)) return false;
 
-        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - (inc_end_frame & bit_mask)))};
+        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - bit_position(inc_end_frame)))};
         return (*end & end_mask) == end_mask;
     }
 
@@ -1031,7 +1040,7 @@ namespace kernel::memory
         }
 
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);
-        g_bitmap.end = g_bitmap.start + ((g_total_frames + 7) >> bits_per_byte_shift);
+        g_bitmap.end = g_bitmap.start + bitmap_index(g_total_frames + 7);
         g_bitmap.search_begin = g_bitmap.start;
 
         // Set bit of the bitmap to 1 (used)
@@ -1132,25 +1141,32 @@ namespace kernel::memory
 
         if(run.length < frames) return nullptr;
 
-        const bit_n_byte start_byte{get_bit_n_byte(run.start_frame)};
-        const bit_n_byte end_byte{get_bit_n_byte(run.start_frame + frames - 1)};
-
-        uint8_t* set_start{g_bitmap.start + start_byte.byte_index};
-        uint8_t* const set_end{g_bitmap.start + end_byte.byte_index};
-
-        const uint8_t front_mask{static_cast<uint8_t>(0xFF << start_byte.bit_index)};
-        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index))};
-
-        if(start_byte.byte_index == end_byte.byte_index) *set_start |= (front_mask & end_mask);
+        const size_t byte_start{bitmap_index(run.start_frame)};
+        const size_t inc_end_frame{run.start_frame + frames - 1};
+        const size_t byte_end{bitmap_index(inc_end_frame)};
+        uint8_t* const end{&g_bitmap.start[byte_end]};
+        uint8_t value{*end};
+        if(byte_start == byte_end)
+        {
+            const uint8_t front_mask{static_cast<uint8_t>(0xFF << bit_position(run.start_frame))};
+            const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - bit_position(inc_end_frame)))};
+            const uint8_t mask{static_cast<uint8_t>(front_mask & end_mask)};
+            value |= mask;
+        }
         else
         {
-            *set_start |= front_mask;
-            set_range_used[cpu::features::get()](++set_start, set_end);
-            *set_end |= end_mask;
+            uint8_t* start{&g_bitmap.start[byte_start]};
+            const uint8_t front_mask{static_cast<uint8_t>(0xFF << bit_position(run.start_frame))};
+            *start |= front_mask;
+
+            set_range_used[cpu::features::get()](start + 1, end);
+            const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - bit_position(inc_end_frame)))};
+            value |= end_mask;
         }
 
+        *end = value;
         g_used_frames += frames;
-        g_bitmap.search_begin = set_end + (*set_end == 0xFF);
+        g_bitmap.search_begin = end + (value == 0xFF);
         return reinterpret_cast<void*>(frame_address(run.start_frame));
     }
 
@@ -1175,13 +1191,13 @@ namespace kernel::memory
         if(on_reserved) return pmm_result::reserved;
 
         const size_t excluded_end_frame{index + frames};
-        if(is_frame_range_used(index, excluded_end_frame)) return pmm_result::failed;
+        if(!is_frame_range_used(index, excluded_end_frame)) return pmm_result::failed;
         free_frame_range(index, excluded_end_frame);
 
         const uintptr_t search_candidate{reinterpret_cast<uintptr_t>(&g_bitmap.start[index >> bits_per_byte_shift])};
         const uintptr_t sb_hint{reinterpret_cast<uintptr_t>(g_bitmap.search_begin)};
         const uintptr_t mask{static_cast<uintptr_t>(-(search_candidate < sb_hint))};
-        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((search_candidate & mask) | (sb_hint & ~mask));
+        g_bitmap.search_begin = reinterpret_cast<const uint8_t*>((search_candidate & mask) | (sb_hint & ~mask));
         return pmm_result::success;
     }
 
