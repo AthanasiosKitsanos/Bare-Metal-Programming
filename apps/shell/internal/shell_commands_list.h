@@ -6,7 +6,8 @@
     X(2, "flag")   \
     X(3, "interrupt stack") \
     X(4, "kernel stack")    \
-    X(5, "ticks")   
+    X(5, "pmm test")    \
+    X(6, "ticks")
 
 #define COMMAND_FUNCTIONS    \
     X(0, clear) \
@@ -14,4 +15,5 @@
     X(2, flag)  \
     X(3, interrupt_stack)   \
     X(4, kernel_stack)  \
-    X(5, ticks)
+    X(5, pmm_test)  \
+    X(6, ticks)
