@@ -56,14 +56,15 @@ namespace
 
         public:
         [[gnu::always_inline]]
-        constexpr array_of_shifts(const size_t frames) noexcept: array_of_shifts(frames, static_cast<size_t>(power::highest_of_2(frames)), sequence::make_index_list<array_size>{})
-        {}
-
-        [[gnu::always_inline]]
         constexpr T space(T inv) const noexcept
         {
             return space_impl(inv, sequence::make_index_list<array_size>{});
         }
+
+        [[gnu::always_inline]]
+        constexpr array_of_shifts(const size_t frames) noexcept: array_of_shifts(frames, static_cast<size_t>(power::highest_of_2(frames)), sequence::make_index_list<array_size>{})
+        {}
+
     };
 
     // General Purpose Registers
