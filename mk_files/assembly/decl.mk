@@ -10,10 +10,6 @@ BOOT_STAGE_2_OBJ = obj/boot/boot_stage_2.o
 PM_ENTRY = assembly/pm_entry.S
 PM_ENTRY_OBJ = obj/boot/pm_entry.o
 
-#----------------Pm Entry Helper Function-----------------------
-MOVE_KERNEL_CPP = assembly/move_kernel.cpp
-MOVE_KERNEL_OBJ = obj/boot/move_kernel.o
-
 #-------------------------Kernel Entry
 KENREL_ENTRY = assembly/kernel_entry.S
 KERNEL_ENTRY_OBJ = obj/boot/kernel_entry.o

@@ -2,6 +2,11 @@
 #include "e820.h"
 #include "cpu/features.h"
 #include <immintrin.h>
+#include "tools/cmp.h"
+#include "tools/builtin.h"
+#include "tools/math.h"
+#include "internal/pmm_templates.h"
+#include "terminal/output.h"
 
 namespace
 {
@@ -9,6 +14,13 @@ namespace
     {
         size_t byte_index;
         uint8_t bit_index;
+
+        [[gnu::always_inline]]
+        inline bit_n_byte() noexcept = default;
+
+        [[gnu::always_inline]]
+        inline bit_n_byte(const size_t byte, const uint8_t bit) noexcept: byte_index{byte}, bit_index{bit}
+        {}
 
         [[gnu::always_inline]]
         inline bool operator<(const bit_n_byte& other) const noexcept
@@ -22,255 +34,125 @@ namespace
         uint8_t* start{nullptr};
         const uint8_t* end{nullptr};
         const uint8_t* search_begin{nullptr};
-        const uint8_t* search_end{nullptr};
-        bit_n_byte lower_limit;
     };
 
     size_t g_used_frames{0};
     size_t g_total_frames{0};
     bitmap g_bitmap{};
 
-    constexpr size_t get_power_of_two(const size_t size) noexcept
+    // Converts physical address to a frame index
+    [[gnu::always_inline]]
+    inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_shift; }
+
+    // Converts a frame index to physical address
+    [[gnu::always_inline]]
+    inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_shift; }
+
+    // Convert a frame index to a bitmap index
+    [[gnu::always_inline]]
+    inline size_t bitmap_index(const size_t frame) noexcept { return frame >> bits_per_byte_shift; }
+
+    // Takes the bit position of a frame inside the bitmap
+    [[gnu::always_inline]]
+    inline uint8_t bit_position(const size_t frame) noexcept { return static_cast<uint8_t>(frame & bit_mask); }
+
+    // Converts a frame index to bit and byte position
+    [[gnu::always_inline]]
+    inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bits_per_byte_shift), static_cast<uint8_t>(index & bit_mask)}; }
+
+    // The 2nd parm changes and the new value returns
+    [[gnu::always_inline]]
+    inline uint8_t set_frame_used(uint8_t* const ptr, uint8_t value, const uint8_t left_shift) noexcept
     {
-        size_t power_of_two{0};
-        size_t entries{2};
-        while(entries <= size)
-        {
-            entries <<= 1;
-            ++power_of_two;
-        }
-        return power_of_two;
-    }
-
-    constexpr size_t frame_size_bit_mask{get_power_of_two(kernel::memory::frame_size)};
-
-    [[gnu::always_inline]]
-    inline size_t frame_index(const uintptr_t address) noexcept { return address >> frame_size_bit_mask; }
-
-    [[gnu::always_inline]]
-    inline uintptr_t frame_address(const size_t index) noexcept { return index << frame_size_bit_mask; }
-
-    constexpr uint8_t bit_size_byte{8};
-    constexpr uint8_t bit_size_byte_mask{get_power_of_two(bit_size_byte)};
-    constexpr uint8_t bit_mask{bit_size_byte - 1};
-
-    [[gnu::always_inline]]
-    inline bit_n_byte get_bit_n_byte(const size_t index) noexcept { return {(index >> bit_size_byte_mask), static_cast<uint8_t>(index & bit_mask)}; }
-
-    [[gnu::always_inline]]
-    inline bool is_frame_used(const bit_n_byte* const pair) noexcept
-    {
-        return (*(g_bitmap.start + pair->byte_index) & (1 << pair->bit_index)) != 0;
-    }
-
-    [[gnu::always_inline]]
-    inline uintptr_t max(const kernel::memory::e820_entry* entry) noexcept
-    {
-        return static_cast<uintptr_t>(entry->base + entry->length);
-    }
-
-    [[gnu::always_inline]]
-    inline void set_frame_used(const bit_n_byte* const pair) noexcept
-    {
-        *(g_bitmap.start + pair->byte_index) |= (1 << pair->bit_index);
+        value |= (1 << left_shift);
+        *ptr = value;
         ++g_used_frames;
+        return value;
     }
 
     [[gnu::always_inline]]
-    inline void set_frame_free(const bit_n_byte* const pair) noexcept
+    inline void set_frame_free(uint8_t* const ptr, const uint8_t bit_index) noexcept
     {
-        *(g_bitmap.start + pair->byte_index) &= ~(1 << pair->bit_index);
+        *ptr &= ~(1 << bit_index);
         --g_used_frames;
     }
-    
-    struct run
-    {
-        uint8_t position{0};
-        uint8_t length{0};
-    };
-
-    // This is for finding one free bit without the need to use loops
-    constexpr uint8_t dedicated_1_frame_lut(const uint8_t value) noexcept
-    {
-        uint8_t position{0};
-        for(uint8_t i{0}; i < bit_size_byte; ++i)
-        {
-            if((value & (1 << i)) == 0)
-            {
-                position = i;
-                break;
-            }
-        }
-        return position;
-    }
-
-    constexpr size_t dedicated_1_frame_lut_size{255};
-    struct dedicated_lut_frame
-    {
-        uint8_t entries[dedicated_1_frame_lut_size];
-
-        constexpr dedicated_lut_frame(): entries{}
-        {
-            for(uint8_t i{0}; i < dedicated_1_frame_lut_size; ++i)
-            {
-                entries[i] = dedicated_1_frame_lut(i);
-            }
-        }
-    };
-
-    constexpr dedicated_lut_frame dedicated_lut{};
-    
-    // There is no need for branchless calculations. Those are done for practicing
-    constexpr uint8_t find_buried_run_packed(const uint8_t value) noexcept
-    {
-        run current_run{};
-        run best_run{};
-        bool is_first_run{false};
-        bool is_zero_bit{false};
-        bool is_current_better{false};
-        
-        for(uint8_t i{1}; i < 7; ++i)
-        {
-            is_first_run = (current_run.length == 0);
-            is_zero_bit = ((value & (1 << i)) == 0);
-            current_run.position = (current_run.position * !is_first_run) + (i * is_first_run);
-            current_run.length += is_zero_bit;
-            
-            is_current_better = (current_run.length > best_run.length);
-            best_run.position = (best_run.position * !is_current_better) + (current_run.position * is_current_better);
-            best_run.length = (best_run.length * !is_current_better) + (current_run.length * is_current_better);
-            current_run.length *= is_zero_bit;
-        }
-        return static_cast<uint8_t>((best_run.length > 1) * ((best_run.position << 4) | best_run.length));
-    }
-    
-    constexpr size_t byte_array_size{256};
-    struct byte_lut
-    {
-        uint8_t entries[byte_array_size];
-        
-        constexpr byte_lut() noexcept: entries{}
-        {
-            for(size_t i{0}; i < byte_array_size; ++i)
-            {
-                *(entries + i) = find_buried_run_packed(static_cast<uint8_t>(i));
-            }
-        }
-    };
-    
-    constexpr byte_lut buried_zeros_lut{};
-    
-    constexpr uint8_t fill_mask{0xFF};
-    constexpr uint8_t bit_max_pos{0x07};
-    
-    [[gnu::always_inline]]
-    inline uint8_t front_byte_mask_used(const uint8_t bit_pos) noexcept
-    {
-        return fill_mask << bit_pos;
-    }
-    
-    [[gnu::always_inline]]
-    inline uint8_t back_byte_mask_used(const uint8_t bit_end_pos) noexcept
-    {
-        return fill_mask >> (bit_max_pos - bit_end_pos);
-    }
-    
-    [[gnu::always_inline]]
-    inline void set_frames_in_byte_used(const size_t index, const uint8_t mask, const size_t frames) noexcept
-    {
-        *(g_bitmap.start + index) |= mask;
-        g_used_frames += frames;
-    }
 
     [[gnu::always_inline]]
-    inline void mark_whole_byte_used(const size_t index) noexcept
+    inline bool is_frame_used(const uint8_t* const ptr, const uint8_t bit_index) noexcept
     {
-        *(g_bitmap.start + index) = 0xFF;
-        g_used_frames += bit_size_byte;
-    }
-    
-    [[gnu::always_inline]]
-    inline uint8_t front_byte_free_mask(const size_t index) noexcept
-    {
-        return fill_mask >> (bit_size_byte - index);
-    }
-
-    [[gnu::always_inline]]
-    inline uint8_t back_byte_free_mask(const size_t index) noexcept
-    {
-        return fill_mask << (index + 1);
-    }
-    
-    [[gnu::always_inline]]
-    inline void mark_whole_byte_free(const size_t index) noexcept
-    {
-        *(g_bitmap.start + index) = 0x00;
-        g_used_frames -= bit_size_byte;
-    }
-
-    [[gnu::always_inline]]
-    inline void set_frames_in_byte_free(const size_t index, const uint8_t mask, const size_t frames) noexcept
-    {
-        *(g_bitmap.start + index) &= mask;
-        g_used_frames -= frames;
+        return (*ptr & (1 << bit_index)) != 0;
     }
 
     // SIMD Methods
-    #include "internal/pmm_templates.tpp"
-
     constexpr uint8_t gpr_flag{0x00};
     constexpr uint8_t simd_flag{0x01};
     constexpr uint8_t avx2_flag{0x02};
 
     struct allocation_run
     {
-        bit_n_byte start_index{};
+        size_t start_frame{};
         size_t length{};
     };
 
     [[gnu::always_inline]]
-    inline uint8_t safe_trailing_zeros(const uint8_t value) noexcept { return (value !=0) ? trailing_zeros (value) : bit_size_byte; }
+    inline size_t run_found(const uint8_t* const ptr, const size_t length) noexcept
+    {
+        return (((ptr - g_bitmap.start) << bits_per_byte_shift) - length);
+    }
 
     [[gnu::always_inline]]
-    inline uint8_t safe_leading_zeros(const uint8_t value) noexcept { return (value != 0) ? leading_zeros(value) : bit_size_byte; }
-
-    [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_8_core_inline(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
     {
         const uint8_t* current{*start};
-        uint8_t current_value{0};
-        bool is_first_run{false};
+        size_t length{run->length};
+
+        const array_of_shifts<uint8_t> shifts{frames};
 
         for(; current < end; ++current)
         {
-            current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>(current - g_bitmap.start) * is_first_run);
-            run->start_index.bit_index *= !is_first_run;
+            const uint8_t current_value{*current};
 
             if(current_value == 0x00)
             {
-                run->length += 8;
-                if(run->length >= frames) break;
+                length += byte_size;
+                if(length >= frames)
+                {
+                    length -= byte_size;
+                    run->start_frame = run_found(current, length);
+                    break;
+                }
             }
-            else if(current_value == 0xFF) run->length ^= run->length;
+            else if(current_value == 0xFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) break;
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames)
+                {
+                    run->start_frame = run_found(current, length);
+                    break;
+                }
 
-                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
+                if(frames <= 7)
+                {
+                    /*
+                        Since we get here only if frames <= 7 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    uint8_t inverted_value{shifts.space(static_cast<uint8_t>(~current_value))};
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        run->start_frame = run_found(current, length);
+                        break;
+                    }
 
-                run->start_index.byte_index = static_cast<size_t>(current - g_bitmap.start);
-                run->start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                run->length = (pos_n_length & 0x0F);
-                if(run->length >= frames) break;
+                }
 
-                run->length = leading_zeros(current_value);
-                run->start_index.bit_index = (bit_size_byte - run->length);
-                if(run->length >= frames) break;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -279,110 +161,112 @@ namespace
     void contiguous_8_core(allocation_run* const run, const size_t frames, const uint8_t* const end, const uint8_t** start) noexcept
     {
         const uint8_t* current{*start};
-        uint8_t current_value{0};
-        bool is_first_run{false};
+        size_t length{run->length};
+
+        const array_of_shifts<uint8_t> shifts{frames};
 
         for(; current < end; ++current)
         {
-            current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>(current - g_bitmap.start) * is_first_run);
-            run->start_index.bit_index *= !is_first_run;
+            const uint8_t current_value{*current};
 
             if(current_value == 0x00)
             {
-                run->length += 8;
-                if(run->length >= frames) break;
+                length += byte_size;
+                if(length >= frames)
+                {
+                    length -= byte_size;
+                    run->start_frame = run_found(current, length);
+                    break;
+                }
             }
-            else if(current_value == 0xFF) run->length ^= run->length;
+            else if(current_value == 0xFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) break;
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames)
+                {
+                    run->start_frame = run_found(current, length);
+                    break;
+                }
 
-                const uint8_t pos_n_length{*(buried_zeros_lut.entries + current_value)};
+                if(frames <= 7)
+                {
+                    /*
+                        Since we get fhere only if frames <= 7 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    uint8_t inverted_value{shifts.space(static_cast<uint8_t>(~current_value))};
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        run->start_frame = run_found(current, length);
+                        break;
+                    }
 
-                run->start_index.byte_index = static_cast<size_t>(current - g_bitmap.start);
-                run->start_index.bit_index = static_cast<uint8_t>(pos_n_length >> 4);
-                run->length = (pos_n_length & 0x0F);
-                if(run->length >= frames) break;
+                }
 
-                run->length = leading_zeros(current_value);
-                run->start_index.bit_index = (bit_size_byte - run->length);
-                if(run->length >= frames) break;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
+    constexpr size_t width_16{16};
     [[gnu::always_inline]] [[gnu::regparm(3)]]
     inline void contiguous_16_core_inline(allocation_run* const run, const size_t frames, const uint16_t* const end, const uint16_t** start) noexcept
     {
         const uint16_t* current{*start};
+        size_t length{run->length};
 
-        uint16_t current_value{0};
-        bool is_first_run{false};
-        bool greater_equal{false};
+        const array_of_shifts<uint16_t> shifts{frames};
 
         for(; current < end; ++current)
         {
-            current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.bit_index *= !is_first_run;
+            const uint16_t current_value{*current};
 
             if(current_value == 0x0000)
             {
-                run->length += 16;
-                if(run->length >= frames) return;
+                length += width_16;
+                if(length >= frames)
+                {
+                    length -= width_16;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(current_value == 0xFFFF) run->length ^= run->length;
+            else if(current_value == 0xFFFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) return;
-
-                uint8_t byte_n_bit_pos{0};
-                uintptr_t absolute_address{static_cast<uintptr_t>(reinterpret_cast<const uint8_t*>(current) - g_bitmap.start)};
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames)
                 {
-                    uint8_t pos_n_length{0};
-                    uint8_t temp_lut_value{0};
-                    for(uint8_t right_shift{0}; right_shift < 16; right_shift += 8)
-                    {
-                        temp_lut_value = *(buried_zeros_lut.entries + static_cast<uint8_t>(current_value >> right_shift));
-                        greater_equal = ((pos_n_length & 0x0F) >= ((temp_lut_value & 0x0F)));
-                        pos_n_length = (pos_n_length * greater_equal) + (temp_lut_value * !greater_equal);
-                        byte_n_bit_pos = static_cast<uint8_t>((byte_n_bit_pos * greater_equal) + (((right_shift << 1) | (pos_n_length >> 4)) * !greater_equal));
-                    }
-
-                    const uint8_t byte0_leading{safe_leading_zeros(static_cast<uint8_t>(current_value))};
-                    const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + safe_trailing_zeros(static_cast<uint8_t>(current_value >> 8)))};
-
-                    uint8_t temp_length{static_cast<uint8_t>(pos_n_length & 0x0F)};
-
-                    greater_equal = (temp_length >= length_sum);
-                    temp_length = (temp_length * greater_equal) + (length_sum * !greater_equal);
-                    byte_n_bit_pos = (byte_n_bit_pos * greater_equal) + (static_cast<uint8_t>(0x00 | (bit_size_byte - byte0_leading)) * !greater_equal);
-
-                    run->length = temp_length;
-                    run->start_index.byte_index = static_cast<size_t>(absolute_address + (byte_n_bit_pos >> 4));
-                    run->start_index.bit_index = static_cast<uint8_t>(byte_n_bit_pos & 0x0F);
-                    if(run->length >= frames) return;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
                 }
 
+                if(frames <= 15)
+                {
+                    /*
+                        Since we get here only if frames <= 15 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    const uint16_t inverted_value{shifts.space(~current_value)};
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                        break;
+                    }
 
-                constexpr uint8_t word_bits{16};
-                const uint8_t l_zeros{leading_zeros(current_value)};
-                greater_equal = (run->length >= l_zeros);
-                run->length = (run->length * greater_equal) + (l_zeros * !greater_equal);
+                }
 
-                const uint8_t bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
-                byte_n_bit_pos = static_cast<uint8_t>((bit_index >> bit_size_byte_mask) << 4) | (bit_index & bit_mask);
-                run->start_index.byte_index = static_cast<size_t>((run->start_index.byte_index * greater_equal) + ((absolute_address + (byte_n_bit_pos >> 4)) * !greater_equal));
-                run->start_index.bit_index = (run->start_index.bit_index * greater_equal) + ((byte_n_bit_pos & 0x0F) * !greater_equal);
-                if(run->length >= frames) return;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -391,184 +275,112 @@ namespace
     void contiguous_16_core(allocation_run* const run, const size_t frames, const uint16_t* const end, const uint16_t** start) noexcept
     {
         const uint16_t* current{*start};
+        size_t length{run->length};
 
-        uint16_t current_value{0};
-        bool is_first_run{false};
-        bool greater_equal{false};
+        const array_of_shifts<uint16_t> shifts{frames};
 
         for(; current < end; ++current)
         {
-            current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.bit_index *= !is_first_run;
+            const uint16_t current_value{*current};
 
             if(current_value == 0x0000)
             {
-                run->length += 16;
-                if(run->length >= frames) return;
+                length += width_16;
+                if(length >= frames)
+                {
+                    length -= width_16;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(current_value == 0xFFFF) run->length ^= run->length;
+            else if(current_value == 0xFFFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) return;
-
-                uint8_t byte_n_bit_pos{0};
-                uintptr_t absolute_address{static_cast<uintptr_t>(reinterpret_cast<const uint8_t*>(current) - g_bitmap.start)};
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames)
                 {
-                    uint8_t pos_n_length{0};
-                    uint8_t temp_lut_value{0};
-                    for(uint8_t right_shift{0}; right_shift < 16; right_shift += 8)
-                    {
-                        temp_lut_value = *(buried_zeros_lut.entries + static_cast<uint8_t>(current_value >> right_shift));
-                        greater_equal = ((pos_n_length & 0x0F) >= ((temp_lut_value & 0x0F)));
-                        pos_n_length = (pos_n_length * greater_equal) + (temp_lut_value * !greater_equal);
-                        byte_n_bit_pos = static_cast<uint8_t>((byte_n_bit_pos * greater_equal) + (((right_shift << 1) | (pos_n_length >> 4)) * !greater_equal));
-                    }
-
-                    const uint8_t byte0_leading{safe_leading_zeros(static_cast<uint8_t>(current_value))};
-                    const uint8_t length_sum{static_cast<uint8_t>(byte0_leading + safe_trailing_zeros(static_cast<uint8_t>(current_value >> 8)))};
-
-                    uint8_t temp_length{static_cast<uint8_t>(pos_n_length & 0x0F)};
-
-                    greater_equal = (temp_length >= length_sum);
-                    temp_length = (temp_length * greater_equal) + (length_sum * !greater_equal);
-                    byte_n_bit_pos = (byte_n_bit_pos * greater_equal) + (static_cast<uint8_t>(0x00 | (bit_size_byte - byte0_leading)) * !greater_equal);
-
-                    run->length = temp_length;
-                    run->start_index.byte_index = static_cast<size_t>(absolute_address + (byte_n_bit_pos >> 4));
-                    run->start_index.bit_index = static_cast<uint8_t>(byte_n_bit_pos & 0x0F);
-                    if(run->length >= frames) return;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
                 }
 
+                if(frames <= 15)
+                {
+                    /*
+                        Since we get here only if frames <= 15 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    const uint16_t inverted_value{shifts.space(~current_value)};
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                        break;
+                    }
 
-                constexpr uint8_t word_bits{16};
-                const uint8_t l_zeros{leading_zeros(current_value)};
-                greater_equal = (run->length >= l_zeros);
-                run->length = (run->length * greater_equal) + (l_zeros * !greater_equal);
+                }
 
-                const uint8_t bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
-                byte_n_bit_pos = static_cast<uint8_t>((bit_index >> bit_size_byte_mask) << 4) | (bit_index & bit_mask);
-                run->start_index.byte_index = static_cast<size_t>((run->start_index.byte_index * greater_equal) + ((absolute_address + (byte_n_bit_pos >> 4)) * !greater_equal));
-                run->start_index.bit_index = (run->start_index.bit_index * greater_equal) + ((byte_n_bit_pos & 0x0F) * !greater_equal);
-                if(run->length >= frames) return;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
+    constexpr size_t width_32{32};
     [[gnu::regparm(3)]] [[gnu::always_inline]]
     inline void contiguous_32_core_inline(allocation_run* const run, const size_t frames, const uint32_t* const end, const uint32_t** start) noexcept
     {
         const uint32_t* current{*start};
+        size_t length{run->length};
 
-        uint32_t current_value{0};
-        bool is_first_run{false};
-        bool greater_equal{false};
+        const array_of_shifts<uint32_t> shifts{frames};
 
         for(; current < end; ++current)
         {
-            current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.bit_index *= !is_first_run;
+            const uint32_t current_value{*current};
 
             if(current_value == 0x00000000)
             {
-                run->length += 32;
-                if(run->length >= frames) return;
+                length += width_32;
+                if(length >= frames)
+                {
+                    length -= width_32;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(current_value == 0xFFFFFFFF) run->length ^= run->length;
+            else if(current_value == 0xFFFFFFFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) return;
-
-                uint8_t byte_n_bit_pos{0};
-                uintptr_t absolute_address{static_cast<uintptr_t>(reinterpret_cast<const uint8_t*>(current) - g_bitmap.start)};
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames)
                 {
-                    uint8_t pos_n_length{0};
-                    {
-                        uint8_t temp_lut_value{0};
-                        for(uint8_t right_shift{0}; right_shift < 32; right_shift += 8)
-                        {
-                            temp_lut_value = *(buried_zeros_lut.entries + static_cast<uint8_t>(current_value >> right_shift));
-                            greater_equal = ((pos_n_length & 0x0F) >= ((temp_lut_value & 0x0F)));
-                            pos_n_length = (pos_n_length * greater_equal) + (temp_lut_value * !greater_equal);
-                            byte_n_bit_pos = static_cast<uint8_t>((byte_n_bit_pos * greater_equal) + (((right_shift << 1) | (pos_n_length >> 4)) * !greater_equal));
-                        }
-                    }
-
-                    {
-                        uint8_t byte0_leading{0};
-                        uint8_t byte1_trailing{0};
-                        uint8_t byte1_leading{0};
-                        uint8_t byte2_trailing{0};
-                        uint8_t byte2_leading{0};
-                        uint8_t byte3_trailing{0};
-
-                        uint8_t value{static_cast<uint8_t>(current_value)};
-                        byte0_leading = safe_leading_zeros(value);
-
-                        value = static_cast<uint8_t>(current_value >> 8);
-                        byte1_trailing = safe_trailing_zeros(value);
-                        byte1_leading = safe_leading_zeros(value);
-
-                        value = static_cast<uint8_t>(current_value >> 16);
-                        byte2_trailing = safe_trailing_zeros(value);
-                        byte2_leading = safe_leading_zeros(value);
-
-                        value = static_cast<uint8_t>(current_value >> 24);
-                        byte3_trailing = safe_trailing_zeros(value);
-
-                        const uint8_t length_sums[] =
-                        {
-                            static_cast<uint8_t>(byte0_leading + byte1_trailing),
-                            static_cast<uint8_t>(byte1_leading + byte2_trailing),
-                            static_cast<uint8_t>(byte2_leading + byte3_trailing)
-                        };
-
-                        const uint8_t packed_positions[] =
-                        {
-                            static_cast<uint8_t>(0x00 | (bit_size_byte - byte0_leading)),
-                            static_cast<uint8_t>(0x10 | (bit_size_byte - byte1_leading)),
-                            static_cast<uint8_t>(0x20 | (bit_size_byte - byte2_leading))
-                        };
-
-                        uint8_t length_sum{0};
-                        uint8_t temp_length{static_cast<uint8_t>(pos_n_length & 0x0F)};
-
-                        for(uint8_t i{0}; i < 3; ++i)
-                        {
-                            length_sum = *(length_sums + i);
-                            greater_equal = (temp_length >= length_sum);
-                            temp_length = (temp_length * greater_equal) + (length_sum * !greater_equal);
-                            byte_n_bit_pos = (byte_n_bit_pos * greater_equal) + (*(packed_positions + i) * !greater_equal);
-                        }
-
-                        run->length = temp_length;
-                        run->start_index.byte_index = static_cast<size_t>(absolute_address + (byte_n_bit_pos >> 4));
-                        run->start_index.bit_index = static_cast<uint8_t>(byte_n_bit_pos & 0x0F);
-                        if(run->length >= frames) return;
-                    }
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
                 }
 
+                if(frames <= 31)
+                {
+                    /*
+                        Since we get here only if frames <= 31 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    const uint32_t inverted_value{shifts.space(~current_value)};
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                        break;
+                    }
 
-                constexpr uint8_t word_bits{32};
-                const uint8_t l_zeros{leading_zeros(current_value)};
-                greater_equal = (run->length >= l_zeros);
-                run->length = (run->length * greater_equal) + (l_zeros * !greater_equal);
+                }
 
-                const uint8_t bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
-                 
-                byte_n_bit_pos = static_cast<uint8_t>((bit_index >> bit_size_byte_mask) << 4) | (bit_index & bit_mask);
-                
-                run->start_index.byte_index = static_cast<size_t>((run->start_index.byte_index * greater_equal) + ((absolute_address + (byte_n_bit_pos >> 4)) * !greater_equal));
-                run->start_index.bit_index = (run->start_index.bit_index * greater_equal) + ((byte_n_bit_pos & 0x0F) * !greater_equal);
-                if(run->length >= frames) return;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -577,214 +389,143 @@ namespace
     void contiguous_32_core(allocation_run* const run, const size_t frames, const uint32_t* const end, const uint32_t** start) noexcept
     {
         const uint32_t* current{*start};
+        size_t length{run->length};
 
-        uint32_t current_value{0};
-        bool is_first_run{false};
-        bool greater_equal{false};
+        const array_of_shifts<uint32_t> shifts{frames};
 
         for(; current < end; ++current)
         {
-            current_value = *current;
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.bit_index *= !is_first_run;
+            const uint32_t current_value{*current};
 
             if(current_value == 0x00000000)
             {
-                run->length += 32;
-                if(run->length >= frames) return;
+                length += width_32;
+                if(length >= frames)
+                {
+                    length -= width_32;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(current_value == 0xFFFFFFFF) run->length ^= run->length;
+            else if(current_value == 0xFFFFFFFF) length ^= length;
             else
             {
-                run->length += trailing_zeros(current_value);
-                if(run->length >= frames) return;
-
-                uint8_t byte_n_bit_pos{0};
-                uintptr_t absolute_address{static_cast<uintptr_t>(reinterpret_cast<const uint8_t*>(current) - g_bitmap.start)};
+                if((length + static_cast<size_t>(builtin::trailing_zeros(current_value))) >= frames)
                 {
-                    uint8_t pos_n_length{0};
-                    {
-                        uint8_t temp_lut_value{0};
-                        for(uint8_t right_shift{0}; right_shift < 32; right_shift += 8)
-                        {
-                            temp_lut_value = *(buried_zeros_lut.entries + static_cast<uint8_t>(current_value >> right_shift));
-                            greater_equal = ((pos_n_length & 0x0F) >= ((temp_lut_value & 0x0F)));
-                            pos_n_length = (pos_n_length * greater_equal) + (temp_lut_value * !greater_equal);
-                            byte_n_bit_pos = static_cast<uint8_t>((byte_n_bit_pos * greater_equal) + (((right_shift << 1) | (pos_n_length >> 4)) * !greater_equal));
-                        }
-                    }
-
-                    {
-                        uint8_t byte0_leading{0};
-                        uint8_t byte1_trailing{0};
-                        uint8_t byte1_leading{0};
-                        uint8_t byte2_trailing{0};
-                        uint8_t byte2_leading{0};
-                        uint8_t byte3_trailing{0};
-
-                        uint8_t value{static_cast<uint8_t>(current_value)};
-                        byte0_leading = safe_leading_zeros(value);
-
-                        value = static_cast<uint8_t>(current_value >> 8);
-                        byte1_trailing = safe_trailing_zeros(value);
-                        byte1_leading = safe_leading_zeros(value);
-
-                        value = static_cast<uint8_t>(current_value >> 16);
-                        byte2_trailing = safe_trailing_zeros(value);
-                        byte2_leading = safe_leading_zeros(value);
-
-                        value = static_cast<uint8_t>(current_value >> 24);
-                        byte3_trailing = safe_trailing_zeros(value);
-
-                        const uint8_t length_sums[] =
-                        {
-                            static_cast<uint8_t>(byte0_leading + byte1_trailing),
-                            static_cast<uint8_t>(byte1_leading + byte2_trailing),
-                            static_cast<uint8_t>(byte2_leading + byte3_trailing)
-                        };
-
-                        const uint8_t packed_positions[] =
-                        {
-                            static_cast<uint8_t>(0x00 | (bit_size_byte - byte0_leading)),
-                            static_cast<uint8_t>(0x10 | (bit_size_byte - byte1_leading)),
-                            static_cast<uint8_t>(0x20 | (bit_size_byte - byte2_leading))
-                        };
-
-                        uint8_t length_sum{0};
-                        uint8_t temp_length{static_cast<uint8_t>(pos_n_length & 0x0F)};
-
-                        for(uint8_t i{0}; i < 3; ++i)
-                        {
-                            length_sum = *(length_sums + i);
-                            greater_equal = (temp_length >= length_sum);
-                            temp_length = (temp_length * greater_equal) + (length_sum * !greater_equal);
-                            byte_n_bit_pos = (byte_n_bit_pos * greater_equal) + (*(packed_positions + i) * !greater_equal);
-                        }
-
-                        run->length = temp_length;
-                        run->start_index.byte_index = static_cast<size_t>(absolute_address + (byte_n_bit_pos >> 4));
-                        run->start_index.bit_index = static_cast<uint8_t>(byte_n_bit_pos & 0x0F);
-                        if(run->length >= frames) return;
-                    }
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
                 }
 
+                if(frames <= 31)
+                {
+                    /*
+                        Since we get here only if frames <= 31 (maximum amount of free frames in the middle)
+                        and the inverted byte is not 0, means that the run here is completed.
+                        So we don't really care if the length suddenly becomes huge (wrap around)
+                        since we only care about the frames
+                    */
+                    const uint32_t inverted_value{shifts.space(~current_value)};
+                    if(inverted_value != 0)
+                    {
+                        length = -builtin::trailing_zeros(inverted_value);
+                        run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                        break;
+                    }
 
-                constexpr uint8_t word_bits{32};
-                const uint8_t l_zeros{leading_zeros(current_value)};
-                greater_equal = (run->length >= l_zeros);
-                run->length = (run->length * greater_equal) + (l_zeros * !greater_equal);
+                }
 
-                const uint8_t bit_index{static_cast<uint8_t>(word_bits - l_zeros)};
-                 
-                byte_n_bit_pos = static_cast<uint8_t>((bit_index >> bit_size_byte_mask) << 4) | (bit_index & bit_mask);
-                
-                run->start_index.byte_index = static_cast<size_t>((run->start_index.byte_index * greater_equal) + ((absolute_address + (byte_n_bit_pos >> 4)) * !greater_equal));
-                run->start_index.bit_index = (run->start_index.bit_index * greater_equal) + ((byte_n_bit_pos & 0x0F) * !greater_equal);
-                if(run->length >= frames) return;
+                length = static_cast<size_t>(builtin::leading_zeros(current_value));
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
     [[gnu::always_inline]] [[gnu::regparm(2)]]
     inline const void* get_best_aligned_address(const uintptr_t addr_1, const uintptr_t addr_2) noexcept
     {
-        bool addr_1_le{addr_1 <= addr_2};
-        return reinterpret_cast<void*>((addr_1 * addr_1_le) + (addr_2 * !addr_1_le));
+        return reinterpret_cast<void*>((addr_1 <= addr_2) ? addr_1 : addr_2);
     }
 
-    [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline const void* sweep_32(allocation_run* run, const size_t frames) noexcept
+    [[gnu::always_inline]]
+    inline void sweep_32(const uint8_t* begin, const uint8_t* const end, const size_t frames, allocation_run* const run) noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-
         constexpr uintptr_t mask_2_byte{0x01};
         constexpr uintptr_t mask_4_byte{0x03};
-        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(g_bitmap.search_end)};
+        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_address{unaligned_end & ~mask_2_byte};
-        const void* end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
-        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(end), &current);
-        if(run->length >= frames) return current;
+        const void* aligned_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
+        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(aligned_end), &begin);
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_4_address{unaligned_end & ~mask_4_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
-        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(end), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
-        
-        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
+        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(aligned_end), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
+
+        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
         // Fallback
-        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_8_core(run, frames, g_bitmap.search_end, reinterpret_cast<const uint8_t**>(&current));
-        return current;
+        contiguous_8_core(run, frames, end, reinterpret_cast<const uint8_t**>(&begin));
     }
 
     [[gnu::regparm(2)]]
     void find_contiguous_frames_32(allocation_run* const run, const size_t frames) noexcept
     {
-        if(sweep_32(run, frames) == g_bitmap.end)
+        sweep_32(g_bitmap.search_begin, g_bitmap.end, frames, run);
+        if(run->length < frames)
         {
-            run->length ^= run->length;
-            g_bitmap.search_end = g_bitmap.search_begin;
-            g_bitmap.search_begin = (g_bitmap.start + g_bitmap.lower_limit.byte_index);
-            sweep_32(run, frames);
-            g_bitmap.search_end = g_bitmap.end;
+            run->length = 0;
+            sweep_32(g_bitmap.start, g_bitmap.search_begin, frames, run);
         }
     }
 
-    [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(3)]]
+    constexpr size_t width_128{128};
+    [[gnu::target("sse2")]] [[gnu::always_inline]]
     inline void contiguous_sse2_core_inline(allocation_run* run, const size_t frames, const __m128i* const end, const __m128i** start) noexcept
     {
-       const __m128i* current{*start};
+        size_t length{run->length};
+        const __m128i* current{*start};
         const __m128i cmp{_mm_setzero_si128()};
         const __m128i all_ones{_mm_cmpeq_epi32(cmp, cmp)};
 
-        __m128i current_value{cmp};
-        __m128i cmp_result{cmp};
-        __m128i all_ones_cmp_result{cmp};
-
-        uint16_t packed_result{0};
-        uint16_t all_ones_packed{0};
-        
-        const uint32_t* lane_start{nullptr};
-        const uint32_t* lane_end{nullptr};
-
-        bool is_first_run{false};
-
         for(; current < end; ++current)
         {
-            current_value = _mm_load_si128(current);
-            
-            cmp_result = _mm_cmpeq_epi32(current_value, cmp);
-            packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
+            const __m128i current_value{_mm_load_si128(current)};
+            const __m128i cmp_result{_mm_cmpeq_epi32(current_value, cmp)};
+            const uint16_t packed_result{static_cast<uint16_t>(_mm_movemask_epi8(cmp_result))};
 
-            all_ones_cmp_result = _mm_cmpeq_epi32(current_value, all_ones);
-            all_ones_packed = static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result));
-
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.bit_index *= !is_first_run;
+            const __m128i all_ones_cmp_result{_mm_cmpeq_epi32(current_value, all_ones)};
+            const uint16_t all_ones_packed{static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result))};
 
             if(packed_result == 0xFFFF)
             {
-                run->length += 128;
-                if(run->length >= frames) return;
+                length += width_128;
+                if(length >= frames)
+                {
+                    length -= width_128;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(all_ones_packed == 0xFFFF) run->length ^= run->length;
+            else if(all_ones_packed == 0xFFFF) length ^= length;
             else
             {
-                lane_start = reinterpret_cast<const uint32_t*>(current);
+                const uint32_t* lane_start{reinterpret_cast<const uint32_t*>(current)};
                 constexpr uint8_t end_pos{sizeof(__m128i) >> 2};
-                lane_end = lane_start + end_pos;
+                const uint32_t* const lane_end{lane_start + end_pos};
+                run->length = length;
                 contiguous_32_core_inline(run, frames, lane_end, &lane_start);
-                if(run->length >= frames) return;
+                length = run->length;
+                if(length >= frames) break;
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
@@ -792,216 +533,192 @@ namespace
     [[gnu::target("sse2")]] [[gnu::regparm(3)]] [[gnu::noinline]]
     void contiguous_sse2_core(allocation_run* run, const size_t frames, const __m128i* const end, const __m128i** start) noexcept
     {
+        size_t length{run->length};
         const __m128i* current{*start};
         const __m128i cmp{_mm_setzero_si128()};
         const __m128i all_ones{_mm_cmpeq_epi32(cmp, cmp)};
 
-        __m128i current_value{cmp};
-        __m128i cmp_result{cmp};
-        __m128i all_ones_cmp_result{cmp};
-
-        uint16_t packed_result{0};
-        uint16_t all_ones_packed{0};
-        
-        const uint32_t* lane_start{nullptr};
-        const uint32_t* lane_end{nullptr};
-
-        bool is_first_run{false};
-
         for(; current < end; ++current)
         {
-            current_value = _mm_load_si128(current);
-            
-            cmp_result = _mm_cmpeq_epi32(current_value, cmp);
-            packed_result = static_cast<uint16_t>(_mm_movemask_epi8(cmp_result));
+            const __m128i current_value{_mm_load_si128(current)};
+            const __m128i cmp_result{_mm_cmpeq_epi32(current_value, cmp)};
+            const uint16_t packed_result{static_cast<uint16_t>(_mm_movemask_epi8(cmp_result))};
 
-            all_ones_cmp_result = _mm_cmpeq_epi32(current_value, all_ones);
-            all_ones_packed = static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result));
-
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>((reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run));
-            run->start_index.bit_index *= !is_first_run;
+            const __m128i all_ones_cmp_result{_mm_cmpeq_epi32(current_value, all_ones)};
+            const uint16_t all_ones_packed{static_cast<uint16_t>(_mm_movemask_epi8(all_ones_cmp_result))};
 
             if(packed_result == 0xFFFF)
             {
-                run->length += 128;
-                if(run->length >= frames) return;
+                length += width_128;
+                if(length >= frames)
+                {
+                    length -= width_128;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(all_ones_packed == 0xFFFF) run->length ^= run->length;
+            else if(all_ones_packed == 0xFFFF) length ^= length;
             else
             {
-                lane_start = reinterpret_cast<const uint32_t*>(current);
+                const uint32_t* lane_start{reinterpret_cast<const uint32_t*>(current)};
                 constexpr uint8_t end_pos{sizeof(__m128i) >> 2};
-                lane_end = lane_start + end_pos;
+                const uint32_t* const lane_end{lane_start + end_pos};
+                run->length = length;
                 contiguous_32_core_inline(run, frames, lane_end, &lane_start);
-                if(run->length >= frames) return;
+                length = run->length;
+                if(length >= frames) break;
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
-    [[gnu::target("sse2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline const uint8_t* sweep_sse_2(allocation_run* const run, const size_t frames) noexcept
+    [[gnu::target("sse2")]] [[gnu::always_inline]]
+    inline void sweep_sse_2(const uint8_t* begin, const uint8_t* const end, const size_t frames, allocation_run* const run) noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-
         constexpr uintptr_t mask_2_byte{0x01};
         constexpr uintptr_t mask_4_byte{0x03};
         constexpr uintptr_t mask_16_byte{0x0F};
-        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(g_bitmap.search_end)};
+        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_address{unaligned_end & ~mask_2_byte};
-        const void* end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
-        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(end), &current);
-        if(run->length >= frames) return current;
+        const void* aligned_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
+        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(aligned_end), &begin);
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_4_address{unaligned_end & ~mask_4_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
-        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(end), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
-        
-        const uintptr_t aligned_end_16_address{unaligned_end & ~mask_16_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
-        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(end), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
+        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(aligned_end), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&current));
-        if(run->length >= frames) return current;
+        const uintptr_t aligned_end_16_address{unaligned_end & ~mask_16_byte};
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
+        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
+
+        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&begin));
+        if(run->length >= frames) return;
 
         // Fallback
-        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_8_core(run, frames, g_bitmap.search_end, reinterpret_cast<const uint8_t**>(&current));
-        return current;
+        contiguous_8_core(run, frames, end, reinterpret_cast<const uint8_t**>(&begin));
     }
 
-    
+
     [[gnu::target("sse2")]] [[gnu::regparm(2)]]
     void find_contiguous_frames_sse2(allocation_run* const run, const size_t frames) noexcept
     {
-        if(sweep_sse_2(run, frames) == g_bitmap.end)
+        sweep_sse_2(g_bitmap.search_begin, g_bitmap.end, frames, run);
+        if(run->length < frames)
         {
-            run->length ^= run->length;
-            g_bitmap.search_end = g_bitmap.search_begin;
-            g_bitmap.search_begin = (g_bitmap.start + g_bitmap.lower_limit.byte_index);
-            sweep_sse_2(run, frames);
-            g_bitmap.search_end = g_bitmap.end;
+            run->length = 0;
+            sweep_sse_2(g_bitmap.start, g_bitmap.search_begin, frames, run);
         }
     }
 
-    [[gnu::target("avx2")]] [[gnu::regparm(3)]] [[gnu::always_inline]]
+    constexpr size_t width_256{256};
+    [[gnu::target("avx2")]] [[gnu::always_inline]]
     inline void contiguous_avx2_core_inline(allocation_run* run, const size_t frames, const __m256i* const end, const __m256i** start) noexcept
     {
+        size_t length{run->length};
+
         const __m256i* current{*start};
         const __m256i cmp{_mm256_setzero_si256()};
         const __m256i all_ones{_mm256_cmpeq_epi32(cmp, cmp)};
 
-        __m256i current_value{cmp};
-        __m256i cmp_result{cmp};
-        __m256i all_ones_cmp_result{cmp};
-
-        uint32_t packed_result{0};
-        uint32_t all_ones_packed{0};
-
-        const __m128i* lane_start{nullptr};
-        const __m128i* lane_end{nullptr};
-
-        bool is_first_run{false};
-
         for(; current < end; ++current)
         {
-            current_value = _mm256_load_si256(current);
+            const __m256i current_value{_mm256_load_si256(current)};
+            const __m256i cmp_result{_mm256_cmpeq_epi32(current_value, cmp)};
+            const uint32_t packed_result{static_cast<uint32_t>(_mm256_movemask_epi8(cmp_result))};
 
-            cmp_result = _mm256_cmpeq_epi32(current_value, cmp);
-            packed_result = static_cast<uint32_t>(_mm256_movemask_epi8(cmp_result));
-
-            all_ones_cmp_result = _mm256_cmpeq_epi8(current_value, all_ones);
-            all_ones_packed = static_cast<uint32_t>(_mm256_movemask_epi8(all_ones_cmp_result));
-
-            is_first_run = (run->length == 0);
-            run->start_index.byte_index = (run->start_index.byte_index * !is_first_run) + (static_cast<size_t>(reinterpret_cast<const uint8_t*>(current) - g_bitmap.start) * is_first_run);
-            run->start_index.bit_index *= !is_first_run;
+            const __m256i all_ones_cmp_result{_mm256_cmpeq_epi8(current_value, all_ones)};
+            const uint32_t all_ones_packed{static_cast<uint32_t>(_mm256_movemask_epi8(all_ones_cmp_result))};
 
             if(packed_result == 0xFFFFFFFF)
             {
-                run->length += 256;
-                if(run->length >= frames) return;
+                length += width_256;
+                if(length >= frames)
+                {
+                    length -= width_256;
+                    run->start_frame = run_found(reinterpret_cast<const uint8_t*>(current), length);
+                    break;
+                }
             }
-            else if(all_ones_packed == 0xFFFFFFFF) run->length ^= run->length;
+            else if(all_ones_packed == 0xFFFFFFFF) length ^= length;
             else
             {
-                lane_start = reinterpret_cast<const __m128i*>(current);
+                const __m128i* lane_start{reinterpret_cast<const __m128i*>(current)};
                 constexpr uint8_t end_pos{sizeof(__m256i) >> 4};
-                lane_end = lane_start + end_pos;
+                const __m128i* lane_end{lane_start + end_pos};
+                run->length = length;
                 contiguous_sse2_core_inline(run, frames, lane_end, &lane_start);
-                if(run->length >= frames) return;
+                length = run->length;
+                if(length >= frames) break;
             }
         }
+        run->length = (current < end) ? frames : length;
         *start = current;
     }
 
-    [[gnu::target("avx2")]] [[gnu::always_inline]] [[gnu::regparm(2)]]
-    inline const uint8_t* sweep_avx_2(allocation_run* const run, const size_t frames) noexcept
+    [[gnu::target("avx2")]] [[gnu::always_inline]]
+    inline void sweep_avx_2(const uint8_t* begin, const uint8_t* const end, const size_t frames, allocation_run* const run) noexcept
     {
-        const uint8_t* current{g_bitmap.search_begin};
-
         constexpr uintptr_t mask_2_byte{0x01};
         constexpr uintptr_t mask_4_byte{0x03};
         constexpr uintptr_t mask_16_byte{0x0F};
         constexpr uintptr_t mask_32_byte{0x1F};
-        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(g_bitmap.search_end)};
+        const uintptr_t unaligned_end{reinterpret_cast<uintptr_t>(end)};
 
         const uintptr_t aligned_end_2_address{unaligned_end & ~mask_2_byte};
-        const void* end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
-        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(end), &current);
-        if(run->length >= frames) return current;
+        const void* aligned_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_2_byte) & ~mask_2_byte), aligned_end_2_address)};
+        contiguous_8_core_inline(run, frames, reinterpret_cast<const uint8_t*>(aligned_end), &begin);
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_4_address{unaligned_end & ~mask_4_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
-        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(end), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
-        
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_4_byte) & ~mask_4_byte), aligned_end_4_address);
+        contiguous_16_core_inline(run, frames, reinterpret_cast<const uint16_t*>(aligned_end), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
+
         const uintptr_t aligned_end_16_address{unaligned_end & ~mask_16_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
-        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(end), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_16_byte) & ~mask_16_byte), aligned_end_16_address);
+        contiguous_32_core_inline(run, frames, reinterpret_cast<const uint32_t*>(aligned_end), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
         const uintptr_t aligned_end_32_address{unaligned_end & ~mask_32_byte};
-        end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(current) + mask_32_byte) & ~mask_32_byte), aligned_end_32_address);
-        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(end), reinterpret_cast<const __m128i**>(&current));
-        if(run->length >= frames) return current;
+        aligned_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(begin) + mask_32_byte) & ~mask_32_byte), aligned_end_32_address);
+        contiguous_sse2_core_inline(run, frames, reinterpret_cast<const __m128i*>(aligned_end), reinterpret_cast<const __m128i**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_avx2_core_inline(run, frames, reinterpret_cast<const __m256i*>(aligned_end_32_address), reinterpret_cast<const __m256i**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_avx2_core_inline(run, frames, reinterpret_cast<const __m256i*>(aligned_end_32_address), reinterpret_cast<const __m256i**>(&begin));
+        if(run->length >= frames) return;
 
         // Fallback
-        contiguous_sse2_core(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_sse2_core(run, frames, reinterpret_cast<const __m128i*>(aligned_end_16_address), reinterpret_cast<const __m128i**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_32_core(run, frames, reinterpret_cast<const uint32_t*>(aligned_end_4_address), reinterpret_cast<const uint32_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&current));
-        if(run->length >= frames) return current;
+        contiguous_16_core(run, frames, reinterpret_cast<const uint16_t*>(aligned_end_2_address), reinterpret_cast<const uint16_t**>(&begin));
+        if(run->length >= frames) return;
 
-        contiguous_8_core(run, frames, g_bitmap.search_end, reinterpret_cast<const uint8_t**>(&current));
-        return current;
+        contiguous_8_core(run, frames, end, reinterpret_cast<const uint8_t**>(&begin));
     }
 
     [[gnu::target("avx2")]] [[gnu::regparm(2)]]
     void find_contiguous_frames_avx2(allocation_run* const run, const size_t frames) noexcept
     {
-        if(sweep_avx_2(run, frames) == g_bitmap.end)
+        sweep_avx_2(g_bitmap.search_begin, g_bitmap.end, frames, run);
+        if(run->length < frames)
         {
-            run->length ^= run->length;
-            g_bitmap.search_end = g_bitmap.search_begin;
-            g_bitmap.search_begin = (g_bitmap.start + g_bitmap.lower_limit.byte_index);
-            sweep_avx_2(run, frames);
-            g_bitmap.search_end = g_bitmap.end;
+            run->length = 0;
+            sweep_avx_2(g_bitmap.start, g_bitmap.search_begin, frames, run);
         }
     }
 
@@ -1011,12 +728,17 @@ namespace
     struct simd_alloc_lut
     {
         simd_alloc_methods entries[simd_methods_size];
-        
+
         constexpr simd_alloc_lut() noexcept: entries{}
         {
             entries[gpr_flag] = find_contiguous_frames_32;
             entries[simd_flag] = find_contiguous_frames_sse2;
             entries[avx2_flag] = find_contiguous_frames_avx2;
+        }
+
+        simd_alloc_methods operator[](const size_t index) const noexcept
+        {
+            return entries[index];
         }
     };
 
@@ -1049,7 +771,7 @@ namespace
         set_gpr<uint8_t, set_bits::all_ones>(&start, end);
     }
 
-    [[gnu::target("sse2")]] [[gnu::regparm(2)]] 
+    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
     void set_frames_used_sse2(uint8_t* start, const uint8_t* const end) noexcept
     {
         const uintptr_t unaligbed_end{reinterpret_cast<uintptr_t>(end)};
@@ -1083,7 +805,7 @@ namespace
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
         set_gpr_inline<uint8_t, set_bits::all_ones>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
-        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)}; 
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
         set_gpr_inline<uint16_t, set_bits::all_ones>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
@@ -1168,7 +890,7 @@ namespace
         const void* temp_end{get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_2_byte) & ~mask_2_byte), aligned_end_2_byte_address)};
         set_gpr_inline<uint8_t, set_bits::all_zeros>(&start, reinterpret_cast<const uint8_t*>(temp_end));
 
-        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)}; 
+        const uintptr_t aligned_end_4_byte_address{(unaligbed_end & ~mask_4_byte)};
         temp_end = get_best_aligned_address(((reinterpret_cast<uintptr_t>(start) + mask_4_byte) & ~mask_4_byte), aligned_end_4_byte_address);
         set_gpr_inline<uint16_t, set_bits::all_zeros>(reinterpret_cast<uint16_t**>(&start), reinterpret_cast<const uint16_t*>(temp_end));
 
@@ -1194,7 +916,7 @@ namespace
     template<::set_bits Set>
     struct simd_set_lut
     {
-        simd_set_methods entries[::set_methods_size];
+        simd_set_methods entries[set_methods_size];
 
         constexpr simd_set_lut(): entries{}
         {
@@ -1211,12 +933,84 @@ namespace
                 entries[avx2_flag] = set_frames_free_avx2;
             }
         }
+
+        [[gnu::always_inline]]
+        constexpr simd_set_methods operator[](const size_t index) const noexcept
+        {
+            return entries[index];
+        }
     };
 
-    constexpr simd_set_lut<set_bits::all_ones> set_used_lut{};
-    constexpr simd_set_lut<set_bits::all_zeros> set_free_lut{};
+    constexpr simd_set_lut<set_bits::all_ones> set_range_used{};
+    constexpr simd_set_lut<set_bits::all_zeros> set_range_free{};
 
-    
+    [[gnu::always_inline]]
+    inline const uint8_t* find_free_byte(const uint8_t* begin, const uint8_t* const end) noexcept
+    {
+        for(; begin < end; ++begin)
+        {
+            if(*begin != 0xFF) return begin;
+        }
+        return nullptr;
+    }
+
+    // Precondition start < end, must be guarantied by caller
+    [[gnu::regparm(2)]]
+    void free_frame_range(const size_t start_frame, const size_t end_frame) noexcept
+    {
+        g_used_frames -= (end_frame - start_frame);
+        const size_t byte_start{bitmap_index(start_frame)};
+        const size_t inc_end_frame{end_frame - 1};
+        const size_t byte_end{bitmap_index(inc_end_frame)};
+        if(byte_start == byte_end)
+        {
+            const uint8_t mask{static_cast<uint8_t>((0xFF >> (byte_size - bit_position(start_frame))) | (0xFF << (bit_position(inc_end_frame) + 1)))};
+            g_bitmap.start[byte_end] &= mask;
+            return;
+        }
+        uint8_t* start{&g_bitmap.start[byte_start]};
+        uint8_t* end{&g_bitmap.start[byte_end]};
+        *start &= static_cast<uint8_t>(0xFF >> (byte_size - bit_position(start_frame)));
+        set_range_free[cpu::features::get()](start + 1, end);
+        *end &= static_cast<uint8_t>(0xFF << (bit_position(inc_end_frame) + 1));
+    }
+
+    // Precondition: start < end
+    [[gnu::regparm(2)]]
+    bool is_frame_range_used(const size_t start_frame, const size_t end_frame) noexcept
+    {
+        const size_t start_byte{bitmap_index(start_frame)};
+        const size_t inc_end_frame{end_frame - 1};
+        const size_t end_byte{bitmap_index(inc_end_frame)};
+        if(start_byte  == end_byte)
+        {
+            const uint8_t mask{static_cast<uint8_t>((0xFF << bit_position(start_frame)) & (0xFF >> (bit_max_pos - bit_position(inc_end_frame))))};
+            return (g_bitmap.start[start_byte] & mask) == mask;
+        }
+
+        const uint8_t front_mask{static_cast<uint8_t>(0xFF << bit_position(start_frame))};
+        if((g_bitmap.start[start_byte] & front_mask) != front_mask) return false;
+
+        const uint8_t* const end{&g_bitmap.start[end_byte]};
+        if(find_free_byte(&g_bitmap.start[start_byte + 1], end)) return false;
+
+        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - bit_position(inc_end_frame)))};
+        return (*end & end_mask) == end_mask;
+    }
+
+    struct reserved_vector
+    {
+        size_t base;
+        size_t length;
+    };
+
+    constexpr size_t reserved_vector_size{2};
+    constexpr size_t total_size_m1{(sizeof(reserved_vector) * reserved_vector_size) - 1};
+    constexpr size_t align_at(power::highest_of_2(total_size_m1) << 1);
+    alignas(align_at) reserved_vector g_reserved[reserved_vector_size];
+
+    constexpr size_t cache_line_size{64};
+    static_assert(align_at <= cache_line_size, "g_reserved must fit in one cache line");
 }
 
 namespace kernel::memory
@@ -1224,136 +1018,116 @@ namespace kernel::memory
     size_t pmm_total_frames() noexcept { return g_total_frames; }
     size_t pmm_used_frames() noexcept { return g_used_frames; }
     size_t pmm_free_frames() noexcept { return g_total_frames - g_used_frames; }
-    
-    [[gnu::regparm(2)]]
-    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_end) noexcept
+
+    [[gnu::regparm(3)]]
+    void pmm_initialize(const e820_memory_map* map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept
     {
         const e820_entry* const entries_end{map->entries + map->count};
         {
-            uintptr_t highest_address{0};
-            uintptr_t current{0};
+            uint64_t highest_address{0};
+            for(const e820_entry* entry{map->entries}; entry < entries_end; ++entry)
             {
-                bool greater{false};
-                for(const e820_entry* start{map->entries}; start < entries_end; ++start)
+                if(entry->type == e820_memory_type::usable)
                 {
-                    current = max(start);
-                    greater = (highest_address > current);
-                    highest_address = (highest_address * greater) + (current * !greater);
-                } 
+                    const uint64_t current{entry->base + entry->length};
+                    highest_address = cmp::max(highest_address, current);
+                }
             }
-            g_total_frames = (highest_address >> frame_size_bit_mask);
+
+            // accessable_frames == all frames including the frame 0
+            constexpr uintptr_t accessable_frames{(UINTPTR_MAX >> frame_shift) + 1};
+            g_total_frames = static_cast<size_t>(cmp::min((highest_address >> frame_shift), static_cast<uint64_t>(accessable_frames)));
         }
 
         g_bitmap.start = reinterpret_cast<uint8_t*>(kernel_end);
-        g_bitmap.end = g_bitmap.start + ((g_total_frames + 7) >> bit_size_byte_mask);
-        g_bitmap.search_end = g_bitmap.end;
-        
-        uint8_t* bitmap_current{g_bitmap.start};
-        const uint8_t* bitmap_end{g_bitmap.end};
-        const uint8_t features_flag{cpu::features::get()};
-        set_used_lut.entries[features_flag](bitmap_current, bitmap_end);
-        
+        g_bitmap.end = g_bitmap.start + bitmap_index(g_total_frames + 7);
+        g_bitmap.search_begin = g_bitmap.start;
+
+        // Set bit of the bitmap to 1 (used)
+        set_range_used[cpu::features::get()](g_bitmap.start, g_bitmap.end);
         g_used_frames = g_total_frames;
 
-        bit_n_byte pair{get_bit_n_byte(frame_index(reinterpret_cast<uintptr_t>(g_bitmap.end)))};
-        g_bitmap.search_begin = g_bitmap.start + pair.byte_index;
-        g_bitmap.lower_limit = pair;
-        
-        bit_n_byte end_byte{};
-        uint8_t* entry_end{nullptr};
-        size_t entry_start_index{0x00};
-        size_t entry_end_index{0x00};
-        constexpr uintptr_t frame_aligned_mask{frame_size - 1};
-        for(const e820_entry* current{map->entries}; current < entries_end; ++current)
+        // g_reserved[0].base is 0, because .init_bss(kernel_entry.S), already assigns 0
+        g_reserved[0].length = 1;
+        constexpr size_t frame_size_m1{frame_size - 1};
+        const size_t kernel_start_index{frame_index(kernel_start)};
+        const size_t kernel_end_index{frame_index((reinterpret_cast<uintptr_t>(g_bitmap.end) + frame_size_m1))};
+        g_reserved[1].base = kernel_start_index;
+        g_reserved[1].length = kernel_end_index - kernel_start_index;
+
+        const uint64_t promoted_total_frames{static_cast<uint64_t>(g_total_frames)};
+        for(const e820_entry* entry{map->entries}; entry < entries_end; ++entry)
         {
-            if(current->type == e820_memory_type::usable)
+            if(entry->type == e820_memory_type::usable)
             {
-                entry_start_index = frame_index(current->base + frame_aligned_mask);
-                entry_end_index = frame_index(max(current));
+                const uint64_t base{entry->base};
+                const uint64_t start_frame{cmp::min(((base + frame_size_m1) >> frame_shift), promoted_total_frames)};
+                const uint64_t end_frame{cmp::min(((base + entry->length) >> frame_shift), promoted_total_frames)};
 
-                if(entry_start_index >= entry_end_index) continue;
-                g_used_frames -= (entry_end_index - entry_start_index);
-
-                pair = get_bit_n_byte(entry_start_index);
-                end_byte = get_bit_n_byte(entry_end_index);
-                bitmap_current = (g_bitmap.start + pair.byte_index);
-
-                if(pair.byte_index == end_byte.byte_index)
+                if(start_frame < end_frame)
                 {
-                    *bitmap_current &= static_cast<uint8_t>((0xFF >> (bit_size_byte - pair.bit_index)) | (0xFF << (end_byte.bit_index)));
-                    continue;
-                }
-                
-                entry_end = (g_bitmap.start + end_byte.byte_index);
+                    size_t runner{static_cast<size_t>(start_frame)};
+                    const size_t u_end{static_cast<size_t>(end_frame)};
+                    for(size_t i{0}; i < reserved_vector_size; ++i)
+                    {
+                        const size_t reserved_start{g_reserved[i].base};
+                        const size_t piece_end{cmp::min(reserved_start, u_end)};
+                        if(runner < piece_end)
+                        {
+                            free_frame_range(runner, piece_end);
+                        }
+                        runner = cmp::max(runner, reserved_start + g_reserved[i].length);
+                    }
 
-                *bitmap_current &= static_cast<uint8_t>(0xFF >> (bit_size_byte - pair.bit_index));
-                set_free_lut.entries[features_flag](++bitmap_current, entry_end);
-                if(end_byte.bit_index != 0) *entry_end &= static_cast<uint8_t>(0xFF << end_byte.bit_index);
+                    if(runner < u_end) free_frame_range(runner, u_end);
+                }
             }
         }
-        
-        bitmap_current = g_bitmap.start; 
-        entry_end = (bitmap_current + g_bitmap.lower_limit.byte_index);
-        set_used_lut.entries[features_flag](bitmap_current, entry_end);
-        *entry_end |= (static_cast<uint8_t>(0xFF >> (bit_max_pos - g_bitmap.lower_limit.bit_index)));
-        g_used_frames += (g_bitmap.lower_limit.byte_index << bit_size_byte_mask) + (static_cast<size_t>(g_bitmap.lower_limit.bit_index) + 1);
     }
 
     void* pmm_allocate_frame() noexcept
     {
-        bit_n_byte pair{};
-        const uint8_t* current{g_bitmap.search_begin};
-        for(; current < g_bitmap.search_end; ++current)
+        const uint8_t* hint{g_bitmap.search_begin};
+        const uint8_t* byte_ptr{find_free_byte(hint, g_bitmap.end)};
+        if(!byte_ptr)
         {
-            if(*current != 0xFF)
-            {
-                pair.byte_index = static_cast<size_t>(current - g_bitmap.start);
-                pair.bit_index = dedicated_lut.entries[*current];
-                set_frame_used(&pair);
-                g_bitmap.search_begin = current + (*current == 0xFF);
-                return reinterpret_cast<void*>(frame_address((pair.byte_index << bit_size_byte_mask) + pair.bit_index));
-            } 
+            byte_ptr = find_free_byte(g_bitmap.start, hint);
+            if(!byte_ptr) return nullptr;
         }
-        
-        if(current == g_bitmap.end)
-        {
-            g_bitmap.search_end = g_bitmap.search_begin;
-            current = g_bitmap.start + g_bitmap.lower_limit.byte_index;
-            for(; current < g_bitmap.search_end; ++current)
-            {
-                if(*current != 0xFF)
-                {
-                    pair.byte_index = static_cast<size_t>(current - g_bitmap.start);
-                    pair.bit_index = dedicated_lut.entries[*current];
-                    set_frame_used(&pair);
-                    g_bitmap.search_begin = current + (*current == 0xFF);
-                    g_bitmap.search_end = g_bitmap.end;
-                    return reinterpret_cast<void*>(frame_address((pair.byte_index << bit_size_byte_mask) + pair.bit_index));
-                }
-            }
-            g_bitmap.search_end = g_bitmap.end;
-        }
-        return nullptr;
+
+        uint8_t value{*byte_ptr};
+        const uint8_t bit_index{builtin::trailing_zeros(static_cast<uint8_t>(~(value)))};
+
+        // byte_ptr always points inside g_bitmap, whose storage is writable.
+        // It is const only because search_begin is declared const, so casting it away is safe.
+        value = set_frame_used(const_cast<uint8_t*>(byte_ptr), value, bit_index);
+        g_bitmap.search_begin = byte_ptr + (value == 0xFF);
+        const size_t frame_pos{static_cast<size_t>((byte_ptr - g_bitmap.start) << bits_per_byte_shift)};
+        return reinterpret_cast<void*>(frame_address(frame_pos + bit_index));
     }
 
     [[gnu::regparm(1)]]
     pmm_result pmm_free_frame(const void* address) noexcept
     {
-        size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
-        
-        if(index >= g_total_frames) return pmm_result::hb_deny;
+        const size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
+
+        if(index >= g_total_frames) return pmm_result::out_of_range;
+
+        static_assert(reserved_vector_size == 2, "pmm_free_frame: overlap check is unrolled for 2 reserved regions, add a check for each new region");
+        bool on_reserved{(index - g_reserved[0].base < g_reserved[0].length)};
+        on_reserved |= (index - g_reserved[1].base < g_reserved[1].length);
+        if(on_reserved) return pmm_result::reserved;
 
         const bit_n_byte bitmap_frame_pos{get_bit_n_byte(index)};
+        uint8_t* byte_ptr{g_bitmap.start + bitmap_frame_pos.byte_index};
 
-        if(bitmap_frame_pos < g_bitmap.lower_limit) return pmm_result::lb_deny;
+        if(!is_frame_used(byte_ptr, bitmap_frame_pos.bit_index)) return pmm_result::failed;
+        set_frame_free(byte_ptr, bitmap_frame_pos.bit_index);
 
-        if(!is_frame_used(&bitmap_frame_pos)) return pmm_result::failed;
-        set_frame_free(&bitmap_frame_pos);
-
-        const uint8_t* const addr{g_bitmap.start + bitmap_frame_pos.byte_index};
-        const bool is_addr_less{addr < g_bitmap.search_end};
-        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_addr_less) + reinterpret_cast<uintptr_t>(addr) * is_addr_less);
-        
+        const uintptr_t addr{reinterpret_cast<uintptr_t>(g_bitmap.start + bitmap_frame_pos.byte_index)};
+        const uintptr_t sb_hint{reinterpret_cast<uintptr_t>(g_bitmap.search_begin)};
+        const uintptr_t mask{static_cast<uintptr_t>(-(addr < sb_hint))};
+        g_bitmap.search_begin = reinterpret_cast<const uint8_t*>((addr & mask) | (sb_hint & ~mask));
         return pmm_result::success;
     }
 
@@ -1367,59 +1141,95 @@ namespace kernel::memory
 
         if(run.length < frames) return nullptr;
 
-        const uintptr_t start_address{(run.start_index.byte_index << bit_size_byte_mask) + run.start_index.bit_index};
-        const bit_n_byte end_byte{get_bit_n_byte(start_address + frames - 1)};
-
-        uint8_t* set_start{g_bitmap.start + run.start_index.byte_index};
-        uint8_t* const set_end{g_bitmap.start + end_byte.byte_index};
-
-        const uint8_t front_mask{static_cast<uint8_t>(0xFF << run.start_index.bit_index)};
-        const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - end_byte.bit_index))};
-
-        if(run.start_index.byte_index == end_byte.byte_index) *set_start |= (front_mask & end_mask);
+        const size_t byte_start{bitmap_index(run.start_frame)};
+        const size_t inc_end_frame{run.start_frame + frames - 1};
+        const size_t byte_end{bitmap_index(inc_end_frame)};
+        uint8_t* const end{&g_bitmap.start[byte_end]};
+        uint8_t value{*end};
+        if(byte_start == byte_end)
+        {
+            const uint8_t front_mask{static_cast<uint8_t>(0xFF << bit_position(run.start_frame))};
+            const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - bit_position(inc_end_frame)))};
+            const uint8_t mask{static_cast<uint8_t>(front_mask & end_mask)};
+            value |= mask;
+        }
         else
         {
-            *set_start |= front_mask;
-            set_used_lut.entries[cpu::features::get()](++set_start, set_end);
-            *set_end |= end_mask;
+            uint8_t* start{&g_bitmap.start[byte_start]};
+            const uint8_t front_mask{static_cast<uint8_t>(0xFF << bit_position(run.start_frame))};
+            *start |= front_mask;
+
+            set_range_used[cpu::features::get()](start + 1, end);
+            const uint8_t end_mask{static_cast<uint8_t>(0xFF >> (bit_max_pos - bit_position(inc_end_frame)))};
+            value |= end_mask;
         }
-        
+
+        *end = value;
         g_used_frames += frames;
-        g_bitmap.search_begin = set_end + (*set_end == 0xFF);
-        return reinterpret_cast<void*>(frame_address(start_address));
+        g_bitmap.search_begin = end + (value == 0xFF);
+        return reinterpret_cast<void*>(frame_address(run.start_frame));
     }
-        
-    [[gnu::regparm(2)]] 
+
+    [[gnu::regparm(2)]]
     pmm_result pmm_free_contiguous_frames(const void* address, const size_t frames) noexcept
     {
         if(frames == 0) return pmm_result::zero_frames;
 
         const size_t index{frame_index(reinterpret_cast<uintptr_t>(address))};
-        if(index >= g_total_frames) return pmm_result::hb_deny;
+        const size_t total_frames_cpy{g_total_frames};
+        if((index >= total_frames_cpy) | (frames > (total_frames_cpy - index))) return pmm_result::out_of_range;
 
-        const bit_n_byte start_byte{get_bit_n_byte(index)};
+        static_assert(reserved_vector_size == 2, "pmm_free_contiguous_frames: overlap check is unrolled for 2 reserved regions, add a check for each new region");
 
-        if(start_byte < g_bitmap.lower_limit) return pmm_result::lb_deny;
+        const size_t r1_base{g_reserved[0].base};
+        bool on_reserved{(index - r1_base) < g_reserved[0].length};
+        on_reserved |= ((r1_base - index) < frames);
 
-        const bit_n_byte end_byte{get_bit_n_byte(index + frames - 1)};
+        const size_t r2_base{g_reserved[1].base};
+        on_reserved |= ((index - r2_base) < g_reserved[1].length);
+        on_reserved |= ((r2_base - index) < frames);
+        if(on_reserved) return pmm_result::reserved;
 
-        uint8_t* free_start{g_bitmap.start + start_byte.byte_index};
-        uint8_t* const end{g_bitmap.start + end_byte.byte_index};
+        const size_t excluded_end_frame{index + frames};
+        if(!is_frame_range_used(index, excluded_end_frame)) return pmm_result::failed;
+        free_frame_range(index, excluded_end_frame);
 
-        const uint8_t front_mask{static_cast<uint8_t>(0xFF >> (bit_size_byte - start_byte.bit_index))};
-        const uint8_t back_mask{static_cast<uint8_t>(0xFF << (end_byte.bit_index + 1))};
-
-        if(start_byte.byte_index == end_byte.byte_index) *free_start &= (front_mask | back_mask);
-        else
-        {
-            *free_start &= front_mask;
-            set_free_lut.entries[cpu::features::get()](free_start + 1, end);
-            *end &= back_mask;
-        }
-
-        const bool is_free_start_less{free_start < g_bitmap.search_begin};
-        g_bitmap.search_begin = reinterpret_cast<uint8_t*>((reinterpret_cast<uintptr_t>(g_bitmap.search_begin) * !is_free_start_less) + reinterpret_cast<uintptr_t>(free_start) * is_free_start_less);
-        g_used_frames -= frames;
+        const uintptr_t search_candidate{reinterpret_cast<uintptr_t>(&g_bitmap.start[index >> bits_per_byte_shift])};
+        const uintptr_t sb_hint{reinterpret_cast<uintptr_t>(g_bitmap.search_begin)};
+        const uintptr_t mask{static_cast<uintptr_t>(-(search_candidate < sb_hint))};
+        g_bitmap.search_begin = reinterpret_cast<const uint8_t*>((search_candidate & mask) | (sb_hint & ~mask));
         return pmm_result::success;
+    }
+
+    namespace test
+    {
+        // Changes bitmap values without restoring them
+        void allocate_8_frames() noexcept
+        {
+            *g_bitmap.start = 0x0F;
+            g_bitmap.start[1] = 0xF0;
+            const uint8_t* curr{g_bitmap.start};
+
+            allocation_run run{};
+            constexpr size_t frames{8};
+            contiguous_8_core(&run, frames, (curr + 2), &curr);
+            terminal::output out{};
+
+            if(run.length >= frames) out << "Found\n";
+            else out << "Not Found\n";
+
+            const bit_n_byte start{get_bit_n_byte(run.start_frame)};
+            const bit_n_byte end{get_bit_n_byte(run.start_frame + frames - 1)};
+            out << "Frames: " << frames
+            << "\nLength: " << run.length
+            << "\nStart value: " << terminal::hex << *g_bitmap.start << terminal::dec
+            << "\nByte index: " << start.byte_index
+            << "\nBit index: " << start.bit_index;
+
+            out << "\n\nEnd value: " << terminal::hex << g_bitmap.start[1] << terminal::dec
+            << "\nByte end: " << end.byte_index
+            << "\nBit end: " << end.bit_index
+            << "\nCurrent Finished: " << static_cast<size_t>(curr - g_bitmap.start);
+        }
     }
 }

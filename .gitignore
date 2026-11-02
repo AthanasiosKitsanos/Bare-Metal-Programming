@@ -1,5 +1,7 @@
 bin
 obj
 .vscode
+.zed
 elf
 lib
+.clangd

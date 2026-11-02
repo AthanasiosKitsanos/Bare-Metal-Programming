@@ -19,30 +19,30 @@ constexpr const char* undepended_interrupt_methods[] =
 {
     "_ZN6kernel22handle_timer_interruptEPNS_15interrupt_frameE",
     "_ZN6driver8keyboard25handle_keyboard_interruptEPN6kernel15interrupt_frameE",
-    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_sse_2EPVmtm",
-    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_avx_2EPVmtm",
-    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_fillEPVmtm",
-    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_sse_2_copyEPVKmPVmt",
-    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_avx_2_copyEPVKmPVmt",
-    "utilities/vga/vga_text_buffer/terminal_vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_copyEPVKmPVmt",
+    "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_sse_2EPVmtm",
+    "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L9use_avx_2EPVmtm",
+    "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_fillEPVmtm",
+    "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_sse_2_copyEPVKmPVmt",
+    "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L14use_avx_2_copyEPVKmPVmt",
+    "io/vga_text_buffer.cpp:_ZN12_GLOBAL__N_1L13fallback_copyEPVKmPVmt",
     "_ZN8terminal3decERNS_6outputE",
     "_ZN8terminal3hexERNS_6outputE", 
     "_ZN8terminal10bool_alphaERNS_6outputE",
     "_ZN8terminal13bool_no_alphaERNS_6outputE",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh",
-    "kernel/memory/pmm/kernel_pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh"
+    "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L25find_contiguous_frames_32EPNS_14allocation_runEm",
+    "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_sse2EPNS_14allocation_runEm",
+    "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L27find_contiguous_frames_avx2EPNS_14allocation_runEm",
+    "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L18set_frames_free_32EPhPKh",
+    "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_sse2EPhPKh",
+    "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L20set_frames_free_avx2EPhPKh"
 
 };
 
 constexpr uint32_t depended_interrupt_methods_size{2};
 constexpr const char* depended_interrupt_methods[depended_interrupt_methods_size] =
 {
-    "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE",
-    "kernel/exceptions/kernel_exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE"
+    "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE",
+    "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE"
 };
 
 [[gnu::always_inline]]
@@ -147,7 +147,7 @@ uint64_t get_interrupt_stack_size() noexcept
         catch(std::exception& ex)
         {
             std::cout << ex.what() << '\n'
-            << *current_interrupt << " does not exist\n";
+            << *current_interrupt << " does not exist\n\n";
         }
     }
     
@@ -164,7 +164,7 @@ uint64_t get_interrupt_stack_size() noexcept
         catch(std::exception& ex)
         {
             std::cout << ex.what() << '\n'
-            << *current_interrupt << " does not exist\n";
+            << *current_interrupt << " does not exist\n\n";
         }
     }
     indirect_call->frame_size = static_cast<uint32_t>(stack_size);

@@ -1,6 +1,7 @@
 _interrupt_preamble_size = 52;
 _kernel_stack_size = _kernel_raw_stack + _interrupt_preamble_size;
 _interrupt_stack_size = _interrupt_raw_stack + (_interrupt_raw_stack + _interrupt_preamble_size) * 17;
+_kernel_size = _bss_start - _kernel_start;
 
 ENTRY(kernel_entry)
 

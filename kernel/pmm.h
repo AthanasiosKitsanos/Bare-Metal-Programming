@@ -5,21 +5,21 @@
 
 namespace kernel::memory
 {
-    constexpr size_t frame_size{4096};
-
     struct e820_memory_map;
 
     enum class pmm_result: uint8_t
     {
         success = 0x00,
         failed = 0x01,
-        lb_deny = 0x02,
-        hb_deny = 0x03,
+        reserved = 0x02,
+        out_of_range = 0x03,
         zero_frames = 0x04
     };
 
-    [[gnu::regparm(2)]]
-    void pmm_initialize(const e820_memory_map* map, const uintptr_t kenrel_end) noexcept;
+    [[gnu::regparm(3)]]
+    void pmm_initialize(const e820_memory_map *map, const uintptr_t kernel_start, const uintptr_t kernel_end) noexcept;
+
+    void NewFunction(size_t i);
 
     void* pmm_allocate_frame() noexcept;
 
@@ -35,4 +35,9 @@ namespace kernel::memory
     size_t pmm_total_frames() noexcept;
     size_t pmm_used_frames() noexcept;
     size_t pmm_free_frames() noexcept;
+
+    namespace test
+    {
+        void allocate_8_frames() noexcept;
+    }
 }

@@ -17,8 +17,11 @@ namespace kernel
     [[gnu::regparm(1)]]
     void handle_timer_interrupt(interrupt_frame* frame) noexcept
     {
+        // Interrupt Gate of type 0xE makes IF(Interrupt Flag) zero
+        // meaning no other interrupt comes between read and write
         static_cast<void>(frame);
-        ++g_timer_ticks;
+        const uint32_t ticks_snapshot{g_timer_ticks + 1};
+        g_timer_ticks = ticks_snapshot;
     }
 
     void set_timer_frequency(uint32_t frequency) noexcept { g_timer_frequency = frequency; }
