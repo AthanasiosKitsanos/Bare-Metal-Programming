@@ -18,7 +18,9 @@ namespace tools
             char data[N];
 
             [[gnu::always_inline]]
-            constexpr explicit fixed_string(const char (&source)[N]) noexcept: fixed_string(source, sequence::make_index_list<N>{})
+            constexpr inline explicit fixed_string(const char (&source)[N]) noexcept: fixed_string(source, sequence::make_index_list<N>{})
             {}
+
+
     };
 }
