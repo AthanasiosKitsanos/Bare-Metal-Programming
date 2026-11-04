@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stddef.h>
+#include <stdint.h>
 #include "tools/fixed_string.h"
 
 namespace terminal::format_parser
@@ -78,5 +79,20 @@ namespace terminal::format_parser
         }
         s_vault[slice] = str_slice{slice_base, fmt_size - slice_base - 1};
         return s_vault;
+    }
+
+    template<tools::fixed_string Fmt, size_t Size>
+    consteval size_t get_max_index() noexcept
+    {
+        size_t mask{static_cast<size_t>(-(sizeof(Size) == sizeof(uint32_t)))};
+        return (((sizeof(slice_string<Fmt>().slices) >> 3) - 1) & mask) | (((sizeof(slice_string<Fmt>().slices) >> 4) - 1) & ~mask);
+    }
+
+    template<tools::fixed_string Fmt, size_t I>
+    consteval tools::fixed_string<slice_string<Fmt>()[I].length + 1> sub_string() noexcept
+    {
+        const size_t max_index{get_max_index<Fmt, I>()};
+        static_assert(I <= max_index, "index out of bounts");
+
     }
 }
