@@ -15,12 +15,12 @@ namespace tools
         {}
 
         public:
-            char data[N];
+            static constexpr size_t size{N};
+            char data[size];
 
+            //  No explicit: template parameter initialized through copy
             [[gnu::always_inline]]
-            constexpr inline explicit fixed_string(const char (&source)[N]) noexcept: fixed_string(source, sequence::make_index_list<N>{})
+            constexpr inline fixed_string(const char (&source)[N]) noexcept: fixed_string(source, sequence::make_index_list<N>{})
             {}
-
-
     };
 }
