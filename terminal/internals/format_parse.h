@@ -95,8 +95,35 @@ namespace terminal::format_parser
     template<tools::fixed_string Fmt, size_t I>
     struct sub_string
     {
-        using layout = format_layout<Fmt>;
-        static_assert(I < layout::placeholders_count, "sub_string: index template parameter out of bounds");
-        static constexpr size_t sub_size{layout::slices[I].length};
+        public:
+            using layout = format_layout<Fmt>;
+            static_assert(I < layout::slices_count, "sub_string: index template parameter out of bounds");
+            static constexpr size_t base{layout::slices[I].base};
+            static constexpr size_t sub_size{layout::slices[I].length};
+
+        private:
+            consteval static tools::fixed_string<sub_size + 1> create_sub_string() noexcept
+            {
+                constexpr size_t temp_size{sub_size + 1};
+                char buffer[temp_size]{}; // Initializing a char array with brackets, zeros the array '\0'
+                for(size_t j{0}; j < temp_size - 1; ++j)
+                {
+                    buffer[j] = Fmt.data[base + j];
+                }
+                return buffer;
+            }
+
+        public:
+            static constexpr tools::fixed_string<sub_size + 1> string{create_sub_string()};
     };
+
+
+    constexpr tools::fixed_string str{"ab{}cd"};
+    using sub_1 = sub_string<str, 0>;
+    static_assert(sub_1::sub_size == 2);
+    static_assert(sub_1::string.data[0] == 'a' && sub_1::string.data[1] == 'b');
+
+    using sub_2 = sub_string<str, 1>;
+    static_assert(sub_2::sub_size == 2);
+    static_assert(sub_2::string.data[0] == 'c' && sub_2::string.data[1] == 'd');
 }
