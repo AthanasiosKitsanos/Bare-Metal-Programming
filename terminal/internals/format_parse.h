@@ -6,124 +6,123 @@
 
 namespace terminal::format_parser
 {
-    struct str_slice
+    enum class output_type: uint8_t
     {
-        size_t base;
-        size_t length;
+        plain_text = 0,
+        argument = 1
     };
 
-    template<size_t Slices>
-    struct str_slice_vault
+    enum class representation: uint8_t
     {
-        static_assert(Slices >= 1, "Vault must have at least one slice of text");
-        str_slice slices[Slices];
+        dec = 0,
+        hex = 1,
+        bin = 2,
+        lex = 3
+    };
 
-        [[gnu::always_inline]]
-        constexpr inline str_slice& operator[](const size_t index) noexcept
+    struct token
+    {
+        size_t base{0};
+        size_t length{0};
+        output_type o_type{output_type::plain_text};
+        representation rep{representation::dec};
+    };
+    static_assert(sizeof(token) == 12);
+
+    enum class lexeme_kind: uint8_t
+    {
+        simple_character = 0,
+        argument_placeholder = 1,
+        escape = 2,
+        wrong_syntax = 3
+    };
+
+    struct report
+    {
+        uint8_t width{1};
+        lexeme_kind kind{lexeme_kind::simple_character};
+        representation rep{representation::dec};
+    };
+
+    // Recognizes the lexeme that starts at 'index'. Does not loop.
+    //
+    // Bounds safety relies on two rules working together:
+    //   1. Caller contract: index <= N - 2 (only real characters, never the '\0').
+    //      Therefore index + 1 <= N - 1, so reading data[index + 1] is always in bounds.
+    //   2. Sentinel: data[N - 1] is always '\0'. data[index + 2] is read only when
+    //      data[index + 1] is a specifier letter ('h', 'b', 'l'). A letter is not '\0',
+    //      so index + 1 <= N - 2, which means index + 2 <= N - 1, still in bounds.
+
+    // Changing the caller's loop bound or the order of the reads breaks this proof.
+    template<size_t N>
+    consteval report write_report(const tools::fixed_string<N> Fmt, const size_t index) noexcept
+    {
+        if(Fmt.data[index] != '{' && Fmt.data[index] != '}') return report{};
+        if(Fmt.data[index] == '{')
         {
-            return slices[index];
+            switch(Fmt.data[index + 1])
+            {
+                case '{':
+                    return report{2, lexeme_kind::escape};
+                case '}':
+                    return report{2, lexeme_kind::argument_placeholder};
+                case 'h':
+                    if(Fmt.data[index + 2] == '}') return report{3, lexeme_kind::argument_placeholder, representation::hex};
+                    break;
+                case 'b':
+                    if(Fmt.data[index + 2] == '}') return report{3, lexeme_kind::argument_placeholder, representation::bin};
+                    break;
+                case 'l':
+                    if(Fmt.data[index + 2] == '}') return report{3, lexeme_kind::argument_placeholder, representation::lex};
+                    break;
+                default:
+                    break;
+            }
+            return report{0, lexeme_kind::wrong_syntax};
         }
+        if(Fmt.data[index] == '}' && Fmt.data[index + 1] == '}') return report{2, lexeme_kind::escape};
+        return report{0, lexeme_kind::wrong_syntax};
+    }
+
+    template<size_t Capacity>
+    struct token_collection
+    {
+        static_assert(Capacity > 0, "The token collection needs at least 1 element");
+        token entries[Capacity];
+        size_t counter{0};
 
         [[gnu::always_inline]]
-        constexpr inline const str_slice operator[](const size_t index) const noexcept
+        token& operator[](const size_t index) noexcept
         {
-            return slices[index];
+            return entries[index];
         }
     };
 
     template<size_t N>
-    consteval size_t count_args_slots(const tools::fixed_string<N> str) noexcept
+    consteval token_collection<N - 1> generate_token_collection(const tools::fixed_string<N> Fmt) noexcept
     {
-        static_assert(N >= 2, "count_args_slots: fixed string must be greater than 1, since \\0 counts as 1 character");
-        size_t counter{0};
-        for(size_t i{0}; i < (N - 2); ++i)
+        static_assert(N >= 2, "String must not be empty");
+        const size_t end{N - 1};
+        token_collection<end> collection{};
+        size_t text_start{0};
+        for(size_t i{0}; i < end;)
         {
-            bool condition{(str.data[i] == '{')};
-            condition &= (str.data[i + 1] == '}');
-            if(condition)
+            report rpt{write_report(Fmt, i)};
+            output_type type{};
+            switch(rpt.kind)
             {
-                ++counter;
-                ++i;
+                case lexeme_kind::argument_placeholder:
+                    text_start = i + rpt.width;
+                    break;
+                case lexeme_kind::escape:
+                    text_start = i + 1;
+                    break;
+                default:
+                    break;
             }
+            collection[collection.counter++ ] = token{text_start, end - i + rpt.width, ,rpt.rep};
+            i += rpt.width;
         }
-        return counter;
+        return collection;
     }
-
-    template<tools::fixed_string Fmt>
-    struct format_layout;
-
-    template<tools::fixed_string Fmt>
-    consteval str_slice_vault<format_layout<Fmt>::slices_count> slice_string() noexcept
-    {
-        static_assert(Fmt.size >= 2, "slice_string: fixed string must be greater than 1, since \\0 counts as 1 character");
-        str_slice_vault<format_layout<Fmt>::slices_count> s_vault{};
-        size_t slice{0};
-        size_t slice_base{0};
-
-        constexpr size_t fmt_end{Fmt.size - 2};
-        for(size_t i{0}; i < fmt_end; ++i)
-        {
-            bool condition{(Fmt.data[i] == '{')};
-            condition &= (Fmt.data[i + 1] == '}');
-            if(condition)
-            {
-                s_vault[slice] = str_slice{slice_base, i - slice_base};
-                ++slice;
-                ++i;
-                slice_base = i + 1;
-            }
-        }
-        s_vault[slice] = str_slice{slice_base, Fmt.size - slice_base - 1};
-        return s_vault;
-    }
-
-    template<tools::fixed_string Fmt>
-    struct format_layout
-    {
-        // Slots and slice_count are not depended from slices and slice_string
-        static constexpr size_t placeholders_count{count_args_slots(Fmt)};
-        static constexpr size_t slices_count{placeholders_count + 1};
-        static constexpr str_slice_vault<slices_count> slices{slice_string<Fmt>()};
-
-        [[gnu::always_inline]]
-        constexpr inline const str_slice operator[](const size_t index) const noexcept
-        {
-            return slices[index];
-        }
-    };
-
-    template<tools::fixed_string Fmt, size_t I>
-    struct sub_string
-    {
-        public:
-            using layout = format_layout<Fmt>;
-            static_assert(I < layout::slices_count, "sub_string: index template parameter out of bounds");
-            static constexpr size_t base{layout::slices[I].base};
-            static constexpr size_t sub_size{layout::slices[I].length};
-
-        private:
-            consteval static tools::fixed_string<sub_size + 1> create_sub_string() noexcept
-            {
-                constexpr size_t temp_size{sub_size + 1};
-                char buffer[temp_size]{}; // Initializing a char array with brackets, zeros the array '\0'
-                for(size_t j{0}; j < temp_size - 1; ++j)
-                {
-                    buffer[j] = Fmt.data[base + j];
-                }
-                return buffer;
-            }
-
-        public:
-            static constexpr tools::fixed_string<sub_size + 1> string{create_sub_string()};
-    };
-
-
-    constexpr tools::fixed_string str{"ab{}cd"};
-    using sub_1 = sub_string<str, 0>;
-    static_assert(sub_1::sub_size == 2);
-    static_assert(sub_1::string.data[0] == 'a' && sub_1::string.data[1] == 'b');
-
-    using sub_2 = sub_string<str, 1>;
-    static_assert(sub_2::sub_size == 2);
-    static_assert(sub_2::string.data[0] == 'c' && sub_2::string.data[1] == 'd');
 }
