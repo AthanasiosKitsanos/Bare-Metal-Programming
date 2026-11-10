@@ -31,16 +31,15 @@ namespace terminal::format_parser
 
     enum class lexeme_kind: uint8_t
     {
-        simple_character = 0,
+        wrong_syntax = 0,
         argument_placeholder = 1,
-        escape = 2,
-        wrong_syntax = 3
+        escape = 2
     };
 
     struct report
     {
-        uint8_t width{1};
-        lexeme_kind kind{lexeme_kind::simple_character};
+        uint8_t width{0};
+        lexeme_kind kind{lexeme_kind::wrong_syntax};
         representation rep{representation::dec};
     };
 
@@ -55,9 +54,8 @@ namespace terminal::format_parser
 
     // Changing the caller's loop bound or the order of the reads breaks this proof.
     template<size_t N>
-    consteval report write_report(const tools::fixed_string<N> Fmt, const size_t index) noexcept
+    consteval report locate_characteristics(const tools::fixed_string<N> Fmt, const size_t index) noexcept
     {
-        if(Fmt.data[index] != '{' && Fmt.data[index] != '}') return report{};
         if(Fmt.data[index] == '{')
         {
             switch(Fmt.data[index + 1])
@@ -78,10 +76,10 @@ namespace terminal::format_parser
                 default:
                     break;
             }
-            return report{0, lexeme_kind::wrong_syntax};
+            return report{};
         }
         if(Fmt.data[index] == '}' && Fmt.data[index + 1] == '}') return report{2, lexeme_kind::escape};
-        return report{0, lexeme_kind::wrong_syntax};
+        return report{};
     }
 
     template<size_t Capacity>
@@ -92,7 +90,13 @@ namespace terminal::format_parser
         size_t counter{0};
 
         [[gnu::always_inline]]
-        token& operator[](const size_t index) noexcept
+        constexpr token& operator[](const size_t index) noexcept
+        {
+            return entries[index];
+        }
+
+        [[gnu::always_inline]]
+        constexpr const token& operator[](const size_t index) const noexcept
         {
             return entries[index];
         }
@@ -102,27 +106,44 @@ namespace terminal::format_parser
     consteval token_collection<N - 1> generate_token_collection(const tools::fixed_string<N> Fmt) noexcept
     {
         static_assert(N >= 2, "String must not be empty");
-        const size_t end{N - 1};
+        // variable end points to the termination character '\0'
+        constexpr size_t end{N - 1};
         token_collection<end> collection{};
         size_t text_start{0};
+        const auto close_text = [&](const size_t stop)
+        {
+                if(stop > text_start)
+                {
+                    collection[collection.counter++] = token{text_start, (stop - text_start), output_type::plain_text};
+                }
+        };
+
         for(size_t i{0}; i < end;)
         {
-            report rpt{write_report(Fmt, i)};
-            output_type type{};
+            const char c{Fmt.data[i]};
+            if(c != '{' && c != '}')
+            {
+                ++i;
+                continue;
+            }
+            close_text(i);
+            report rpt{locate_characteristics(Fmt, i)};
             switch(rpt.kind)
             {
                 case lexeme_kind::argument_placeholder:
+                    collection[collection.counter++] = token{0, 0, output_type::argument, rpt.rep};
                     text_start = i + rpt.width;
                     break;
                 case lexeme_kind::escape:
                     text_start = i + 1;
                     break;
-                default:
-                    break;
+                case lexeme_kind::wrong_syntax:
+                    // TODO implement compile error for layer 5
+                    return collection;
             }
-            collection[collection.counter++ ] = token{text_start, end - i + rpt.width, ,rpt.rep};
             i += rpt.width;
         }
+        close_text(end);
         return collection;
     }
 }
