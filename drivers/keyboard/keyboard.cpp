@@ -3,7 +3,7 @@
 #include "io/io_registers.h"
 #include "../internal/keyboard_key_list_n_map.h"
 #include "kernel/internal/interrupt_frame.h"
-#include "kernel/internal/interrupt_guard.h"
+#include "cpu/interrupt_guard.h"
 #include "kernel/logger.h"
 
 namespace
@@ -311,24 +311,24 @@ namespace driver::keyboard
 
     modifier_state current_keyboard_modifier_state() noexcept
     {
-        kernel::interrupt_guard guard{};
+        cpu::interrupt_guard guard{};
         return g_modifier_state;
     }
 
     [[gnu::regparm(1)]]
     bool poll_keyboard_event(keyboard_event* out_event) noexcept
     {
-        kernel::interrupt_guard guard{};
+        cpu::interrupt_guard guard{};
         if(g_keyboard_event_queue.count == 0) return false;
         *out_event = g_keyboard_event_queue.entries[g_keyboard_event_queue.head];
         g_keyboard_event_queue.head = next_keyboard_event(g_keyboard_event_queue.head);
         --g_keyboard_event_queue.count;
         return true;
     }
-    
+
     uint8_t has_pending_keyboard_event() noexcept
     {
-        kernel::interrupt_guard guard{};
+        cpu::interrupt_guard guard{};
         return g_keyboard_event_queue.count;
     }
 }

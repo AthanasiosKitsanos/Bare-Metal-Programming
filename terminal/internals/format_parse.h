@@ -107,6 +107,7 @@ namespace terminal::format_parser
         static_assert(Capacity > 0, "token_collection: collection must have at least 1 element");
         token entries[Capacity];
         size_t counter{0};
+        size_t total_arguments{0};
 
         [[gnu::always_inline]]
         constexpr token& operator[](const size_t index) noexcept { return entries[index]; }
@@ -148,6 +149,7 @@ namespace terminal::format_parser
                 case lexeme_kind::argument_placeholder:
                     collection[collection.counter++] = token{0, 0, output_type::argument, rpt.rep};
                     text_start = i + rpt.width;
+                    ++collection.total_arguments;
                     break;
                 case lexeme_kind::escape:
                     text_start = i + 1;
@@ -180,6 +182,7 @@ namespace terminal::format_parser
 
         public:
             static constexpr size_t size{temp_collection.counter};
+            static constexpr size_t total_arguments{temp_collection.argument_count};
 
         private:
             token entries[size];
@@ -196,5 +199,8 @@ namespace terminal::format_parser
 
             [[gnu::always_inline]]
             constexpr const token& operator[](const size_t index) const noexcept { return entries[index]; }
+
+            [[gnu::always_inline]]
+            constexpr token operator[](const size_t index) noexcept { return entries[index]; }
     };
 }

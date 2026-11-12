@@ -208,7 +208,7 @@ namespace terminal
             template<size_t N>
             output& operator<<(const char (&text)[N]) noexcept
             {
-                write_string_no_sync(text);
+            write_string_no_sync(text);
                 sync_cursor();
                 return *this;
             }

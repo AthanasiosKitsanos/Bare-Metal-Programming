@@ -44,7 +44,7 @@ namespace io
         uint8_t row;
         uint8_t column;
         color_code active_color;
-        
+
         [[gnu::always_inline]]
         inline static volatile uint16_t* begin() noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE); }
 
@@ -52,7 +52,7 @@ namespace io
         inline static volatile uint32_t* begin_32() noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE); }
 
         [[gnu::always_inline]]
-        constexpr static inline color_code make_color(vga_color foreground, vga_color background) noexcept 
+        constexpr static inline color_code make_color(vga_color foreground, vga_color background) noexcept
         {
             return static_cast<color_code>(foreground) | (static_cast<color_code>(background) << 4);
         }
@@ -82,7 +82,7 @@ namespace io
             // Public Methods
             void clear() noexcept;
 
-            [[gnu::regparm(2)]]
+        [[gnu::regparm(2)]]
             void put(char c) noexcept;
 
             [[gnu::regparm(1)]]

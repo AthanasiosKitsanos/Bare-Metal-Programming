@@ -2,7 +2,7 @@
 #include "timer.h"
 #include "logger.h"
 #include "internal/interrupt_frame.h"
-#include "internal/interrupt_guard.h"
+#include "cpu/interrupt_guard.h"
 
 namespace
 {
@@ -39,7 +39,7 @@ namespace kernel
     {
         constexpr uint32_t interrupt_flag{1u << 9};
         const uint32_t start{g_timer_ticks};
-        bool was_enabled{static_cast<bool>(kernel::read_eflags() & interrupt_flag)};
+        bool was_enabled{static_cast<bool>(cpu::read_eflags() & interrupt_flag)};
         while((g_timer_ticks - start) < ticks) asm volatile("sti; hlt");
         if(!was_enabled) asm volatile("cli");
     }

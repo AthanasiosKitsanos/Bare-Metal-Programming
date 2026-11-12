@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-namespace kernel
+namespace cpu
 {
     [[gnu::always_inline]]
     inline uint32_t read_eflags() noexcept
@@ -30,15 +30,13 @@ namespace kernel
         bool was_enabled;
 
         public:
-            interrupt_guard() noexcept: was_enabled((read_eflags() & interrupt_flag) != 0)
+            [[nodiscard]]
+            explicit interrupt_guard() noexcept: was_enabled((read_eflags() & interrupt_flag) != 0)
             {
                 disable_interrupts();
             }
 
-            ~interrupt_guard() noexcept
-            {
-                if(was_enabled) enable_interrupts();
-            }
+            ~interrupt_guard() noexcept { if(was_enabled) enable_interrupts(); }
 
             interrupt_guard(const interrupt_guard&) = delete;
             interrupt_guard& operator=(const interrupt_guard&) = delete;
