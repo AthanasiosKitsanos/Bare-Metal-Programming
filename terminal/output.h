@@ -4,6 +4,7 @@
 #include "io/hardware_cursor.h"
 #include <stddef.h>
 #include <stdint.h>
+#include "tools/builtin.h"
 
 enum class integer_base: uint8_t
 {
@@ -77,12 +78,11 @@ namespace terminal
                     break;
                 default:
                     io::vga_text_buffer::put(c);
-
             }
         }
 
         [[gnu::always_inline]]
-        inline static void sync_cursor() noexcept { io::hardware_cursor::set_position(io::vga_text_buffer::get_position()); }
+        inline static void sync_cursor() noexcept { io::hardware_cursor::set_position(io::vga_text_buffer::get_position(builtin::convert_type<uint32_t>(io::vga_text_buffer::state))); }
 
         [[gnu::always_inline]]
         inline void line_start() noexcept { io::vga_text_buffer::line_start(); }

@@ -4,7 +4,7 @@
 namespace
 {
     constexpr size_t total_entries{256};
-    kernel::idt_entry idt_entry_table[total_entries]; // 0 - 255
+    constinit kernel::idt_entry idt_entry_table[total_entries]{}; // 0 - 255
 }
 
 namespace kernel

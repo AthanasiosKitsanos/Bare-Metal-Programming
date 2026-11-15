@@ -93,4 +93,4 @@ clean:
 	rm -f elf/*
 	rm -f lib/*.a
 	rm -f ci_files/*
-	rm -f dism/*
+	rm -rf dism/*

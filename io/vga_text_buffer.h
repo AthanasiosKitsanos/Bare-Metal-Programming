@@ -56,15 +56,19 @@ namespace io
 
         inline static constinit state_t state{.column = 0, .row = 0, .base_row = 0, .active_color = default_color};
 
-        static void clear_row() noexcept;
         static void clear() noexcept;
         static void move_forward() noexcept;
         static void remove_last_char() noexcept;
         static void move_backwards() noexcept;
         static state_t move_to_next_line() noexcept;
 
-        [[gnu::regparm(1)]]
-        static uint32_t reset(state_t state) noexcept;
+        // No inline to avoid inlining inside a hotpath and taking more bytes in L1i  cache lines
+        // Called about once per 14400 characters and more often when lines are cut short by '\n', hence cold.
+        [[gnu::noinline]] [[gnu::regparm(1)]] [[gnu::cold]]
+        static uint32_t reset(uint32_t) noexcept;
+
+        [[gnu::noinline]] [[gnu::regparm(1)]]
+        static void clear_row(const uint32_t) noexcept;
 
         [[gnu::regparm(1)]]
         static void put(char c) noexcept;
@@ -94,13 +98,17 @@ namespace io
         }
 
         [[gnu::always_inline]]
-        inline static uint16_t get_position() noexcept { return static_cast<uint16_t>((state.base_row + state.row) * vga_width + state.column); }
+        inline static uint16_t get_position(const uint32_t s) noexcept
+        {
+            return s;
+            // return static_cast<uint16_t>((s.base_row + s.row) * vga_width + s.column);
+        }
 
         [[gnu::always_inline]]
-        inline static volatile uint16_t* cell() noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE + (get_position() << 1)); }
+        inline static volatile uint16_t* cell(const uint32_t s) noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE + (get_position(s) << 1)); }
 
         [[gnu::always_inline]]
-        inline static volatile uint32_t* cell_32() noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE + (get_position() << 1)); }
+        inline static volatile uint32_t* cell_32(const uint32_t s) noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE + (get_position(s) << 1)); }
 
 
         [[gnu::always_inline]]

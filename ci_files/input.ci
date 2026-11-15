@@ -8,9 +8,9 @@ node: { title: "_ZN8terminal5input16delete_characterEv" label: "bool terminal::i
 node: { title: "_ZN8terminal5input12reset_bufferEv" label: "void terminal::input::reset_buffer()\nterminal/input.cpp:79:10\n4 bytes (static)" }
 node: { title: "_ZN8terminal5input8trim_endEv" label: "void terminal::input::trim_end()\nterminal/input.cpp:88:10\n4 bytes (static)" }
 node: { title: "_ZN8terminal5input13handle_escapeEv" label: "void terminal::input::handle_escape()\nterminal/input.cpp:134:10\n32 bytes (static)" }
-node: { title: "_ZN2io15vga_text_buffer19move_cursor_right_nEh" label: "static void io::vga_text_buffer::move_cursor_right_n(uint8_t)\n./io/vga_text_buffer.h:76:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer19move_cursor_right_nEh" label: "static void io::vga_text_buffer::move_cursor_right_n(uint8_t)\n./io/vga_text_buffer.h:80:21" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input13handle_escapeEv" targetname: "_ZN2io15vga_text_buffer19move_cursor_right_nEh" label: "terminal/output.h:127:117" }
-node: { title: "_ZN2io15vga_text_buffer16remove_last_charEv" label: "static void io::vga_text_buffer::remove_last_char()\n./io/vga_text_buffer.h:62:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer16remove_last_charEv" label: "static void io::vga_text_buffer::remove_last_char()\n./io/vga_text_buffer.h:61:21" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input13handle_escapeEv" targetname: "_ZN2io15vga_text_buffer16remove_last_charEv" label: "terminal/output.h:143:100" }
 node: { title: "_ZN2io15hardware_cursor12set_positionEt" label: "static void io::hardware_cursor::set_position(uint16_t)\n./io/hardware_cursor.h:23:25" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input13handle_escapeEv" targetname: "_ZN2io15hardware_cursor12set_positionEt" label: "terminal/output.h:85:86" }
@@ -18,9 +18,9 @@ node: { title: "_ZN8terminal5input16handle_backspaceEv" label: "void terminal::i
 edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN2io15vga_text_buffer16remove_last_charEv" label: "terminal/output.h:143:100" }
 node: { title: "_ZN8terminal6output20write_string_no_syncEPKc" label: "void terminal::output::write_string_no_sync(const char*)\nterminal/output.h:28:14" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN8terminal6output20write_string_no_syncEPKc" label: "terminal/output.h:149:97" }
-node: { title: "_ZN2io15vga_text_buffer3putEc" label: "static void io::vga_text_buffer::put(char)\n./io/vga_text_buffer.h:70:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer3putEc" label: "static void io::vga_text_buffer::put(char)\n./io/vga_text_buffer.h:74:21" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN2io15vga_text_buffer3putEc" label: "terminal/output.h:79:45" }
-node: { title: "_ZN2io15vga_text_buffer18move_cursor_left_nEh" label: "static void io::vga_text_buffer::move_cursor_left_n(uint8_t)\n./io/vga_text_buffer.h:73:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer18move_cursor_left_nEh" label: "static void io::vga_text_buffer::move_cursor_left_n(uint8_t)\n./io/vga_text_buffer.h:77:21" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN2io15vga_text_buffer18move_cursor_left_nEh" label: "terminal/output.h:124:115" }
 edge: { sourcename: "_ZN8terminal5input16handle_backspaceEv" targetname: "_ZN2io15hardware_cursor12set_positionEt" label: "terminal/output.h:85:86" }
 node: { title: "_ZN8terminal5input10handle_tabEv" label: "void terminal::input::handle_tab()\nterminal/input.cpp:162:10\n16 bytes (static)" }
@@ -48,11 +48,11 @@ edge: { sourcename: "_ZN8terminal5input11handle_homeEv" targetname: "_ZN2io15har
 node: { title: "_ZN8terminal5input15handle_arrow_upEv" label: "void terminal::input::handle_arrow_up()\nterminal/input.cpp:214:10\n4 bytes (static)" }
 node: { title: "_ZN8terminal5input14handle_page_upEv" label: "void terminal::input::handle_page_up()\nterminal/input.cpp:220:10\n4 bytes (static)" }
 node: { title: "_ZN8terminal5input17handle_arrow_leftEv" label: "void terminal::input::handle_arrow_left()\nterminal/input.cpp:226:10\n16 bytes (static)" }
-node: { title: "_ZN2io15vga_text_buffer14move_backwardsEv" label: "static void io::vga_text_buffer::move_backwards()\n./io/vga_text_buffer.h:63:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer14move_backwardsEv" label: "static void io::vga_text_buffer::move_backwards()\n./io/vga_text_buffer.h:62:21" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input17handle_arrow_leftEv" targetname: "_ZN2io15vga_text_buffer14move_backwardsEv" label: "terminal/output.h:155:86" }
 edge: { sourcename: "_ZN8terminal5input17handle_arrow_leftEv" targetname: "_ZN2io15hardware_cursor12set_positionEt" label: "terminal/output.h:85:86" }
 node: { title: "_ZN8terminal5input18handle_arrow_rightEv" label: "void terminal::input::handle_arrow_right()\nterminal/input.cpp:233:10\n16 bytes (static)" }
-node: { title: "_ZN2io15vga_text_buffer12move_forwardEv" label: "static void io::vga_text_buffer::move_forward()\n./io/vga_text_buffer.h:61:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer12move_forwardEv" label: "static void io::vga_text_buffer::move_forward()\n./io/vga_text_buffer.h:60:21" shape : ellipse }
 edge: { sourcename: "_ZN8terminal5input18handle_arrow_rightEv" targetname: "_ZN2io15vga_text_buffer12move_forwardEv" label: "terminal/output.h:158:82" }
 edge: { sourcename: "_ZN8terminal5input18handle_arrow_rightEv" targetname: "_ZN2io15hardware_cursor12set_positionEt" label: "terminal/output.h:85:86" }
 node: { title: "_ZN8terminal5input10handle_endEv" label: "void terminal::input::handle_end()\nterminal/input.cpp:240:10\n16 bytes (static)" }

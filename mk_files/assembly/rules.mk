@@ -27,18 +27,18 @@ $(STAGE_2_SECTORS): $(CODE_32_BIN) $(KERNEL_BIN)
 	printf '.set BOOT_STAGE_2_SECTORS, %s\n' "$$sectors" > $(STAGE_2_SECTORS)
 
 # Common Interrupt Entry
-$(INTERRUPT_ENTRY_OBJ): $(INTERRUPT_ENTRY_S) 
+$(INTERRUPT_ENTRY_OBJ): $(INTERRUPT_ENTRY_S)
 	$(AS) $(INTERRUPT_ENTRY_S) -o $(INTERRUPT_ENTRY_OBJ)
 
 # Code 16
-$(CODE_16_ELF): $(BOOT_STAGE_1_OBJ) 
+$(CODE_16_ELF): $(BOOT_STAGE_1_OBJ)
 	$(LD) $(LINKING_FLAGS) -T $(CODE_16_LIKNER) -o $(CODE_16_ELF) $(BOOT_STAGE_1_OBJ)
 
 $(CODE_16_BIN): $(CODE_16_ELF)
 	$(OBJC) -O binary $(CODE_16_ELF) $(CODE_16_BIN)
 
 # Code 32
-$(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER) $(LIBRARIES) $(MAIN_OBJ) $()
+$(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER) $(LIBRARIES) $(MAIN_OBJ)
 	kernel_stack=$$(grep -v '^#' $(CALC_RESULT_FILE) | head -n 1) &&	\
 	interrupt_stack=$$(grep -v '^#' $(CALC_RESULT_FILE) | tail -n 1);	\
 	$(LD) $(LINKING_FLAGS) -T $(KERNEL_LINKING_FLAG) $(DEF_KERNEL_STACK)=$$kernel_stack $(DEF_INTERRUPT_STACK)=$$interrupt_stack -o $(KERNEL_ELF) \
@@ -46,7 +46,7 @@ $(KERNEL_ELF): $(KERNEL_ENTRY_OBJ) $(CI_FILES_FOLDER) $(LIBRARIES) $(MAIN_OBJ) $
 		$(LINK_LIBRARIES)
 
 $(KERNEL_DISASM): $(KERNEL_ELF)
-	$(OBJDUMP) -d $(KERNEL_ELF) > $(KERNEL_DISASM)
+	$(OBJDUMP) $(KERNEL_ELF) > $(KERNEL_DISASM)
 
 $(KERNEL_BIN): $(KERNEL_ELF) $(KERNEL_DISASM)
 	$(OBJC) -O binary $(KERNEL_ELF) $(KERNEL_BIN)
@@ -54,11 +54,11 @@ $(KERNEL_BIN): $(KERNEL_ELF) $(KERNEL_DISASM)
 	sectors=$$(( ($$size + $(SECTOR_SIZE) - 1) / $(SECTOR_SIZE) )); \
 	padded_size=$$(( $$sectors * $(SECTOR_SIZE) )); \
 	truncate -s $$padded_size $(KERNEL_BIN)
-	
+
 $(CODE_32_ELF): $(KERNEL_ELF)
 	$(LD) $(LINKING_FLAGS) -T $(CODE_32_LINKER) --just-symbols=$(KERNEL_ELF) -o $(CODE_32_ELF) \
 		$(BOOT_STAGE_2_OBJ) $(PM_ENTRY_OBJ)
-	
+
 $(CODE_32_DISASM): $(CODE_32_ELF)
 	$(OBJDUMP) -d $(CODE_32_ELF) > $(CODE_32_DISASM)
 

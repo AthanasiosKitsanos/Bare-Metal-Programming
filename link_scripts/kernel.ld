@@ -9,11 +9,17 @@ SECTIONS
 {
     . = 0x100000;
     _kernel_start = .;
+
     .text :
     {
         *kernel_entry.o(.text*)
+        *(
+            .text.unlikely.*
+            .text.unlikely
+        )
         *(.text*)
     }
+
     .rodata :
     {
         *(.rodata*)
