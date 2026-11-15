@@ -1,17 +1,17 @@
 graph: { title: "kernel/exceptions.cpp"
 node: { title: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" label: "void {anonymous}::handle_exception(const char*, const char*, kernel::interrupt_frame*)\nkernel/exceptions.cpp:67:10\n32 bytes (dynamic,bounded)" }
-node: { title: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "void kernel::logger::set_prefix_text_and_color(const char*, vga_color, vga_color)\nkernel/logger.h:14:14" shape : ellipse }
-edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "kernel/logger.h:31:42" }
-node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\n./terminal/output.h:172:21" shape : ellipse }
+node: { title: "_ZN6kernel6logger25set_prefix_text_and_colorEPKcN2io9vga_colorES4_" label: "void kernel::logger::set_prefix_text_and_color(const char*, io::vga_color, io::vga_color)\nkernel/logger.h:14:14" shape : ellipse }
+edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKcN2io9vga_colorES4_" label: "kernel/logger.h:31:42" }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\n./terminal/output.h:171:21" shape : ellipse }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:69:24" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:69:45" }
-node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\n./terminal/output.h:169:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEc" label: "terminal::output& terminal::output::operator<<(char)\n./terminal/output.h:168:21" shape : ellipse }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEc" label: "kernel/exceptions.cpp:69:53" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:69:60" }
-node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\n./terminal/output.h:205:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\n./terminal/output.h:204:21" shape : ellipse }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/exceptions.cpp:70:22" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:70:29" }
-node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\n./terminal/output.h:187:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\n./terminal/output.h:186:21" shape : ellipse }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEm" label: "kernel/exceptions.cpp:70:48" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:70:55" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEm" label: "kernel/exceptions.cpp:70:77" }
@@ -43,11 +43,11 @@ edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_except
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" label: "kernel/exceptions.cpp:85:13" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" label: "kernel/exceptions.cpp:85:13" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L16handle_exceptionEPKcS1_PN6kernel15interrupt_frameE" label: "kernel/exceptions.cpp:85:13" }
-edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "kernel/logger.h:38:42" }
+edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKcN2io9vga_colorES4_" label: "kernel/logger.h:38:42" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:90:34" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L20handle_cpu_exceptionEPN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEm" label: "kernel/exceptions.cpp:90:79" }
 node: { title: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE" label: "void {anonymous}::default_interrupt_handler(kernel::interrupt_frame*)\nkernel/exceptions.cpp:97:10\n32 bytes (dynamic,bounded)" }
-edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKc9vga_colorS3_" label: "kernel/logger.h:31:42" }
+edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE" targetname: "_ZN6kernel6logger25set_prefix_text_and_colorEPKcN2io9vga_colorES4_" label: "kernel/logger.h:31:42" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:101:24" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEm" label: "kernel/exceptions.cpp:101:58" }
 edge: { sourcename: "kernel/exceptions.cpp:_ZN12_GLOBAL__N_1L25default_interrupt_handlerEPN6kernel15interrupt_frameE" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/exceptions.cpp:101:68" }

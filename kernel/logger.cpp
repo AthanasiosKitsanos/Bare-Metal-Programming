@@ -11,9 +11,9 @@ namespace
 namespace kernel
 {
     // Private Methods
-    void logger::set_prefix_text_and_color(const char* error_type, vga_color foreground, vga_color background) noexcept
+    void logger::set_prefix_text_and_color(const char* error_type, io::vga_color foreground, io::vga_color background) noexcept
     {
-        color_code temp{m_terminal.current_color_code()};
+        io::color_code temp{m_terminal.current_color_code()};
         m_terminal.set_color(foreground, background);
         m_terminal << error_type;
         m_terminal.set_color_code(temp);
@@ -22,7 +22,7 @@ namespace kernel
     // Public Methods
     [[noreturn]] void logger::panic(const char* panic_message) noexcept
     {
-        m_terminal.set_color(vga_color::white, vga_color::red);
+        m_terminal.set_color(io::vga_color::white, io::vga_color::red);
         m_terminal << "[PANIC]: " << panic_message << '\n';
         halt_forever();
     }

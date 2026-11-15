@@ -14,7 +14,7 @@ namespace terminal
     [[gnu::regparm(1)]]
     void output::new_line() noexcept
     {
-        buffer.move_to_next_line();
+        io::vga_text_buffer::move_to_next_line();
     }
 
     [[gnu::regparm(2)]]
@@ -108,7 +108,7 @@ namespace terminal
             put_char_no_sync(hex_digit((value >> shift) & 0x0F));
         }
     }
-    
+
     [[gnu::regparm(2)]]
     void output::write_hex_16_no_sync(uint16_t value) noexcept
     {
@@ -118,7 +118,7 @@ namespace terminal
             put_char_no_sync('0');
             return;
         }
-        
+
         constexpr int total_nibbles_m1{sizeof(uint16_t) * 2 - 1};
         const int leading_zeros{(__builtin_clz(value) - 16) >> 2};
 
@@ -172,7 +172,7 @@ namespace terminal
     // Public Methods
     void output::initialize() noexcept
     {
-        buffer.clear();
+        io::vga_text_buffer::clear();
         io::hardware_cursor::enable();
         sync_cursor();
     }
@@ -203,7 +203,7 @@ namespace terminal
                 break;
             case integer_base::hex:
                 write_hex_8_no_sync(value);
-                break;   
+                break;
         }
         sync_cursor();
         return *this;
@@ -241,7 +241,7 @@ namespace terminal
                 break;
             case integer_base::hex:
                 write_hex_16_no_sync(value);
-                break;   
+                break;
         }
         sync_cursor();
         return *this;
@@ -279,7 +279,7 @@ namespace terminal
                 break;
             case integer_base::hex:
                 write_hex_32_no_sync(value);
-                break;   
+                break;
         }
         sync_cursor();
         return *this;
@@ -317,7 +317,7 @@ namespace terminal
                 break;
             case integer_base::hex:
                 write_hex_64_no_sync(value);
-                break;   
+                break;
         }
         sync_cursor();
         return *this;

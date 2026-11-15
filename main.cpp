@@ -33,9 +33,9 @@ extern "C" [[noreturn]] void kernel_main()
     kernel::initialize_exceptions();
     drivers::initialize();
 
-    app::shell shell{};
+    // app::shell shell{};
     asm volatile("sti");
-    shell.run();
+    // shell.run();
 
     for(;;)
     {

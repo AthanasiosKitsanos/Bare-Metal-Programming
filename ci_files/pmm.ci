@@ -76,18 +76,18 @@ node: { title: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" label: "kern
 edge: { sourcename: "_ZN6kernel6memory26pmm_free_contiguous_framesEPKvm" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L16free_frame_rangeEmm" label: "kernel/pmm.cpp:1195:25" }
 node: { title: "_ZN6kernel6memory4test17allocate_8_framesEv" label: "void kernel::memory::test::allocate_8_frames()\nkernel/pmm.cpp:1207:14\n52 bytes (dynamic,bounded)" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "kernel/pmm.cpp:_ZN12_GLOBAL__N_1L17contiguous_8_coreEPNS_14allocation_runEmPKhPS3_" label: "kernel/pmm.cpp:1215:30" }
-node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\n./terminal/output.h:172:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\n./terminal/output.h:171:21" shape : ellipse }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1218:45" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1219:25" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1223:20" }
-node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\n./terminal/output.h:187:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEm" label: "terminal::output& terminal::output::operator<<(uint32_t)\n./terminal/output.h:186:21" shape : ellipse }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1223:34" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1224:16" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEm" label: "kernel/pmm.cpp:1224:36" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1225:16" }
-node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\n./terminal/output.h:205:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "terminal::output& terminal::output::operator<<(output_manipulator)\n./terminal/output.h:204:21" shape : ellipse }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1225:47" }
-node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\n./terminal/output.h:175:21" shape : ellipse }
+node: { title: "_ZN8terminal6outputlsEh" label: "terminal::output& terminal::output::operator<<(uint8_t)\n./terminal/output.h:174:21" shape : ellipse }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEh" label: "kernel/pmm.cpp:1225:64" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPU7regparmILi1EEDoFRS0_S1_E" label: "kernel/pmm.cpp:1225:83" }
 edge: { sourcename: "_ZN6kernel6memory4test17allocate_8_framesEv" targetname: "_ZN8terminal6outputlsEPKc" label: "kernel/pmm.cpp:1226:16" }

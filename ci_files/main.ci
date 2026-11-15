@@ -1,12 +1,12 @@
 graph: { title: "main.cpp"
-node: { title: "kernel_main" label: "void kernel_main()\nmain.cpp:9:30\n336 bytes (dynamic,bounded)" }
+node: { title: "kernel_main" label: "void kernel_main()\nmain.cpp:9:30\n48 bytes (dynamic,bounded)" }
 node: { title: "_ZN3cpu3gdt10initializeEv" label: "void cpu::gdt::initialize()\ncpu/gdt.h:5:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN3cpu3gdt10initializeEv" label: "main.cpp:11:25" }
 node: { title: "_ZN6kernel14initialize_pitEm" label: "void kernel::initialize_pit(uint32_t)\nkernel/pit.h:7:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel14initialize_pitEm" label: "main.cpp:13:27" }
 node: { title: "_ZN6kernel19set_timer_frequencyEm" label: "void kernel::set_timer_frequency(uint32_t)\nkernel/timer.h:13:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel19set_timer_frequencyEm" label: "main.cpp:14:32" }
-node: { title: "_ZN8terminal6output10initializeEv" label: "static void terminal::output::initialize()\nterminal/output.h:122:25" shape : ellipse }
+node: { title: "_ZN8terminal6output10initializeEv" label: "static void terminal::output::initialize()\nterminal/output.h:121:25" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN8terminal6output10initializeEv" label: "main.cpp:15:33" }
 node: { title: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "kernel::memory::e820_memory_map kernel::memory::get_e820_memory_map()\nkernel/e820.h:31:21" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel6memory19get_e820_memory_mapEv" label: "main.cpp:19:80" }
@@ -16,8 +16,6 @@ node: { title: "_ZN6kernel21initialize_exceptionsEv" label: "void kernel::initia
 edge: { sourcename: "kernel_main" targetname: "_ZN6kernel21initialize_exceptionsEv" label: "main.cpp:33:34" }
 node: { title: "_ZN6driver19initialize_keyboardEv" label: "void driver::initialize_keyboard()\ndrivers/keyboard/keyboard.h:12:10" shape : ellipse }
 edge: { sourcename: "kernel_main" targetname: "_ZN6driver19initialize_keyboardEv" label: "drivers/drivers.h:9:36" }
-node: { title: "_ZN3app5shellC1Ev" label: "app::shell::shell()\napps/shell/shell.h:22:13" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3app5shellC1Ev" label: "main.cpp:36:22" }
-node: { title: "_ZN3app5shell3runEv" label: "void app::shell::run()\napps/shell/shell.h:27:18" shape : ellipse }
-edge: { sourcename: "kernel_main" targetname: "_ZN3app5shell3runEv" label: "main.cpp:38:14" }
+node: { title: "_ZN2io15vga_text_buffer11dummy_resetENS0_7state_tE" label: "static uint32_t io::vga_text_buffer::dummy_reset(state_t)\n./io/vga_text_buffer.h:139:29" shape : ellipse }
+edge: { sourcename: "kernel_main" targetname: "_ZN2io15vga_text_buffer11dummy_resetENS0_7state_tE" label: "main.cpp:37:66" }
 }

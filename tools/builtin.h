@@ -102,4 +102,12 @@ namespace builtin
             return static_cast<uint8_t>(__builtin_ctz((mask | static_cast<unsigned int>(value))));
         }
     }
+
+    template<typename T, typename U>
+    [[gnu::always_inline]]
+    constexpr T convert_type(U value) noexcept
+    {
+        static_assert(__has_unique_object_representations(U), "convert_to: Source type has padding bytes, whose values are indeterminate and would leak into the result. Reorder its members or fill the gap explicitly.");
+        return __builtin_bit_cast(T, value);
+    }
 }

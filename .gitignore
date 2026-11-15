@@ -5,3 +5,4 @@ obj
 elf
 lib
 .clangd
+ci_files

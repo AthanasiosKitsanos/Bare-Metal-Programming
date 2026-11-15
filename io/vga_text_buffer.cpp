@@ -2,6 +2,7 @@
 #include "hardware_cursor.h"
 #include "cpu/features.h"
 #include <immintrin.h>
+#include "tools/builtin.h"
 
 namespace
 {
@@ -30,7 +31,7 @@ namespace
         {
             _mm256_store_si256(ptr, blank);
             ++ptr;
-        }   
+        }
     }
 
     [[gnu::regparm(3)]]
@@ -45,7 +46,7 @@ namespace
         }
     }
 
-    
+
     using fill_fn = void(*)(volatile uint32_t* dst, uint16_t count, const uint32_t entry) noexcept [[gnu::regparm(3)]];
     struct fill_functions
     {
@@ -115,11 +116,14 @@ namespace
 
 namespace io
 {
-    void vga_text_buffer::reset() noexcept
+    [[gnu::noinline]] [[gnu::regparm(1)]] [[gnu::cold]]
+    uint32_t vga_text_buffer::reset(state_t l_state) noexcept
     {
+        static_assert(__has_unique_object_representations(state_t), "state_t reordered or changed, reset it to the previous member and order state");
         constexpr uint16_t copy_bytes{(vga_height - 1) * vga_width << 1};
+        uint32_t s{builtin::convert_type<uint32_t>(l_state)};
 
-        const volatile uint32_t* source{begin_32() + ((base_row * vga_width) >> 1)};
+        const volatile uint32_t* source{begin_32() + ((static_cast<uint8_t>(s >> 16) * vga_width) >> 1)};
         constexpr uint16_t dst_width{vga_width >> 1};
         volatile uint32_t* destination{begin_32() + dst_width};
 
@@ -127,13 +131,15 @@ namespace io
         destination = g_dispatch_cpy.entries[idx](source, destination, copy_bytes);
 
         constexpr uint8_t vga_height_m1{vga_height - 1};
-        base_row = 1;
-        row = vga_height_m1;
+        constexpr uint32_t values{static_cast<uint32_t>((1 << 16) | (vga_height_m1 << 8))};
+        constexpr uint32_t mask{0xFF0000FF};
+        s = static_cast<uint32_t>((s & mask) | values);
 
         constexpr uint8_t remaining_bytes{vga_width << 1};
         constexpr uint16_t entry{make_entry(' ', default_color)};
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16 | entry)};
         g_dispatch.entries[idx](destination, remaining_bytes, entry_32);
+        return s;
     }
 
     void vga_text_buffer::clear() noexcept
@@ -144,14 +150,13 @@ namespace io
 
         g_dispatch.entries[cpu::features::get()](begin_32(), bytes, entry_32);
 
-        base_row = 0;
-        column = 0;
-        row = 0;
+        state.base_row = 0;
+        state.column = 0;
+        state.row = 0;
 
         hardware_cursor::set_display_start(0);
     }
 
-    [[gnu::regparm(1)]]
     void vga_text_buffer::clear_row() noexcept
     {
         constexpr uint16_t entry{make_entry(' ', default_color)};
@@ -161,90 +166,90 @@ namespace io
         g_dispatch.entries[cpu::features::get()](cell_32(), bytes, entry_32);
     }
 
-    [[gnu::regparm(2)]]
+    [[gnu::regparm(1)]]
     void vga_text_buffer::put(char c) noexcept
     {
-        *cell() = make_entry(c, active_color);
+        *cell() = make_entry(c, state.active_color);
         move_forward();
     }
 
-    [[gnu::regparm(1)]]
     void vga_text_buffer::remove_last_char() noexcept
     {
         move_backwards();
-        *cell() = make_entry(' ', active_color);
+        *cell() = make_entry(' ', state.active_color);
     }
 
-    [[gnu::regparm(1)]]
     void vga_text_buffer::move_forward() noexcept
     {
-        ++column;
+        state_t state_snapshot{state};
+        ++state_snapshot.column;
 
-        bool overflowed{column == vga_width};
-        column -= overflowed * vga_width;
-        row += overflowed;
+        bool overflowed{state.column == vga_width};
+        state_snapshot.column -= overflowed * vga_width;
+        state_snapshot.row += overflowed;
 
-        overflowed = (row == vga_height);
-        base_row += overflowed;
-        row -= overflowed;
+        overflowed = (state_snapshot.row == vga_height);
+        state_snapshot.base_row += overflowed;
+        state_snapshot.row -= overflowed;
 
         if(overflowed)
         {
-            if(base_row > base_row_max) reset();
+            if(state_snapshot.base_row > base_row_max) state_snapshot = builtin::convert_type<state_t>(reset(state_snapshot));
             else clear_row();
-            hardware_cursor::set_display_start(base_row * vga_width);
+            hardware_cursor::set_display_start(state_snapshot.base_row * vga_width);
         }
+        state = state_snapshot;
     }
 
-    [[gnu::regparm(1)]]
     void vga_text_buffer::move_backwards() noexcept
     {
-        bool column_at_end{column == 0};
-        column = (column - 1) + column_at_end * vga_width;
+        bool column_at_end{state.column == 0};
+        state.column = (state.column - 1) + column_at_end * vga_width;
 
-        bool row_at_end{static_cast<bool>((row == 0) & (column_at_end))};
-        base_row -= row_at_end;
-        row = (row - column_at_end) + row_at_end * vga_height;
+        bool row_at_end{static_cast<bool>((state.row == 0) & (column_at_end))};
+        state.base_row -= row_at_end;
+        state.row = (state.row - column_at_end) + row_at_end * vga_height;
+    }
+
+    vga_text_buffer::state_t vga_text_buffer::move_to_next_line() noexcept
+    {
+        state_t state_snapshot{state};
+        state_snapshot.column = 0;
+        ++state_snapshot.row;
+        bool overflowed{(state_snapshot.row == vga_height)};
+        state_snapshot.base_row += overflowed;
+        state_snapshot.row -= overflowed;
+
+        if(overflowed)
+        {
+            if(state.base_row > base_row_max) state_snapshot = builtin::convert_type<state_t>(reset(state_snapshot));
+            else clear_row();
+            hardware_cursor::set_display_start(state_snapshot.base_row * vga_width);
+        }
+        return state_snapshot;
     }
 
     [[gnu::regparm(1)]]
-    void vga_text_buffer::move_to_next_line() noexcept
-    {
-        column = 0;
-        ++row;
-        bool overflowed{(row == vga_height)};
-        base_row += overflowed;
-        row -= overflowed;
-        
-        if(overflowed)
-        {
-            if(base_row > base_row_max) reset();
-             else clear_row();
-            hardware_cursor::set_display_start(base_row * vga_width);
-        }
-    }
-
-    [[gnu::regparm(2)]]
     void vga_text_buffer::move_cursor_left_n(const uint8_t count) noexcept
     {
-        int16_t abs_pos{static_cast<int16_t>(row * vga_width + column - count)};
+        int16_t abs_pos{static_cast<int16_t>(state.row * vga_width + state.column - count)};
         const uint8_t new_row{static_cast<uint8_t>(abs_pos / vga_width)};
         const uint8_t new_column{static_cast<uint8_t>(abs_pos - new_row * vga_width)};
 
-        base_row -= static_cast<uint8_t>(row - new_row);
-        row = new_row;
-        column = new_column;
+        state.base_row -= static_cast<uint8_t>(state.row - new_row);
+        state.row = new_row;
+        state.column = new_column;
     }
 
-    [[gnu::regparm(2)]]
+    [[gnu::regparm(1)]]
     void vga_text_buffer::move_cursor_right_n(const uint8_t count) noexcept
     {
-        int16_t abs_pos{static_cast<int16_t>(row * vga_width + column + count)};
+        int16_t abs_pos{static_cast<int16_t>(state.row * vga_width + state.column + count)};
         const uint8_t new_row{static_cast<uint8_t>(abs_pos / vga_width)};
         const uint8_t new_column{static_cast<uint8_t>(abs_pos - new_row * vga_width)};
 
-        base_row -= static_cast<uint8_t>(row - new_row);
-        row = new_row;
-        column = new_column;
+        state.base_row -= static_cast<uint8_t>(state.row - new_row);
+        state.row = new_row;
+        state.column = new_column;
     }
 }
