@@ -5,7 +5,8 @@ CC = i686-elf-g++
 AS = i686-elf-as
 LD = i686-elf-ld
 OBJC = i686-elf-objcopy
-OBJDUMP = i686-elf-objdump -d
+OBJDUMP = i686-elf-objdump -d -C
+DISASM = i686-elf-objdump -d -r -C
 
 MAKE_LIB = i686-elf-ar rcs
 
@@ -39,6 +40,7 @@ include mk_files/stack_calculator/decl.mk
 include mk_files/terminal/decl.mk
 include mk_files/cpu/decl.mk
 include mk_files/io/decl.mk
+include mk_files/dism/decl.mk
 
 #------------------------------ Include MK Libraries ---------------------------------
 include mk_files/lib/decl.mk
@@ -52,7 +54,7 @@ MAIN_OBJ = obj/main.o
 
 # ----------------------Rules--------------------------------
 
-all: $(OS_IMAGE) $(KERNEL_DISASM) $(CI_FILES)
+all: $(OS_IMAGE) $(KERNEL_DISASM) $(CI_FILES) $(DIS_FILES)
 
 #------------------------  MK Rules ---------------------------------
 include mk_files/apps/rules.mk
@@ -63,6 +65,7 @@ include mk_files/stack_calculator/rules.mk
 include mk_files/terminal/rules.mk
 include mk_files/cpu/rules.mk
 include mk_files/io/rules.mk
+include mk_files/dism/rules.mk
 
 #------------------------------ Include MK Librarys ---------------------------------
 include mk_files/lib/rules.mk
@@ -90,3 +93,4 @@ clean:
 	rm -f elf/*
 	rm -f lib/*.a
 	rm -f ci_files/*
+	rm -f dism/*

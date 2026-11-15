@@ -1,5 +1,4 @@
 #-----------------------------Input_Output----------------------------------------
-
 VGA_H = io/vga_text_buffer.h
 VGA_CPP = io/vga_text_buffer.cpp
 VGA_OBJ = obj/io/vga_text_buffer.o

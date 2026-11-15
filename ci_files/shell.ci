@@ -5,7 +5,7 @@ edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L16execute_pmm_testEP
 node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" label: "void {anonymous}::execute_clear(app::shell*)\napps/shell/shell.cpp:48:10\n16 bytes (static)" }
 node: { title: "_ZN8terminal5input12reset_bufferEv" label: "void terminal::input::reset_buffer()\n./terminal/input.h:58:14" shape : ellipse }
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" targetname: "_ZN8terminal5input12reset_bufferEv" label: "./terminal/input.h:117:56" }
-node: { title: "_ZN2io15vga_text_buffer5clearEv" label: "static void io::vga_text_buffer::clear()\n./io/vga_text_buffer.h:71:21" shape : ellipse }
+node: { title: "_ZN2io15vga_text_buffer5clearEv" label: "static void io::vga_text_buffer::clear()\n./io/vga_text_buffer.h:60:21" shape : ellipse }
 edge: { sourcename: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L13execute_clearEPN3app5shellE" targetname: "_ZN2io15vga_text_buffer5clearEv" label: "./terminal/output.h:164:70" }
 node: { title: "apps/shell/shell.cpp:_ZN12_GLOBAL__N_1L12execute_exitEPN3app5shellE" label: "void {anonymous}::execute_exit(app::shell*)\napps/shell/shell.cpp:51:10\n4 bytes (static)" }
 node: { title: "_ZN8terminal6outputlsEPKc" label: "terminal::output& terminal::output::operator<<(const char*)\n./terminal/output.h:171:21" shape : ellipse }
