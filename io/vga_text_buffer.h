@@ -2,8 +2,11 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "tools/types.h"
 
 namespace terminal { class output; }
+typedef unsigned int vga_state_packed;
+
 
 namespace io
 {
@@ -57,18 +60,21 @@ namespace io
         inline static constinit state_t state{.column = 0, .row = 0, .base_row = 0, .active_color = default_color};
 
         static void clear() noexcept;
-        static void move_forward() noexcept;
         static void remove_last_char() noexcept;
         static void move_backwards() noexcept;
         static state_t move_to_next_line() noexcept;
+        static void move_forward() noexcept;
 
         // No inline to avoid inlining inside a hotpath and taking more bytes in L1i  cache lines
         // Called about once per 14400 characters and more often when lines are cut short by '\n', hence cold.
         [[gnu::noinline]] [[gnu::regparm(1)]] [[gnu::cold]]
-        static uint32_t reset(uint32_t) noexcept;
+        static vga_state_packed reset(vga_state_packed) noexcept;
+
+        [[gnu::regparm(3)]] [[gnu::hot]]
+        static vga_state_packed write_on_screen(vga_state_packed state_snapshot, const char* ptr, const size_t length) noexcept;
 
         [[gnu::noinline]] [[gnu::regparm(1)]]
-        static void clear_row(const uint32_t) noexcept;
+        static void clear_row(const vga_state_packed) noexcept;
 
         [[gnu::regparm(1)]]
         static void put(char c) noexcept;
@@ -98,17 +104,23 @@ namespace io
         }
 
         [[gnu::always_inline]]
-        inline static uint16_t get_position(const uint32_t s) noexcept
+        inline static uint16_t get_position(const vga_state_packed s) noexcept
         {
-            return s;
-            // return static_cast<uint16_t>((s.base_row + s.row) * vga_width + s.column);
+            constexpr uint32_t mask{0xFFu};
+
+            // (base_row + row) * vga_width + column
+            uint32_t pos{(s >> 16) & mask};
+            pos += (s >> 8) & mask;
+            pos *= vga_width;
+            pos += (s & mask);
+            return static_cast<uint16_t>(pos);
         }
 
         [[gnu::always_inline]]
-        inline static volatile uint16_t* cell(const uint32_t s) noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE + (get_position(s) << 1)); }
+        inline static volatile uint16_t* cell(const vga_state_packed s) noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE + (get_position(s) << 1)); }
 
         [[gnu::always_inline]]
-        inline static volatile uint32_t* cell_32(const uint32_t s) noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE + (get_position(s) << 1)); }
+        inline static volatile uint32_t* cell_32(const vga_state_packed s) noexcept { return reinterpret_cast<volatile uint32_t*>(VGA_BASE + (get_position(s) << 1)); }
 
 
         [[gnu::always_inline]]

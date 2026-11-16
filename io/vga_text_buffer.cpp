@@ -3,6 +3,7 @@
 #include "cpu/features.h"
 #include <immintrin.h>
 #include "tools/builtin.h"
+#include "tools/cmp.h"
 
 namespace
 {
@@ -112,12 +113,55 @@ namespace
         {}
     };
     constexpr fill_copy_function g_dispatch_cpy{};
+
+    [[gnu::always_inline]]
+    constexpr static inline uint16_t make_entry_shifted(const uint32_t shifted_color, const unsigned char c) noexcept
+    {
+        return static_cast<uint16_t>(shifted_color | c);
+    }
 }
 
 namespace io
 {
+    [[gnu::regparm(3)]] [[gnu::hot]]
+    vga_state_packed vga_text_buffer::write_on_screen(vga_state_packed state_snapshot, const char *ptr, const size_t length) noexcept
+    {
+        const uint32_t color{static_cast<uint32_t>((state_snapshot >> 16) & 0xFF00u)};
+        size_t temp_length{length};
+        volatile uint16_t* cell_ptr{cell(state_snapshot)};
+        while(temp_length > 0)
+        {
+            const size_t segment_length{cmp::min_cmov(temp_length, static_cast<size_t>(vga_width - static_cast<uint8_t>(state_snapshot)))};
+            const char* const end{ptr + segment_length};
+            for(; ptr < end; ++ptr)
+            {
+                *cell_ptr = make_entry_shifted(color, *ptr);
+                ++cell_ptr;
+            }
+            state_snapshot += segment_length;
+            if(static_cast<uint8_t>(state_snapshot) >= vga_width)
+            {
+                state_snapshot &= ~0xFFu;
+                state_snapshot += 0x100u;
+                if(static_cast<uint8_t>(state_snapshot >> 8) == vga_height)
+                {
+                    state_snapshot += (0x10000u - 0x100u);
+                    if(static_cast<uint8_t>(state_snapshot >> 16) > base_row_max)
+                    {
+                        state_snapshot = reset(state_snapshot);
+                        cell_ptr = cell(state_snapshot);
+                    }
+                    else clear_row(state_snapshot);
+                    io::hardware_cursor::set_display_start(static_cast<uint8_t>(state_snapshot >> 16) * vga_width);
+                }
+            }
+            temp_length -= segment_length;
+        }
+        return state_snapshot;
+    }
+
     [[gnu::noinline]] [[gnu::regparm(1)]] [[gnu::cold]]
-    uint32_t vga_text_buffer::reset(uint32_t s) noexcept
+    vga_state_packed vga_text_buffer::reset(vga_state_packed s) noexcept
     {
         static_assert(__has_unique_object_representations(state_t), "state_t reordered or changed, reset it to the previous member and order state");
         constexpr uint16_t copy_bytes{(vga_height - 1) * vga_width << 1};
@@ -150,15 +194,15 @@ namespace io
 
         g_dispatch.entries[cpu::features::get()](begin_32(), bytes, entry_32);
 
-        state.base_row = 0;
-        state.column = 0;
-        state.row = 0;
+        vga_state_packed snapshot{builtin::convert_type<vga_state_packed>(state)};
+        snapshot &= ~0xFFFFFFu;
+        state = builtin::convert_type<state_t>(snapshot);
 
         hardware_cursor::set_display_start(0);
     }
 
     [[gnu::noinline]] [[gnu::regparm(1)]]
-    void vga_text_buffer::clear_row(const uint32_t s) noexcept
+    void vga_text_buffer::clear_row(const vga_state_packed s) noexcept
     {
         constexpr uint16_t entry{make_entry(' ', default_color)};
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
@@ -170,65 +214,54 @@ namespace io
     [[gnu::regparm(1)]]
     void vga_text_buffer::put(char c) noexcept
     {
-        *cell(builtin::convert_type<uint32_t>(state)) = make_entry(c, state.active_color);
+        *cell(builtin::convert_type<vga_state_packed>(state)) = make_entry(c, state.active_color);
         move_forward();
     }
 
     void vga_text_buffer::remove_last_char() noexcept
     {
         move_backwards();
-        *cell(builtin::convert_type<uint32_t>(state)) = make_entry(' ', state.active_color);
+        const vga_state_packed p_state{builtin::convert_type<vga_state_packed>(state)};
+        *cell(p_state) = make_entry(' ', static_cast<uint8_t>(p_state >> 24));
     }
 
     void vga_text_buffer::move_forward() noexcept
     {
-        uint32_t state_snapshot{builtin::convert_type<uint32_t>(state)};
+        vga_state_packed state_snapshot{builtin::convert_type<vga_state_packed>(state)};
         state_snapshot += 0x01u;
         if(static_cast<uint8_t>(state_snapshot) == vga_width)
         {
-            state_snapshot &= 0xFFFFFF00;
+            state_snapshot &= ~0xFFu;
             state_snapshot += 0x0100u;
 
             if(static_cast<uint8_t>(state_snapshot >> 8) == vga_height)
             {
-                state_snapshot += 0x010000u;
-                state_snapshot -= 0x0100u;
+                state_snapshot += (0x010000u - 0x100u);
 
                 if(static_cast<uint8_t>(state_snapshot >> 16) > base_row_max)
                 {
                     state_snapshot = reset(state_snapshot);
                 }
                 else clear_row(state_snapshot);
+                hardware_cursor::set_display_start(static_cast<uint8_t>(state_snapshot >> 16) * vga_width);
             }
         }
         state = builtin::convert_type<state_t>(state_snapshot);
-        // state_t state_snapshot{state};
-        // ++state_snapshot.column;
-        // if(state_snapshot.column == vga_width)
-        // {
-        //     state_snapshot.column = 0;
-        //     ++state_snapshot.row;
-        //     if(state_snapshot.row == vga_height)
-        //     {
-        //         ++state_snapshot.base_row;
-        //         --state_snapshot.row;
-
-        //         if(state_snapshot.base_row > base_row_max) state_snapshot = builtin::convert_type<state_t>(reset(state_snapshot));
-        //         else clear_row(state_snapshot);
-        //         hardware_cursor::set_display_start(state_snapshot.base_row * vga_width);
-        //     }
-        // }
-        // state = state_snapshot;
     }
 
     void vga_text_buffer::move_backwards() noexcept
     {
-        bool column_at_end{state.column == 0};
-        state.column = (state.column - 1) + column_at_end * vga_width;
-
-        bool row_at_end{static_cast<bool>((state.row == 0) & (column_at_end))};
-        state.base_row -= row_at_end;
-        state.row = (state.row - column_at_end) + row_at_end * vga_height;
+        vga_state_packed state_snapshot{builtin::convert_type<vga_state_packed>(state)};
+        if(static_cast<uint8_t>(state_snapshot) == 0)
+        {
+            state_snapshot |= static_cast<vga_state_packed>(vga_width);
+            if((state_snapshot >> 8) == 0)
+            {
+                state_snapshot |= static_cast<vga_state_packed>(vga_height << 8);
+            }
+            else state_snapshot -= 0x100u;
+        }
+        else state_snapshot -= 0x01u;
     }
 
     vga_text_buffer::state_t vga_text_buffer::move_to_next_line() noexcept

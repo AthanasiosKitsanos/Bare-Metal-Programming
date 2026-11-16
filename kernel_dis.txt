@@ -11,9 +11,9 @@ Disassembly of section .text:
   100008:	8e e0                	mov    %eax,%fs
   10000a:	8e e8                	mov    %eax,%gs
   10000c:	8e d0                	mov    %eax,%ss
-  10000e:	bc 37 47 10 00       	mov    $0x104737,%esp
-  100013:	bf 40 3a 10 00       	mov    $0x103a40,%edi
-  100018:	b9 03 45 10 00       	mov    $0x104503,%ecx
+  10000e:	bc b7 47 10 00       	mov    $0x1047b7,%esp
+  100013:	bf c0 3a 10 00       	mov    $0x103ac0,%edi
+  100018:	b9 83 45 10 00       	mov    $0x104583,%ecx
 
 0010001d <.init_bss>:
   10001d:	39 f9                	cmp    %edi,%ecx
@@ -23,7 +23,7 @@ Disassembly of section .text:
   100025:	eb f6                	jmp    10001d <.init_bss>
 
 00100027 <.kernel_call>:
-  100027:	88 1d 02 45 10 00    	mov    %bl,0x104502
+  100027:	88 1d 82 45 10 00    	mov    %bl,0x104582
   10002d:	89 e5                	mov    %esp,%ebp
   10002f:	e8 fc 05 00 00       	call   100630 <kernel_main>
 
@@ -32,13 +32,13 @@ Disassembly of section .text:
   100035:	f4                   	hlt
   100036:	eb fc                	jmp    100034 <hang>
 
-00100038 <io::vga_text_buffer::reset(unsigned long)>:
+00100038 <io::vga_text_buffer::reset(unsigned int)>:
   100038:	55                   	push   %ebp
   100039:	b9 00 0f 00 00       	mov    $0xf00,%ecx
   10003e:	ba a0 80 0b 00       	mov    $0xb80a0,%edx
   100043:	89 e5                	mov    %esp,%ebp
   100045:	56                   	push   %esi
-  100046:	0f b6 35 02 45 10 00 	movzbl 0x104502,%esi
+  100046:	0f b6 35 82 45 10 00 	movzbl 0x104582,%esi
   10004d:	53                   	push   %ebx
   10004e:	89 c3                	mov    %eax,%ebx
   100050:	c1 e8 10             	shr    $0x10,%eax
@@ -46,10 +46,10 @@ Disassembly of section .text:
   100056:	81 e3 ff 00 00 ff    	and    $0xff0000ff,%ebx
   10005c:	69 c0 a0 00 00 00    	imul   $0xa0,%eax,%eax
   100062:	05 00 80 0b 00       	add    $0xb8000,%eax
-  100067:	ff 14 b5 d0 39 10 00 	call   *0x1039d0(,%esi,4)
+  100067:	ff 14 b5 50 3a 10 00 	call   *0x103a50(,%esi,4)
   10006e:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
   100073:	ba a0 00 00 00       	mov    $0xa0,%edx
-  100078:	ff 14 b5 dc 39 10 00 	call   *0x1039dc(,%esi,4)
+  100078:	ff 14 b5 5c 3a 10 00 	call   *0x103a5c(,%esi,4)
   10007f:	89 d8                	mov    %ebx,%eax
   100081:	5b                   	pop    %ebx
   100082:	5e                   	pop    %esi
@@ -58,475 +58,474 @@ Disassembly of section .text:
   100089:	c3                   	ret
 
 0010008a <io::vga_text_buffer::put(char) [clone .cold]>:
-  10008a:	e8 a9 ff ff ff       	call   100038 <io::vga_text_buffer::reset(unsigned long)>
-  10008f:	e9 75 2f 00 00       	jmp    103009 <io::vga_text_buffer::put(char)+0x79>
+  10008a:	89 d8                	mov    %ebx,%eax
+  10008c:	e8 a7 ff ff ff       	call   100038 <io::vga_text_buffer::reset(unsigned int)>
+  100091:	89 c3                	mov    %eax,%ebx
+  100093:	c1 e8 10             	shr    $0x10,%eax
+  100096:	89 c6                	mov    %eax,%esi
+  100098:	e9 db 2f 00 00       	jmp    103078 <io::vga_text_buffer::put(char)+0x88>
 
-00100094 <isr_0>:
-  100094:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10009b:	0f 83 7c 05 00 00    	jae    10061d <nesting_overflow_hlt>
-  1000a1:	fe 05 41 3a 10 00    	incb   0x103a41
-  1000a7:	6a 00                	push   $0x0
-  1000a9:	6a 00                	push   $0x0
-  1000ab:	60                   	pusha
-  1000ac:	e9 27 05 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010009d <isr_0>:
+  10009d:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1000a4:	0f 83 7c 05 00 00    	jae    100626 <nesting_overflow_hlt>
+  1000aa:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1000b0:	6a 00                	push   $0x0
+  1000b2:	6a 00                	push   $0x0
+  1000b4:	60                   	pusha
+  1000b5:	e9 27 05 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001000b1 <isr_1>:
-  1000b1:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1000b8:	0f 83 5f 05 00 00    	jae    10061d <nesting_overflow_hlt>
-  1000be:	fe 05 41 3a 10 00    	incb   0x103a41
-  1000c4:	6a 00                	push   $0x0
-  1000c6:	6a 01                	push   $0x1
-  1000c8:	60                   	pusha
-  1000c9:	e9 0a 05 00 00       	jmp    1005d8 <common_interrupt_entry>
+001000ba <isr_1>:
+  1000ba:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1000c1:	0f 83 5f 05 00 00    	jae    100626 <nesting_overflow_hlt>
+  1000c7:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1000cd:	6a 00                	push   $0x0
+  1000cf:	6a 01                	push   $0x1
+  1000d1:	60                   	pusha
+  1000d2:	e9 0a 05 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001000ce <isr_2>:
-  1000ce:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1000d5:	0f 83 42 05 00 00    	jae    10061d <nesting_overflow_hlt>
-  1000db:	fe 05 41 3a 10 00    	incb   0x103a41
-  1000e1:	6a 00                	push   $0x0
-  1000e3:	6a 02                	push   $0x2
-  1000e5:	60                   	pusha
-  1000e6:	e9 ed 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+001000d7 <isr_2>:
+  1000d7:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1000de:	0f 83 42 05 00 00    	jae    100626 <nesting_overflow_hlt>
+  1000e4:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1000ea:	6a 00                	push   $0x0
+  1000ec:	6a 02                	push   $0x2
+  1000ee:	60                   	pusha
+  1000ef:	e9 ed 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001000eb <isr_3>:
-  1000eb:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1000f2:	0f 83 25 05 00 00    	jae    10061d <nesting_overflow_hlt>
-  1000f8:	fe 05 41 3a 10 00    	incb   0x103a41
-  1000fe:	6a 00                	push   $0x0
-  100100:	6a 03                	push   $0x3
-  100102:	60                   	pusha
-  100103:	e9 d0 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+001000f4 <isr_3>:
+  1000f4:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1000fb:	0f 83 25 05 00 00    	jae    100626 <nesting_overflow_hlt>
+  100101:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100107:	6a 00                	push   $0x0
+  100109:	6a 03                	push   $0x3
+  10010b:	60                   	pusha
+  10010c:	e9 d0 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100108 <isr_4>:
-  100108:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10010f:	0f 83 08 05 00 00    	jae    10061d <nesting_overflow_hlt>
-  100115:	fe 05 41 3a 10 00    	incb   0x103a41
-  10011b:	6a 00                	push   $0x0
-  10011d:	6a 04                	push   $0x4
-  10011f:	60                   	pusha
-  100120:	e9 b3 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100111 <isr_4>:
+  100111:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100118:	0f 83 08 05 00 00    	jae    100626 <nesting_overflow_hlt>
+  10011e:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100124:	6a 00                	push   $0x0
+  100126:	6a 04                	push   $0x4
+  100128:	60                   	pusha
+  100129:	e9 b3 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100125 <isr_5>:
-  100125:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10012c:	0f 83 eb 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  100132:	fe 05 41 3a 10 00    	incb   0x103a41
-  100138:	6a 00                	push   $0x0
-  10013a:	6a 05                	push   $0x5
-  10013c:	60                   	pusha
-  10013d:	e9 96 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010012e <isr_5>:
+  10012e:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100135:	0f 83 eb 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  10013b:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100141:	6a 00                	push   $0x0
+  100143:	6a 05                	push   $0x5
+  100145:	60                   	pusha
+  100146:	e9 96 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100142 <isr_6>:
-  100142:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100149:	0f 83 ce 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  10014f:	fe 05 41 3a 10 00    	incb   0x103a41
-  100155:	6a 00                	push   $0x0
-  100157:	6a 06                	push   $0x6
-  100159:	60                   	pusha
-  10015a:	e9 79 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010014b <isr_6>:
+  10014b:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100152:	0f 83 ce 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  100158:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  10015e:	6a 00                	push   $0x0
+  100160:	6a 06                	push   $0x6
+  100162:	60                   	pusha
+  100163:	e9 79 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010015f <isr_7>:
-  10015f:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100166:	0f 83 b1 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  10016c:	fe 05 41 3a 10 00    	incb   0x103a41
-  100172:	6a 00                	push   $0x0
-  100174:	6a 07                	push   $0x7
-  100176:	60                   	pusha
-  100177:	e9 5c 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100168 <isr_7>:
+  100168:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  10016f:	0f 83 b1 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  100175:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  10017b:	6a 00                	push   $0x0
+  10017d:	6a 07                	push   $0x7
+  10017f:	60                   	pusha
+  100180:	e9 5c 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010017c <isr_9>:
-  10017c:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100183:	0f 83 94 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  100189:	fe 05 41 3a 10 00    	incb   0x103a41
-  10018f:	6a 00                	push   $0x0
-  100191:	6a 09                	push   $0x9
-  100193:	60                   	pusha
-  100194:	e9 3f 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100185 <isr_9>:
+  100185:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  10018c:	0f 83 94 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  100192:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100198:	6a 00                	push   $0x0
+  10019a:	6a 09                	push   $0x9
+  10019c:	60                   	pusha
+  10019d:	e9 3f 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100199 <isr_15>:
-  100199:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1001a0:	0f 83 77 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  1001a6:	fe 05 41 3a 10 00    	incb   0x103a41
-  1001ac:	6a 00                	push   $0x0
-  1001ae:	6a 0f                	push   $0xf
-  1001b0:	60                   	pusha
-  1001b1:	e9 22 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+001001a2 <isr_15>:
+  1001a2:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1001a9:	0f 83 77 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  1001af:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1001b5:	6a 00                	push   $0x0
+  1001b7:	6a 0f                	push   $0xf
+  1001b9:	60                   	pusha
+  1001ba:	e9 22 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001001b6 <isr_16>:
-  1001b6:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1001bd:	0f 83 5a 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  1001c3:	fe 05 41 3a 10 00    	incb   0x103a41
-  1001c9:	6a 00                	push   $0x0
-  1001cb:	6a 10                	push   $0x10
-  1001cd:	60                   	pusha
-  1001ce:	e9 05 04 00 00       	jmp    1005d8 <common_interrupt_entry>
+001001bf <isr_16>:
+  1001bf:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1001c6:	0f 83 5a 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  1001cc:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1001d2:	6a 00                	push   $0x0
+  1001d4:	6a 10                	push   $0x10
+  1001d6:	60                   	pusha
+  1001d7:	e9 05 04 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001001d3 <isr_8>:
-  1001d3:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1001da:	0f 83 3d 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  1001e0:	fe 05 41 3a 10 00    	incb   0x103a41
-  1001e6:	6a 08                	push   $0x8
-  1001e8:	60                   	pusha
-  1001e9:	e9 ea 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+001001dc <isr_8>:
+  1001dc:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1001e3:	0f 83 3d 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  1001e9:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1001ef:	6a 08                	push   $0x8
+  1001f1:	60                   	pusha
+  1001f2:	e9 ea 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001001ee <isr_10>:
-  1001ee:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1001f5:	0f 83 22 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  1001fb:	fe 05 41 3a 10 00    	incb   0x103a41
-  100201:	6a 0a                	push   $0xa
-  100203:	60                   	pusha
-  100204:	e9 cf 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+001001f7 <isr_10>:
+  1001f7:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1001fe:	0f 83 22 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  100204:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  10020a:	6a 0a                	push   $0xa
+  10020c:	60                   	pusha
+  10020d:	e9 cf 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100209 <isr_11>:
-  100209:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100210:	0f 83 07 04 00 00    	jae    10061d <nesting_overflow_hlt>
-  100216:	fe 05 41 3a 10 00    	incb   0x103a41
-  10021c:	6a 0b                	push   $0xb
-  10021e:	60                   	pusha
-  10021f:	e9 b4 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100212 <isr_11>:
+  100212:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100219:	0f 83 07 04 00 00    	jae    100626 <nesting_overflow_hlt>
+  10021f:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100225:	6a 0b                	push   $0xb
+  100227:	60                   	pusha
+  100228:	e9 b4 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100224 <isr_12>:
-  100224:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10022b:	0f 83 ec 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  100231:	fe 05 41 3a 10 00    	incb   0x103a41
-  100237:	6a 0c                	push   $0xc
-  100239:	60                   	pusha
-  10023a:	e9 99 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010022d <isr_12>:
+  10022d:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100234:	0f 83 ec 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  10023a:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100240:	6a 0c                	push   $0xc
+  100242:	60                   	pusha
+  100243:	e9 99 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010023f <isr_13>:
-  10023f:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100246:	0f 83 d1 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  10024c:	fe 05 41 3a 10 00    	incb   0x103a41
-  100252:	6a 0d                	push   $0xd
-  100254:	60                   	pusha
-  100255:	e9 7e 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100248 <isr_13>:
+  100248:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  10024f:	0f 83 d1 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  100255:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  10025b:	6a 0d                	push   $0xd
+  10025d:	60                   	pusha
+  10025e:	e9 7e 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010025a <isr_14>:
-  10025a:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100261:	0f 83 b6 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  100267:	fe 05 41 3a 10 00    	incb   0x103a41
-  10026d:	6a 0e                	push   $0xe
-  10026f:	60                   	pusha
-  100270:	e9 63 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100263 <isr_14>:
+  100263:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  10026a:	0f 83 b6 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  100270:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100276:	6a 0e                	push   $0xe
+  100278:	60                   	pusha
+  100279:	e9 63 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100275 <isr_17>:
-  100275:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10027c:	0f 83 9b 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  100282:	fe 05 41 3a 10 00    	incb   0x103a41
-  100288:	6a 11                	push   $0x11
-  10028a:	60                   	pusha
-  10028b:	e9 48 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010027e <isr_17>:
+  10027e:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100285:	0f 83 9b 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  10028b:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100291:	6a 11                	push   $0x11
+  100293:	60                   	pusha
+  100294:	e9 48 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100290 <isr_18>:
-  100290:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100297:	0f 83 80 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  10029d:	fe 05 41 3a 10 00    	incb   0x103a41
-  1002a3:	6a 00                	push   $0x0
-  1002a5:	6a 12                	push   $0x12
-  1002a7:	60                   	pusha
-  1002a8:	e9 2b 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100299 <isr_18>:
+  100299:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1002a0:	0f 83 80 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  1002a6:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1002ac:	6a 00                	push   $0x0
+  1002ae:	6a 12                	push   $0x12
+  1002b0:	60                   	pusha
+  1002b1:	e9 2b 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001002ad <isr_19>:
-  1002ad:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1002b4:	0f 83 63 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  1002ba:	fe 05 41 3a 10 00    	incb   0x103a41
-  1002c0:	6a 00                	push   $0x0
-  1002c2:	6a 13                	push   $0x13
-  1002c4:	60                   	pusha
-  1002c5:	e9 0e 03 00 00       	jmp    1005d8 <common_interrupt_entry>
+001002b6 <isr_19>:
+  1002b6:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1002bd:	0f 83 63 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  1002c3:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1002c9:	6a 00                	push   $0x0
+  1002cb:	6a 13                	push   $0x13
+  1002cd:	60                   	pusha
+  1002ce:	e9 0e 03 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001002ca <isr_20>:
-  1002ca:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1002d1:	0f 83 46 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  1002d7:	fe 05 41 3a 10 00    	incb   0x103a41
-  1002dd:	6a 00                	push   $0x0
-  1002df:	6a 14                	push   $0x14
-  1002e1:	60                   	pusha
-  1002e2:	e9 f1 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+001002d3 <isr_20>:
+  1002d3:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1002da:	0f 83 46 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  1002e0:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1002e6:	6a 00                	push   $0x0
+  1002e8:	6a 14                	push   $0x14
+  1002ea:	60                   	pusha
+  1002eb:	e9 f1 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001002e7 <isr_21>:
-  1002e7:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1002ee:	0f 83 29 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  1002f4:	fe 05 41 3a 10 00    	incb   0x103a41
-  1002fa:	6a 00                	push   $0x0
-  1002fc:	6a 15                	push   $0x15
-  1002fe:	60                   	pusha
-  1002ff:	e9 d4 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+001002f0 <isr_21>:
+  1002f0:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1002f7:	0f 83 29 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  1002fd:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100303:	6a 00                	push   $0x0
+  100305:	6a 15                	push   $0x15
+  100307:	60                   	pusha
+  100308:	e9 d4 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100304 <isr_22>:
-  100304:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10030b:	0f 83 0c 03 00 00    	jae    10061d <nesting_overflow_hlt>
-  100311:	fe 05 41 3a 10 00    	incb   0x103a41
-  100317:	6a 00                	push   $0x0
-  100319:	6a 16                	push   $0x16
-  10031b:	60                   	pusha
-  10031c:	e9 b7 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010030d <isr_22>:
+  10030d:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100314:	0f 83 0c 03 00 00    	jae    100626 <nesting_overflow_hlt>
+  10031a:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100320:	6a 00                	push   $0x0
+  100322:	6a 16                	push   $0x16
+  100324:	60                   	pusha
+  100325:	e9 b7 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100321 <isr_23>:
-  100321:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100328:	0f 83 ef 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  10032e:	fe 05 41 3a 10 00    	incb   0x103a41
-  100334:	6a 00                	push   $0x0
-  100336:	6a 17                	push   $0x17
-  100338:	60                   	pusha
-  100339:	e9 9a 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010032a <isr_23>:
+  10032a:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100331:	0f 83 ef 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  100337:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  10033d:	6a 00                	push   $0x0
+  10033f:	6a 17                	push   $0x17
+  100341:	60                   	pusha
+  100342:	e9 9a 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010033e <isr_24>:
-  10033e:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100345:	0f 83 d2 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  10034b:	fe 05 41 3a 10 00    	incb   0x103a41
-  100351:	6a 00                	push   $0x0
-  100353:	6a 18                	push   $0x18
-  100355:	60                   	pusha
-  100356:	e9 7d 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100347 <isr_24>:
+  100347:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  10034e:	0f 83 d2 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  100354:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  10035a:	6a 00                	push   $0x0
+  10035c:	6a 18                	push   $0x18
+  10035e:	60                   	pusha
+  10035f:	e9 7d 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010035b <isr_25>:
-  10035b:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100362:	0f 83 b5 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  100368:	fe 05 41 3a 10 00    	incb   0x103a41
-  10036e:	6a 00                	push   $0x0
-  100370:	6a 19                	push   $0x19
-  100372:	60                   	pusha
-  100373:	e9 60 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100364 <isr_25>:
+  100364:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  10036b:	0f 83 b5 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  100371:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100377:	6a 00                	push   $0x0
+  100379:	6a 19                	push   $0x19
+  10037b:	60                   	pusha
+  10037c:	e9 60 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100378 <isr_26>:
-  100378:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10037f:	0f 83 98 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  100385:	fe 05 41 3a 10 00    	incb   0x103a41
-  10038b:	6a 00                	push   $0x0
-  10038d:	6a 1a                	push   $0x1a
-  10038f:	60                   	pusha
-  100390:	e9 43 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100381 <isr_26>:
+  100381:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100388:	0f 83 98 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  10038e:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100394:	6a 00                	push   $0x0
+  100396:	6a 1a                	push   $0x1a
+  100398:	60                   	pusha
+  100399:	e9 43 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100395 <isr_27>:
-  100395:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  10039c:	0f 83 7b 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  1003a2:	fe 05 41 3a 10 00    	incb   0x103a41
-  1003a8:	6a 00                	push   $0x0
-  1003aa:	6a 1b                	push   $0x1b
-  1003ac:	60                   	pusha
-  1003ad:	e9 26 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010039e <isr_27>:
+  10039e:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1003a5:	0f 83 7b 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  1003ab:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1003b1:	6a 00                	push   $0x0
+  1003b3:	6a 1b                	push   $0x1b
+  1003b5:	60                   	pusha
+  1003b6:	e9 26 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001003b2 <isr_28>:
-  1003b2:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1003b9:	0f 83 5e 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  1003bf:	fe 05 41 3a 10 00    	incb   0x103a41
-  1003c5:	6a 00                	push   $0x0
-  1003c7:	6a 1c                	push   $0x1c
-  1003c9:	60                   	pusha
-  1003ca:	e9 09 02 00 00       	jmp    1005d8 <common_interrupt_entry>
+001003bb <isr_28>:
+  1003bb:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1003c2:	0f 83 5e 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  1003c8:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1003ce:	6a 00                	push   $0x0
+  1003d0:	6a 1c                	push   $0x1c
+  1003d2:	60                   	pusha
+  1003d3:	e9 09 02 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001003cf <isr_29>:
-  1003cf:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1003d6:	0f 83 41 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  1003dc:	fe 05 41 3a 10 00    	incb   0x103a41
-  1003e2:	6a 00                	push   $0x0
-  1003e4:	6a 1d                	push   $0x1d
-  1003e6:	60                   	pusha
-  1003e7:	e9 ec 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+001003d8 <isr_29>:
+  1003d8:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1003df:	0f 83 41 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  1003e5:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  1003eb:	6a 00                	push   $0x0
+  1003ed:	6a 1d                	push   $0x1d
+  1003ef:	60                   	pusha
+  1003f0:	e9 ec 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001003ec <isr_30>:
-  1003ec:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  1003f3:	0f 83 24 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  1003f9:	fe 05 41 3a 10 00    	incb   0x103a41
-  1003ff:	6a 00                	push   $0x0
-  100401:	6a 1e                	push   $0x1e
-  100403:	60                   	pusha
-  100404:	e9 cf 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+001003f5 <isr_30>:
+  1003f5:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  1003fc:	0f 83 24 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  100402:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100408:	6a 00                	push   $0x0
+  10040a:	6a 1e                	push   $0x1e
+  10040c:	60                   	pusha
+  10040d:	e9 cf 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100409 <isr_31>:
-  100409:	80 3d 41 3a 10 00 03 	cmpb   $0x3,0x103a41
-  100410:	0f 83 07 02 00 00    	jae    10061d <nesting_overflow_hlt>
-  100416:	fe 05 41 3a 10 00    	incb   0x103a41
-  10041c:	6a 00                	push   $0x0
-  10041e:	6a 1f                	push   $0x1f
-  100420:	60                   	pusha
-  100421:	e9 b2 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100412 <isr_31>:
+  100412:	80 3d c1 3a 10 00 03 	cmpb   $0x3,0x103ac1
+  100419:	0f 83 07 02 00 00    	jae    100626 <nesting_overflow_hlt>
+  10041f:	fe 05 c1 3a 10 00    	incb   0x103ac1
+  100425:	6a 00                	push   $0x0
+  100427:	6a 1f                	push   $0x1f
+  100429:	60                   	pusha
+  10042a:	e9 b2 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100426 <irq_32>:
-  100426:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  10042d:	0f 83 ea 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  100433:	fe 05 40 3a 10 00    	incb   0x103a40
-  100439:	6a 00                	push   $0x0
-  10043b:	6a 20                	push   $0x20
-  10043d:	60                   	pusha
-  10043e:	e9 95 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010042f <irq_32>:
+  10042f:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  100436:	0f 83 ea 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  10043c:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  100442:	6a 00                	push   $0x0
+  100444:	6a 20                	push   $0x20
+  100446:	60                   	pusha
+  100447:	e9 95 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100443 <irq_33>:
-  100443:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  10044a:	0f 83 cd 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  100450:	fe 05 40 3a 10 00    	incb   0x103a40
-  100456:	6a 00                	push   $0x0
-  100458:	6a 21                	push   $0x21
-  10045a:	60                   	pusha
-  10045b:	e9 78 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+0010044c <irq_33>:
+  10044c:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  100453:	0f 83 cd 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  100459:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  10045f:	6a 00                	push   $0x0
+  100461:	6a 21                	push   $0x21
+  100463:	60                   	pusha
+  100464:	e9 78 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100460 <irq_34>:
-  100460:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  100467:	0f 83 b0 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  10046d:	fe 05 40 3a 10 00    	incb   0x103a40
-  100473:	6a 00                	push   $0x0
-  100475:	6a 22                	push   $0x22
-  100477:	60                   	pusha
-  100478:	e9 5b 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100469 <irq_34>:
+  100469:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  100470:	0f 83 b0 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  100476:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  10047c:	6a 00                	push   $0x0
+  10047e:	6a 22                	push   $0x22
+  100480:	60                   	pusha
+  100481:	e9 5b 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010047d <irq_35>:
-  10047d:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  100484:	0f 83 93 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  10048a:	fe 05 40 3a 10 00    	incb   0x103a40
-  100490:	6a 00                	push   $0x0
-  100492:	6a 23                	push   $0x23
-  100494:	60                   	pusha
-  100495:	e9 3e 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100486 <irq_35>:
+  100486:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  10048d:	0f 83 93 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  100493:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  100499:	6a 00                	push   $0x0
+  10049b:	6a 23                	push   $0x23
+  10049d:	60                   	pusha
+  10049e:	e9 3e 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010049a <irq_36>:
-  10049a:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  1004a1:	0f 83 76 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  1004a7:	fe 05 40 3a 10 00    	incb   0x103a40
-  1004ad:	6a 00                	push   $0x0
-  1004af:	6a 24                	push   $0x24
-  1004b1:	60                   	pusha
-  1004b2:	e9 21 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+001004a3 <irq_36>:
+  1004a3:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  1004aa:	0f 83 76 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  1004b0:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  1004b6:	6a 00                	push   $0x0
+  1004b8:	6a 24                	push   $0x24
+  1004ba:	60                   	pusha
+  1004bb:	e9 21 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001004b7 <irq_37>:
-  1004b7:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  1004be:	0f 83 59 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  1004c4:	fe 05 40 3a 10 00    	incb   0x103a40
-  1004ca:	6a 00                	push   $0x0
-  1004cc:	6a 25                	push   $0x25
-  1004ce:	60                   	pusha
-  1004cf:	e9 04 01 00 00       	jmp    1005d8 <common_interrupt_entry>
+001004c0 <irq_37>:
+  1004c0:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  1004c7:	0f 83 59 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  1004cd:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  1004d3:	6a 00                	push   $0x0
+  1004d5:	6a 25                	push   $0x25
+  1004d7:	60                   	pusha
+  1004d8:	e9 04 01 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001004d4 <irq_38>:
-  1004d4:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  1004db:	0f 83 3c 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  1004e1:	fe 05 40 3a 10 00    	incb   0x103a40
-  1004e7:	6a 00                	push   $0x0
-  1004e9:	6a 26                	push   $0x26
-  1004eb:	60                   	pusha
-  1004ec:	e9 e7 00 00 00       	jmp    1005d8 <common_interrupt_entry>
+001004dd <irq_38>:
+  1004dd:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  1004e4:	0f 83 3c 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  1004ea:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  1004f0:	6a 00                	push   $0x0
+  1004f2:	6a 26                	push   $0x26
+  1004f4:	60                   	pusha
+  1004f5:	e9 e7 00 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-001004f1 <irq_39>:
-  1004f1:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  1004f8:	0f 83 1f 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  1004fe:	fe 05 40 3a 10 00    	incb   0x103a40
-  100504:	6a 00                	push   $0x0
-  100506:	6a 27                	push   $0x27
-  100508:	60                   	pusha
-  100509:	e9 ca 00 00 00       	jmp    1005d8 <common_interrupt_entry>
+001004fa <irq_39>:
+  1004fa:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  100501:	0f 83 1f 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  100507:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  10050d:	6a 00                	push   $0x0
+  10050f:	6a 27                	push   $0x27
+  100511:	60                   	pusha
+  100512:	e9 ca 00 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010050e <irq_40>:
-  10050e:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  100515:	0f 83 02 01 00 00    	jae    10061d <nesting_overflow_hlt>
-  10051b:	fe 05 40 3a 10 00    	incb   0x103a40
-  100521:	6a 00                	push   $0x0
-  100523:	6a 28                	push   $0x28
-  100525:	60                   	pusha
-  100526:	e9 ad 00 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100517 <irq_40>:
+  100517:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  10051e:	0f 83 02 01 00 00    	jae    100626 <nesting_overflow_hlt>
+  100524:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  10052a:	6a 00                	push   $0x0
+  10052c:	6a 28                	push   $0x28
+  10052e:	60                   	pusha
+  10052f:	e9 ad 00 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-0010052b <irq_41>:
-  10052b:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  100532:	0f 83 e5 00 00 00    	jae    10061d <nesting_overflow_hlt>
-  100538:	fe 05 40 3a 10 00    	incb   0x103a40
-  10053e:	6a 00                	push   $0x0
-  100540:	6a 29                	push   $0x29
-  100542:	60                   	pusha
-  100543:	e9 90 00 00 00       	jmp    1005d8 <common_interrupt_entry>
+00100534 <irq_41>:
+  100534:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  10053b:	0f 83 e5 00 00 00    	jae    100626 <nesting_overflow_hlt>
+  100541:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  100547:	6a 00                	push   $0x0
+  100549:	6a 29                	push   $0x29
+  10054b:	60                   	pusha
+  10054c:	e9 90 00 00 00       	jmp    1005e1 <common_interrupt_entry>
 
-00100548 <irq_42>:
-  100548:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  10054f:	0f 83 c8 00 00 00    	jae    10061d <nesting_overflow_hlt>
-  100555:	fe 05 40 3a 10 00    	incb   0x103a40
-  10055b:	6a 00                	push   $0x0
-  10055d:	6a 2a                	push   $0x2a
-  10055f:	60                   	pusha
-  100560:	eb 76                	jmp    1005d8 <common_interrupt_entry>
+00100551 <irq_42>:
+  100551:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  100558:	0f 83 c8 00 00 00    	jae    100626 <nesting_overflow_hlt>
+  10055e:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  100564:	6a 00                	push   $0x0
+  100566:	6a 2a                	push   $0x2a
+  100568:	60                   	pusha
+  100569:	eb 76                	jmp    1005e1 <common_interrupt_entry>
 
-00100562 <irq_43>:
-  100562:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  100569:	0f 83 ae 00 00 00    	jae    10061d <nesting_overflow_hlt>
-  10056f:	fe 05 40 3a 10 00    	incb   0x103a40
-  100575:	6a 00                	push   $0x0
-  100577:	6a 2b                	push   $0x2b
-  100579:	60                   	pusha
-  10057a:	eb 5c                	jmp    1005d8 <common_interrupt_entry>
+0010056b <irq_43>:
+  10056b:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  100572:	0f 83 ae 00 00 00    	jae    100626 <nesting_overflow_hlt>
+  100578:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  10057e:	6a 00                	push   $0x0
+  100580:	6a 2b                	push   $0x2b
+  100582:	60                   	pusha
+  100583:	eb 5c                	jmp    1005e1 <common_interrupt_entry>
 
-0010057c <irq_44>:
-  10057c:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  100583:	0f 83 94 00 00 00    	jae    10061d <nesting_overflow_hlt>
-  100589:	fe 05 40 3a 10 00    	incb   0x103a40
-  10058f:	6a 00                	push   $0x0
-  100591:	6a 2c                	push   $0x2c
-  100593:	60                   	pusha
-  100594:	eb 42                	jmp    1005d8 <common_interrupt_entry>
+00100585 <irq_44>:
+  100585:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  10058c:	0f 83 94 00 00 00    	jae    100626 <nesting_overflow_hlt>
+  100592:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  100598:	6a 00                	push   $0x0
+  10059a:	6a 2c                	push   $0x2c
+  10059c:	60                   	pusha
+  10059d:	eb 42                	jmp    1005e1 <common_interrupt_entry>
 
-00100596 <irq_45>:
-  100596:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  10059d:	73 7e                	jae    10061d <nesting_overflow_hlt>
-  10059f:	fe 05 40 3a 10 00    	incb   0x103a40
-  1005a5:	6a 00                	push   $0x0
-  1005a7:	6a 2d                	push   $0x2d
-  1005a9:	60                   	pusha
-  1005aa:	eb 2c                	jmp    1005d8 <common_interrupt_entry>
+0010059f <irq_45>:
+  10059f:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  1005a6:	73 7e                	jae    100626 <nesting_overflow_hlt>
+  1005a8:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  1005ae:	6a 00                	push   $0x0
+  1005b0:	6a 2d                	push   $0x2d
+  1005b2:	60                   	pusha
+  1005b3:	eb 2c                	jmp    1005e1 <common_interrupt_entry>
 
-001005ac <irq_46>:
-  1005ac:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  1005b3:	73 68                	jae    10061d <nesting_overflow_hlt>
-  1005b5:	fe 05 40 3a 10 00    	incb   0x103a40
-  1005bb:	6a 00                	push   $0x0
-  1005bd:	6a 2e                	push   $0x2e
-  1005bf:	60                   	pusha
-  1005c0:	eb 16                	jmp    1005d8 <common_interrupt_entry>
+001005b5 <irq_46>:
+  1005b5:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  1005bc:	73 68                	jae    100626 <nesting_overflow_hlt>
+  1005be:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  1005c4:	6a 00                	push   $0x0
+  1005c6:	6a 2e                	push   $0x2e
+  1005c8:	60                   	pusha
+  1005c9:	eb 16                	jmp    1005e1 <common_interrupt_entry>
 
-001005c2 <irq_47>:
-  1005c2:	80 3d 40 3a 10 00 0f 	cmpb   $0xf,0x103a40
-  1005c9:	73 52                	jae    10061d <nesting_overflow_hlt>
-  1005cb:	fe 05 40 3a 10 00    	incb   0x103a40
-  1005d1:	6a 00                	push   $0x0
-  1005d3:	6a 2f                	push   $0x2f
-  1005d5:	60                   	pusha
-  1005d6:	eb 00                	jmp    1005d8 <common_interrupt_entry>
+001005cb <irq_47>:
+  1005cb:	80 3d c0 3a 10 00 0f 	cmpb   $0xf,0x103ac0
+  1005d2:	73 52                	jae    100626 <nesting_overflow_hlt>
+  1005d4:	fe 05 c0 3a 10 00    	incb   0x103ac0
+  1005da:	6a 00                	push   $0x0
+  1005dc:	6a 2f                	push   $0x2f
+  1005de:	60                   	pusha
+  1005df:	eb 00                	jmp    1005e1 <common_interrupt_entry>
 
-001005d8 <common_interrupt_entry>:
-  1005d8:	89 e2                	mov    %esp,%edx
-  1005da:	bb 37 47 10 00       	mov    $0x104737,%ebx
-  1005df:	b9 4b 62 10 00       	mov    $0x10624b,%ecx
-  1005e4:	39 da                	cmp    %ebx,%edx
-  1005e6:	0f 46 e1             	cmovbe %ecx,%esp
-  1005e9:	39 ca                	cmp    %ecx,%edx
-  1005eb:	0f 47 e1             	cmova  %ecx,%esp
+001005e1 <common_interrupt_entry>:
+  1005e1:	89 e2                	mov    %esp,%edx
+  1005e3:	bb b7 47 10 00       	mov    $0x1047b7,%ebx
+  1005e8:	b9 cb 62 10 00       	mov    $0x1062cb,%ecx
+  1005ed:	39 da                	cmp    %ebx,%edx
+  1005ef:	0f 46 e1             	cmovbe %ecx,%esp
+  1005f2:	39 ca                	cmp    %ecx,%edx
+  1005f4:	0f 47 e1             	cmova  %ecx,%esp
 
-001005ee <set_interrupt_grounds>:
-  1005ee:	52                   	push   %edx
-  1005ef:	66 b8 10 00          	mov    $0x10,%ax
-  1005f3:	8e d8                	mov    %eax,%ds
-  1005f5:	8e c0                	mov    %eax,%es
+001005f7 <set_interrupt_grounds>:
   1005f7:	52                   	push   %edx
-  1005f8:	e8 43 03 00 00       	call   100940 <interrupt_dispatcher>
-  1005fd:	83 c4 04             	add    $0x4,%esp
-  100600:	5c                   	pop    %esp
-  100601:	83 7c 24 20 20       	cmpl   $0x20,0x20(%esp)
-  100606:	0f 93 c0             	setae  %al
-  100609:	0f 92 c3             	setb   %bl
-  10060c:	28 05 40 3a 10 00    	sub    %al,0x103a40
-  100612:	28 1d 41 3a 10 00    	sub    %bl,0x103a41
-  100618:	61                   	popa
-  100619:	83 c4 08             	add    $0x8,%esp
-  10061c:	cf                   	iret
+  1005f8:	66 b8 10 00          	mov    $0x10,%ax
+  1005fc:	8e d8                	mov    %eax,%ds
+  1005fe:	8e c0                	mov    %eax,%es
+  100600:	52                   	push   %edx
+  100601:	e8 3a 03 00 00       	call   100940 <interrupt_dispatcher>
+  100606:	83 c4 04             	add    $0x4,%esp
+  100609:	5c                   	pop    %esp
+  10060a:	83 7c 24 20 20       	cmpl   $0x20,0x20(%esp)
+  10060f:	0f 93 c0             	setae  %al
+  100612:	0f 92 c3             	setb   %bl
+  100615:	28 05 c0 3a 10 00    	sub    %al,0x103ac0
+  10061b:	28 1d c1 3a 10 00    	sub    %bl,0x103ac1
+  100621:	61                   	popa
+  100622:	83 c4 08             	add    $0x8,%esp
+  100625:	cf                   	iret
 
-0010061d <nesting_overflow_hlt>:
-  10061d:	fa                   	cli
+00100626 <nesting_overflow_hlt>:
+  100626:	fa                   	cli
 
-0010061e <halt_interrupt_table>:
-  10061e:	f4                   	hlt
-  10061f:	eb fd                	jmp    10061e <halt_interrupt_table>
-  100621:	66 90                	xchg   %ax,%ax
-  100623:	66 90                	xchg   %ax,%ax
-  100625:	66 90                	xchg   %ax,%ax
-  100627:	66 90                	xchg   %ax,%ax
-  100629:	66 90                	xchg   %ax,%ax
-  10062b:	66 90                	xchg   %ax,%ax
-  10062d:	66 90                	xchg   %ax,%ax
-  10062f:	90                   	nop
+00100627 <halt_interrupt_table>:
+  100627:	f4                   	hlt
+  100628:	eb fd                	jmp    100627 <halt_interrupt_table>
+  10062a:	66 90                	xchg   %ax,%ax
+  10062c:	66 90                	xchg   %ax,%ax
+  10062e:	66 90                	xchg   %ax,%ax
 
 00100630 <kernel_main>:
   100630:	55                   	push   %ebp
@@ -534,7 +533,7 @@ Disassembly of section .text:
   100633:	53                   	push   %ebx
   100634:	8d 5d f0             	lea    -0x10(%ebp),%ebx
   100637:	83 ec 14             	sub    $0x14,%esp
-  10063a:	e8 11 2b 00 00       	call   103150 <cpu::gdt::initialize()>
+  10063a:	e8 a1 2b 00 00       	call   1031e0 <cpu::gdt::initialize()>
   10063f:	83 ec 0c             	sub    $0xc,%esp
   100642:	6a 64                	push   $0x64
   100644:	e8 87 05 00 00       	call   100bd0 <kernel::initialize_pit(unsigned long)>
@@ -543,7 +542,7 @@ Disassembly of section .text:
   100655:	e8 f6 23 00 00       	call   102a50 <terminal::output::initialize()>
   10065a:	89 1c 24             	mov    %ebx,(%esp)
   10065d:	e8 de 05 00 00       	call   100c40 <kernel::memory::get_e820_memory_map()>
-  100662:	b9 4b 62 10 00       	mov    $0x10624b,%ecx
+  100662:	b9 cb 62 10 00       	mov    $0x1062cb,%ecx
   100667:	ba 00 00 10 00       	mov    $0x100000,%edx
   10066c:	89 d8                	mov    %ebx,%eax
   10066e:	83 c4 0c             	add    $0xc,%esp
@@ -573,74 +572,74 @@ Disassembly of section .text:
   1006a7:	8b 5d 0c             	mov    0xc(%ebp),%ebx
   1006aa:	6a 00                	push   $0x0
   1006ac:	6a 0c                	push   $0xc
-  1006ae:	68 80 31 10 00       	push   $0x103180
-  1006b3:	68 42 3a 10 00       	push   $0x103a42
+  1006ae:	68 00 32 10 00       	push   $0x103200
+  1006b3:	68 c2 3a 10 00       	push   $0x103ac2
   1006b8:	e8 c3 03 00 00       	call   100a80 <kernel::logger::set_prefix_text_and_color(char const*, io::vga_color, io::vga_color)>
-  1006bd:	ba 8a 31 10 00       	mov    $0x10318a,%edx
-  1006c2:	b8 42 3a 10 00       	mov    $0x103a42,%eax
-  1006c7:	e8 14 24 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1006bd:	ba 0a 32 10 00       	mov    $0x10320a,%edx
+  1006c2:	b8 c2 3a 10 00       	mov    $0x103ac2,%eax
+  1006c7:	e8 34 24 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1006cc:	89 f2                	mov    %esi,%edx
-  1006ce:	e8 0d 24 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1006ce:	e8 2d 24 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1006d3:	ba 20 00 00 00       	mov    $0x20,%edx
-  1006d8:	e8 a3 23 00 00       	call   102a80 <terminal::output::operator<<(char)>
+  1006d8:	e8 b3 23 00 00       	call   102a90 <terminal::output::operator<<(char)>
   1006dd:	8b 55 08             	mov    0x8(%ebp),%edx
-  1006e0:	e8 fb 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
-  1006e5:	ba e0 2c 10 00       	mov    $0x102ce0,%edx
-  1006ea:	e8 d1 25 00 00       	call   102cc0 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>
-  1006ef:	ba 9a 31 10 00       	mov    $0x10319a,%edx
-  1006f4:	e8 e7 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1006e0:	e8 1b 24 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
+  1006e5:	ba 20 2d 10 00       	mov    $0x102d20,%edx
+  1006ea:	e8 11 26 00 00       	call   102d00 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>
+  1006ef:	ba 1a 32 10 00       	mov    $0x10321a,%edx
+  1006f4:	e8 07 24 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1006f9:	8b 53 28             	mov    0x28(%ebx),%edx
-  1006fc:	e8 5f 24 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  100701:	ba a0 31 10 00       	mov    $0x1031a0,%edx
-  100706:	e8 d5 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1006fc:	e8 9f 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  100701:	ba 20 32 10 00       	mov    $0x103220,%edx
+  100706:	e8 f5 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   10070b:	8b 53 30             	mov    0x30(%ebx),%edx
-  10070e:	e8 4d 24 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  100713:	ba a9 31 10 00       	mov    $0x1031a9,%edx
-  100718:	e8 c3 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  10070e:	e8 8d 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  100713:	ba 29 32 10 00       	mov    $0x103229,%edx
+  100718:	e8 e3 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   10071d:	8b 53 24             	mov    0x24(%ebx),%edx
-  100720:	e8 3b 24 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  100725:	ba b6 31 10 00       	mov    $0x1031b6,%edx
-  10072a:	e8 b1 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100720:	e8 7b 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  100725:	ba 36 32 10 00       	mov    $0x103236,%edx
+  10072a:	e8 d1 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   10072f:	8b 53 1c             	mov    0x1c(%ebx),%edx
-  100732:	e8 29 24 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  100737:	ba bc 31 10 00       	mov    $0x1031bc,%edx
-  10073c:	e8 9f 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100732:	e8 69 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  100737:	ba 3c 32 10 00       	mov    $0x10323c,%edx
+  10073c:	e8 bf 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100741:	8b 53 18             	mov    0x18(%ebx),%edx
-  100744:	e8 17 24 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  100749:	ba c6 31 10 00       	mov    $0x1031c6,%edx
-  10074e:	e8 8d 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100744:	e8 57 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  100749:	ba 46 32 10 00       	mov    $0x103246,%edx
+  10074e:	e8 ad 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100753:	8b 53 14             	mov    0x14(%ebx),%edx
-  100756:	e8 05 24 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  10075b:	ba cc 31 10 00       	mov    $0x1031cc,%edx
-  100760:	e8 7b 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100756:	e8 45 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  10075b:	ba 4c 32 10 00       	mov    $0x10324c,%edx
+  100760:	e8 9b 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100765:	8b 53 10             	mov    0x10(%ebx),%edx
-  100768:	e8 f3 23 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  10076d:	ba d2 31 10 00       	mov    $0x1031d2,%edx
-  100772:	e8 69 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100768:	e8 33 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  10076d:	ba 52 32 10 00       	mov    $0x103252,%edx
+  100772:	e8 89 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100777:	8b 53 0c             	mov    0xc(%ebx),%edx
-  10077a:	e8 e1 23 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  10077f:	ba d8 31 10 00       	mov    $0x1031d8,%edx
-  100784:	e8 57 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  10077a:	e8 21 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  10077f:	ba 58 32 10 00       	mov    $0x103258,%edx
+  100784:	e8 77 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100789:	8b 53 08             	mov    0x8(%ebx),%edx
-  10078c:	e8 cf 23 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  100791:	ba de 31 10 00       	mov    $0x1031de,%edx
-  100796:	e8 45 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  10078c:	e8 0f 24 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  100791:	ba 5e 32 10 00       	mov    $0x10325e,%edx
+  100796:	e8 65 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   10079b:	8b 53 04             	mov    0x4(%ebx),%edx
-  10079e:	e8 bd 23 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  1007a3:	ba e4 31 10 00       	mov    $0x1031e4,%edx
-  1007a8:	e8 33 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  10079e:	e8 fd 23 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  1007a3:	ba 64 32 10 00       	mov    $0x103264,%edx
+  1007a8:	e8 53 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1007ad:	8b 13                	mov    (%ebx),%edx
-  1007af:	e8 ac 23 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  1007b4:	ba eb 31 10 00       	mov    $0x1031eb,%edx
-  1007b9:	e8 22 23 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1007af:	e8 ec 23 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  1007b4:	ba 6b 32 10 00       	mov    $0x10326b,%edx
+  1007b9:	e8 42 23 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1007be:	8b 53 20             	mov    0x20(%ebx),%edx
-  1007c1:	e8 9a 23 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
+  1007c1:	e8 da 23 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
   1007c6:	ba 0a 00 00 00       	mov    $0xa,%edx
-  1007cb:	e8 b0 22 00 00       	call   102a80 <terminal::output::operator<<(char)>
+  1007cb:	e8 c0 22 00 00       	call   102a90 <terminal::output::operator<<(char)>
   1007d0:	58                   	pop    %eax
   1007d1:	5a                   	pop    %edx
-  1007d2:	68 f4 31 10 00       	push   $0x1031f4
-  1007d7:	68 42 3a 10 00       	push   $0x103a42
+  1007d2:	68 74 32 10 00       	push   $0x103274
+  1007d7:	68 c2 3a 10 00       	push   $0x103ac2
   1007dc:	e8 df 02 00 00       	call   100ac0 <kernel::logger::panic(char const*)>
   1007e1:	66 90                	xchg   %ax,%ax
   1007e3:	66 90                	xchg   %ax,%ax
@@ -666,46 +665,46 @@ Disassembly of section .text:
   10080d:	75 29                	jne    100838 <(anonymous namespace)::handle_cpu_exception(kernel::interrupt_frame*)+0x48>
   10080f:	50                   	push   %eax
   100810:	50                   	push   %eax
-  100811:	b8 1d 32 10 00       	mov    $0x10321d,%eax
+  100811:	b8 9d 32 10 00       	mov    $0x10329d,%eax
   100816:	51                   	push   %ecx
-  100817:	68 2c 32 10 00       	push   $0x10322c
+  100817:	68 ac 32 10 00       	push   $0x1032ac
   10081c:	e8 7f fe ff ff       	call   1006a0 <(anonymous namespace)::handle_exception(char const*, char const*, kernel::interrupt_frame*)>
   100821:	83 f8 0e             	cmp    $0xe,%eax
   100824:	75 12                	jne    100838 <(anonymous namespace)::handle_cpu_exception(kernel::interrupt_frame*)+0x48>
   100826:	50                   	push   %eax
   100827:	50                   	push   %eax
-  100828:	b8 4d 32 10 00       	mov    $0x10324d,%eax
+  100828:	b8 cd 32 10 00       	mov    $0x1032cd,%eax
   10082d:	51                   	push   %ecx
-  10082e:	68 58 32 10 00       	push   $0x103258
+  10082e:	68 d8 32 10 00       	push   $0x1032d8
   100833:	e8 68 fe ff ff       	call   1006a0 <(anonymous namespace)::handle_exception(char const*, char const*, kernel::interrupt_frame*)>
   100838:	6a 00                	push   $0x0
   10083a:	6a 0e                	push   $0xe
-  10083c:	68 5c 32 10 00       	push   $0x10325c
-  100841:	68 42 3a 10 00       	push   $0x103a42
+  10083c:	68 dc 32 10 00       	push   $0x1032dc
+  100841:	68 c2 3a 10 00       	push   $0x103ac2
   100846:	89 4d f4             	mov    %ecx,-0xc(%ebp)
   100849:	e8 32 02 00 00       	call   100a80 <kernel::logger::set_prefix_text_and_color(char const*, io::vga_color, io::vga_color)>
-  10084e:	ba c0 32 10 00       	mov    $0x1032c0,%edx
-  100853:	b8 42 3a 10 00       	mov    $0x103a42,%eax
-  100858:	e8 83 22 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  10084e:	ba 40 33 10 00       	mov    $0x103340,%edx
+  100853:	b8 c2 3a 10 00       	mov    $0x103ac2,%eax
+  100858:	e8 a3 22 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   10085d:	8b 4d f4             	mov    -0xc(%ebp),%ecx
   100860:	8b 51 20             	mov    0x20(%ecx),%edx
-  100863:	e8 f8 22 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
+  100863:	e8 38 23 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
   100868:	83 c4 10             	add    $0x10,%esp
   10086b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
   100870:	fa                   	cli
   100871:	f4                   	hlt
   100872:	eb fc                	jmp    100870 <(anonymous namespace)::handle_cpu_exception(kernel::interrupt_frame*)+0x80>
   100874:	52                   	push   %edx
-  100875:	b8 30 32 10 00       	mov    $0x103230,%eax
+  100875:	b8 b0 32 10 00       	mov    $0x1032b0,%eax
   10087a:	52                   	push   %edx
   10087b:	51                   	push   %ecx
-  10087c:	68 49 32 10 00       	push   $0x103249
+  10087c:	68 c9 32 10 00       	push   $0x1032c9
   100881:	e8 1a fe ff ff       	call   1006a0 <(anonymous namespace)::handle_exception(char const*, char const*, kernel::interrupt_frame*)>
   100886:	50                   	push   %eax
   100887:	50                   	push   %eax
-  100888:	b8 0c 32 10 00       	mov    $0x10320c,%eax
+  100888:	b8 8c 32 10 00       	mov    $0x10328c,%eax
   10088d:	51                   	push   %ecx
-  10088e:	68 19 32 10 00       	push   $0x103219
+  10088e:	68 99 32 10 00       	push   $0x103299
   100893:	e8 08 fe ff ff       	call   1006a0 <(anonymous namespace)::handle_exception(char const*, char const*, kernel::interrupt_frame*)>
   100898:	66 90                	xchg   %ax,%ax
   10089a:	66 90                	xchg   %ax,%ax
@@ -723,28 +722,28 @@ Disassembly of section .text:
   1008b0:	89 c3                	mov    %eax,%ebx
   1008b2:	6a 00                	push   $0x0
   1008b4:	6a 0c                	push   $0xc
-  1008b6:	68 80 31 10 00       	push   $0x103180
-  1008bb:	68 42 3a 10 00       	push   $0x103a42
+  1008b6:	68 00 32 10 00       	push   $0x103200
+  1008bb:	68 c2 3a 10 00       	push   $0x103ac2
   1008c0:	e8 bb 01 00 00       	call   100a80 <kernel::logger::set_prefix_text_and_color(char const*, io::vga_color, io::vga_color)>
-  1008c5:	ba 68 32 10 00       	mov    $0x103268,%edx
-  1008ca:	b8 42 3a 10 00       	mov    $0x103a42,%eax
-  1008cf:	e8 0c 22 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1008c5:	ba e8 32 10 00       	mov    $0x1032e8,%edx
+  1008ca:	b8 c2 3a 10 00       	mov    $0x103ac2,%eax
+  1008cf:	e8 2c 22 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1008d4:	89 f2                	mov    %esi,%edx
-  1008d6:	e8 85 22 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  1008db:	ba 85 32 10 00       	mov    $0x103285,%edx
-  1008e0:	e8 fb 21 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1008d6:	e8 c5 22 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  1008db:	ba 05 33 10 00       	mov    $0x103305,%edx
+  1008e0:	e8 1b 22 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   1008e5:	8b 53 24             	mov    0x24(%ebx),%edx
-  1008e8:	e8 73 22 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
-  1008ed:	ba 93 32 10 00       	mov    $0x103293,%edx
-  1008f2:	e8 e9 21 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
-  1008f7:	ba e0 2c 10 00       	mov    $0x102ce0,%edx
-  1008fc:	e8 bf 23 00 00       	call   102cc0 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>
+  1008e8:	e8 b3 22 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
+  1008ed:	ba 13 33 10 00       	mov    $0x103313,%edx
+  1008f2:	e8 09 22 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
+  1008f7:	ba 20 2d 10 00       	mov    $0x102d20,%edx
+  1008fc:	e8 ff 23 00 00       	call   102d00 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>
   100901:	8b 53 28             	mov    0x28(%ebx),%edx
-  100904:	e8 57 22 00 00       	call   102b60 <terminal::output::operator<<(unsigned long)>
+  100904:	e8 97 22 00 00       	call   102ba0 <terminal::output::operator<<(unsigned long)>
   100909:	ba 0a 00 00 00       	mov    $0xa,%edx
-  10090e:	e8 6d 21 00 00       	call   102a80 <terminal::output::operator<<(char)>
-  100913:	ba d0 2c 10 00       	mov    $0x102cd0,%edx
-  100918:	e8 a3 23 00 00       	call   102cc0 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>
+  10090e:	e8 7d 21 00 00       	call   102a90 <terminal::output::operator<<(char)>
+  100913:	ba 10 2d 10 00       	mov    $0x102d10,%edx
+  100918:	e8 e3 23 00 00       	call   102d00 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>
   10091d:	8d 46 e0             	lea    -0x20(%esi),%eax
   100920:	83 c4 10             	add    $0x10,%esp
   100923:	83 f8 0f             	cmp    $0xf,%eax
@@ -772,7 +771,7 @@ Disassembly of section .text:
   100944:	83 ec 04             	sub    $0x4,%esp
   100947:	8b 45 08             	mov    0x8(%ebp),%eax
   10094a:	8b 58 20             	mov    0x20(%eax),%ebx
-  10094d:	ff 14 9d 20 33 10 00 	call   *0x103320(,%ebx,4)
+  10094d:	ff 14 9d a0 33 10 00 	call   *0x1033a0(,%ebx,4)
   100954:	8d 43 e0             	lea    -0x20(%ebx),%eax
   100957:	83 f8 0f             	cmp    $0xf,%eax
   10095a:	76 0c                	jbe    100968 <interrupt_dispatcher+0x28>
@@ -800,35 +799,35 @@ Disassembly of section .text:
   10098a:	e8 71 01 00 00       	call   100b00 <kernel::pic_remap(unsigned char, unsigned char)>
   10098f:	68 8e 00 00 00       	push   $0x8e
   100994:	6a 08                	push   $0x8
-  100996:	68 94 00 10 00       	push   $0x100094
+  100996:	68 9d 00 10 00       	push   $0x10009d
   10099b:	6a 00                	push   $0x0
   10099d:	e8 7e 00 00 00       	call   100a20 <kernel::set_interrupt_gate(unsigned char, unsigned long, unsigned short, unsigned char)>
   1009a2:	83 c4 20             	add    $0x20,%esp
   1009a5:	68 8e 00 00 00       	push   $0x8e
   1009aa:	6a 08                	push   $0x8
-  1009ac:	68 42 01 10 00       	push   $0x100142
+  1009ac:	68 4b 01 10 00       	push   $0x10014b
   1009b1:	6a 06                	push   $0x6
   1009b3:	e8 68 00 00 00       	call   100a20 <kernel::set_interrupt_gate(unsigned char, unsigned long, unsigned short, unsigned char)>
   1009b8:	68 8e 00 00 00       	push   $0x8e
   1009bd:	6a 08                	push   $0x8
-  1009bf:	68 3f 02 10 00       	push   $0x10023f
+  1009bf:	68 48 02 10 00       	push   $0x100248
   1009c4:	6a 0d                	push   $0xd
   1009c6:	e8 55 00 00 00       	call   100a20 <kernel::set_interrupt_gate(unsigned char, unsigned long, unsigned short, unsigned char)>
   1009cb:	83 c4 20             	add    $0x20,%esp
   1009ce:	68 8e 00 00 00       	push   $0x8e
   1009d3:	6a 08                	push   $0x8
-  1009d5:	68 5a 02 10 00       	push   $0x10025a
+  1009d5:	68 63 02 10 00       	push   $0x100263
   1009da:	6a 0e                	push   $0xe
   1009dc:	e8 3f 00 00 00       	call   100a20 <kernel::set_interrupt_gate(unsigned char, unsigned long, unsigned short, unsigned char)>
   1009e1:	68 8e 00 00 00       	push   $0x8e
   1009e6:	6a 08                	push   $0x8
-  1009e8:	68 26 04 10 00       	push   $0x100426
+  1009e8:	68 2f 04 10 00       	push   $0x10042f
   1009ed:	6a 20                	push   $0x20
   1009ef:	e8 2c 00 00 00       	call   100a20 <kernel::set_interrupt_gate(unsigned char, unsigned long, unsigned short, unsigned char)>
   1009f4:	83 c4 20             	add    $0x20,%esp
   1009f7:	68 8e 00 00 00       	push   $0x8e
   1009fc:	6a 08                	push   $0x8
-  1009fe:	68 43 04 10 00       	push   $0x100443
+  1009fe:	68 4c 04 10 00       	push   $0x10044c
   100a03:	6a 21                	push   $0x21
   100a05:	e8 16 00 00 00       	call   100a20 <kernel::set_interrupt_gate(unsigned char, unsigned long, unsigned short, unsigned char)>
   100a0a:	e8 a1 01 00 00       	call   100bb0 <kernel::mask_all_except_timer_and_keyboard()>
@@ -849,10 +848,10 @@ Disassembly of section .text:
   100a2b:	53                   	push   %ebx
   100a2c:	8b 75 10             	mov    0x10(%ebp),%esi
   100a2f:	8b 5d 14             	mov    0x14(%ebp),%ebx
-  100a32:	8d 14 cd 60 3a 10 00 	lea    0x103a60(,%ecx,8),%edx
-  100a39:	66 89 04 cd 60 3a 10 	mov    %ax,0x103a60(,%ecx,8)
+  100a32:	8d 14 cd e0 3a 10 00 	lea    0x103ae0(,%ecx,8),%edx
+  100a39:	66 89 04 cd e0 3a 10 	mov    %ax,0x103ae0(,%ecx,8)
   100a40:	00 
-  100a41:	0f b7 0d 20 37 10 00 	movzwl 0x103720,%ecx
+  100a41:	0f b7 0d a0 37 10 00 	movzwl 0x1037a0,%ecx
   100a48:	c1 e8 10             	shr    $0x10,%eax
   100a4b:	66 89 72 02          	mov    %si,0x2(%edx)
   100a4f:	88 dd                	mov    %bl,%ch
@@ -871,7 +870,7 @@ Disassembly of section .text:
   100a66:	89 e5                	mov    %esp,%ebp
   100a68:	83 ec 10             	sub    $0x10,%esp
   100a6b:	66 89 45 fa          	mov    %ax,-0x6(%ebp)
-  100a6f:	c7 45 fc 60 3a 10 00 	movl   $0x103a60,-0x4(%ebp)
+  100a6f:	c7 45 fc e0 3a 10 00 	movl   $0x103ae0,-0x4(%ebp)
   100a76:	0f 01 5d fa          	lidtl  -0x6(%ebp)
   100a7a:	c9                   	leave
   100a7b:	c3                   	ret
@@ -884,14 +883,14 @@ Disassembly of section .text:
   100a83:	53                   	push   %ebx
   100a84:	83 ec 04             	sub    $0x4,%esp
   100a87:	0f b6 45 14          	movzbl 0x14(%ebp),%eax
-  100a8b:	0f b6 1d 0b 3a 10 00 	movzbl 0x103a0b,%ebx
+  100a8b:	0f b6 1d 8b 3a 10 00 	movzbl 0x103a8b,%ebx
   100a92:	8b 55 0c             	mov    0xc(%ebp),%edx
   100a95:	c1 e0 04             	shl    $0x4,%eax
   100a98:	0a 45 10             	or     0x10(%ebp),%al
-  100a9b:	a2 0b 3a 10 00       	mov    %al,0x103a0b
+  100a9b:	a2 8b 3a 10 00       	mov    %al,0x103a8b
   100aa0:	8b 45 08             	mov    0x8(%ebp),%eax
-  100aa3:	e8 38 20 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
-  100aa8:	88 1d 0b 3a 10 00    	mov    %bl,0x103a0b
+  100aa3:	e8 58 20 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
+  100aa8:	88 1d 8b 3a 10 00    	mov    %bl,0x103a8b
   100aae:	8b 5d fc             	mov    -0x4(%ebp),%ebx
   100ab1:	c9                   	leave
   100ab2:	c3                   	ret
@@ -905,16 +904,16 @@ Disassembly of section .text:
 
 00100ac0 <kernel::logger::panic(char const*)>:
   100ac0:	55                   	push   %ebp
-  100ac1:	ba 9a 32 10 00       	mov    $0x10329a,%edx
+  100ac1:	ba 1a 33 10 00       	mov    $0x10331a,%edx
   100ac6:	89 e5                	mov    %esp,%ebp
   100ac8:	83 ec 08             	sub    $0x8,%esp
-  100acb:	c6 05 0b 3a 10 00 4f 	movb   $0x4f,0x103a0b
+  100acb:	c6 05 8b 3a 10 00 4f 	movb   $0x4f,0x103a8b
   100ad2:	8b 45 08             	mov    0x8(%ebp),%eax
-  100ad5:	e8 06 20 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100ad5:	e8 26 20 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100ada:	8b 55 0c             	mov    0xc(%ebp),%edx
-  100add:	e8 fe 1f 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  100add:	e8 1e 20 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   100ae2:	ba 0a 00 00 00       	mov    $0xa,%edx
-  100ae7:	e8 94 1f 00 00       	call   102a80 <terminal::output::operator<<(char)>
+  100ae7:	e8 a4 1f 00 00       	call   102a90 <terminal::output::operator<<(char)>
   100aec:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   100af0:	fa                   	cli
   100af1:	f4                   	hlt
@@ -1044,7 +1043,7 @@ Disassembly of section .text:
   100c05:	50                   	push   %eax
   100c06:	50                   	push   %eax
   100c07:	8d 45 f6             	lea    -0xa(%ebp),%eax
-  100c0a:	68 a4 32 10 00       	push   $0x1032a4
+  100c0a:	68 24 33 10 00       	push   $0x103324
   100c0f:	50                   	push   %eax
   100c10:	66 c7 45 f6 00 00    	movw   $0x0,-0xa(%ebp)
   100c16:	e8 a5 fe ff ff       	call   100ac0 <kernel::logger::panic(char const*)>
@@ -1053,9 +1052,9 @@ Disassembly of section .text:
   100c1f:	90                   	nop
 
 00100c20 <kernel::handle_timer_interrupt(kernel::interrupt_frame*)>:
-  100c20:	a1 64 42 10 00       	mov    0x104264,%eax
+  100c20:	a1 e4 42 10 00       	mov    0x1042e4,%eax
   100c25:	83 c0 01             	add    $0x1,%eax
-  100c28:	a3 64 42 10 00       	mov    %eax,0x104264
+  100c28:	a3 e4 42 10 00       	mov    %eax,0x1042e4
   100c2d:	c3                   	ret
   100c2e:	66 90                	xchg   %ax,%ax
 
@@ -1064,7 +1063,7 @@ Disassembly of section .text:
   100c31:	89 e5                	mov    %esp,%ebp
   100c33:	8b 45 08             	mov    0x8(%ebp),%eax
   100c36:	5d                   	pop    %ebp
-  100c37:	a3 60 42 10 00       	mov    %eax,0x104260
+  100c37:	a3 e0 42 10 00       	mov    %eax,0x1042e0
   100c3c:	c3                   	ret
   100c3d:	66 90                	xchg   %ax,%ax
   100c3f:	90                   	nop
@@ -1108,8 +1107,8 @@ Disassembly of section .text:
   100c94:	c1 ef 03             	shr    $0x3,%edi
   100c97:	83 ec 1c             	sub    $0x1c,%esp
   100c9a:	89 dd                	mov    %ebx,%ebp
-  100c9c:	01 05 90 42 10 00    	add    %eax,0x104290
-  100ca2:	a1 80 42 10 00       	mov    0x104280,%eax
+  100c9c:	01 05 10 43 10 00    	add    %eax,0x104310
+  100ca2:	a1 00 43 10 00       	mov    0x104300,%eax
   100ca7:	d3 fd                	sar    %cl,%ebp
   100ca9:	8d 4a 01             	lea    0x1(%edx),%ecx
   100cac:	89 6c 24 0c          	mov    %ebp,0xc(%esp)
@@ -1121,9 +1120,9 @@ Disassembly of section .text:
   100cbb:	0f b6 4c 24 0c       	movzbl 0xc(%esp),%ecx
   100cc0:	89 ea                	mov    %ebp,%edx
   100cc2:	20 08                	and    %cl,(%eax)
-  100cc4:	0f b6 0d 02 45 10 00 	movzbl 0x104502,%ecx
+  100cc4:	0f b6 0d 82 45 10 00 	movzbl 0x104582,%ecx
   100ccb:	83 c0 01             	add    $0x1,%eax
-  100cce:	ff 14 8d 24 37 10 00 	call   *0x103724(,%ecx,4)
+  100cce:	ff 14 8d a4 37 10 00 	call   *0x1037a4(,%ecx,4)
   100cd5:	22 5d 00             	and    0x0(%ebp),%bl
   100cd8:	88 5d 00             	mov    %bl,0x0(%ebp)
   100cdb:	83 c4 1c             	add    $0x1c,%esp
@@ -1619,7 +1618,7 @@ Disassembly of section .text:
   10120a:	76 2d                	jbe    101239 <(anonymous namespace)::set_frames_used_sse2(unsigned char*, unsigned char const*)+0xa9>
   10120c:	01 fd                	add    %edi,%ebp
   10120e:	89 f1                	mov    %esi,%ecx
-  101210:	8b 3d 3c 37 10 00    	mov    0x10373c,%edi
+  101210:	8b 3d bc 37 10 00    	mov    0x1037bc,%edi
   101216:	c1 e9 02             	shr    $0x2,%ecx
   101219:	89 7d 00             	mov    %edi,0x0(%ebp)
   10121c:	83 f9 01             	cmp    $0x1,%ecx
@@ -1934,7 +1933,7 @@ Disassembly of section .text:
   10159e:	01 fe                	add    %edi,%esi
   1015a0:	8b 7c 24 04          	mov    0x4(%esp),%edi
   1015a4:	01 de                	add    %ebx,%esi
-  1015a6:	8b 1d 3c 37 10 00    	mov    0x10373c,%ebx
+  1015a6:	8b 1d bc 37 10 00    	mov    0x1037bc,%ebx
   1015ac:	89 1e                	mov    %ebx,(%esi)
   1015ae:	83 ff 01             	cmp    $0x1,%edi
   1015b1:	74 0b                	je     1015be <(anonymous namespace)::set_frames_used_avx2(unsigned char*, unsigned char const*)+0xde>
@@ -3361,29 +3360,29 @@ Disassembly of section .text:
   10257e:	0f 42 c8             	cmovb  %eax,%ecx
   102581:	8d 51 07             	lea    0x7(%ecx),%edx
   102584:	c1 ea 03             	shr    $0x3,%edx
-  102587:	89 0d 8c 42 10 00    	mov    %ecx,0x10428c
+  102587:	89 0d 0c 43 10 00    	mov    %ecx,0x10430c
   10258d:	01 fa                	add    %edi,%edx
   10258f:	89 f8                	mov    %edi,%eax
-  102591:	0f b6 0d 02 45 10 00 	movzbl 0x104502,%ecx
-  102598:	89 15 84 42 10 00    	mov    %edx,0x104284
-  10259e:	89 3d 80 42 10 00    	mov    %edi,0x104280
-  1025a4:	89 3d 88 42 10 00    	mov    %edi,0x104288
-  1025aa:	ff 14 8d 30 37 10 00 	call   *0x103730(,%ecx,4)
-  1025b1:	a1 84 42 10 00       	mov    0x104284,%eax
+  102591:	0f b6 0d 82 45 10 00 	movzbl 0x104582,%ecx
+  102598:	89 15 04 43 10 00    	mov    %edx,0x104304
+  10259e:	89 3d 00 43 10 00    	mov    %edi,0x104300
+  1025a4:	89 3d 08 43 10 00    	mov    %edi,0x104308
+  1025aa:	ff 14 8d b0 37 10 00 	call   *0x1037b0(,%ecx,4)
+  1025b1:	a1 04 43 10 00       	mov    0x104304,%eax
   1025b6:	8b 4c 24 08          	mov    0x8(%esp),%ecx
-  1025ba:	c7 05 74 42 10 00 01 	movl   $0x1,0x104274
+  1025ba:	c7 05 f4 42 10 00 01 	movl   $0x1,0x1042f4
   1025c1:	00 00 00 
-  1025c4:	8b 15 8c 42 10 00    	mov    0x10428c,%edx
+  1025c4:	8b 15 0c 43 10 00    	mov    0x10430c,%edx
   1025ca:	8b 36                	mov    (%esi),%esi
   1025cc:	c7 44 24 0c 00 00 00 	movl   $0x0,0xc(%esp)
   1025d3:	00 
   1025d4:	05 ff 0f 00 00       	add    $0xfff,%eax
   1025d9:	c1 e9 0c             	shr    $0xc,%ecx
   1025dc:	c1 e8 0c             	shr    $0xc,%eax
-  1025df:	89 15 90 42 10 00    	mov    %edx,0x104290
+  1025df:	89 15 10 43 10 00    	mov    %edx,0x104310
   1025e5:	29 c8                	sub    %ecx,%eax
-  1025e7:	89 0d 78 42 10 00    	mov    %ecx,0x104278
-  1025ed:	a3 7c 42 10 00       	mov    %eax,0x10427c
+  1025e7:	89 0d f8 42 10 00    	mov    %ecx,0x1042f8
+  1025ed:	a3 fc 42 10 00       	mov    %eax,0x1042fc
   1025f2:	89 54 24 08          	mov    %edx,0x8(%esp)
   1025f6:	39 ee                	cmp    %ebp,%esi
   1025f8:	72 11                	jb     10260b <kernel::memory::pmm_initialize(kernel::memory::e820_memory_map const*, unsigned long, unsigned long)+0x10b>
@@ -3431,23 +3430,23 @@ Disassembly of section .text:
   102683:	19 d3                	sbb    %edx,%ebx
   102685:	0f 83 75 ff ff ff    	jae    102600 <kernel::memory::pmm_initialize(kernel::memory::e820_memory_map const*, unsigned long, unsigned long)+0x100>
   10268b:	89 cf                	mov    %ecx,%edi
-  10268d:	8b 0d 70 42 10 00    	mov    0x104270,%ecx
+  10268d:	8b 0d f0 42 10 00    	mov    0x1042f0,%ecx
   102693:	89 c3                	mov    %eax,%ebx
   102695:	39 c8                	cmp    %ecx,%eax
   102697:	89 ca                	mov    %ecx,%edx
   102699:	0f 46 d0             	cmovbe %eax,%edx
   10269c:	39 d7                	cmp    %edx,%edi
   10269e:	72 68                	jb     102708 <kernel::memory::pmm_initialize(kernel::memory::e820_memory_map const*, unsigned long, unsigned long)+0x208>
-  1026a0:	03 0d 74 42 10 00    	add    0x104274,%ecx
+  1026a0:	03 0d f4 42 10 00    	add    0x1042f4,%ecx
   1026a6:	39 f9                	cmp    %edi,%ecx
   1026a8:	0f 42 cf             	cmovb  %edi,%ecx
-  1026ab:	8b 3d 78 42 10 00    	mov    0x104278,%edi
+  1026ab:	8b 3d f8 42 10 00    	mov    0x1042f8,%edi
   1026b1:	39 fb                	cmp    %edi,%ebx
   1026b3:	89 fa                	mov    %edi,%edx
   1026b5:	0f 46 d3             	cmovbe %ebx,%edx
   1026b8:	39 d1                	cmp    %edx,%ecx
   1026ba:	72 34                	jb     1026f0 <kernel::memory::pmm_initialize(kernel::memory::e820_memory_map const*, unsigned long, unsigned long)+0x1f0>
-  1026bc:	03 3d 7c 42 10 00    	add    0x10427c,%edi
+  1026bc:	03 3d fc 42 10 00    	add    0x1042fc,%edi
   1026c2:	89 c8                	mov    %ecx,%eax
   1026c4:	39 cf                	cmp    %ecx,%edi
   1026c6:	0f 43 c7             	cmovae %edi,%eax
@@ -3486,7 +3485,7 @@ Disassembly of section .text:
   10272f:	90                   	nop
 
 00102730 <driver::initialize_keyboard()>:
-  102730:	c6 05 00 45 10 00 00 	movb   $0x0,0x104500
+  102730:	c6 05 80 45 10 00 00 	movb   $0x0,0x104580
   102737:	ba a0 86 01 00       	mov    $0x186a0,%edx
   10273c:	eb 0d                	jmp    10274b <driver::initialize_keyboard()+0x1b>
   10273e:	66 90                	xchg   %ax,%ax
@@ -3557,12 +3556,12 @@ Disassembly of section .text:
   1027e4:	66 89 45 f6          	mov    %ax,-0xa(%ebp)
   1027e8:	6a 00                	push   $0x0
   1027ea:	6a 0e                	push   $0xe
-  1027ec:	68 5c 32 10 00       	push   $0x10325c
+  1027ec:	68 dc 32 10 00       	push   $0x1032dc
   1027f1:	53                   	push   %ebx
   1027f2:	e8 89 e2 ff ff       	call   100a80 <kernel::logger::set_prefix_text_and_color(char const*, io::vga_color, io::vga_color)>
   1027f7:	89 d8                	mov    %ebx,%eax
-  1027f9:	ba e4 32 10 00       	mov    $0x1032e4,%edx
-  1027fe:	e8 dd 02 00 00       	call   102ae0 <terminal::output::operator<<(char const*)>
+  1027f9:	ba 64 33 10 00       	mov    $0x103364,%edx
+  1027fe:	e8 fd 02 00 00       	call   102b00 <terminal::output::operator<<(char const*)>
   102803:	8b 5d fc             	mov    -0x4(%ebp),%ebx
   102806:	83 c4 10             	add    $0x10,%esp
   102809:	c9                   	leave
@@ -3578,7 +3577,7 @@ Disassembly of section .text:
   102816:	e4 60                	in     $0x60,%al
   102818:	3c e0                	cmp    $0xe0,%al
   10281a:	0f 84 e0 00 00 00    	je     102900 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0xf0>
-  102820:	0f b6 15 c2 44 10 00 	movzbl 0x1044c2,%edx
+  102820:	0f b6 15 42 45 10 00 	movzbl 0x104542,%edx
   102827:	80 fa 3f             	cmp    $0x3f,%dl
   10282a:	77 64                	ja     102890 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x80>
   10282c:	55                   	push   %ebp
@@ -3589,20 +3588,20 @@ Disassembly of section .text:
   102835:	56                   	push   %esi
   102836:	53                   	push   %ebx
   102837:	83 ec 04             	sub    $0x4,%esp
-  10283a:	0f b6 1d 01 45 10 00 	movzbl 0x104501,%ebx
+  10283a:	0f b6 1d 81 45 10 00 	movzbl 0x104581,%ebx
   102841:	88 4d f3             	mov    %cl,-0xd(%ebp)
   102844:	89 c1                	mov    %eax,%ecx
   102846:	83 e1 7f             	and    $0x7f,%ecx
   102849:	89 df                	mov    %ebx,%edi
   10284b:	84 db                	test   %bl,%bl
   10284d:	0f 85 bd 00 00 00    	jne    102910 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x100>
-  102853:	0f b7 8c 09 c0 38 10 	movzwl 0x1038c0(%ecx,%ecx,1),%ecx
+  102853:	0f b7 8c 09 40 39 10 	movzwl 0x103940(%ecx,%ecx,1),%ecx
   10285a:	00 
   10285b:	89 c3                	mov    %eax,%ebx
   10285d:	f7 d3                	not    %ebx
   10285f:	c0 eb 07             	shr    $0x7,%bl
   102862:	88 5d f2             	mov    %bl,-0xe(%ebp)
-  102865:	0f b6 1d 00 45 10 00 	movzbl 0x104500,%ebx
+  102865:	0f b6 1d 80 45 10 00 	movzbl 0x104580,%ebx
   10286c:	66 83 f9 3a          	cmp    $0x3a,%cx
   102870:	0f 87 aa 00 00 00    	ja     102920 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x110>
   102876:	66 83 f9 1c          	cmp    $0x1c,%cx
@@ -3611,30 +3610,30 @@ Disassembly of section .text:
   10287f:	66 83 fe 1d          	cmp    $0x1d,%si
   102883:	77 1d                	ja     1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102885:	0f b7 f6             	movzwl %si,%esi
-  102888:	ff 24 b5 40 37 10 00 	jmp    *0x103740(,%esi,4)
+  102888:	ff 24 b5 c0 37 10 00 	jmp    *0x1037c0(,%esi,4)
   10288f:	90                   	nop
   102890:	c3                   	ret
   102891:	84 c0                	test   %al,%al
   102893:	0f 89 77 01 00 00    	jns    102a10 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x200>
   102899:	83 e3 fe             	and    $0xfffffffe,%ebx
-  10289c:	88 1d 00 45 10 00    	mov    %bl,0x104500
-  1028a2:	0f b6 35 c1 44 10 00 	movzbl 0x1044c1,%esi
+  10289c:	88 1d 80 45 10 00    	mov    %bl,0x104580
+  1028a2:	0f b6 35 41 45 10 00 	movzbl 0x104541,%esi
   1028a9:	83 c2 01             	add    $0x1,%edx
-  1028ac:	c6 05 01 45 10 00 00 	movb   $0x0,0x104501
-  1028b3:	88 15 c2 44 10 00    	mov    %dl,0x1044c2
-  1028b9:	66 89 0c f5 c0 42 10 	mov    %cx,0x1042c0(,%esi,8)
+  1028ac:	c6 05 81 45 10 00 00 	movb   $0x0,0x104581
+  1028b3:	88 15 42 45 10 00    	mov    %dl,0x104542
+  1028b9:	66 89 0c f5 40 43 10 	mov    %cx,0x104340(,%esi,8)
   1028c0:	00 
   1028c1:	0f b6 4d f3          	movzbl -0xd(%ebp),%ecx
   1028c5:	89 f0                	mov    %esi,%eax
   1028c7:	83 c0 01             	add    $0x1,%eax
-  1028ca:	88 1c f5 c5 42 10 00 	mov    %bl,0x1042c5(,%esi,8)
-  1028d1:	88 0c f5 c2 42 10 00 	mov    %cl,0x1042c2(,%esi,8)
+  1028ca:	88 1c f5 45 43 10 00 	mov    %bl,0x104345(,%esi,8)
+  1028d1:	88 0c f5 42 43 10 00 	mov    %cl,0x104342(,%esi,8)
   1028d8:	0f b6 4d f2          	movzbl -0xe(%ebp),%ecx
   1028dc:	83 e0 3f             	and    $0x3f,%eax
-  1028df:	a2 c1 44 10 00       	mov    %al,0x1044c1
-  1028e4:	88 0c f5 c3 42 10 00 	mov    %cl,0x1042c3(,%esi,8)
+  1028df:	a2 41 45 10 00       	mov    %al,0x104541
+  1028e4:	88 0c f5 43 43 10 00 	mov    %cl,0x104343(,%esi,8)
   1028eb:	89 f9                	mov    %edi,%ecx
-  1028ed:	88 0c f5 c4 42 10 00 	mov    %cl,0x1042c4(,%esi,8)
+  1028ed:	88 0c f5 44 43 10 00 	mov    %cl,0x104344(,%esi,8)
   1028f4:	83 c4 04             	add    $0x4,%esp
   1028f7:	5b                   	pop    %ebx
   1028f8:	5e                   	pop    %esi
@@ -3642,11 +3641,11 @@ Disassembly of section .text:
   1028fa:	5d                   	pop    %ebp
   1028fb:	c3                   	ret
   1028fc:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102900:	c6 05 01 45 10 00 01 	movb   $0x1,0x104501
+  102900:	c6 05 81 45 10 00 01 	movb   $0x1,0x104581
   102907:	c3                   	ret
   102908:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   10290f:	00 
-  102910:	0f b7 8c 09 c0 37 10 	movzwl 0x1037c0(%ecx,%ecx,1),%ecx
+  102910:	0f b7 8c 09 40 38 10 	movzwl 0x103840(%ecx,%ecx,1),%ecx
   102917:	00 
   102918:	e9 3e ff ff ff       	jmp    10285b <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x4b>
   10291d:	8d 76 00             	lea    0x0(%esi),%esi
@@ -3657,47 +3656,47 @@ Disassembly of section .text:
   102932:	84 c0                	test   %al,%al
   102934:	0f 89 7e 00 00 00    	jns    1029b8 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x1a8>
   10293a:	83 e3 df             	and    $0xffffffdf,%ebx
-  10293d:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  10293d:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102943:	e9 5a ff ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102948:	84 c0                	test   %al,%al
   10294a:	0f 89 a0 00 00 00    	jns    1029f0 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x1e0>
   102950:	83 e3 bf             	and    $0xffffffbf,%ebx
-  102953:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102953:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102959:	e9 44 ff ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   10295e:	84 c0                	test   %al,%al
   102960:	0f 89 ba 00 00 00    	jns    102a20 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x210>
   102966:	83 e3 ef             	and    $0xffffffef,%ebx
-  102969:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102969:	88 1d 80 45 10 00    	mov    %bl,0x104580
   10296f:	e9 2e ff ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102974:	84 c0                	test   %al,%al
   102976:	0f 89 b4 00 00 00    	jns    102a30 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x220>
   10297c:	83 e3 fd             	and    $0xfffffffd,%ebx
-  10297f:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  10297f:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102985:	e9 18 ff ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   10298a:	84 c0                	test   %al,%al
   10298c:	79 42                	jns    1029d0 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x1c0>
   10298e:	83 e3 fb             	and    $0xfffffffb,%ebx
-  102991:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102991:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102997:	e9 06 ff ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   10299c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
   1029a0:	84 c0                	test   %al,%al
   1029a2:	79 3c                	jns    1029e0 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x1d0>
   1029a4:	83 e3 f7             	and    $0xfffffff7,%ebx
-  1029a7:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  1029a7:	88 1d 80 45 10 00    	mov    %bl,0x104580
   1029ad:	e9 f0 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   1029b2:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
   1029b8:	83 cb 20             	or     $0x20,%ebx
-  1029bb:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  1029bb:	88 1d 80 45 10 00    	mov    %bl,0x104580
   1029c1:	e9 dc fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   1029c6:	66 90                	xchg   %ax,%ax
   1029c8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
   1029cf:	00 
   1029d0:	83 cb 04             	or     $0x4,%ebx
-  1029d3:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  1029d3:	88 1d 80 45 10 00    	mov    %bl,0x104580
   1029d9:	e9 c4 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   1029de:	66 90                	xchg   %ax,%ax
   1029e0:	83 cb 08             	or     $0x8,%ebx
-  1029e3:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  1029e3:	88 1d 80 45 10 00    	mov    %bl,0x104580
   1029e9:	e9 b4 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   1029ee:	66 90                	xchg   %ax,%ax
   1029f0:	f6 c3 40             	test   $0x40,%bl
@@ -3705,23 +3704,23 @@ Disassembly of section .text:
   1029f9:	84 db                	test   %bl,%bl
   1029fb:	78 41                	js     102a3e <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x22e>
   1029fd:	83 cb c0             	or     $0xffffffc0,%ebx
-  102a00:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102a00:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102a06:	e9 97 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102a0b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
   102a10:	83 cb 01             	or     $0x1,%ebx
-  102a13:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102a13:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102a19:	e9 84 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102a1e:	66 90                	xchg   %ax,%ax
   102a20:	83 cb 10             	or     $0x10,%ebx
-  102a23:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102a23:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102a29:	e9 74 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102a2e:	66 90                	xchg   %ax,%ax
   102a30:	83 cb 02             	or     $0x2,%ebx
-  102a33:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102a33:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102a39:	e9 64 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102a3e:	83 e3 7f             	and    $0x7f,%ebx
   102a41:	83 cb 40             	or     $0x40,%ebx
-  102a44:	88 1d 00 45 10 00    	mov    %bl,0x104500
+  102a44:	88 1d 80 45 10 00    	mov    %bl,0x104580
   102a4a:	e9 53 fe ff ff       	jmp    1028a2 <driver::keyboard::handle_keyboard_interrupt(kernel::interrupt_frame*)+0x92>
   102a4f:	90                   	nop
 
@@ -3729,722 +3728,794 @@ Disassembly of section .text:
   102a50:	55                   	push   %ebp
   102a51:	89 e5                	mov    %esp,%ebp
   102a53:	83 ec 08             	sub    $0x8,%esp
-  102a56:	e8 c5 04 00 00       	call   102f20 <io::vga_text_buffer::clear()>
+  102a56:	e8 05 05 00 00       	call   102f60 <io::vga_text_buffer::clear()>
   102a5b:	83 ec 08             	sub    $0x8,%esp
   102a5e:	6a 0f                	push   $0xf
   102a60:	6a 0e                	push   $0xe
-  102a62:	e8 09 06 00 00       	call   103070 <io::hardware_cursor::enable(unsigned char, unsigned char)>
-  102a67:	0f b7 05 08 3a 10 00 	movzwl 0x103a08,%eax
-  102a6e:	83 c4 10             	add    $0x10,%esp
-  102a71:	c9                   	leave
-  102a72:	e9 79 06 00 00       	jmp    1030f0 <io::hardware_cursor::set_position(unsigned short)>
-  102a77:	66 90                	xchg   %ax,%ax
-  102a79:	66 90                	xchg   %ax,%ax
-  102a7b:	66 90                	xchg   %ax,%ax
-  102a7d:	66 90                	xchg   %ax,%ax
-  102a7f:	90                   	nop
+  102a62:	e8 99 06 00 00       	call   103100 <io::hardware_cursor::enable(unsigned char, unsigned char)>
+  102a67:	a1 88 3a 10 00       	mov    0x103a88,%eax
+  102a6c:	83 c4 10             	add    $0x10,%esp
+  102a6f:	c9                   	leave
+  102a70:	89 c1                	mov    %eax,%ecx
+  102a72:	0f b6 d4             	movzbl %ah,%edx
+  102a75:	0f b6 c0             	movzbl %al,%eax
+  102a78:	c1 e9 10             	shr    $0x10,%ecx
+  102a7b:	0f b6 c9             	movzbl %cl,%ecx
+  102a7e:	01 ca                	add    %ecx,%edx
+  102a80:	8d 14 92             	lea    (%edx,%edx,4),%edx
+  102a83:	c1 e2 04             	shl    $0x4,%edx
+  102a86:	01 d0                	add    %edx,%eax
+  102a88:	e9 f3 06 00 00       	jmp    103180 <io::hardware_cursor::set_position(unsigned short)>
+  102a8d:	66 90                	xchg   %ax,%ax
+  102a8f:	90                   	nop
 
-00102a80 <terminal::output::operator<<(char)>:
-  102a80:	55                   	push   %ebp
-  102a81:	89 e5                	mov    %esp,%ebp
-  102a83:	53                   	push   %ebx
-  102a84:	89 c3                	mov    %eax,%ebx
-  102a86:	83 ec 14             	sub    $0x14,%esp
-  102a89:	80 fa 0a             	cmp    $0xa,%dl
-  102a8c:	74 32                	je     102ac0 <terminal::output::operator<<(char)+0x40>
-  102a8e:	80 fa 0d             	cmp    $0xd,%dl
-  102a91:	75 1d                	jne    102ab0 <terminal::output::operator<<(char)+0x30>
-  102a93:	c6 05 08 3a 10 00 00 	movb   $0x0,0x103a08
-  102a9a:	0f b7 05 08 3a 10 00 	movzwl 0x103a08,%eax
-  102aa1:	e8 4a 06 00 00       	call   1030f0 <io::hardware_cursor::set_position(unsigned short)>
-  102aa6:	89 d8                	mov    %ebx,%eax
-  102aa8:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  102aab:	c9                   	leave
-  102aac:	c3                   	ret
-  102aad:	8d 76 00             	lea    0x0(%esi),%esi
-  102ab0:	0f be c2             	movsbl %dl,%eax
-  102ab3:	e8 d8 04 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102ab8:	eb e0                	jmp    102a9a <terminal::output::operator<<(char)+0x1a>
-  102aba:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  102ac0:	8d 45 f4             	lea    -0xc(%ebp),%eax
-  102ac3:	83 ec 0c             	sub    $0xc,%esp
-  102ac6:	50                   	push   %eax
-  102ac7:	e8 44 05 00 00       	call   103010 <io::vga_text_buffer::move_to_next_line()>
-  102acc:	83 c4 0c             	add    $0xc,%esp
-  102acf:	eb c9                	jmp    102a9a <terminal::output::operator<<(char)+0x1a>
-  102ad1:	66 90                	xchg   %ax,%ax
-  102ad3:	66 90                	xchg   %ax,%ax
-  102ad5:	66 90                	xchg   %ax,%ax
-  102ad7:	66 90                	xchg   %ax,%ax
-  102ad9:	66 90                	xchg   %ax,%ax
-  102adb:	66 90                	xchg   %ax,%ax
-  102add:	66 90                	xchg   %ax,%ax
-  102adf:	90                   	nop
+00102a90 <terminal::output::operator<<(char)>:
+  102a90:	55                   	push   %ebp
+  102a91:	89 e5                	mov    %esp,%ebp
+  102a93:	53                   	push   %ebx
+  102a94:	89 c3                	mov    %eax,%ebx
+  102a96:	83 ec 14             	sub    $0x14,%esp
+  102a99:	80 fa 0a             	cmp    $0xa,%dl
+  102a9c:	74 4a                	je     102ae8 <terminal::output::operator<<(char)+0x58>
+  102a9e:	80 fa 0d             	cmp    $0xd,%dl
+  102aa1:	75 35                	jne    102ad8 <terminal::output::operator<<(char)+0x48>
+  102aa3:	c6 05 88 3a 10 00 00 	movb   $0x0,0x103a88
+  102aaa:	a1 88 3a 10 00       	mov    0x103a88,%eax
+  102aaf:	89 c1                	mov    %eax,%ecx
+  102ab1:	0f b6 d4             	movzbl %ah,%edx
+  102ab4:	0f b6 c0             	movzbl %al,%eax
+  102ab7:	c1 e9 10             	shr    $0x10,%ecx
+  102aba:	0f b6 c9             	movzbl %cl,%ecx
+  102abd:	01 ca                	add    %ecx,%edx
+  102abf:	8d 14 92             	lea    (%edx,%edx,4),%edx
+  102ac2:	c1 e2 04             	shl    $0x4,%edx
+  102ac5:	01 d0                	add    %edx,%eax
+  102ac7:	e8 b4 06 00 00       	call   103180 <io::hardware_cursor::set_position(unsigned short)>
+  102acc:	89 d8                	mov    %ebx,%eax
+  102ace:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  102ad1:	c9                   	leave
+  102ad2:	c3                   	ret
+  102ad3:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102ad8:	0f be c2             	movsbl %dl,%eax
+  102adb:	e8 10 05 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102ae0:	eb c8                	jmp    102aaa <terminal::output::operator<<(char)+0x1a>
+  102ae2:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  102ae8:	8d 45 f4             	lea    -0xc(%ebp),%eax
+  102aeb:	83 ec 0c             	sub    $0xc,%esp
+  102aee:	50                   	push   %eax
+  102aef:	e8 ac 05 00 00       	call   1030a0 <io::vga_text_buffer::move_to_next_line()>
+  102af4:	83 c4 0c             	add    $0xc,%esp
+  102af7:	eb b1                	jmp    102aaa <terminal::output::operator<<(char)+0x1a>
+  102af9:	66 90                	xchg   %ax,%ax
+  102afb:	66 90                	xchg   %ax,%ax
+  102afd:	66 90                	xchg   %ax,%ax
+  102aff:	90                   	nop
 
-00102ae0 <terminal::output::operator<<(char const*)>:
-  102ae0:	55                   	push   %ebp
-  102ae1:	89 e5                	mov    %esp,%ebp
-  102ae3:	57                   	push   %edi
-  102ae4:	56                   	push   %esi
-  102ae5:	89 c6                	mov    %eax,%esi
-  102ae7:	53                   	push   %ebx
-  102ae8:	83 ec 1c             	sub    $0x1c,%esp
-  102aeb:	0f be 02             	movsbl (%edx),%eax
-  102aee:	84 c0                	test   %al,%al
-  102af0:	74 3e                	je     102b30 <terminal::output::operator<<(char const*)+0x50>
-  102af2:	89 d7                	mov    %edx,%edi
-  102af4:	8d 5d e4             	lea    -0x1c(%ebp),%ebx
-  102af7:	eb 1d                	jmp    102b16 <terminal::output::operator<<(char const*)+0x36>
-  102af9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102b00:	3c 0d                	cmp    $0xd,%al
-  102b02:	75 4c                	jne    102b50 <terminal::output::operator<<(char const*)+0x70>
-  102b04:	c6 05 08 3a 10 00 00 	movb   $0x0,0x103a08
-  102b0b:	0f be 47 01          	movsbl 0x1(%edi),%eax
-  102b0f:	83 c7 01             	add    $0x1,%edi
-  102b12:	84 c0                	test   %al,%al
-  102b14:	74 1a                	je     102b30 <terminal::output::operator<<(char const*)+0x50>
-  102b16:	3c 0a                	cmp    $0xa,%al
-  102b18:	75 e6                	jne    102b00 <terminal::output::operator<<(char const*)+0x20>
-  102b1a:	83 ec 0c             	sub    $0xc,%esp
-  102b1d:	83 c7 01             	add    $0x1,%edi
-  102b20:	53                   	push   %ebx
-  102b21:	e8 ea 04 00 00       	call   103010 <io::vga_text_buffer::move_to_next_line()>
-  102b26:	0f be 07             	movsbl (%edi),%eax
-  102b29:	83 c4 0c             	add    $0xc,%esp
-  102b2c:	84 c0                	test   %al,%al
-  102b2e:	75 e6                	jne    102b16 <terminal::output::operator<<(char const*)+0x36>
-  102b30:	0f b7 05 08 3a 10 00 	movzwl 0x103a08,%eax
-  102b37:	e8 b4 05 00 00       	call   1030f0 <io::hardware_cursor::set_position(unsigned short)>
-  102b3c:	8d 65 f4             	lea    -0xc(%ebp),%esp
-  102b3f:	89 f0                	mov    %esi,%eax
-  102b41:	5b                   	pop    %ebx
-  102b42:	5e                   	pop    %esi
-  102b43:	5f                   	pop    %edi
-  102b44:	5d                   	pop    %ebp
-  102b45:	c3                   	ret
-  102b46:	66 90                	xchg   %ax,%ax
-  102b48:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102b4f:	00 
-  102b50:	e8 3b 04 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102b55:	eb b4                	jmp    102b0b <terminal::output::operator<<(char const*)+0x2b>
-  102b57:	66 90                	xchg   %ax,%ax
-  102b59:	66 90                	xchg   %ax,%ax
-  102b5b:	66 90                	xchg   %ax,%ax
-  102b5d:	66 90                	xchg   %ax,%ax
-  102b5f:	90                   	nop
+00102b00 <terminal::output::operator<<(char const*)>:
+  102b00:	55                   	push   %ebp
+  102b01:	89 e5                	mov    %esp,%ebp
+  102b03:	57                   	push   %edi
+  102b04:	56                   	push   %esi
+  102b05:	89 c6                	mov    %eax,%esi
+  102b07:	53                   	push   %ebx
+  102b08:	83 ec 1c             	sub    $0x1c,%esp
+  102b0b:	0f be 02             	movsbl (%edx),%eax
+  102b0e:	84 c0                	test   %al,%al
+  102b10:	74 3e                	je     102b50 <terminal::output::operator<<(char const*)+0x50>
+  102b12:	89 d7                	mov    %edx,%edi
+  102b14:	8d 5d e4             	lea    -0x1c(%ebp),%ebx
+  102b17:	eb 1d                	jmp    102b36 <terminal::output::operator<<(char const*)+0x36>
+  102b19:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102b20:	3c 0d                	cmp    $0xd,%al
+  102b22:	75 5c                	jne    102b80 <terminal::output::operator<<(char const*)+0x80>
+  102b24:	c6 05 88 3a 10 00 00 	movb   $0x0,0x103a88
+  102b2b:	0f be 47 01          	movsbl 0x1(%edi),%eax
+  102b2f:	83 c7 01             	add    $0x1,%edi
+  102b32:	84 c0                	test   %al,%al
+  102b34:	74 1a                	je     102b50 <terminal::output::operator<<(char const*)+0x50>
+  102b36:	3c 0a                	cmp    $0xa,%al
+  102b38:	75 e6                	jne    102b20 <terminal::output::operator<<(char const*)+0x20>
+  102b3a:	83 ec 0c             	sub    $0xc,%esp
+  102b3d:	83 c7 01             	add    $0x1,%edi
+  102b40:	53                   	push   %ebx
+  102b41:	e8 5a 05 00 00       	call   1030a0 <io::vga_text_buffer::move_to_next_line()>
+  102b46:	0f be 07             	movsbl (%edi),%eax
+  102b49:	83 c4 0c             	add    $0xc,%esp
+  102b4c:	84 c0                	test   %al,%al
+  102b4e:	75 e6                	jne    102b36 <terminal::output::operator<<(char const*)+0x36>
+  102b50:	a1 88 3a 10 00       	mov    0x103a88,%eax
+  102b55:	89 c1                	mov    %eax,%ecx
+  102b57:	0f b6 d4             	movzbl %ah,%edx
+  102b5a:	0f b6 c0             	movzbl %al,%eax
+  102b5d:	c1 e9 10             	shr    $0x10,%ecx
+  102b60:	0f b6 c9             	movzbl %cl,%ecx
+  102b63:	01 ca                	add    %ecx,%edx
+  102b65:	8d 14 92             	lea    (%edx,%edx,4),%edx
+  102b68:	c1 e2 04             	shl    $0x4,%edx
+  102b6b:	01 d0                	add    %edx,%eax
+  102b6d:	e8 0e 06 00 00       	call   103180 <io::hardware_cursor::set_position(unsigned short)>
+  102b72:	8d 65 f4             	lea    -0xc(%ebp),%esp
+  102b75:	89 f0                	mov    %esi,%eax
+  102b77:	5b                   	pop    %ebx
+  102b78:	5e                   	pop    %esi
+  102b79:	5f                   	pop    %edi
+  102b7a:	5d                   	pop    %ebp
+  102b7b:	c3                   	ret
+  102b7c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102b80:	e8 6b 04 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102b85:	eb a4                	jmp    102b2b <terminal::output::operator<<(char const*)+0x2b>
+  102b87:	66 90                	xchg   %ax,%ax
+  102b89:	66 90                	xchg   %ax,%ax
+  102b8b:	66 90                	xchg   %ax,%ax
+  102b8d:	66 90                	xchg   %ax,%ax
+  102b8f:	66 90                	xchg   %ax,%ax
+  102b91:	66 90                	xchg   %ax,%ax
+  102b93:	66 90                	xchg   %ax,%ax
+  102b95:	66 90                	xchg   %ax,%ax
+  102b97:	66 90                	xchg   %ax,%ax
+  102b99:	66 90                	xchg   %ax,%ax
+  102b9b:	66 90                	xchg   %ax,%ax
+  102b9d:	66 90                	xchg   %ax,%ax
+  102b9f:	90                   	nop
 
-00102b60 <terminal::output::operator<<(unsigned long)>:
-  102b60:	55                   	push   %ebp
-  102b61:	89 e5                	mov    %esp,%ebp
-  102b63:	57                   	push   %edi
-  102b64:	89 c7                	mov    %eax,%edi
-  102b66:	56                   	push   %esi
-  102b67:	89 d6                	mov    %edx,%esi
-  102b69:	53                   	push   %ebx
-  102b6a:	83 ec 2c             	sub    $0x2c,%esp
-  102b6d:	0f b6 00             	movzbl (%eax),%eax
-  102b70:	84 c0                	test   %al,%al
-  102b72:	0f 84 a8 00 00 00    	je     102c20 <terminal::output::operator<<(unsigned long)+0xc0>
-  102b78:	3c 01                	cmp    $0x1,%al
-  102b7a:	75 74                	jne    102bf0 <terminal::output::operator<<(unsigned long)+0x90>
-  102b7c:	b8 30 00 00 00       	mov    $0x30,%eax
-  102b81:	e8 0a 04 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102b86:	b8 78 00 00 00       	mov    $0x78,%eax
-  102b8b:	e8 00 04 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102b90:	85 f6                	test   %esi,%esi
-  102b92:	0f 84 18 01 00 00    	je     102cb0 <terminal::output::operator<<(unsigned long)+0x150>
-  102b98:	0f bd c6             	bsr    %esi,%eax
-  102b9b:	b9 07 00 00 00       	mov    $0x7,%ecx
-  102ba0:	83 f0 1f             	xor    $0x1f,%eax
-  102ba3:	c1 f8 02             	sar    $0x2,%eax
-  102ba6:	29 c1                	sub    %eax,%ecx
-  102ba8:	8d 1c 8d 00 00 00 00 	lea    0x0(,%ecx,4),%ebx
-  102baf:	eb 17                	jmp    102bc8 <terminal::output::operator<<(unsigned long)+0x68>
-  102bb1:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102bb8:	3c 0d                	cmp    $0xd,%al
-  102bba:	75 54                	jne    102c10 <terminal::output::operator<<(unsigned long)+0xb0>
-  102bbc:	c6 05 08 3a 10 00 00 	movb   $0x0,0x103a08
-  102bc3:	83 eb 04             	sub    $0x4,%ebx
-  102bc6:	78 28                	js     102bf0 <terminal::output::operator<<(unsigned long)+0x90>
-  102bc8:	89 f0                	mov    %esi,%eax
-  102bca:	89 d9                	mov    %ebx,%ecx
-  102bcc:	d3 e8                	shr    %cl,%eax
-  102bce:	83 e0 0f             	and    $0xf,%eax
-  102bd1:	0f be 80 c0 39 10 00 	movsbl 0x1039c0(%eax),%eax
-  102bd8:	3c 0a                	cmp    $0xa,%al
-  102bda:	75 dc                	jne    102bb8 <terminal::output::operator<<(unsigned long)+0x58>
-  102bdc:	83 ec 0c             	sub    $0xc,%esp
-  102bdf:	8d 45 d4             	lea    -0x2c(%ebp),%eax
-  102be2:	50                   	push   %eax
-  102be3:	e8 28 04 00 00       	call   103010 <io::vga_text_buffer::move_to_next_line()>
-  102be8:	83 c4 0c             	add    $0xc,%esp
-  102beb:	83 eb 04             	sub    $0x4,%ebx
-  102bee:	79 d8                	jns    102bc8 <terminal::output::operator<<(unsigned long)+0x68>
-  102bf0:	0f b7 05 08 3a 10 00 	movzwl 0x103a08,%eax
-  102bf7:	e8 f4 04 00 00       	call   1030f0 <io::hardware_cursor::set_position(unsigned short)>
-  102bfc:	8d 65 f4             	lea    -0xc(%ebp),%esp
-  102bff:	89 f8                	mov    %edi,%eax
-  102c01:	5b                   	pop    %ebx
-  102c02:	5e                   	pop    %esi
-  102c03:	5f                   	pop    %edi
-  102c04:	5d                   	pop    %ebp
-  102c05:	c3                   	ret
-  102c06:	66 90                	xchg   %ax,%ax
-  102c08:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c0f:	00 
-  102c10:	e8 7b 03 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102c15:	eb ac                	jmp    102bc3 <terminal::output::operator<<(unsigned long)+0x63>
-  102c17:	90                   	nop
-  102c18:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c1f:	00 
-  102c20:	89 7d d0             	mov    %edi,-0x30(%ebp)
-  102c23:	8d 5d e8             	lea    -0x18(%ebp),%ebx
-  102c26:	b9 cd cc cc cc       	mov    $0xcccccccd,%ecx
-  102c2b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c30:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c37:	00 
-  102c38:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102c3f:	00 
-  102c40:	89 f0                	mov    %esi,%eax
-  102c42:	83 eb 01             	sub    $0x1,%ebx
-  102c45:	f7 e1                	mul    %ecx
-  102c47:	89 f0                	mov    %esi,%eax
-  102c49:	c1 ea 03             	shr    $0x3,%edx
-  102c4c:	8d 3c 92             	lea    (%edx,%edx,4),%edi
-  102c4f:	01 ff                	add    %edi,%edi
-  102c51:	29 f8                	sub    %edi,%eax
-  102c53:	83 c0 30             	add    $0x30,%eax
-  102c56:	83 fe 09             	cmp    $0x9,%esi
-  102c59:	89 d6                	mov    %edx,%esi
-  102c5b:	88 03                	mov    %al,(%ebx)
-  102c5d:	77 e1                	ja     102c40 <terminal::output::operator<<(unsigned long)+0xe0>
-  102c5f:	8d 45 e8             	lea    -0x18(%ebp),%eax
-  102c62:	8b 7d d0             	mov    -0x30(%ebp),%edi
-  102c65:	39 c3                	cmp    %eax,%ebx
-  102c67:	73 87                	jae    102bf0 <terminal::output::operator<<(unsigned long)+0x90>
-  102c69:	8d 75 d4             	lea    -0x2c(%ebp),%esi
-  102c6c:	eb 1b                	jmp    102c89 <terminal::output::operator<<(unsigned long)+0x129>
-  102c6e:	66 90                	xchg   %ax,%ax
-  102c70:	3c 0d                	cmp    $0xd,%al
-  102c72:	75 2c                	jne    102ca0 <terminal::output::operator<<(unsigned long)+0x140>
-  102c74:	c6 05 08 3a 10 00 00 	movb   $0x0,0x103a08
-  102c7b:	83 c3 01             	add    $0x1,%ebx
-  102c7e:	8d 45 e8             	lea    -0x18(%ebp),%eax
-  102c81:	39 c3                	cmp    %eax,%ebx
-  102c83:	0f 84 67 ff ff ff    	je     102bf0 <terminal::output::operator<<(unsigned long)+0x90>
-  102c89:	0f be 03             	movsbl (%ebx),%eax
-  102c8c:	3c 0a                	cmp    $0xa,%al
-  102c8e:	75 e0                	jne    102c70 <terminal::output::operator<<(unsigned long)+0x110>
-  102c90:	83 ec 0c             	sub    $0xc,%esp
-  102c93:	56                   	push   %esi
-  102c94:	e8 77 03 00 00       	call   103010 <io::vga_text_buffer::move_to_next_line()>
-  102c99:	83 c4 0c             	add    $0xc,%esp
-  102c9c:	eb dd                	jmp    102c7b <terminal::output::operator<<(unsigned long)+0x11b>
-  102c9e:	66 90                	xchg   %ax,%ax
-  102ca0:	e8 eb 02 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102ca5:	eb d4                	jmp    102c7b <terminal::output::operator<<(unsigned long)+0x11b>
-  102ca7:	90                   	nop
-  102ca8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102caf:	00 
-  102cb0:	b8 30 00 00 00       	mov    $0x30,%eax
-  102cb5:	e8 d6 02 00 00       	call   102f90 <io::vga_text_buffer::put(char)>
-  102cba:	e9 31 ff ff ff       	jmp    102bf0 <terminal::output::operator<<(unsigned long)+0x90>
-  102cbf:	90                   	nop
-
-00102cc0 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>:
-  102cc0:	ff e2                	jmp    *%edx
-  102cc2:	66 90                	xchg   %ax,%ax
-  102cc4:	66 90                	xchg   %ax,%ax
-  102cc6:	66 90                	xchg   %ax,%ax
-  102cc8:	66 90                	xchg   %ax,%ax
-  102cca:	66 90                	xchg   %ax,%ax
-  102ccc:	66 90                	xchg   %ax,%ax
-  102cce:	66 90                	xchg   %ax,%ax
-
-00102cd0 <terminal::dec(terminal::output&)>:
-  102cd0:	c6 00 00             	movb   $0x0,(%eax)
-  102cd3:	c3                   	ret
-  102cd4:	66 90                	xchg   %ax,%ax
-  102cd6:	66 90                	xchg   %ax,%ax
-  102cd8:	66 90                	xchg   %ax,%ax
-  102cda:	66 90                	xchg   %ax,%ax
-  102cdc:	66 90                	xchg   %ax,%ax
+00102ba0 <terminal::output::operator<<(unsigned long)>:
+  102ba0:	55                   	push   %ebp
+  102ba1:	89 e5                	mov    %esp,%ebp
+  102ba3:	57                   	push   %edi
+  102ba4:	89 c7                	mov    %eax,%edi
+  102ba6:	56                   	push   %esi
+  102ba7:	89 d6                	mov    %edx,%esi
+  102ba9:	53                   	push   %ebx
+  102baa:	83 ec 2c             	sub    $0x2c,%esp
+  102bad:	0f b6 00             	movzbl (%eax),%eax
+  102bb0:	84 c0                	test   %al,%al
+  102bb2:	0f 84 b8 00 00 00    	je     102c70 <terminal::output::operator<<(unsigned long)+0xd0>
+  102bb8:	3c 01                	cmp    $0x1,%al
+  102bba:	75 74                	jne    102c30 <terminal::output::operator<<(unsigned long)+0x90>
+  102bbc:	b8 30 00 00 00       	mov    $0x30,%eax
+  102bc1:	e8 2a 04 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102bc6:	b8 78 00 00 00       	mov    $0x78,%eax
+  102bcb:	e8 20 04 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102bd0:	85 f6                	test   %esi,%esi
+  102bd2:	0f 84 18 01 00 00    	je     102cf0 <terminal::output::operator<<(unsigned long)+0x150>
+  102bd8:	0f bd c6             	bsr    %esi,%eax
+  102bdb:	b9 07 00 00 00       	mov    $0x7,%ecx
+  102be0:	83 f0 1f             	xor    $0x1f,%eax
+  102be3:	c1 f8 02             	sar    $0x2,%eax
+  102be6:	29 c1                	sub    %eax,%ecx
+  102be8:	8d 1c 8d 00 00 00 00 	lea    0x0(,%ecx,4),%ebx
+  102bef:	eb 17                	jmp    102c08 <terminal::output::operator<<(unsigned long)+0x68>
+  102bf1:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102bf8:	3c 0d                	cmp    $0xd,%al
+  102bfa:	75 64                	jne    102c60 <terminal::output::operator<<(unsigned long)+0xc0>
+  102bfc:	c6 05 88 3a 10 00 00 	movb   $0x0,0x103a88
+  102c03:	83 eb 04             	sub    $0x4,%ebx
+  102c06:	78 28                	js     102c30 <terminal::output::operator<<(unsigned long)+0x90>
+  102c08:	89 f0                	mov    %esi,%eax
+  102c0a:	89 d9                	mov    %ebx,%ecx
+  102c0c:	d3 e8                	shr    %cl,%eax
+  102c0e:	83 e0 0f             	and    $0xf,%eax
+  102c11:	0f be 80 40 3a 10 00 	movsbl 0x103a40(%eax),%eax
+  102c18:	3c 0a                	cmp    $0xa,%al
+  102c1a:	75 dc                	jne    102bf8 <terminal::output::operator<<(unsigned long)+0x58>
+  102c1c:	83 ec 0c             	sub    $0xc,%esp
+  102c1f:	8d 45 d4             	lea    -0x2c(%ebp),%eax
+  102c22:	50                   	push   %eax
+  102c23:	e8 78 04 00 00       	call   1030a0 <io::vga_text_buffer::move_to_next_line()>
+  102c28:	83 c4 0c             	add    $0xc,%esp
+  102c2b:	83 eb 04             	sub    $0x4,%ebx
+  102c2e:	79 d8                	jns    102c08 <terminal::output::operator<<(unsigned long)+0x68>
+  102c30:	a1 88 3a 10 00       	mov    0x103a88,%eax
+  102c35:	89 c1                	mov    %eax,%ecx
+  102c37:	0f b6 d4             	movzbl %ah,%edx
+  102c3a:	0f b6 c0             	movzbl %al,%eax
+  102c3d:	c1 e9 10             	shr    $0x10,%ecx
+  102c40:	0f b6 c9             	movzbl %cl,%ecx
+  102c43:	01 ca                	add    %ecx,%edx
+  102c45:	8d 14 92             	lea    (%edx,%edx,4),%edx
+  102c48:	c1 e2 04             	shl    $0x4,%edx
+  102c4b:	01 d0                	add    %edx,%eax
+  102c4d:	e8 2e 05 00 00       	call   103180 <io::hardware_cursor::set_position(unsigned short)>
+  102c52:	8d 65 f4             	lea    -0xc(%ebp),%esp
+  102c55:	89 f8                	mov    %edi,%eax
+  102c57:	5b                   	pop    %ebx
+  102c58:	5e                   	pop    %esi
+  102c59:	5f                   	pop    %edi
+  102c5a:	5d                   	pop    %ebp
+  102c5b:	c3                   	ret
+  102c5c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102c60:	e8 8b 03 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102c65:	eb 9c                	jmp    102c03 <terminal::output::operator<<(unsigned long)+0x63>
+  102c67:	90                   	nop
+  102c68:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102c6f:	00 
+  102c70:	89 7d d0             	mov    %edi,-0x30(%ebp)
+  102c73:	8d 5d e8             	lea    -0x18(%ebp),%ebx
+  102c76:	b9 cd cc cc cc       	mov    $0xcccccccd,%ecx
+  102c7b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102c80:	89 f0                	mov    %esi,%eax
+  102c82:	83 eb 01             	sub    $0x1,%ebx
+  102c85:	f7 e1                	mul    %ecx
+  102c87:	89 f0                	mov    %esi,%eax
+  102c89:	c1 ea 03             	shr    $0x3,%edx
+  102c8c:	8d 3c 92             	lea    (%edx,%edx,4),%edi
+  102c8f:	01 ff                	add    %edi,%edi
+  102c91:	29 f8                	sub    %edi,%eax
+  102c93:	83 c0 30             	add    $0x30,%eax
+  102c96:	83 fe 09             	cmp    $0x9,%esi
+  102c99:	89 d6                	mov    %edx,%esi
+  102c9b:	88 03                	mov    %al,(%ebx)
+  102c9d:	77 e1                	ja     102c80 <terminal::output::operator<<(unsigned long)+0xe0>
+  102c9f:	8d 45 e8             	lea    -0x18(%ebp),%eax
+  102ca2:	8b 7d d0             	mov    -0x30(%ebp),%edi
+  102ca5:	39 c3                	cmp    %eax,%ebx
+  102ca7:	73 87                	jae    102c30 <terminal::output::operator<<(unsigned long)+0x90>
+  102ca9:	8d 75 d4             	lea    -0x2c(%ebp),%esi
+  102cac:	eb 1b                	jmp    102cc9 <terminal::output::operator<<(unsigned long)+0x129>
+  102cae:	66 90                	xchg   %ax,%ax
+  102cb0:	3c 0d                	cmp    $0xd,%al
+  102cb2:	75 2c                	jne    102ce0 <terminal::output::operator<<(unsigned long)+0x140>
+  102cb4:	c6 05 88 3a 10 00 00 	movb   $0x0,0x103a88
+  102cbb:	83 c3 01             	add    $0x1,%ebx
+  102cbe:	8d 45 e8             	lea    -0x18(%ebp),%eax
+  102cc1:	39 c3                	cmp    %eax,%ebx
+  102cc3:	0f 84 67 ff ff ff    	je     102c30 <terminal::output::operator<<(unsigned long)+0x90>
+  102cc9:	0f be 03             	movsbl (%ebx),%eax
+  102ccc:	3c 0a                	cmp    $0xa,%al
+  102cce:	75 e0                	jne    102cb0 <terminal::output::operator<<(unsigned long)+0x110>
+  102cd0:	83 ec 0c             	sub    $0xc,%esp
+  102cd3:	56                   	push   %esi
+  102cd4:	e8 c7 03 00 00       	call   1030a0 <io::vga_text_buffer::move_to_next_line()>
+  102cd9:	83 c4 0c             	add    $0xc,%esp
+  102cdc:	eb dd                	jmp    102cbb <terminal::output::operator<<(unsigned long)+0x11b>
   102cde:	66 90                	xchg   %ax,%ax
+  102ce0:	e8 0b 03 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102ce5:	eb d4                	jmp    102cbb <terminal::output::operator<<(unsigned long)+0x11b>
+  102ce7:	90                   	nop
+  102ce8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102cef:	00 
+  102cf0:	b8 30 00 00 00       	mov    $0x30,%eax
+  102cf5:	e8 f6 02 00 00       	call   102ff0 <io::vga_text_buffer::put(char)>
+  102cfa:	e9 31 ff ff ff       	jmp    102c30 <terminal::output::operator<<(unsigned long)+0x90>
+  102cff:	90                   	nop
 
-00102ce0 <terminal::hex(terminal::output&)>:
-  102ce0:	c6 00 01             	movb   $0x1,(%eax)
-  102ce3:	c3                   	ret
-  102ce4:	66 90                	xchg   %ax,%ax
-  102ce6:	66 90                	xchg   %ax,%ax
-  102ce8:	66 90                	xchg   %ax,%ax
-  102cea:	66 90                	xchg   %ax,%ax
-  102cec:	66 90                	xchg   %ax,%ax
-  102cee:	66 90                	xchg   %ax,%ax
+00102d00 <terminal::output::operator<<(terminal::output& ( regparm<1>*)(terminal::output&) noexcept)>:
+  102d00:	ff e2                	jmp    *%edx
+  102d02:	66 90                	xchg   %ax,%ax
+  102d04:	66 90                	xchg   %ax,%ax
+  102d06:	66 90                	xchg   %ax,%ax
+  102d08:	66 90                	xchg   %ax,%ax
+  102d0a:	66 90                	xchg   %ax,%ax
+  102d0c:	66 90                	xchg   %ax,%ax
+  102d0e:	66 90                	xchg   %ax,%ax
 
-00102cf0 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)>:
-  102cf0:	66 c1 ea 04          	shr    $0x4,%dx
-  102cf4:	0f b7 d2             	movzwl %dx,%edx
-  102cf7:	c1 e2 04             	shl    $0x4,%edx
-  102cfa:	01 c2                	add    %eax,%edx
-  102cfc:	39 d0                	cmp    %edx,%eax
-  102cfe:	73 3e                	jae    102d3e <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x4e>
-  102d00:	66 0f 6e c9          	movd   %ecx,%xmm1
-  102d04:	89 c1                	mov    %eax,%ecx
-  102d06:	83 c0 10             	add    $0x10,%eax
-  102d09:	f7 d1                	not    %ecx
-  102d0b:	66 0f 70 c1 00       	pshufd $0x0,%xmm1,%xmm0
-  102d10:	0f 29 40 f0          	movaps %xmm0,-0x10(%eax)
-  102d14:	01 d1                	add    %edx,%ecx
-  102d16:	c1 e9 04             	shr    $0x4,%ecx
-  102d19:	39 d0                	cmp    %edx,%eax
-  102d1b:	73 23                	jae    102d40 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x50>
-  102d1d:	83 e1 01             	and    $0x1,%ecx
-  102d20:	74 0e                	je     102d30 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
-  102d22:	0f 29 00             	movaps %xmm0,(%eax)
-  102d25:	83 c0 10             	add    $0x10,%eax
-  102d28:	39 d0                	cmp    %edx,%eax
-  102d2a:	73 15                	jae    102d41 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x51>
-  102d2c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
-  102d30:	0f 29 00             	movaps %xmm0,(%eax)
-  102d33:	83 c0 20             	add    $0x20,%eax
-  102d36:	0f 29 40 f0          	movaps %xmm0,-0x10(%eax)
-  102d3a:	39 d0                	cmp    %edx,%eax
-  102d3c:	72 f2                	jb     102d30 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
-  102d3e:	c3                   	ret
-  102d3f:	90                   	nop
-  102d40:	c3                   	ret
-  102d41:	c3                   	ret
-  102d42:	66 90                	xchg   %ax,%ax
-  102d44:	66 90                	xchg   %ax,%ax
-  102d46:	66 90                	xchg   %ax,%ax
-  102d48:	66 90                	xchg   %ax,%ax
-  102d4a:	66 90                	xchg   %ax,%ax
-  102d4c:	66 90                	xchg   %ax,%ax
-  102d4e:	66 90                	xchg   %ax,%ax
+00102d10 <terminal::dec(terminal::output&)>:
+  102d10:	c6 00 00             	movb   $0x0,(%eax)
+  102d13:	c3                   	ret
+  102d14:	66 90                	xchg   %ax,%ax
+  102d16:	66 90                	xchg   %ax,%ax
+  102d18:	66 90                	xchg   %ax,%ax
+  102d1a:	66 90                	xchg   %ax,%ax
+  102d1c:	66 90                	xchg   %ax,%ax
+  102d1e:	66 90                	xchg   %ax,%ax
 
-00102d50 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)>:
-  102d50:	66 c1 ea 05          	shr    $0x5,%dx
-  102d54:	0f b7 d2             	movzwl %dx,%edx
-  102d57:	c1 e2 05             	shl    $0x5,%edx
-  102d5a:	01 c2                	add    %eax,%edx
-  102d5c:	39 d0                	cmp    %edx,%eax
-  102d5e:	73 43                	jae    102da3 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x53>
-  102d60:	c5 f9 6e c1          	vmovd  %ecx,%xmm0
-  102d64:	89 c1                	mov    %eax,%ecx
-  102d66:	83 c0 20             	add    $0x20,%eax
-  102d69:	c4 e2 7d 58 c0       	vpbroadcastd %xmm0,%ymm0
-  102d6e:	f7 d1                	not    %ecx
-  102d70:	01 d1                	add    %edx,%ecx
-  102d72:	c5 fd 7f 40 e0       	vmovdqa %ymm0,-0x20(%eax)
-  102d77:	c1 e9 05             	shr    $0x5,%ecx
+00102d20 <terminal::hex(terminal::output&)>:
+  102d20:	c6 00 01             	movb   $0x1,(%eax)
+  102d23:	c3                   	ret
+  102d24:	66 90                	xchg   %ax,%ax
+  102d26:	66 90                	xchg   %ax,%ax
+  102d28:	66 90                	xchg   %ax,%ax
+  102d2a:	66 90                	xchg   %ax,%ax
+  102d2c:	66 90                	xchg   %ax,%ax
+  102d2e:	66 90                	xchg   %ax,%ax
+
+00102d30 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)>:
+  102d30:	66 c1 ea 04          	shr    $0x4,%dx
+  102d34:	0f b7 d2             	movzwl %dx,%edx
+  102d37:	c1 e2 04             	shl    $0x4,%edx
+  102d3a:	01 c2                	add    %eax,%edx
+  102d3c:	39 d0                	cmp    %edx,%eax
+  102d3e:	73 3e                	jae    102d7e <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x4e>
+  102d40:	66 0f 6e c9          	movd   %ecx,%xmm1
+  102d44:	89 c1                	mov    %eax,%ecx
+  102d46:	83 c0 10             	add    $0x10,%eax
+  102d49:	f7 d1                	not    %ecx
+  102d4b:	66 0f 70 c1 00       	pshufd $0x0,%xmm1,%xmm0
+  102d50:	0f 29 40 f0          	movaps %xmm0,-0x10(%eax)
+  102d54:	01 d1                	add    %edx,%ecx
+  102d56:	c1 e9 04             	shr    $0x4,%ecx
+  102d59:	39 d0                	cmp    %edx,%eax
+  102d5b:	73 23                	jae    102d80 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x50>
+  102d5d:	83 e1 01             	and    $0x1,%ecx
+  102d60:	74 0e                	je     102d70 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
+  102d62:	0f 29 00             	movaps %xmm0,(%eax)
+  102d65:	83 c0 10             	add    $0x10,%eax
+  102d68:	39 d0                	cmp    %edx,%eax
+  102d6a:	73 15                	jae    102d81 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x51>
+  102d6c:	8d 74 26 00          	lea    0x0(%esi,%eiz,1),%esi
+  102d70:	0f 29 00             	movaps %xmm0,(%eax)
+  102d73:	83 c0 20             	add    $0x20,%eax
+  102d76:	0f 29 40 f0          	movaps %xmm0,-0x10(%eax)
   102d7a:	39 d0                	cmp    %edx,%eax
-  102d7c:	73 22                	jae    102da0 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x50>
-  102d7e:	83 e1 01             	and    $0x1,%ecx
-  102d81:	74 0d                	je     102d90 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
-  102d83:	c5 fd 7f 00          	vmovdqa %ymm0,(%eax)
-  102d87:	83 c0 20             	add    $0x20,%eax
-  102d8a:	39 d0                	cmp    %edx,%eax
-  102d8c:	73 12                	jae    102da0 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x50>
+  102d7c:	72 f2                	jb     102d70 <(anonymous namespace)::use_sse_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
+  102d7e:	c3                   	ret
+  102d7f:	90                   	nop
+  102d80:	c3                   	ret
+  102d81:	c3                   	ret
+  102d82:	66 90                	xchg   %ax,%ax
+  102d84:	66 90                	xchg   %ax,%ax
+  102d86:	66 90                	xchg   %ax,%ax
+  102d88:	66 90                	xchg   %ax,%ax
+  102d8a:	66 90                	xchg   %ax,%ax
+  102d8c:	66 90                	xchg   %ax,%ax
   102d8e:	66 90                	xchg   %ax,%ax
-  102d90:	c5 fd 7f 00          	vmovdqa %ymm0,(%eax)
-  102d94:	83 c0 40             	add    $0x40,%eax
-  102d97:	c5 fd 7f 40 e0       	vmovdqa %ymm0,-0x20(%eax)
+
+00102d90 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)>:
+  102d90:	66 c1 ea 05          	shr    $0x5,%dx
+  102d94:	0f b7 d2             	movzwl %dx,%edx
+  102d97:	c1 e2 05             	shl    $0x5,%edx
+  102d9a:	01 c2                	add    %eax,%edx
   102d9c:	39 d0                	cmp    %edx,%eax
-  102d9e:	72 f0                	jb     102d90 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
-  102da0:	c5 f8 77             	vzeroupper
-  102da3:	c3                   	ret
-  102da4:	66 90                	xchg   %ax,%ax
-  102da6:	66 90                	xchg   %ax,%ax
-  102da8:	66 90                	xchg   %ax,%ax
-  102daa:	66 90                	xchg   %ax,%ax
-  102dac:	66 90                	xchg   %ax,%ax
-  102dae:	66 90                	xchg   %ax,%ax
-
-00102db0 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)>:
-  102db0:	66 c1 ea 02          	shr    $0x2,%dx
-  102db4:	0f b7 d2             	movzwl %dx,%edx
-  102db7:	8d 14 90             	lea    (%eax,%edx,4),%edx
+  102d9e:	73 43                	jae    102de3 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x53>
+  102da0:	c5 f9 6e c1          	vmovd  %ecx,%xmm0
+  102da4:	89 c1                	mov    %eax,%ecx
+  102da6:	83 c0 20             	add    $0x20,%eax
+  102da9:	c4 e2 7d 58 c0       	vpbroadcastd %xmm0,%ymm0
+  102dae:	f7 d1                	not    %ecx
+  102db0:	01 d1                	add    %edx,%ecx
+  102db2:	c5 fd 7f 40 e0       	vmovdqa %ymm0,-0x20(%eax)
+  102db7:	c1 e9 05             	shr    $0x5,%ecx
   102dba:	39 d0                	cmp    %edx,%eax
-  102dbc:	73 4a                	jae    102e08 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x58>
-  102dbe:	55                   	push   %ebp
-  102dbf:	89 e5                	mov    %esp,%ebp
-  102dc1:	53                   	push   %ebx
-  102dc2:	89 c3                	mov    %eax,%ebx
-  102dc4:	83 c0 04             	add    $0x4,%eax
-  102dc7:	f7 d3                	not    %ebx
-  102dc9:	89 48 fc             	mov    %ecx,-0x4(%eax)
-  102dcc:	01 d3                	add    %edx,%ebx
-  102dce:	c1 eb 02             	shr    $0x2,%ebx
-  102dd1:	39 d0                	cmp    %edx,%eax
-  102dd3:	73 27                	jae    102dfc <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x4c>
-  102dd5:	83 e3 01             	and    $0x1,%ebx
-  102dd8:	74 16                	je     102df0 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x40>
-  102dda:	89 08                	mov    %ecx,(%eax)
-  102ddc:	83 c0 04             	add    $0x4,%eax
-  102ddf:	39 d0                	cmp    %edx,%eax
-  102de1:	73 19                	jae    102dfc <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x4c>
-  102de3:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102de8:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102def:	00 
-  102df0:	89 08                	mov    %ecx,(%eax)
-  102df2:	83 c0 08             	add    $0x8,%eax
-  102df5:	89 48 fc             	mov    %ecx,-0x4(%eax)
-  102df8:	39 d0                	cmp    %edx,%eax
-  102dfa:	72 f4                	jb     102df0 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x40>
-  102dfc:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  102dff:	c9                   	leave
-  102e00:	c3                   	ret
-  102e01:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102e08:	c3                   	ret
-  102e09:	66 90                	xchg   %ax,%ax
-  102e0b:	66 90                	xchg   %ax,%ax
-  102e0d:	66 90                	xchg   %ax,%ax
-  102e0f:	66 90                	xchg   %ax,%ax
-  102e11:	66 90                	xchg   %ax,%ax
-  102e13:	66 90                	xchg   %ax,%ax
-  102e15:	66 90                	xchg   %ax,%ax
-  102e17:	66 90                	xchg   %ax,%ax
-  102e19:	66 90                	xchg   %ax,%ax
-  102e1b:	66 90                	xchg   %ax,%ax
-  102e1d:	66 90                	xchg   %ax,%ax
-  102e1f:	90                   	nop
+  102dbc:	73 22                	jae    102de0 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x50>
+  102dbe:	83 e1 01             	and    $0x1,%ecx
+  102dc1:	74 0d                	je     102dd0 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
+  102dc3:	c5 fd 7f 00          	vmovdqa %ymm0,(%eax)
+  102dc7:	83 c0 20             	add    $0x20,%eax
+  102dca:	39 d0                	cmp    %edx,%eax
+  102dcc:	73 12                	jae    102de0 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x50>
+  102dce:	66 90                	xchg   %ax,%ax
+  102dd0:	c5 fd 7f 00          	vmovdqa %ymm0,(%eax)
+  102dd4:	83 c0 40             	add    $0x40,%eax
+  102dd7:	c5 fd 7f 40 e0       	vmovdqa %ymm0,-0x20(%eax)
+  102ddc:	39 d0                	cmp    %edx,%eax
+  102dde:	72 f0                	jb     102dd0 <(anonymous namespace)::use_avx_2(unsigned long volatile*, unsigned short, unsigned long)+0x40>
+  102de0:	c5 f8 77             	vzeroupper
+  102de3:	c3                   	ret
+  102de4:	66 90                	xchg   %ax,%ax
+  102de6:	66 90                	xchg   %ax,%ax
+  102de8:	66 90                	xchg   %ax,%ax
+  102dea:	66 90                	xchg   %ax,%ax
+  102dec:	66 90                	xchg   %ax,%ax
+  102dee:	66 90                	xchg   %ax,%ax
 
-00102e20 <(anonymous namespace)::use_sse_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)>:
-  102e20:	55                   	push   %ebp
-  102e21:	89 e5                	mov    %esp,%ebp
-  102e23:	56                   	push   %esi
-  102e24:	89 d6                	mov    %edx,%esi
-  102e26:	53                   	push   %ebx
-  102e27:	89 cb                	mov    %ecx,%ebx
-  102e29:	66 c1 eb 04          	shr    $0x4,%bx
-  102e2d:	0f b7 db             	movzwl %bx,%ebx
-  102e30:	c1 e3 04             	shl    $0x4,%ebx
-  102e33:	8d 0c 18             	lea    (%eax,%ebx,1),%ecx
-  102e36:	39 c8                	cmp    %ecx,%eax
-  102e38:	73 26                	jae    102e60 <(anonymous namespace)::use_sse_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x40>
-  102e3a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  102e40:	66 0f 6f 00          	movdqa (%eax),%xmm0
-  102e44:	83 c0 10             	add    $0x10,%eax
-  102e47:	83 c2 10             	add    $0x10,%edx
-  102e4a:	0f 29 42 f0          	movaps %xmm0,-0x10(%edx)
-  102e4e:	39 c8                	cmp    %ecx,%eax
-  102e50:	72 ee                	jb     102e40 <(anonymous namespace)::use_sse_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x20>
-  102e52:	8d 04 1e             	lea    (%esi,%ebx,1),%eax
-  102e55:	5b                   	pop    %ebx
-  102e56:	5e                   	pop    %esi
-  102e57:	5d                   	pop    %ebp
-  102e58:	c3                   	ret
-  102e59:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102e60:	5b                   	pop    %ebx
-  102e61:	89 d0                	mov    %edx,%eax
-  102e63:	5e                   	pop    %esi
-  102e64:	5d                   	pop    %ebp
-  102e65:	c3                   	ret
-  102e66:	66 90                	xchg   %ax,%ax
-  102e68:	66 90                	xchg   %ax,%ax
-  102e6a:	66 90                	xchg   %ax,%ax
-  102e6c:	66 90                	xchg   %ax,%ax
-  102e6e:	66 90                	xchg   %ax,%ax
-  102e70:	66 90                	xchg   %ax,%ax
-  102e72:	66 90                	xchg   %ax,%ax
-  102e74:	66 90                	xchg   %ax,%ax
-  102e76:	66 90                	xchg   %ax,%ax
-  102e78:	66 90                	xchg   %ax,%ax
-  102e7a:	66 90                	xchg   %ax,%ax
-  102e7c:	66 90                	xchg   %ax,%ax
-  102e7e:	66 90                	xchg   %ax,%ax
+00102df0 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)>:
+  102df0:	66 c1 ea 02          	shr    $0x2,%dx
+  102df4:	0f b7 d2             	movzwl %dx,%edx
+  102df7:	8d 14 90             	lea    (%eax,%edx,4),%edx
+  102dfa:	39 d0                	cmp    %edx,%eax
+  102dfc:	73 4a                	jae    102e48 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x58>
+  102dfe:	55                   	push   %ebp
+  102dff:	89 e5                	mov    %esp,%ebp
+  102e01:	53                   	push   %ebx
+  102e02:	89 c3                	mov    %eax,%ebx
+  102e04:	83 c0 04             	add    $0x4,%eax
+  102e07:	f7 d3                	not    %ebx
+  102e09:	89 48 fc             	mov    %ecx,-0x4(%eax)
+  102e0c:	01 d3                	add    %edx,%ebx
+  102e0e:	c1 eb 02             	shr    $0x2,%ebx
+  102e11:	39 d0                	cmp    %edx,%eax
+  102e13:	73 27                	jae    102e3c <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x4c>
+  102e15:	83 e3 01             	and    $0x1,%ebx
+  102e18:	74 16                	je     102e30 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x40>
+  102e1a:	89 08                	mov    %ecx,(%eax)
+  102e1c:	83 c0 04             	add    $0x4,%eax
+  102e1f:	39 d0                	cmp    %edx,%eax
+  102e21:	73 19                	jae    102e3c <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x4c>
+  102e23:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102e28:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102e2f:	00 
+  102e30:	89 08                	mov    %ecx,(%eax)
+  102e32:	83 c0 08             	add    $0x8,%eax
+  102e35:	89 48 fc             	mov    %ecx,-0x4(%eax)
+  102e38:	39 d0                	cmp    %edx,%eax
+  102e3a:	72 f4                	jb     102e30 <(anonymous namespace)::fallback_fill(unsigned long volatile*, unsigned short, unsigned long)+0x40>
+  102e3c:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  102e3f:	c9                   	leave
+  102e40:	c3                   	ret
+  102e41:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102e48:	c3                   	ret
+  102e49:	66 90                	xchg   %ax,%ax
+  102e4b:	66 90                	xchg   %ax,%ax
+  102e4d:	66 90                	xchg   %ax,%ax
+  102e4f:	66 90                	xchg   %ax,%ax
+  102e51:	66 90                	xchg   %ax,%ax
+  102e53:	66 90                	xchg   %ax,%ax
+  102e55:	66 90                	xchg   %ax,%ax
+  102e57:	66 90                	xchg   %ax,%ax
+  102e59:	66 90                	xchg   %ax,%ax
+  102e5b:	66 90                	xchg   %ax,%ax
+  102e5d:	66 90                	xchg   %ax,%ax
+  102e5f:	90                   	nop
 
-00102e80 <(anonymous namespace)::use_avx_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)>:
-  102e80:	55                   	push   %ebp
-  102e81:	89 e5                	mov    %esp,%ebp
-  102e83:	56                   	push   %esi
-  102e84:	89 d6                	mov    %edx,%esi
-  102e86:	53                   	push   %ebx
-  102e87:	89 cb                	mov    %ecx,%ebx
-  102e89:	66 c1 eb 05          	shr    $0x5,%bx
-  102e8d:	0f b7 db             	movzwl %bx,%ebx
-  102e90:	c1 e3 05             	shl    $0x5,%ebx
-  102e93:	8d 0c 18             	lea    (%eax,%ebx,1),%ecx
-  102e96:	39 c8                	cmp    %ecx,%eax
-  102e98:	73 26                	jae    102ec0 <(anonymous namespace)::use_avx_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x40>
-  102e9a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
-  102ea0:	c5 fd 6f 00          	vmovdqa (%eax),%ymm0
-  102ea4:	83 c0 20             	add    $0x20,%eax
-  102ea7:	83 c2 20             	add    $0x20,%edx
-  102eaa:	c5 fd 7f 42 e0       	vmovdqa %ymm0,-0x20(%edx)
-  102eaf:	39 c8                	cmp    %ecx,%eax
-  102eb1:	72 ed                	jb     102ea0 <(anonymous namespace)::use_avx_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x20>
-  102eb3:	8d 04 1e             	lea    (%esi,%ebx,1),%eax
-  102eb6:	c5 f8 77             	vzeroupper
-  102eb9:	5b                   	pop    %ebx
-  102eba:	5e                   	pop    %esi
-  102ebb:	5d                   	pop    %ebp
-  102ebc:	c3                   	ret
-  102ebd:	8d 76 00             	lea    0x0(%esi),%esi
-  102ec0:	5b                   	pop    %ebx
-  102ec1:	89 d0                	mov    %edx,%eax
-  102ec3:	5e                   	pop    %esi
-  102ec4:	5d                   	pop    %ebp
-  102ec5:	c3                   	ret
-  102ec6:	66 90                	xchg   %ax,%ax
-  102ec8:	66 90                	xchg   %ax,%ax
-  102eca:	66 90                	xchg   %ax,%ax
-  102ecc:	66 90                	xchg   %ax,%ax
-  102ece:	66 90                	xchg   %ax,%ax
+00102e60 <(anonymous namespace)::use_sse_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)>:
+  102e60:	55                   	push   %ebp
+  102e61:	89 e5                	mov    %esp,%ebp
+  102e63:	56                   	push   %esi
+  102e64:	89 d6                	mov    %edx,%esi
+  102e66:	53                   	push   %ebx
+  102e67:	89 cb                	mov    %ecx,%ebx
+  102e69:	66 c1 eb 04          	shr    $0x4,%bx
+  102e6d:	0f b7 db             	movzwl %bx,%ebx
+  102e70:	c1 e3 04             	shl    $0x4,%ebx
+  102e73:	8d 0c 18             	lea    (%eax,%ebx,1),%ecx
+  102e76:	39 c8                	cmp    %ecx,%eax
+  102e78:	73 26                	jae    102ea0 <(anonymous namespace)::use_sse_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x40>
+  102e7a:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  102e80:	66 0f 6f 00          	movdqa (%eax),%xmm0
+  102e84:	83 c0 10             	add    $0x10,%eax
+  102e87:	83 c2 10             	add    $0x10,%edx
+  102e8a:	0f 29 42 f0          	movaps %xmm0,-0x10(%edx)
+  102e8e:	39 c8                	cmp    %ecx,%eax
+  102e90:	72 ee                	jb     102e80 <(anonymous namespace)::use_sse_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x20>
+  102e92:	8d 04 1e             	lea    (%esi,%ebx,1),%eax
+  102e95:	5b                   	pop    %ebx
+  102e96:	5e                   	pop    %esi
+  102e97:	5d                   	pop    %ebp
+  102e98:	c3                   	ret
+  102e99:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
+  102ea0:	5b                   	pop    %ebx
+  102ea1:	89 d0                	mov    %edx,%eax
+  102ea3:	5e                   	pop    %esi
+  102ea4:	5d                   	pop    %ebp
+  102ea5:	c3                   	ret
+  102ea6:	66 90                	xchg   %ax,%ax
+  102ea8:	66 90                	xchg   %ax,%ax
+  102eaa:	66 90                	xchg   %ax,%ax
+  102eac:	66 90                	xchg   %ax,%ax
+  102eae:	66 90                	xchg   %ax,%ax
+  102eb0:	66 90                	xchg   %ax,%ax
+  102eb2:	66 90                	xchg   %ax,%ax
+  102eb4:	66 90                	xchg   %ax,%ax
+  102eb6:	66 90                	xchg   %ax,%ax
+  102eb8:	66 90                	xchg   %ax,%ax
+  102eba:	66 90                	xchg   %ax,%ax
+  102ebc:	66 90                	xchg   %ax,%ax
+  102ebe:	66 90                	xchg   %ax,%ax
 
-00102ed0 <(anonymous namespace)::fallback_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)>:
-  102ed0:	55                   	push   %ebp
-  102ed1:	89 e5                	mov    %esp,%ebp
-  102ed3:	57                   	push   %edi
-  102ed4:	89 cf                	mov    %ecx,%edi
-  102ed6:	66 c1 ef 02          	shr    $0x2,%di
-  102eda:	56                   	push   %esi
-  102edb:	89 d6                	mov    %edx,%esi
-  102edd:	0f b7 ff             	movzwl %di,%edi
-  102ee0:	53                   	push   %ebx
-  102ee1:	c1 e7 02             	shl    $0x2,%edi
-  102ee4:	8d 1c 38             	lea    (%eax,%edi,1),%ebx
-  102ee7:	39 d8                	cmp    %ebx,%eax
-  102ee9:	73 25                	jae    102f10 <(anonymous namespace)::fallback_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x40>
-  102eeb:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102ef0:	8b 08                	mov    (%eax),%ecx
-  102ef2:	83 c0 04             	add    $0x4,%eax
-  102ef5:	83 c2 04             	add    $0x4,%edx
-  102ef8:	89 4a fc             	mov    %ecx,-0x4(%edx)
-  102efb:	39 d8                	cmp    %ebx,%eax
-  102efd:	72 f1                	jb     102ef0 <(anonymous namespace)::fallback_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x20>
-  102eff:	8d 04 3e             	lea    (%esi,%edi,1),%eax
-  102f02:	5b                   	pop    %ebx
+00102ec0 <(anonymous namespace)::use_avx_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)>:
+  102ec0:	55                   	push   %ebp
+  102ec1:	89 e5                	mov    %esp,%ebp
+  102ec3:	56                   	push   %esi
+  102ec4:	89 d6                	mov    %edx,%esi
+  102ec6:	53                   	push   %ebx
+  102ec7:	89 cb                	mov    %ecx,%ebx
+  102ec9:	66 c1 eb 05          	shr    $0x5,%bx
+  102ecd:	0f b7 db             	movzwl %bx,%ebx
+  102ed0:	c1 e3 05             	shl    $0x5,%ebx
+  102ed3:	8d 0c 18             	lea    (%eax,%ebx,1),%ecx
+  102ed6:	39 c8                	cmp    %ecx,%eax
+  102ed8:	73 26                	jae    102f00 <(anonymous namespace)::use_avx_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x40>
+  102eda:	8d b6 00 00 00 00    	lea    0x0(%esi),%esi
+  102ee0:	c5 fd 6f 00          	vmovdqa (%eax),%ymm0
+  102ee4:	83 c0 20             	add    $0x20,%eax
+  102ee7:	83 c2 20             	add    $0x20,%edx
+  102eea:	c5 fd 7f 42 e0       	vmovdqa %ymm0,-0x20(%edx)
+  102eef:	39 c8                	cmp    %ecx,%eax
+  102ef1:	72 ed                	jb     102ee0 <(anonymous namespace)::use_avx_2_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x20>
+  102ef3:	8d 04 1e             	lea    (%esi,%ebx,1),%eax
+  102ef6:	c5 f8 77             	vzeroupper
+  102ef9:	5b                   	pop    %ebx
+  102efa:	5e                   	pop    %esi
+  102efb:	5d                   	pop    %ebp
+  102efc:	c3                   	ret
+  102efd:	8d 76 00             	lea    0x0(%esi),%esi
+  102f00:	5b                   	pop    %ebx
+  102f01:	89 d0                	mov    %edx,%eax
   102f03:	5e                   	pop    %esi
-  102f04:	5f                   	pop    %edi
-  102f05:	5d                   	pop    %ebp
-  102f06:	c3                   	ret
-  102f07:	90                   	nop
-  102f08:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
-  102f0f:	00 
-  102f10:	5b                   	pop    %ebx
-  102f11:	89 d0                	mov    %edx,%eax
-  102f13:	5e                   	pop    %esi
-  102f14:	5f                   	pop    %edi
-  102f15:	5d                   	pop    %ebp
-  102f16:	c3                   	ret
-  102f17:	66 90                	xchg   %ax,%ax
-  102f19:	66 90                	xchg   %ax,%ax
-  102f1b:	66 90                	xchg   %ax,%ax
-  102f1d:	66 90                	xchg   %ax,%ax
-  102f1f:	90                   	nop
+  102f04:	5d                   	pop    %ebp
+  102f05:	c3                   	ret
+  102f06:	66 90                	xchg   %ax,%ax
+  102f08:	66 90                	xchg   %ax,%ax
+  102f0a:	66 90                	xchg   %ax,%ax
+  102f0c:	66 90                	xchg   %ax,%ax
+  102f0e:	66 90                	xchg   %ax,%ax
 
-00102f20 <io::vga_text_buffer::clear()>:
-  102f20:	55                   	push   %ebp
-  102f21:	b8 00 80 0b 00       	mov    $0xb8000,%eax
-  102f26:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  102f2b:	ba a0 0f 00 00       	mov    $0xfa0,%edx
-  102f30:	89 e5                	mov    %esp,%ebp
-  102f32:	53                   	push   %ebx
-  102f33:	83 ec 04             	sub    $0x4,%esp
-  102f36:	0f b6 1d 02 45 10 00 	movzbl 0x104502,%ebx
-  102f3d:	ff 14 9d dc 39 10 00 	call   *0x1039dc(,%ebx,4)
-  102f44:	31 c0                	xor    %eax,%eax
-  102f46:	c6 05 0a 3a 10 00 00 	movb   $0x0,0x103a0a
-  102f4d:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  102f50:	66 a3 08 3a 10 00    	mov    %ax,0x103a08
-  102f56:	31 c0                	xor    %eax,%eax
-  102f58:	c9                   	leave
-  102f59:	e9 c2 01 00 00       	jmp    103120 <io::hardware_cursor::set_display_start(unsigned short)>
-  102f5e:	66 90                	xchg   %ax,%ax
+00102f10 <(anonymous namespace)::fallback_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)>:
+  102f10:	55                   	push   %ebp
+  102f11:	89 e5                	mov    %esp,%ebp
+  102f13:	57                   	push   %edi
+  102f14:	89 cf                	mov    %ecx,%edi
+  102f16:	66 c1 ef 02          	shr    $0x2,%di
+  102f1a:	56                   	push   %esi
+  102f1b:	89 d6                	mov    %edx,%esi
+  102f1d:	0f b7 ff             	movzwl %di,%edi
+  102f20:	53                   	push   %ebx
+  102f21:	c1 e7 02             	shl    $0x2,%edi
+  102f24:	8d 1c 38             	lea    (%eax,%edi,1),%ebx
+  102f27:	39 d8                	cmp    %ebx,%eax
+  102f29:	73 25                	jae    102f50 <(anonymous namespace)::fallback_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x40>
+  102f2b:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102f30:	8b 08                	mov    (%eax),%ecx
+  102f32:	83 c0 04             	add    $0x4,%eax
+  102f35:	83 c2 04             	add    $0x4,%edx
+  102f38:	89 4a fc             	mov    %ecx,-0x4(%edx)
+  102f3b:	39 d8                	cmp    %ebx,%eax
+  102f3d:	72 f1                	jb     102f30 <(anonymous namespace)::fallback_copy(unsigned long const volatile*, unsigned long volatile*, unsigned short)+0x20>
+  102f3f:	8d 04 3e             	lea    (%esi,%edi,1),%eax
+  102f42:	5b                   	pop    %ebx
+  102f43:	5e                   	pop    %esi
+  102f44:	5f                   	pop    %edi
+  102f45:	5d                   	pop    %ebp
+  102f46:	c3                   	ret
+  102f47:	90                   	nop
+  102f48:	2e 8d b4 26 00 00 00 	lea    %cs:0x0(%esi,%eiz,1),%esi
+  102f4f:	00 
+  102f50:	5b                   	pop    %ebx
+  102f51:	89 d0                	mov    %edx,%eax
+  102f53:	5e                   	pop    %esi
+  102f54:	5f                   	pop    %edi
+  102f55:	5d                   	pop    %ebp
+  102f56:	c3                   	ret
+  102f57:	66 90                	xchg   %ax,%ax
+  102f59:	66 90                	xchg   %ax,%ax
+  102f5b:	66 90                	xchg   %ax,%ax
+  102f5d:	66 90                	xchg   %ax,%ax
+  102f5f:	90                   	nop
 
-00102f60 <io::vga_text_buffer::clear_row(unsigned long)>:
+00102f60 <io::vga_text_buffer::clear()>:
   102f60:	55                   	push   %ebp
-  102f61:	01 c0                	add    %eax,%eax
-  102f63:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
-  102f68:	ba a0 00 00 00       	mov    $0xa0,%edx
-  102f6d:	25 fe ff 01 00       	and    $0x1fffe,%eax
-  102f72:	05 00 80 0b 00       	add    $0xb8000,%eax
-  102f77:	89 e5                	mov    %esp,%ebp
-  102f79:	53                   	push   %ebx
-  102f7a:	83 ec 04             	sub    $0x4,%esp
-  102f7d:	0f b6 1d 02 45 10 00 	movzbl 0x104502,%ebx
-  102f84:	ff 14 9d dc 39 10 00 	call   *0x1039dc(,%ebx,4)
-  102f8b:	8b 5d fc             	mov    -0x4(%ebp),%ebx
-  102f8e:	c9                   	leave
-  102f8f:	c3                   	ret
+  102f61:	b8 00 80 0b 00       	mov    $0xb8000,%eax
+  102f66:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  102f6b:	ba a0 0f 00 00       	mov    $0xfa0,%edx
+  102f70:	89 e5                	mov    %esp,%ebp
+  102f72:	53                   	push   %ebx
+  102f73:	83 ec 04             	sub    $0x4,%esp
+  102f76:	0f b6 1d 82 45 10 00 	movzbl 0x104582,%ebx
+  102f7d:	ff 14 9d 5c 3a 10 00 	call   *0x103a5c(,%ebx,4)
+  102f84:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  102f87:	31 c0                	xor    %eax,%eax
+  102f89:	81 25 88 3a 10 00 00 	andl   $0xff000000,0x103a88
+  102f90:	00 00 ff 
+  102f93:	c9                   	leave
+  102f94:	e9 17 02 00 00       	jmp    1031b0 <io::hardware_cursor::set_display_start(unsigned short)>
+  102f99:	66 90                	xchg   %ax,%ax
+  102f9b:	66 90                	xchg   %ax,%ax
+  102f9d:	66 90                	xchg   %ax,%ax
+  102f9f:	90                   	nop
 
-00102f90 <io::vga_text_buffer::put(char)>:
-  102f90:	0f b6 15 0b 3a 10 00 	movzbl 0x103a0b,%edx
-  102f97:	8b 0d 08 3a 10 00    	mov    0x103a08,%ecx
-  102f9d:	0f b6 c0             	movzbl %al,%eax
-  102fa0:	c1 e2 08             	shl    $0x8,%edx
-  102fa3:	09 d0                	or     %edx,%eax
-  102fa5:	8d 14 09             	lea    (%ecx,%ecx,1),%edx
-  102fa8:	81 e2 fe ff 01 00    	and    $0x1fffe,%edx
-  102fae:	66 89 82 00 80 0b 00 	mov    %ax,0xb8000(%edx)
-  102fb5:	8b 15 08 3a 10 00    	mov    0x103a08,%edx
-  102fbb:	8d 42 01             	lea    0x1(%edx),%eax
-  102fbe:	80 fa 4f             	cmp    $0x4f,%dl
-  102fc1:	74 0d                	je     102fd0 <io::vga_text_buffer::put(char)+0x40>
-  102fc3:	a3 08 3a 10 00       	mov    %eax,0x103a08
-  102fc8:	c3                   	ret
-  102fc9:	8d b4 26 00 00 00 00 	lea    0x0(%esi,%eiz,1),%esi
-  102fd0:	30 c0                	xor    %al,%al
-  102fd2:	89 c2                	mov    %eax,%edx
-  102fd4:	8d 82 00 01 00 00    	lea    0x100(%edx),%eax
-  102fda:	89 c1                	mov    %eax,%ecx
-  102fdc:	c1 e9 08             	shr    $0x8,%ecx
-  102fdf:	80 f9 19             	cmp    $0x19,%cl
-  102fe2:	75 df                	jne    102fc3 <io::vga_text_buffer::put(char)+0x33>
-  102fe4:	55                   	push   %ebp
-  102fe5:	8d 82 00 00 01 00    	lea    0x10000(%edx),%eax
-  102feb:	89 c2                	mov    %eax,%edx
-  102fed:	c1 ea 10             	shr    $0x10,%edx
-  102ff0:	89 e5                	mov    %esp,%ebp
-  102ff2:	83 ec 18             	sub    $0x18,%esp
-  102ff5:	80 fa b3             	cmp    $0xb3,%dl
-  102ff8:	0f 87 8c d0 ff ff    	ja     10008a <io::vga_text_buffer::put(char) [clone .cold]>
-  102ffe:	89 45 f4             	mov    %eax,-0xc(%ebp)
-  103001:	e8 5a ff ff ff       	call   102f60 <io::vga_text_buffer::clear_row(unsigned long)>
-  103006:	8b 45 f4             	mov    -0xc(%ebp),%eax
-  103009:	a3 08 3a 10 00       	mov    %eax,0x103a08
-  10300e:	c9                   	leave
-  10300f:	c3                   	ret
+00102fa0 <io::vga_text_buffer::clear_row(unsigned int)>:
+  102fa0:	55                   	push   %ebp
+  102fa1:	89 c1                	mov    %eax,%ecx
+  102fa3:	0f b6 d4             	movzbl %ah,%edx
+  102fa6:	0f b6 c0             	movzbl %al,%eax
+  102fa9:	c1 e9 10             	shr    $0x10,%ecx
+  102fac:	0f b6 c9             	movzbl %cl,%ecx
+  102faf:	89 e5                	mov    %esp,%ebp
+  102fb1:	53                   	push   %ebx
+  102fb2:	01 ca                	add    %ecx,%edx
+  102fb4:	b9 20 0f 20 0f       	mov    $0xf200f20,%ecx
+  102fb9:	8d 14 92             	lea    (%edx,%edx,4),%edx
+  102fbc:	c1 e2 04             	shl    $0x4,%edx
+  102fbf:	83 ec 04             	sub    $0x4,%esp
+  102fc2:	0f b6 1d 82 45 10 00 	movzbl 0x104582,%ebx
+  102fc9:	01 d0                	add    %edx,%eax
+  102fcb:	ba a0 00 00 00       	mov    $0xa0,%edx
+  102fd0:	8d 84 00 00 80 0b 00 	lea    0xb8000(%eax,%eax,1),%eax
+  102fd7:	ff 14 9d 5c 3a 10 00 	call   *0x103a5c(,%ebx,4)
+  102fde:	8b 5d fc             	mov    -0x4(%ebp),%ebx
+  102fe1:	c9                   	leave
+  102fe2:	c3                   	ret
+  102fe3:	66 90                	xchg   %ax,%ax
+  102fe5:	66 90                	xchg   %ax,%ax
+  102fe7:	66 90                	xchg   %ax,%ax
+  102fe9:	66 90                	xchg   %ax,%ax
+  102feb:	66 90                	xchg   %ax,%ax
+  102fed:	66 90                	xchg   %ax,%ax
+  102fef:	90                   	nop
 
-00103010 <io::vga_text_buffer::move_to_next_line()>:
-  103010:	55                   	push   %ebp
-  103011:	8b 0d 08 3a 10 00    	mov    0x103a08,%ecx
-  103017:	89 c8                	mov    %ecx,%eax
-  103019:	89 e5                	mov    %esp,%ebp
-  10301b:	56                   	push   %esi
-  10301c:	c1 e8 10             	shr    $0x10,%eax
-  10301f:	53                   	push   %ebx
-  103020:	8b 55 08             	mov    0x8(%ebp),%edx
-  103023:	0f b6 dd             	movzbl %ch,%ebx
-  103026:	80 fb 18             	cmp    $0x18,%bl
-  103029:	89 0a                	mov    %ecx,(%edx)
-  10302b:	8d 4b 01             	lea    0x1(%ebx),%ecx
-  10302e:	0f 94 c3             	sete   %bl
-  103031:	8d 34 18             	lea    (%eax,%ebx,1),%esi
-  103034:	c6 02 00             	movb   $0x0,(%edx)
-  103037:	89 f0                	mov    %esi,%eax
-  103039:	88 42 02             	mov    %al,0x2(%edx)
-  10303c:	89 c8                	mov    %ecx,%eax
-  10303e:	29 d8                	sub    %ebx,%eax
-  103040:	88 42 01             	mov    %al,0x1(%edx)
-  103043:	80 f9 19             	cmp    $0x19,%cl
-  103046:	74 08                	je     103050 <io::vga_text_buffer::move_to_next_line()+0x40>
-  103048:	5b                   	pop    %ebx
-  103049:	89 d0                	mov    %edx,%eax
-  10304b:	5e                   	pop    %esi
-  10304c:	5d                   	pop    %ebp
-  10304d:	c2 04 00             	ret    $0x4
-  103050:	89 f0                	mov    %esi,%eax
-  103052:	0f b6 c0             	movzbl %al,%eax
-  103055:	8d 04 80             	lea    (%eax,%eax,4),%eax
-  103058:	c1 e0 04             	shl    $0x4,%eax
-  10305b:	0f b7 c0             	movzwl %ax,%eax
-  10305e:	e8 bd 00 00 00       	call   103120 <io::hardware_cursor::set_display_start(unsigned short)>
-  103063:	8b 55 08             	mov    0x8(%ebp),%edx
-  103066:	5b                   	pop    %ebx
-  103067:	5e                   	pop    %esi
-  103068:	5d                   	pop    %ebp
-  103069:	89 d0                	mov    %edx,%eax
-  10306b:	c2 04 00             	ret    $0x4
-  10306e:	66 90                	xchg   %ax,%ax
+00102ff0 <io::vga_text_buffer::put(char)>:
+  102ff0:	0f b6 0d 8b 3a 10 00 	movzbl 0x103a8b,%ecx
+  102ff7:	55                   	push   %ebp
+  102ff8:	0f b6 d0             	movzbl %al,%edx
+  102ffb:	c1 e1 08             	shl    $0x8,%ecx
+  102ffe:	89 c8                	mov    %ecx,%eax
+  103000:	89 e5                	mov    %esp,%ebp
+  103002:	56                   	push   %esi
+  103003:	09 d0                	or     %edx,%eax
+  103005:	8b 15 88 3a 10 00    	mov    0x103a88,%edx
+  10300b:	53                   	push   %ebx
+  10300c:	89 d3                	mov    %edx,%ebx
+  10300e:	0f b6 ce             	movzbl %dh,%ecx
+  103011:	0f b6 d2             	movzbl %dl,%edx
+  103014:	c1 eb 10             	shr    $0x10,%ebx
+  103017:	0f b6 db             	movzbl %bl,%ebx
+  10301a:	01 d9                	add    %ebx,%ecx
+  10301c:	8d 0c 89             	lea    (%ecx,%ecx,4),%ecx
+  10301f:	c1 e1 04             	shl    $0x4,%ecx
+  103022:	01 ca                	add    %ecx,%edx
+  103024:	01 d2                	add    %edx,%edx
+  103026:	66 89 82 00 80 0b 00 	mov    %ax,0xb8000(%edx)
+  10302d:	a1 88 3a 10 00       	mov    0x103a88,%eax
+  103032:	8d 58 01             	lea    0x1(%eax),%ebx
+  103035:	3c 4f                	cmp    $0x4f,%al
+  103037:	74 0f                	je     103048 <io::vga_text_buffer::put(char)+0x58>
+  103039:	89 1d 88 3a 10 00    	mov    %ebx,0x103a88
+  10303f:	5b                   	pop    %ebx
+  103040:	5e                   	pop    %esi
+  103041:	5d                   	pop    %ebp
+  103042:	c3                   	ret
+  103043:	2e 8d 74 26 00       	lea    %cs:0x0(%esi,%eiz,1),%esi
+  103048:	89 d8                	mov    %ebx,%eax
+  10304a:	30 c0                	xor    %al,%al
+  10304c:	8d 98 00 01 00 00    	lea    0x100(%eax),%ebx
+  103052:	89 da                	mov    %ebx,%edx
+  103054:	c1 ea 08             	shr    $0x8,%edx
+  103057:	80 fa 19             	cmp    $0x19,%dl
+  10305a:	75 dd                	jne    103039 <io::vga_text_buffer::put(char)+0x49>
+  10305c:	8d 98 00 00 01 00    	lea    0x10000(%eax),%ebx
+  103062:	89 d8                	mov    %ebx,%eax
+  103064:	c1 e8 10             	shr    $0x10,%eax
+  103067:	89 c6                	mov    %eax,%esi
+  103069:	3c b3                	cmp    $0xb3,%al
+  10306b:	0f 87 19 d0 ff ff    	ja     10008a <io::vga_text_buffer::put(char) [clone .cold]>
+  103071:	89 d8                	mov    %ebx,%eax
+  103073:	e8 28 ff ff ff       	call   102fa0 <io::vga_text_buffer::clear_row(unsigned int)>
+  103078:	89 f0                	mov    %esi,%eax
+  10307a:	0f b6 c0             	movzbl %al,%eax
+  10307d:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  103080:	c1 e0 04             	shl    $0x4,%eax
+  103083:	0f b7 c0             	movzwl %ax,%eax
+  103086:	e8 25 01 00 00       	call   1031b0 <io::hardware_cursor::set_display_start(unsigned short)>
+  10308b:	89 1d 88 3a 10 00    	mov    %ebx,0x103a88
+  103091:	5b                   	pop    %ebx
+  103092:	5e                   	pop    %esi
+  103093:	5d                   	pop    %ebp
+  103094:	c3                   	ret
+  103095:	66 90                	xchg   %ax,%ax
+  103097:	66 90                	xchg   %ax,%ax
+  103099:	66 90                	xchg   %ax,%ax
+  10309b:	66 90                	xchg   %ax,%ax
+  10309d:	66 90                	xchg   %ax,%ax
+  10309f:	90                   	nop
 
-00103070 <io::hardware_cursor::enable(unsigned char, unsigned char)>:
-  103070:	55                   	push   %ebp
-  103071:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  103076:	89 e5                	mov    %esp,%ebp
-  103078:	57                   	push   %edi
-  103079:	56                   	push   %esi
-  10307a:	53                   	push   %ebx
-  10307b:	83 ec 04             	sub    $0x4,%esp
-  10307e:	8b 45 0c             	mov    0xc(%ebp),%eax
-  103081:	8b 75 08             	mov    0x8(%ebp),%esi
-  103084:	89 45 f0             	mov    %eax,-0x10(%ebp)
-  103087:	b8 0a 00 00 00       	mov    $0xa,%eax
-  10308c:	ee                   	out    %al,(%dx)
-  10308d:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103092:	ec                   	in     (%dx),%al
-  103093:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  103098:	89 c1                	mov    %eax,%ecx
-  10309a:	b8 0a 00 00 00       	mov    $0xa,%eax
-  10309f:	ee                   	out    %al,(%dx)
-  1030a0:	89 c8                	mov    %ecx,%eax
-  1030a2:	83 e6 1f             	and    $0x1f,%esi
-  1030a5:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  1030aa:	83 e0 c0             	and    $0xffffffc0,%eax
-  1030ad:	09 f0                	or     %esi,%eax
-  1030af:	ee                   	out    %al,(%dx)
-  1030b0:	b8 0b 00 00 00       	mov    $0xb,%eax
-  1030b5:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  1030ba:	ee                   	out    %al,(%dx)
-  1030bb:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  1030c0:	ec                   	in     (%dx),%al
-  1030c1:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  1030c6:	89 c1                	mov    %eax,%ecx
-  1030c8:	b8 0b 00 00 00       	mov    $0xb,%eax
-  1030cd:	ee                   	out    %al,(%dx)
-  1030ce:	0f b6 55 f0          	movzbl -0x10(%ebp),%edx
-  1030d2:	89 c8                	mov    %ecx,%eax
-  1030d4:	83 e0 e0             	and    $0xffffffe0,%eax
-  1030d7:	83 e2 1f             	and    $0x1f,%edx
-  1030da:	09 d0                	or     %edx,%eax
-  1030dc:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  1030e1:	ee                   	out    %al,(%dx)
-  1030e2:	83 c4 04             	add    $0x4,%esp
-  1030e5:	5b                   	pop    %ebx
-  1030e6:	5e                   	pop    %esi
-  1030e7:	5f                   	pop    %edi
-  1030e8:	5d                   	pop    %ebp
-  1030e9:	c3                   	ret
-  1030ea:	66 90                	xchg   %ax,%ax
-  1030ec:	66 90                	xchg   %ax,%ax
-  1030ee:	66 90                	xchg   %ax,%ax
+001030a0 <io::vga_text_buffer::move_to_next_line()>:
+  1030a0:	55                   	push   %ebp
+  1030a1:	8b 0d 88 3a 10 00    	mov    0x103a88,%ecx
+  1030a7:	89 c8                	mov    %ecx,%eax
+  1030a9:	89 e5                	mov    %esp,%ebp
+  1030ab:	56                   	push   %esi
+  1030ac:	c1 e8 10             	shr    $0x10,%eax
+  1030af:	53                   	push   %ebx
+  1030b0:	8b 55 08             	mov    0x8(%ebp),%edx
+  1030b3:	0f b6 dd             	movzbl %ch,%ebx
+  1030b6:	80 fb 18             	cmp    $0x18,%bl
+  1030b9:	89 0a                	mov    %ecx,(%edx)
+  1030bb:	8d 4b 01             	lea    0x1(%ebx),%ecx
+  1030be:	0f 94 c3             	sete   %bl
+  1030c1:	8d 34 18             	lea    (%eax,%ebx,1),%esi
+  1030c4:	c6 02 00             	movb   $0x0,(%edx)
+  1030c7:	89 f0                	mov    %esi,%eax
+  1030c9:	88 42 02             	mov    %al,0x2(%edx)
+  1030cc:	89 c8                	mov    %ecx,%eax
+  1030ce:	29 d8                	sub    %ebx,%eax
+  1030d0:	88 42 01             	mov    %al,0x1(%edx)
+  1030d3:	80 f9 19             	cmp    $0x19,%cl
+  1030d6:	74 08                	je     1030e0 <io::vga_text_buffer::move_to_next_line()+0x40>
+  1030d8:	5b                   	pop    %ebx
+  1030d9:	89 d0                	mov    %edx,%eax
+  1030db:	5e                   	pop    %esi
+  1030dc:	5d                   	pop    %ebp
+  1030dd:	c2 04 00             	ret    $0x4
+  1030e0:	89 f0                	mov    %esi,%eax
+  1030e2:	0f b6 c0             	movzbl %al,%eax
+  1030e5:	8d 04 80             	lea    (%eax,%eax,4),%eax
+  1030e8:	c1 e0 04             	shl    $0x4,%eax
+  1030eb:	0f b7 c0             	movzwl %ax,%eax
+  1030ee:	e8 bd 00 00 00       	call   1031b0 <io::hardware_cursor::set_display_start(unsigned short)>
+  1030f3:	8b 55 08             	mov    0x8(%ebp),%edx
+  1030f6:	5b                   	pop    %ebx
+  1030f7:	5e                   	pop    %esi
+  1030f8:	5d                   	pop    %ebp
+  1030f9:	89 d0                	mov    %edx,%eax
+  1030fb:	c2 04 00             	ret    $0x4
+  1030fe:	66 90                	xchg   %ax,%ax
 
-001030f0 <io::hardware_cursor::set_position(unsigned short)>:
-  1030f0:	89 c1                	mov    %eax,%ecx
-  1030f2:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  1030f7:	b8 0f 00 00 00       	mov    $0xf,%eax
-  1030fc:	ee                   	out    %al,(%dx)
-  1030fd:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103102:	89 c8                	mov    %ecx,%eax
-  103104:	ee                   	out    %al,(%dx)
-  103105:	b8 0e 00 00 00       	mov    $0xe,%eax
-  10310a:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  10310f:	ee                   	out    %al,(%dx)
-  103110:	89 c8                	mov    %ecx,%eax
-  103112:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103117:	66 c1 e8 08          	shr    $0x8,%ax
-  10311b:	ee                   	out    %al,(%dx)
-  10311c:	c3                   	ret
-  10311d:	66 90                	xchg   %ax,%ax
-  10311f:	90                   	nop
-
-00103120 <io::hardware_cursor::set_display_start(unsigned short)>:
-  103120:	89 c1                	mov    %eax,%ecx
-  103122:	ba d4 03 00 00       	mov    $0x3d4,%edx
-  103127:	b8 0d 00 00 00       	mov    $0xd,%eax
-  10312c:	ee                   	out    %al,(%dx)
-  10312d:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103132:	89 c8                	mov    %ecx,%eax
-  103134:	ee                   	out    %al,(%dx)
-  103135:	b8 0c 00 00 00       	mov    $0xc,%eax
-  10313a:	ba d4 03 00 00       	mov    $0x3d4,%edx
+00103100 <io::hardware_cursor::enable(unsigned char, unsigned char)>:
+  103100:	55                   	push   %ebp
+  103101:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103106:	89 e5                	mov    %esp,%ebp
+  103108:	57                   	push   %edi
+  103109:	56                   	push   %esi
+  10310a:	53                   	push   %ebx
+  10310b:	83 ec 04             	sub    $0x4,%esp
+  10310e:	8b 45 0c             	mov    0xc(%ebp),%eax
+  103111:	8b 75 08             	mov    0x8(%ebp),%esi
+  103114:	89 45 f0             	mov    %eax,-0x10(%ebp)
+  103117:	b8 0a 00 00 00       	mov    $0xa,%eax
+  10311c:	ee                   	out    %al,(%dx)
+  10311d:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103122:	ec                   	in     (%dx),%al
+  103123:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103128:	89 c1                	mov    %eax,%ecx
+  10312a:	b8 0a 00 00 00       	mov    $0xa,%eax
+  10312f:	ee                   	out    %al,(%dx)
+  103130:	89 c8                	mov    %ecx,%eax
+  103132:	83 e6 1f             	and    $0x1f,%esi
+  103135:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  10313a:	83 e0 c0             	and    $0xffffffc0,%eax
+  10313d:	09 f0                	or     %esi,%eax
   10313f:	ee                   	out    %al,(%dx)
-  103140:	89 c8                	mov    %ecx,%eax
-  103142:	ba d5 03 00 00       	mov    $0x3d5,%edx
-  103147:	66 c1 e8 08          	shr    $0x8,%ax
-  10314b:	ee                   	out    %al,(%dx)
-  10314c:	c3                   	ret
-  10314d:	66 90                	xchg   %ax,%ax
-  10314f:	90                   	nop
+  103140:	b8 0b 00 00 00       	mov    $0xb,%eax
+  103145:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  10314a:	ee                   	out    %al,(%dx)
+  10314b:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103150:	ec                   	in     (%dx),%al
+  103151:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103156:	89 c1                	mov    %eax,%ecx
+  103158:	b8 0b 00 00 00       	mov    $0xb,%eax
+  10315d:	ee                   	out    %al,(%dx)
+  10315e:	0f b6 55 f0          	movzbl -0x10(%ebp),%edx
+  103162:	89 c8                	mov    %ecx,%eax
+  103164:	83 e0 e0             	and    $0xffffffe0,%eax
+  103167:	83 e2 1f             	and    $0x1f,%edx
+  10316a:	09 d0                	or     %edx,%eax
+  10316c:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103171:	ee                   	out    %al,(%dx)
+  103172:	83 c4 04             	add    $0x4,%esp
+  103175:	5b                   	pop    %ebx
+  103176:	5e                   	pop    %esi
+  103177:	5f                   	pop    %edi
+  103178:	5d                   	pop    %ebp
+  103179:	c3                   	ret
+  10317a:	66 90                	xchg   %ax,%ax
+  10317c:	66 90                	xchg   %ax,%ax
+  10317e:	66 90                	xchg   %ax,%ax
 
-00103150 <cpu::gdt::initialize()>:
-  103150:	b8 10 00 00 00       	mov    $0x10,%eax
-  103155:	0f 01 15 e8 39 10 00 	lgdtl  0x1039e8
-  10315c:	8e d8                	mov    %eax,%ds
-  10315e:	8e c0                	mov    %eax,%es
-  103160:	8e e0                	mov    %eax,%fs
-  103162:	8e e8                	mov    %eax,%gs
-  103164:	8e d0                	mov    %eax,%ss
-  103166:	ea 6d 31 10 00 08 00 	ljmp   $0x8,$0x10316d
-  10316d:	c3                   	ret
+00103180 <io::hardware_cursor::set_position(unsigned short)>:
+  103180:	89 c1                	mov    %eax,%ecx
+  103182:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  103187:	b8 0f 00 00 00       	mov    $0xf,%eax
+  10318c:	ee                   	out    %al,(%dx)
+  10318d:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  103192:	89 c8                	mov    %ecx,%eax
+  103194:	ee                   	out    %al,(%dx)
+  103195:	b8 0e 00 00 00       	mov    $0xe,%eax
+  10319a:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  10319f:	ee                   	out    %al,(%dx)
+  1031a0:	89 c8                	mov    %ecx,%eax
+  1031a2:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  1031a7:	66 c1 e8 08          	shr    $0x8,%ax
+  1031ab:	ee                   	out    %al,(%dx)
+  1031ac:	c3                   	ret
+  1031ad:	66 90                	xchg   %ax,%ax
+  1031af:	90                   	nop
+
+001031b0 <io::hardware_cursor::set_display_start(unsigned short)>:
+  1031b0:	89 c1                	mov    %eax,%ecx
+  1031b2:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  1031b7:	b8 0d 00 00 00       	mov    $0xd,%eax
+  1031bc:	ee                   	out    %al,(%dx)
+  1031bd:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  1031c2:	89 c8                	mov    %ecx,%eax
+  1031c4:	ee                   	out    %al,(%dx)
+  1031c5:	b8 0c 00 00 00       	mov    $0xc,%eax
+  1031ca:	ba d4 03 00 00       	mov    $0x3d4,%edx
+  1031cf:	ee                   	out    %al,(%dx)
+  1031d0:	89 c8                	mov    %ecx,%eax
+  1031d2:	ba d5 03 00 00       	mov    $0x3d5,%edx
+  1031d7:	66 c1 e8 08          	shr    $0x8,%ax
+  1031db:	ee                   	out    %al,(%dx)
+  1031dc:	c3                   	ret
+  1031dd:	66 90                	xchg   %ax,%ax
+  1031df:	90                   	nop
+
+001031e0 <cpu::gdt::initialize()>:
+  1031e0:	b8 10 00 00 00       	mov    $0x10,%eax
+  1031e5:	0f 01 15 68 3a 10 00 	lgdtl  0x103a68
+  1031ec:	8e d8                	mov    %eax,%ds
+  1031ee:	8e c0                	mov    %eax,%es
+  1031f0:	8e e0                	mov    %eax,%fs
+  1031f2:	8e e8                	mov    %eax,%gs
+  1031f4:	8e d0                	mov    %eax,%ss
+  1031f6:	ea fd 31 10 00 08 00 	ljmp   $0x8,$0x1031fd
+  1031fd:	c3                   	ret
