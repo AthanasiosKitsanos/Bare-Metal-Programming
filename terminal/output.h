@@ -155,7 +155,7 @@ namespace terminal
             inline void go_backwards() noexcept { io::vga_text_buffer::move_backwards(); }
 
             [[gnu::always_inline]]
-            inline void go_forward() noexcept {io::vga_text_buffer::move_forward(); }
+            inline void go_forward() noexcept {io::vga_text_buffer::next_line(builtin::convert_type<vga_state_packed>(io::vga_text_buffer::state)); }
 
             [[gnu::always_inline]]
             inline void print_char_no_sync(char c) noexcept { put_char_no_sync(c); }
@@ -427,9 +427,3 @@ namespace terminal
     [[gnu::regparm(1)]]
     output& bool_no_alpha(output&) noexcept;
 }
-
-// namespace terminal
-// {
-//     template<size_t N>
-
-// }

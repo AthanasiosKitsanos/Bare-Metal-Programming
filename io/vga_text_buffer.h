@@ -63,7 +63,9 @@ namespace io
         static void remove_last_char() noexcept;
         static void move_backwards() noexcept;
         static state_t move_to_next_line() noexcept;
-        static void move_forward() noexcept;
+
+        [[gnu::regparm(1)]]
+        static vga_state_packed next_line(vga_state_packed snapshot) noexcept;
 
         // No inline to avoid inlining inside a hotpath and taking more bytes in L1i  cache lines
         // Called about once per 14400 characters and more often when lines are cut short by '\n', hence cold.
@@ -71,13 +73,13 @@ namespace io
         static vga_state_packed reset(vga_state_packed) noexcept;
 
         [[gnu::regparm(3)]] [[gnu::hot]]
-        static vga_state_packed write_on_screen(vga_state_packed state_snapshot, const char* ptr, const size_t length) noexcept;
+        static vga_state_packed write_on_screen(vga_state_packed state_snapshot, const char* ptr, size_t length) noexcept;
 
-        [[gnu::noinline]] [[gnu::regparm(1)]]
-        static void clear_row(const vga_state_packed) noexcept;
+        // [[gnu::regparm(1)]]
+        // static void clear_row(const vga_state_packed) noexcept;
 
-        [[gnu::regparm(1)]]
-        static void put(char c) noexcept;
+        [[gnu::regparm(2)]]
+        static vga_state_packed put(vga_state_packed state_snapshot, const char c) noexcept;
 
         [[gnu::regparm(1)]]
         static void move_cursor_left_n(const uint8_t) noexcept;
@@ -97,10 +99,23 @@ namespace io
             return static_cast<color_code>(foreground) | (static_cast<color_code>(background) << 4);
         }
 
+        // In case of using a uint32_t , make sure that the color is at bits 8...15,
+        // since the uint32_t path uses & 0xFF00u
+        template<typename T>
         [[gnu::always_inline]]
-        constexpr static inline uint16_t make_entry(unsigned char c, color_code color) noexcept
+        constexpr static inline uint16_t make_entry(T color, const unsigned char c) noexcept
         {
-            return static_cast<uint16_t>(c) | static_cast<uint16_t>(color << 8);
+            constexpr bool is_8_bit{types::equal<T, color_code>::value};
+            static_assert(types::equal<T, uint32_t>::value || is_8_bit, "The color must to be a 32-bit or 8-bit value");
+            if constexpr(is_8_bit)
+            {
+                return static_cast<uint16_t>((color << 8) | c);
+            }
+            else
+            {
+                color &= 0xFF00u;
+                return static_cast<uint16_t>(color | c);
+            }
         }
 
         [[gnu::always_inline]]

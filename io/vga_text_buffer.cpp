@@ -7,48 +7,88 @@
 
 namespace
 {
-    [[gnu::target("sse2")]] [[gnu::regparm(3)]]
-    void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    template<size_t bytes, uint32_t entry>
+    [[gnu::target("sse2")]] [[gnu::regparm(1)]]
+    void use_sse_2(volatile uint32_t* dst) noexcept
     {
-        bytes >>= 4;
-        __m128i blank{_mm_set1_epi32(static_cast<int>(entry))};
-        __m128i* ptr{reinterpret_cast<__m128i*>(const_cast<uint32_t*>(dst))};
-        const __m128i* const end{ptr + bytes};
-        while(ptr < end)
-        {
-            _mm_store_si128(ptr, blank);
-            ++ptr;
-        }
+        constexpr size_t step{bytes >> 4};
+        const __m128i blank{_mm_set1_epi32(entry)};
+        __m128i* start{reinterpret_cast<__m128i*>(const_cast<uint32_t*>(dst))};
+        const __m128i* end{start + step};
+        for(; start < end; ++start) _mm_store_si128(start, blank);
     }
 
+    // [[gnu::target("sse2")]] [[gnu::regparm(3)]]
+    // void use_sse_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    // {
+    //     bytes >>= 4;
+    //     __m128i blank{_mm_set1_epi32(static_cast<int>(entry))};
+    //     __m128i* ptr{reinterpret_cast<__m128i*>(const_cast<uint32_t*>(dst))};
+    //     const __m128i* const end{ptr + bytes};
+    //     while(ptr < end)
+    //     {
+    //         _mm_store_si128(ptr, blank);
+    //         ++ptr;
+    //     }
+    // }
+
+    template<size_t bytes, uint32_t entries>
     [[gnu::target("avx2")]] [[gnu::regparm(3)]]
-    void use_avx_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    void use_avx_2(volatile uint32_t* dst) noexcept
     {
-        bytes >>= 5;
-        __m256i blank{_mm256_set1_epi32(static_cast<int>(entry))};
-        __m256i* ptr{reinterpret_cast<__m256i*>(const_cast<uint32_t*>(dst))};
-        const __m256i* const end{ptr + bytes};
-        while(ptr < end)
-        {
-            _mm256_store_si256(ptr, blank);
-            ++ptr;
-        }
+        constexpr size_t step{bytes >> 5};
+        const __m256i blank{_mm256_set1_epi32(entries)};
+        __m256i* start{reinterpret_cast<__m256i*>(const_cast<uint32_t*>(dst))};
+        const __m256i* end{start + step};
+        for(; start < end; ++start) _mm256_store_si256(start, blank);
     }
 
+    // [[gnu::target("avx2")]] [[gnu::regparm(3)]]
+    // void use_avx_2(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    // {
+    //     bytes >>= 5;
+    //     __m256i blank{_mm256_set1_epi32(static_cast<int>(entry))};
+    //     __m256i* ptr{reinterpret_cast<__m256i*>(const_cast<uint32_t*>(dst))};
+    //     const __m256i* const end{ptr + bytes};
+    //     while(ptr < end)
+    //     {
+    //         _mm256_store_si256(ptr, blank);
+    //         ++ptr;
+    //     }
+    // }
+
+    template<size_t bytes, uint32_t entries>
     [[gnu::regparm(3)]]
-    void fallback_fill(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    void fallback_fill(volatile uint32_t* dst) noexcept
     {
-        bytes >>= 2;
-        const volatile uint32_t* const end{dst + bytes};
-        while(dst < end)
-        {
-            *dst = entry;
-            ++dst;
-        }
+        const size_t step{bytes >> 2};
+        const volatile uint32_t* const end{dst + step};
+        for(; dst < end; ++dst) *dst = entries;
     }
 
+    // [[gnu::regparm(3)]]
+    // void fallback_fill(volatile uint32_t* dst, uint16_t bytes, const uint32_t entry) noexcept
+    // {
+    //     bytes >>= 2;
+    //     const volatile uint32_t* const end{dst + bytes};
+    //     while(dst < end)
+    //     {
+    //         *dst = entry;
+    //         ++dst;
+    //     }
+    // }
 
-    using fill_fn = void(*)(volatile uint32_t* dst, uint16_t count, const uint32_t entry) noexcept [[gnu::regparm(3)]];
+
+    template<size_t bytes, uint32_t entries>
+    struct fill
+    {
+        void* ptr;
+        constexpr fill(void* const p) noexcept: ptr{p}
+        {}
+    };
+
+    using fill_f = fill(*);
+    using fill_fn = void(*)(volatile uint32_t* dst) noexcept [[gnu::regparm(1)]];
     struct fill_functions
     {
         fill_fn entries[3];
@@ -115,47 +155,35 @@ namespace
     constexpr fill_copy_function g_dispatch_cpy{};
 
     [[gnu::always_inline]]
-    constexpr static inline uint16_t make_entry_shifted(const uint32_t shifted_color, const unsigned char c) noexcept
+    inline void clear_row(volatile uint32_t* const cell, const uint32_t entry, const uint8_t bytes) noexcept
     {
-        return static_cast<uint16_t>(shifted_color | c);
+        g_dispatch.entries[cpu::features::get()](cell, bytes, entry);
     }
 }
 
 namespace io
 {
     [[gnu::regparm(3)]] [[gnu::hot]]
-    vga_state_packed vga_text_buffer::write_on_screen(vga_state_packed state_snapshot, const char *ptr, const size_t length) noexcept
+    vga_state_packed vga_text_buffer::write_on_screen(vga_state_packed state_snapshot, const char *ptr, size_t length) noexcept
     {
-        const uint32_t color{static_cast<uint32_t>((state_snapshot >> 16) & 0xFF00u)};
-        size_t temp_length{length};
+        const uint32_t color{static_cast<uint32_t>(state_snapshot >> 16)};
         volatile uint16_t* cell_ptr{cell(state_snapshot)};
-        while(temp_length > 0)
+        while(length > 0)
         {
-            const size_t segment_length{cmp::min_cmov(temp_length, static_cast<size_t>(vga_width - static_cast<uint8_t>(state_snapshot)))};
+            const size_t segment_length{cmp::min_cmov(length, static_cast<size_t>(vga_width - static_cast<uint8_t>(state_snapshot)))};
             const char* const end{ptr + segment_length};
             for(; ptr < end; ++ptr)
             {
-                *cell_ptr = make_entry_shifted(color, *ptr);
+                *cell_ptr = make_entry(color, *ptr);
                 ++cell_ptr;
             }
             state_snapshot += segment_length;
             if(static_cast<uint8_t>(state_snapshot) >= vga_width)
             {
-                state_snapshot &= ~0xFFu;
-                state_snapshot += 0x100u;
-                if(static_cast<uint8_t>(state_snapshot >> 8) == vga_height)
-                {
-                    state_snapshot += (0x10000u - 0x100u);
-                    if(static_cast<uint8_t>(state_snapshot >> 16) > base_row_max)
-                    {
-                        state_snapshot = reset(state_snapshot);
-                        cell_ptr = cell(state_snapshot);
-                    }
-                    else clear_row(state_snapshot);
-                    io::hardware_cursor::set_display_start(static_cast<uint8_t>(state_snapshot >> 16) * vga_width);
-                }
+                state_snapshot = next_line(state_snapshot);
+                cell_ptr = cell(state_snapshot);
             }
-            temp_length -= segment_length;
+            length -= segment_length;
         }
         return state_snapshot;
     }
@@ -164,31 +192,31 @@ namespace io
     vga_state_packed vga_text_buffer::reset(vga_state_packed s) noexcept
     {
         static_assert(__has_unique_object_representations(state_t), "state_t reordered or changed, reset it to the previous member and order state");
-        constexpr uint16_t copy_bytes{(vga_height - 1) * vga_width << 1};
+        constexpr uint8_t vga_height_m1{vga_height - 1};
+        constexpr uint16_t copy_bytes{vga_height_m1 * vga_width << 1};
         // uint32_t s{builtin::convert_type<uint32_t>(l_state)};
 
         const volatile uint32_t* source{begin_32() + ((static_cast<uint8_t>(s >> 16) * vga_width) >> 1)};
         constexpr uint16_t dst_width{vga_width >> 1};
         volatile uint32_t* destination{begin_32() + dst_width};
 
-        uint8_t idx{cpu::features::get()};
+        const uint8_t idx{cpu::features::get()};
         destination = g_dispatch_cpy.entries[idx](source, destination, copy_bytes);
 
-        constexpr uint8_t vga_height_m1{vga_height - 1};
         constexpr uint32_t values{static_cast<uint32_t>((1 << 16) | (vga_height_m1 << 8))};
         constexpr uint32_t mask{0xFF0000FF};
         s = static_cast<uint32_t>((s & mask) | values);
 
         constexpr uint8_t remaining_bytes{vga_width << 1};
-        constexpr uint16_t entry{make_entry(' ', default_color)};
-        constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16 | entry)};
+        constexpr uint16_t entry{make_entry(default_color, ' ')};
+        constexpr uint32_t entry_32{((static_cast<uint32_t>(entry) << 16) | entry)};
         g_dispatch.entries[idx](destination, remaining_bytes, entry_32);
         return s;
     }
 
     void vga_text_buffer::clear() noexcept
     {
-        constexpr uint16_t entry{make_entry(' ', default_color)};
+        constexpr uint16_t entry{make_entry(default_color, ' ')};
         constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
         constexpr uint16_t bytes{length};
 
@@ -201,36 +229,39 @@ namespace io
         hardware_cursor::set_display_start(0);
     }
 
-    [[gnu::noinline]] [[gnu::regparm(1)]]
-    void vga_text_buffer::clear_row(const vga_state_packed s) noexcept
-    {
-        constexpr uint16_t entry{make_entry(' ', default_color)};
-        constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
-        constexpr uint8_t bytes{vga_width << 1};
+    // [[gnu::regparm(1)]]
+    // void vga_text_buffer::clear_row(const vga_state_packed s) noexcept
+    // {
+    //     constexpr uint16_t entry{make_entry(' ', default_color)};
+    //     constexpr uint32_t entry_32{(static_cast<uint32_t>(entry) << 16) | entry};
+    //     constexpr uint8_t bytes{vga_width << 1};
 
-        g_dispatch.entries[cpu::features::get()](cell_32(s), bytes, entry_32);
-    }
+    //     g_dispatch.entries[cpu::features::get()](cell_32(s), bytes, entry_32);
+    // }
 
-    [[gnu::regparm(1)]]
-    void vga_text_buffer::put(char c) noexcept
+    [[gnu::regparm(2)]]
+    vga_state_packed vga_text_buffer::put(vga_state_packed state_snapshot, const char c) noexcept
     {
-        *cell(builtin::convert_type<vga_state_packed>(state)) = make_entry(c, state.active_color);
-        move_forward();
+        const uint32_t color{state_snapshot >> 16};
+        *cell(state_snapshot) = make_entry(color, c);
+        ++state_snapshot;
+        if(static_cast<uint8_t>(state_snapshot) >= vga_width)
+        {
+            state_snapshot = next_line(state_snapshot);
+        }
+        return state_snapshot;
     }
 
     void vga_text_buffer::remove_last_char() noexcept
     {
         move_backwards();
         const vga_state_packed p_state{builtin::convert_type<vga_state_packed>(state)};
-        *cell(p_state) = make_entry(' ', static_cast<uint8_t>(p_state >> 24));
+        *cell(p_state) = make_entry((p_state >> 16), ' ');
     }
 
-    void vga_text_buffer::move_forward() noexcept
+    [[gnu::regparm(1)]]
+    vga_state_packed vga_text_buffer::next_line(vga_state_packed state_snapshot) noexcept
     {
-        vga_state_packed state_snapshot{builtin::convert_type<vga_state_packed>(state)};
-        state_snapshot += 0x01u;
-        if(static_cast<uint8_t>(state_snapshot) == vga_width)
-        {
             state_snapshot &= ~0xFFu;
             state_snapshot += 0x0100u;
 
@@ -242,11 +273,16 @@ namespace io
                 {
                     state_snapshot = reset(state_snapshot);
                 }
-                else clear_row(state_snapshot);
+                else
+                {
+                    constexpr uint16_t entry{make_entry(default_color, ' ')};
+                    constexpr uint32_t entries{static_cast<uint32_t>(entry << 16) | entry};
+                    constexpr uint8_t bytes{vga_width << 1};
+                    clear_row(cell_32(state_snapshot), entries, bytes);
+                }
                 hardware_cursor::set_display_start(static_cast<uint8_t>(state_snapshot >> 16) * vga_width);
             }
-        }
-        state = builtin::convert_type<state_t>(state_snapshot);
+        return state_snapshot;
     }
 
     void vga_text_buffer::move_backwards() noexcept
