@@ -5,8 +5,7 @@
 #include "tools/types.h"
 
 namespace terminal { class output; }
-typedef unsigned int vga_state_packed;
-
+using vga_state_packed = uint32_t;
 
 namespace io
 {
@@ -46,6 +45,8 @@ namespace io
         static constexpr uint16_t length{(vga_width * vga_height) << 1};
         static constexpr uintptr_t VGA_BASE{0xB8000};
         static constexpr color_code default_color{static_cast<color_code>(vga_color::white) | (static_cast<color_code>(vga_color::black) << 4)};
+        static constexpr uint16_t default_entry{static_cast<uint16_t>((default_color << 8) | ' ')};
+        static constexpr uint32_t default_entry_32{static_cast<uint32_t>((default_entry << 16) | default_entry)};
 
         struct alignas(4) state_t
         {
@@ -57,12 +58,23 @@ namespace io
         static_assert(sizeof(state_t) == 4, "state_t struct: Size must stay at 4 bytes");
         static_assert(alignof(state_t) == 4, "state_t struct: Alignment must stay at 4, to make sure it always fits into a cache line.");
 
+        struct som
+        {
+            uint16_t s;
+            uint8_t column;
+            uint8_t row;
+            uint8_t base_row;
+            color_code active_color;
+            uint16_t padding;
+        };
+
         inline static constinit state_t state{.column = 0, .row = 0, .base_row = 0, .active_color = default_color};
 
         static void clear() noexcept;
         static void remove_last_char() noexcept;
-        static void move_backwards() noexcept;
-        static state_t move_to_next_line() noexcept;
+
+        [[gnu::regparm(1)]]
+        static vga_state_packed move_backwards(vga_state_packed snapshot) noexcept;
 
         [[gnu::regparm(1)]]
         static vga_state_packed next_line(vga_state_packed snapshot) noexcept;
@@ -74,9 +86,6 @@ namespace io
 
         [[gnu::regparm(3)]] [[gnu::hot]]
         static vga_state_packed write_on_screen(vga_state_packed state_snapshot, const char* ptr, size_t length) noexcept;
-
-        // [[gnu::regparm(1)]]
-        // static void clear_row(const vga_state_packed) noexcept;
 
         [[gnu::regparm(2)]]
         static vga_state_packed put(vga_state_packed state_snapshot, const char c) noexcept;
@@ -127,7 +136,7 @@ namespace io
             uint32_t pos{(s >> 16) & mask};
             pos += (s >> 8) & mask;
             pos *= vga_width;
-            pos += (s & mask);
+            pos += static_cast<uint8_t>(s);
             return static_cast<uint16_t>(pos);
         }
 

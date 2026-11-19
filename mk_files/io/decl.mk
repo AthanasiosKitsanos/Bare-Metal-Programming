@@ -1,4 +1,6 @@
 #-----------------------------Input_Output----------------------------------------
+VGA_TEMPLATES = io/internal/vga_templates.h
+
 VGA_H = io/vga_text_buffer.h
 VGA_CPP = io/vga_text_buffer.cpp
 VGA_OBJ = obj/io/vga_text_buffer.o
