@@ -14,7 +14,7 @@ namespace terminal
     [[gnu::regparm(1)]]
     void output::new_line() noexcept
     {
-        io::vga_text_buffer::move_to_next_line();
+        // io::vga_text_buffer::move_to_next_line();
     }
 
     [[gnu::regparm(2)]]

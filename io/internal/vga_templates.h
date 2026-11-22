@@ -3,11 +3,12 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <immintrin.h>
+#include "tools/arch.h"
 
 namespace io::vga
 {
     template<uint32_t E>
-    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+    [[gnu::target("sse2")]] [[REGPARM(2)]]
     void fill_sse_2(volatile uint32_t* dst, size_t bytes) noexcept
     {
         bytes >>= 4;
@@ -18,7 +19,7 @@ namespace io::vga
     }
 
     template<uint32_t E>
-    [[gnu::target("avx2")]] [[gnu::regparm(2)]]
+    [[gnu::target("avx2")]] [[REGPARM(2)]]
     void fill_avx_2(volatile uint32_t* dst, size_t bytes) noexcept
     {
         bytes >>= 5;
@@ -29,7 +30,8 @@ namespace io::vga
     }
 
     template<uint32_t E>
-    [[gnu::regparm(2)]]
+
+    [[REGPARM(2)]]
     void fill_32(volatile uint32_t* dst, size_t bytes) noexcept
     {
         bytes >>= 2;
@@ -38,7 +40,7 @@ namespace io::vga
     }
 
     template<size_t B>
-    [[gnu::target("sse2")]] [[gnu::regparm(2)]]
+    [[gnu::target("sse2")]] [[REGPARM(2)]]
     volatile uint32_t* copy_sse_2(const volatile uint32_t* src, volatile uint32_t* dst) noexcept
     {
         constexpr size_t count{B >> 4};
@@ -55,7 +57,7 @@ namespace io::vga
     }
 
     template<size_t B>
-    [[gnu::target("avx2")]] [[gnu::regparm(2)]]
+    [[gnu::target("avx2")]] [[REGPARM(2)]]
     volatile uint32_t* copy_avx_2(const volatile uint32_t* src, volatile uint32_t* dst) noexcept
     {
         constexpr size_t count{B >> 5};
@@ -72,7 +74,7 @@ namespace io::vga
     }
 
     template<size_t B>
-    [[gnu::regparm(2)]]
+    [[REGPARM(2)]]
     volatile uint32_t* copy_32(const volatile uint32_t* src, volatile uint32_t* dst) noexcept
     {
         constexpr size_t count{B >> 2};
@@ -87,7 +89,7 @@ namespace io::vga
     }
 
     template<uint32_t E>
-    using fill_fn = void(*)(volatile uint32_t* dst, size_t step) noexcept [[gnu::regparm(2)]];
+    using fill_fn = void(*)(volatile uint32_t* dst, size_t step) noexcept [[REGPARM(2)]];
 
     template<uint32_t E>
     struct fill_fn_array
@@ -105,7 +107,7 @@ namespace io::vga
     };
 
     template<size_t B>
-    using copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst) noexcept [[gnu::regparm(2)]];
+    using copy_fn = volatile uint32_t*(*)(const volatile uint32_t* source, volatile uint32_t* dst) noexcept [[REGPARM(2)]];
 
     template<size_t B>
     struct copy_fn_array
@@ -123,8 +125,8 @@ namespace io::vga
     };
 
     template<uint32_t E>
-    constexpr io::vga::fill_fn_array<E> g_fill_dispatch{};
+    constexpr fill_fn_array<E> g_fill_dispatch{};
 
     template<size_t E>
-    constexpr io::vga::copy_fn_array<E> g_copy_dispatch{};
+    constexpr copy_fn_array<E> g_copy_dispatch{};
 }

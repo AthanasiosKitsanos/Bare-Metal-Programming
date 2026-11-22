@@ -1,11 +1,11 @@
 #pragma once
 
-#include <stdint.h>
-#include <stddef.h>
 #include "tools/types.h"
+#include "tools/arch.h"
+#include "io/internal/vga_types.h"
+#include "tools/builtin.h"
 
 namespace terminal { class output; }
-using vga_state_packed = uint32_t;
 
 namespace io
 {
@@ -48,53 +48,44 @@ namespace io
         static constexpr uint16_t default_entry{static_cast<uint16_t>((default_color << 8) | ' ')};
         static constexpr uint32_t default_entry_32{static_cast<uint32_t>((default_entry << 16) | default_entry)};
 
-        struct alignas(4) state_t
-        {
-            uint8_t column;
-            uint8_t row;
-            uint8_t base_row;
-            color_code active_color;
-        };
-        static_assert(sizeof(state_t) == 4, "state_t struct: Size must stay at 4 bytes");
-        static_assert(alignof(state_t) == 4, "state_t struct: Alignment must stay at 4, to make sure it always fits into a cache line.");
-
-        struct som
-        {
-            uint16_t s;
-            uint8_t column;
-            uint8_t row;
-            uint8_t base_row;
-            color_code active_color;
-            uint16_t padding;
-        };
-
-        inline static constinit state_t state{.column = 0, .row = 0, .base_row = 0, .active_color = default_color};
+        inline static constinit io::types_t::state_t state{.index{}, .column = 0, .row = 0, .base_row = 0, .active_color = default_color, .reserved{}};
 
         static void clear() noexcept;
         static void remove_last_char() noexcept;
 
-        [[gnu::regparm(1)]]
+        [[REGPARM(1)]]
         static vga_state_packed move_backwards(vga_state_packed snapshot) noexcept;
 
-        [[gnu::regparm(1)]]
+        [[REGPARM(1)]]
         static vga_state_packed next_line(vga_state_packed snapshot) noexcept;
 
         // No inline to avoid inlining inside a hotpath and taking more bytes in L1i  cache lines
         // Called about once per 14400 characters and more often when lines are cut short by '\n', hence cold.
-        [[gnu::noinline]] [[gnu::regparm(1)]] [[gnu::cold]]
+        [[gnu::noinline]] [[REGPARM(1)]] [[gnu::cold]]
         static vga_state_packed reset(vga_state_packed) noexcept;
 
-        [[gnu::regparm(3)]] [[gnu::hot]]
+        [[REGPARM(3)]] [[gnu::hot]]
         static vga_state_packed write_on_screen(vga_state_packed state_snapshot, const char* ptr, size_t length) noexcept;
 
-        [[gnu::regparm(2)]]
+        [[REGPARM(2)]]
         static vga_state_packed put(vga_state_packed state_snapshot, const char c) noexcept;
 
-        [[gnu::regparm(1)]]
-        static void move_cursor_left_n(const uint8_t) noexcept;
+        [[REGPARM(2)]]
+        static vga_state_packed move_cursor_left_n(vga_state_packed state_snapshot, const uint8_t count) noexcept;
 
-        [[gnu::regparm(1)]]
+        [[REGPARM(1)]]
         static void move_cursor_right_n(const uint8_t) noexcept;
+
+        [[gnu::always_inline]]
+        static vga_state_packed next_row(vga_state_packed state_snapshot) noexcept
+        {
+            if constexpr(types_t::wide)
+            {
+                state_snapshot += static_cast<vga_state_packed>(vga_width - static_cast<uint8_t>(state_snapshot >> layout::isolate_column));
+            }
+            state_snapshot = next_line(state_snapshot);
+            return state_snapshot;
+        }
 
         [[gnu::always_inline]]
         inline static volatile uint16_t* begin() noexcept { return reinterpret_cast<volatile uint16_t*>(VGA_BASE); }
@@ -130,14 +121,18 @@ namespace io
         [[gnu::always_inline]]
         inline static uint16_t get_position(const vga_state_packed s) noexcept
         {
-            constexpr uint32_t mask{0xFFu};
+            if constexpr(!types_t::wide)
+            {
+                constexpr uint32_t mask{0xFFu};
 
-            // (base_row + row) * vga_width + column
-            uint32_t pos{(s >> 16) & mask};
-            pos += (s >> 8) & mask;
-            pos *= vga_width;
-            pos += static_cast<uint8_t>(s);
-            return static_cast<uint16_t>(pos);
+                // (base_row + row) * vga_width + column
+                uint32_t pos{(s >> layout::isolate_base_row) & mask};
+                pos += (s >> layout::isolate_row) & mask;
+                pos *= vga_width;
+                pos += static_cast<uint8_t>(s);
+                return static_cast<uint16_t>(pos);
+            }
+            else return static_cast<uint16_t>(s);
         }
 
         [[gnu::always_inline]]
