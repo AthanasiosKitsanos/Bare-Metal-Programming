@@ -141,24 +141,55 @@ namespace io
         return state_snapshot;
     }
 
+    // The destination is one that is already written
     [[REGPARM(2)]]
     vga_state_packed vga_text_buffer::move_cursor_left_n(vga_state_packed state_snapshot, const uint8_t count) noexcept
     {
         uint16_t pos{get_position(state_snapshot)};
         pos = pos - cmp::min_cmov(pos, static_cast<uint16_t>(count));
+        const uint8_t abs_line{static_cast<uint8_t>(pos / vga_width)};
+        const uint8_t old_base_row{static_cast<uint8_t>(state_snapshot >> layout::isolate_base_row)};
+        const uint8_t new_base_row{cmp::min_cmov(old_base_row, abs_line)};
 
-        // base_row = min(base_row, pos);
+        if(old_base_row != new_base_row)
+        {
+            hardware_cursor::set_display_start(new_base_row * vga_width);
+        }
+
+        const uint8_t new_row{static_cast<uint8_t>(abs_line - new_base_row)};
+        const uint8_t new_column{static_cast<uint8_t>(pos - (abs_line * vga_width))};
+        state_snapshot &= layout::keep_color_n_reset;
+        state_snapshot |= (static_cast<vga_state_packed>(new_base_row) << layout::isolate_base_row);
+        state_snapshot |= (static_cast<vga_state_packed>(new_row) << layout::isolate_row);
+        state_snapshot |= (static_cast<vga_state_packed>(new_column) << layout::isolate_column);
+        if constexpr(types_t::wide) state_snapshot |= pos;
+        return state_snapshot;
     }
 
-    [[REGPARM(1)]]
-    void vga_text_buffer::move_cursor_right_n(const uint8_t count) noexcept
+    // The destination is one that is already written
+    [[REGPARM(2)]]
+    vga_state_packed vga_text_buffer::move_cursor_right_n(vga_state_packed state_snapshot, const uint8_t count) noexcept
     {
-        int16_t abs_pos{static_cast<int16_t>(state.row * vga_width + state.column + count)};
-        const uint8_t new_row{static_cast<uint8_t>(abs_pos / vga_width)};
-        const uint8_t new_column{static_cast<uint8_t>(abs_pos - new_row * vga_width)};
+        uint16_t pos{get_position(state_snapshot)};
+        constexpr uint16_t max_pos{(base_row_max + vga_height) * vga_width - 1};
+        pos = pos + cmp::min_cmov(static_cast<uint16_t>(max_pos - pos), static_cast<uint16_t>(count));
+        const uint8_t abs_line{static_cast<uint8_t>(pos / vga_width)};
+        const uint8_t old_base_row{static_cast<uint8_t>(state_snapshot >> layout::isolate_base_row)};
+        constexpr uint8_t vga_height_m1{vga_height - 1};
+        const uint8_t new_base_row{static_cast<uint8_t>(cmp::max_cmov(static_cast<uint8_t>(old_base_row + vga_height_m1), abs_line) - vga_height_m1)};
 
-        state.base_row -= static_cast<uint8_t>(state.row - new_row);
-        state.row = new_row;
-        state.column = new_column;
+        if(old_base_row != new_base_row)
+        {
+            hardware_cursor::set_display_start(new_base_row * vga_width);
+        }
+
+        const uint8_t new_row{static_cast<uint8_t>(abs_line - new_base_row)};
+        const uint8_t new_column{static_cast<uint8_t>(pos - (abs_line * vga_width))};
+        state_snapshot &= layout::keep_color_n_reset;
+        state_snapshot |= (static_cast<vga_state_packed>(new_base_row) << layout::isolate_base_row);
+        state_snapshot |= (static_cast<vga_state_packed>(new_row) << layout::isolate_row);
+        state_snapshot |= (static_cast<vga_state_packed>(new_column) << layout::isolate_column);
+        if constexpr(types_t::wide) state_snapshot |= pos;
+        return state_snapshot;
     }
 }

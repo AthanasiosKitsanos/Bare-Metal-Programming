@@ -73,8 +73,8 @@ namespace io
         [[REGPARM(2)]]
         static vga_state_packed move_cursor_left_n(vga_state_packed state_snapshot, const uint8_t count) noexcept;
 
-        [[REGPARM(1)]]
-        static void move_cursor_right_n(const uint8_t) noexcept;
+        [[REGPARM(2)]]
+        static vga_state_packed move_cursor_right_n(vga_state_packed state_snapshot, const uint8_t count) noexcept;
 
         [[gnu::always_inline]]
         static vga_state_packed next_row(vga_state_packed state_snapshot) noexcept

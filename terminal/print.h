@@ -10,7 +10,6 @@
 
 namespace terminal
 {
-
     template<tools::fixed_string Fmt, typename... Args>
     [[gnu::regparm(3)]]
     void print(Args... values) noexcept
@@ -19,7 +18,7 @@ namespace terminal
         constexpr size_t total_args{sizeof...(Args)};
         static_assert(tkn_collection::total_arguments == total_args, "number of placeholders does not match the amount of arguments given");
         cpu::interrupt_guard guard{};
-
+        // vga_state_packed state_snapshot{builtin::convert_type<vga_state_packed>(io::vga_text_buffer::state)}
         [&]<size_t... I>(sequence::index_list<I...>)
         {
             auto step = [&]<size_t J>(sequence::index_list<J>)
@@ -37,5 +36,6 @@ namespace terminal
 
             (step(sequence::index_list<I>{}), ...);
         }(sequence::make_index_list<tkn_collection::size>{});
+        // io::vga_text_buffer::state = state_snapshot;
     }
 }
