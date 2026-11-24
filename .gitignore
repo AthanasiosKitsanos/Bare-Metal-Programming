@@ -6,3 +6,4 @@ elf
 lib
 .clangd
 ci_files
+dism

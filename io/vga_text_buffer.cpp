@@ -17,7 +17,7 @@ namespace
 
 namespace io
 {
-    [[REGPARM(3)]] [[gnu::hot]]
+    [[REGPARM(3)]] [[gnu::hot]] [[gnu::noinline]]
     vga_state_packed vga_text_buffer::write_on_screen(vga_state_packed state_snapshot, const char *ptr, size_t length) noexcept
     {
         const uint32_t color{static_cast<uint32_t>(state_snapshot >> layout::isolate_color)};
@@ -52,20 +52,21 @@ namespace io
         const uint8_t idx{cpu::features::get()};
         constexpr uint8_t vga_height_m1{vga_height - 1};
         constexpr size_t copy_bytes{static_cast<size_t>(vga_height_m1 * vga_width << 1)};
-        destination = io::vga::g_copy_dispatch<copy_bytes>[idx](source, destination);
+        destination = vga::g_copy_dispatch<copy_bytes>[idx](source, destination);
 
 
         constexpr vga_state_packed values{layout::inc_base_row | (layout::inc_row * vga_height_m1) | (types_t::wide ? vga_height * vga_width : 0)};
         s = (s & layout::keep_color_n_reset) | values;
 
         constexpr uint8_t remaining_bytes{vga_width << 1};
-        io::vga::g_fill_dispatch<default_entry_32>[idx](destination, remaining_bytes);
+        vga::g_fill_dispatch<default_entry_32>[idx](destination, remaining_bytes);
         return s;
     }
 
+    [[gnu::noinline]]
     void vga_text_buffer::clear() noexcept
     {
-        io::vga::g_fill_dispatch<default_entry_32>[cpu::features::get()](begin_32(), length);
+        vga::g_fill_dispatch<default_entry_32>[cpu::features::get()](begin_32(), length);
 
         vga_state_packed snapshot{builtin::convert_type<vga_state_packed>(state)};
         snapshot &= layout::keep_color_n_reset;
@@ -74,7 +75,7 @@ namespace io
         hardware_cursor::set_display_start(0);
     }
 
-    [[REGPARM(2)]]
+    [[REGPARM(2)]] [[gnu::noinline]]
     vga_state_packed vga_text_buffer::put(vga_state_packed state_snapshot, const char c) noexcept
     {
         const uint32_t color{static_cast<uint32_t>(state_snapshot >> layout::isolate_color)};
@@ -94,7 +95,7 @@ namespace io
         *cell(state_snapshot) = make_entry(static_cast<uint32_t>(state_snapshot >> layout::isolate_color), ' ');
     }
 
-    [[REGPARM(1)]]
+    [[REGPARM(1)]] [[gnu::noinline]]
     vga_state_packed vga_text_buffer::next_line(vga_state_packed state_snapshot) noexcept
     {
             state_snapshot &= layout::reset_column;
@@ -118,7 +119,7 @@ namespace io
         return state_snapshot;
     }
 
-    [[REGPARM(1)]]
+    [[REGPARM(1)]] [[gnu::noinline]]
     vga_state_packed vga_text_buffer::move_backwards(vga_state_packed state_snapshot) noexcept
     {
         constexpr vga_state_packed e{static_cast<vga_state_packed>((vga_width << layout::isolate_column) - layout::step)};
@@ -142,7 +143,7 @@ namespace io
     }
 
     // The destination is one that is already written
-    [[REGPARM(2)]]
+    [[REGPARM(2)]] [[gnu::noinline]]
     vga_state_packed vga_text_buffer::move_cursor_left_n(vga_state_packed state_snapshot, const uint8_t count) noexcept
     {
         uint16_t pos{get_position(state_snapshot)};
@@ -167,7 +168,7 @@ namespace io
     }
 
     // The destination is one that is already written
-    [[REGPARM(2)]]
+    [[REGPARM(2)]] [[gnu::noinline]]
     vga_state_packed vga_text_buffer::move_cursor_right_n(vga_state_packed state_snapshot, const uint8_t count) noexcept
     {
         uint16_t pos{get_position(state_snapshot)};

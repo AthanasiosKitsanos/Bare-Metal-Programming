@@ -53,10 +53,10 @@ namespace io
         static void clear() noexcept;
         static void remove_last_char() noexcept;
 
-        [[REGPARM(1)]]
+        [[REGPARM(1)]] [[gnu::noinline]]
         static vga_state_packed move_backwards(vga_state_packed snapshot) noexcept;
 
-        [[REGPARM(1)]]
+        [[REGPARM(1)]] [[gnu::noinline]]
         static vga_state_packed next_line(vga_state_packed snapshot) noexcept;
 
         // No inline to avoid inlining inside a hotpath and taking more bytes in L1i  cache lines
@@ -64,19 +64,19 @@ namespace io
         [[gnu::noinline]] [[REGPARM(1)]] [[gnu::cold]]
         static vga_state_packed reset(vga_state_packed) noexcept;
 
-        [[REGPARM(3)]] [[gnu::hot]]
+        [[REGPARM(3)]] [[gnu::hot]] [[gnu::noinline]]
         static vga_state_packed write_on_screen(vga_state_packed state_snapshot, const char* ptr, size_t length) noexcept;
 
-        [[REGPARM(2)]]
+        [[REGPARM(2)]] [[gnu::noinline]]
         static vga_state_packed put(vga_state_packed state_snapshot, const char c) noexcept;
 
-        [[REGPARM(2)]]
+        [[REGPARM(2)]] [[gnu::noinline]]
         static vga_state_packed move_cursor_left_n(vga_state_packed state_snapshot, const uint8_t count) noexcept;
 
-        [[REGPARM(2)]]
+        [[REGPARM(2)]] [[gnu::noinline]]
         static vga_state_packed move_cursor_right_n(vga_state_packed state_snapshot, const uint8_t count) noexcept;
 
-        [[gnu::always_inline]]
+        [[gnu::always_inline]] [[gnu::noinline]]
         static vga_state_packed next_row(vga_state_packed state_snapshot) noexcept
         {
             if constexpr(types_t::wide)
@@ -143,7 +143,12 @@ namespace io
 
 
         [[gnu::always_inline]]
-        inline static void line_start() noexcept { state.column = 0; }
+        inline static vga_state_packed line_start(vga_state_packed state_snapshot) noexcept
+        {
+            const vga_state_packed steps_to_lstart{layout::step * static_cast<uint8_t>(state_snapshot >> layout::isolate_column)};
+            state_snapshot -= steps_to_lstart;
+            return state_snapshot;
+        }
 
         [[gnu::always_inline]]
         inline static void set_color_code(color_code color) noexcept { state.active_color = color; }
