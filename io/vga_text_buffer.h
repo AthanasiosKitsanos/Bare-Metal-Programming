@@ -39,19 +39,27 @@ namespace io
         friend terminal::output;
 
         // Private Members
+        // VGA_ADDRESS in memory
+        static constexpr uintptr_t VGA_END{0xBFFFF};
+        static constexpr uintptr_t VGA_BASE{0xB8000};
+        static constexpr size_t VGA_BYTE_LENGTH{VGA_END - VGA_BASE + 1};
+
+        // Bytes shown on screen
         static constexpr uint8_t vga_width{80};
         static constexpr uint8_t vga_height{25};
-        static constexpr uint8_t base_row_max{179};
-        static constexpr uint16_t length{(vga_width * vga_height) << 1};
-        static constexpr uintptr_t VGA_BASE{0xB8000};
+        static constexpr uint16_t total_rows{(VGA_BYTE_LENGTH >> 1) / vga_width};
+        static constexpr uint8_t base_row_max{static_cast<uint8_t>(total_rows - vga_height)};
         static constexpr color_code default_color{static_cast<color_code>(vga_color::white) | (static_cast<color_code>(vga_color::black) << 4)};
         static constexpr uint16_t default_entry{static_cast<uint16_t>((default_color << 8) | ' ')};
         static constexpr uint32_t default_entry_32{static_cast<uint32_t>((default_entry << 16) | default_entry)};
 
+
         inline static constinit io::types_t::state_t state{.index{}, .column = 0, .row = 0, .base_row = 0, .active_color = default_color, .reserved{}};
 
         static void clear() noexcept;
-        static void remove_last_char() noexcept;
+
+        [[gnu::noinline]] [[gnu::cold]] [[REGPARM(1)]]
+        static vga_state_packed remove_last_char(vga_state_packed state_snapshot) noexcept;
 
         [[REGPARM(1)]] [[gnu::noinline]]
         static vga_state_packed move_backwards(vga_state_packed snapshot) noexcept;
