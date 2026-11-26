@@ -44,7 +44,7 @@ namespace io
         static constexpr uintptr_t VGA_BASE{0xB8000};
         static constexpr size_t VGA_BYTE_LENGTH{VGA_END - VGA_BASE + 1};
 
-        // Bytes shown on screen
+        // Cells shown on screen
         static constexpr uint8_t vga_width{80};
         static constexpr uint8_t vga_height{25};
         static constexpr uint16_t total_rows{(VGA_BYTE_LENGTH >> 1) / vga_width};
@@ -54,7 +54,7 @@ namespace io
         static constexpr uint32_t default_entry_32{static_cast<uint32_t>((default_entry << 16) | default_entry)};
 
 
-        inline static constinit io::types_t::state_t state{.index{}, .column = 0, .row = 0, .base_row = 0, .active_color = default_color, .reserved{}};
+        inline static constinit io::types_t::state_t state{.column = 0, .row = 0, .base_row = 0, .active_color = default_color};
 
         static void clear() noexcept;
 
@@ -84,8 +84,9 @@ namespace io
         [[REGPARM(2)]] [[gnu::noinline]]
         static vga_state_packed move_cursor_right_n(vga_state_packed state_snapshot, const uint8_t count) noexcept;
 
-        [[gnu::always_inline]] [[gnu::noinline]]
-        static vga_state_packed next_row(vga_state_packed state_snapshot) noexcept
+        // t is called when the '\n' is detected
+        [[gnu::noinline]]
+        static vga_state_packed new_line(vga_state_packed state_snapshot) noexcept
         {
             if constexpr(types_t::wide)
             {

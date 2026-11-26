@@ -77,7 +77,8 @@ namespace terminal
                     new_line();
                     break;
                 default:
-                    io::vga_text_buffer::put(c);
+                    // io::vga_text_buffer::put(c);
+                    return;
             }
         }
 
@@ -85,7 +86,7 @@ namespace terminal
         inline static void sync_cursor() noexcept { io::hardware_cursor::set_position(io::vga_text_buffer::get_position(builtin::convert_type<uint32_t>(io::vga_text_buffer::state))); }
 
         [[gnu::always_inline]]
-        inline void line_start() noexcept { io::vga_text_buffer::line_start(); }
+        inline void line_start() noexcept { /*io::vga_text_buffer::line_start(); */}
 
         [[gnu::regparm(2)]]
         void write_hex_8_no_sync(uint8_t) noexcept;
@@ -121,10 +122,10 @@ namespace terminal
             static void initialize() noexcept;
 
             [[gnu::always_inline]]
-            inline void move_cursor_left_n(const uint8_t count) noexcept { io::vga_text_buffer::move_cursor_left_n(count); }
+            inline void move_cursor_left_n(const uint8_t count) noexcept { /*io::vga_text_buffer::move_cursor_left_n(count);*/ }
 
             [[gnu::always_inline]]
-            inline void move_cursor_right_n(const uint8_t count) noexcept { io::vga_text_buffer::move_cursor_right_n(count); }
+            inline void move_cursor_right_n(const uint8_t count) noexcept { /*io::vga_text_buffer::move_cursor_right_n(count);*/ }
 
             // Inline Public Methods
             [[gnu::always_inline]]
@@ -140,7 +141,7 @@ namespace terminal
             inline io::color_code current_color_code() const noexcept { return io::vga_text_buffer::current_color_code(); }
 
             [[gnu::always_inline]]
-            inline void delete_last_char_no_sync() noexcept { io::vga_text_buffer::remove_last_char(); }
+            inline void delete_last_char_no_sync() noexcept { /*io::vga_text_buffer::remove_last_char();*/ }
 
             [[gnu::always_inline]]
             inline bool in_default_color() const noexcept { return current_color_code() == io::vga_text_buffer::get_default_color_code(); }
@@ -152,7 +153,7 @@ namespace terminal
             inline void call_cursor_sync() noexcept { sync_cursor(); }
 
             [[gnu::always_inline]]
-            inline void go_backwards() noexcept { io::vga_text_buffer::move_backwards(); }
+            inline void go_backwards() noexcept { /*io::vga_text_buffer::move_backwards();*/ }
 
             [[gnu::always_inline]]
             inline void go_forward() noexcept {io::vga_text_buffer::next_line(builtin::convert_type<vga_state_packed>(io::vga_text_buffer::state)); }

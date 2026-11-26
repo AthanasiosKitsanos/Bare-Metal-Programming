@@ -21,35 +21,40 @@ namespace io::types_t
     };
 
     constexpr bool wide{sizeof(uintptr_t) == 8};
-    constexpr size_t alignment{sizeof(uintptr_t)};
-
-    template<typename T, size_t N>
-    struct if_x64_use
-    {
-        using type = typename pick<wide, T, nothing<N>>::type;
+    constexpr uint32_t align_32{4};
+    constexpr uint64_t align_64{8
     };
-
     // If compiled with a 64-bit targer, the struct will have a size of 8 bytes
     // and an alignment of 8, else it gets a size of 4 and alignment of 4
     // This is made in such way to load the struct inside a register.
     // In case of 8 bytes in size, never change the bits 48 to 63.
-    struct alignas(alignment) state_t
+    struct alignas(align_32) state_32
     {
-        [[no_unique_address]]
-        if_x64_use<uint16_t, 0>::type index;
-
         uint8_t column;
         uint8_t row;
         uint8_t base_row;
         uint8_t active_color;
-
-        [[no_unique_address]]
-        if_x64_use<uint16_t, 1>::type reserved;
     };
 
-    static_assert((sizeof(state_t) == sizeof(uintptr_t)), "Keep state_t size at 4 or 8 bytes.");
-    static_assert((alignof(state_t) == alignof(uintptr_t)), "Keep state_t aligned at 4 or 8.");
-    static_assert(__has_unique_object_representations(state_t), "Introduced padding. Remove it.");
+    struct alignas(align_64) state_64
+    {
+        uint16_t index;
+        uint8_t column;
+        uint8_t row;
+        uint8_t base_row;
+        uint8_t active_color;
+        uint16_t reserved;
+    };
+
+    using state_t = pick<wide, state_64, state_32>::type;
+
+    static_assert((sizeof(state_32) == 4), "Keep state_t size at 4 or 8 bytes.");
+    static_assert((alignof(state_32) == align_32), "Keep state_t aligned at 4 or 8.");
+    static_assert(__has_unique_object_representations(state_32), "Introduced padding. Remove it.");
+
+    static_assert((sizeof(state_64) == 8), "Keep state_t size at 4 or 8 bytes.");
+    static_assert((alignof(state_64) == align_64), "Keep state_t aligned at 4 or 8.");
+    static_assert(__has_unique_object_representations(state_32), "Introduced padding. Remove it.");
 
     template<size_t T>
     struct rules;
